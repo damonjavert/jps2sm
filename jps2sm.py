@@ -12,6 +12,7 @@ import datetime
 import os
 from urlparse import urlparse
 import requests
+import HTMLParser
 
 class MyLoginSession:
     """
@@ -141,7 +142,7 @@ loginData = {'username' : '***REMOVED***', 'password' : '***REMOVED***' }
 
 s = MyLoginSession(loginUrl, loginData, loginTestUrl, successStr)
 
-res = s.retrieveContent("https://jpopsuki.eu/torrents.php?id=212853")
+res = s.retrieveContent("https://jpopsuki.eu/torrents.php?id=256527")
 
 #jps_page = "file:///home/***REMOVED***/Downloads/sgbuono.html"
 #page = urllib2.urlopen(jps_page)
@@ -191,9 +192,21 @@ rel2data = re.findall('\\xbb.* (.*) / (.*) / (.*)</a>', rel2)
 torrentlinks = re.findall('href="(.*)" title="Download"', rel2)
 #print torrentlinks[0]
 
-for releasedata, torrentlink in zip(rel2data, torrentlinks):
+#releasedata[0] - format
+#releasedata[1] - bitrate
+#releasedata[2] - source
+for releasedata, torrentlinkescaped in zip(rel2data, torrentlinks):
     print releasedata[0] , releasedata[1], releasedata[2]
-    print torrentlink
+    #print torrentlink
+    torrentlink = HTMLParser.HTMLParser().unescape(torrentlinkescaped)
+    #Download JPS torrents
+    torrentfile = s.retrieveContent("https://jpopsuki.eu/%s" % torrentlink)
+    torrentfilename = "%s - %s - %s - %s - %s.torrent" % (artist, title, releasedata[0] , releasedata[1], releasedata[2])
+    #print torrentfile.text
+    #torrentdata = torrentfile.text.Value()
+    with open(torrentfilename, "wb") as f:
+        f.write(torrentfile.content)
+
 
 """
 release = soup.select('.torrent_table tbody tr.group_torrent td')
