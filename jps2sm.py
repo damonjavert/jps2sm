@@ -235,8 +235,7 @@ print imagelink
 tagsget = str(soup.select('#content .thin .sidebar .box ul.stats.nobullet li'))
 tags = re.findall('searchtags=([^\"]+)', tagsget)
 print tags
-
-
+tagsall = ",".join(tags)
 
 #Send data to SugoiMusic upload!
 def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, imagelink, groupdescription, filename, **kwargs):
@@ -255,8 +254,7 @@ def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, im
         'media': media, #releasedata[2]
         'audioformat': audioformat, #releasedata[0]
         'bitrate': bitrate, #releasedata[1]
-        'tags': 'test, test2, test3, test4',
-        #'tags': tags #Prob needs extracting into just commas
+        'tags': tagsall,
         'image': imagelink,
         'album_desc': groupdescription,
         #'release_desc': releasedescription
