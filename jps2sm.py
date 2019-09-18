@@ -192,6 +192,7 @@ rel2data = re.findall('\\xbb.* (.*) / (.*) / (.*)</a>', rel2)
 torrentlinks = re.findall('href="(.*)" title="Download"', rel2)
 #print torrentlinks[0]
 
+torrentfiles = []
 #releasedata[0] - format
 #releasedata[1] - bitrate
 #releasedata[2] - source
@@ -206,6 +207,7 @@ for releasedata, torrentlinkescaped in zip(rel2data, torrentlinks):
     #torrentdata = torrentfile.text.Value()
     with open(torrentfilename, "wb") as f:
         f.write(torrentfile.content)
+	torrentfiles.append(torrentfile.content)
 
 
 """
