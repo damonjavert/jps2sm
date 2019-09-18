@@ -192,23 +192,6 @@ rel2data = re.findall('\\xbb.* (.*) / (.*) / (.*)</a>', rel2)
 torrentlinks = re.findall('href="(.*)" title="Download"', rel2)
 #print torrentlinks[0]
 
-torrentfiles = []
-#releasedata[0] - format
-#releasedata[1] - bitrate
-#releasedata[2] - source
-for releasedata, torrentlinkescaped in zip(rel2data, torrentlinks):
-    print releasedata[0] , releasedata[1], releasedata[2]
-    #print torrentlink
-    torrentlink = HTMLParser.HTMLParser().unescape(torrentlinkescaped)
-    #Download JPS torrents
-    torrentfile = s.retrieveContent("https://jpopsuki.eu/%s" % torrentlink)
-    torrentfilename = "%s - %s - %s - %s - %s.torrent" % (artist, title, releasedata[0] , releasedata[1], releasedata[2])
-    #print torrentfile.text
-    #torrentdata = torrentfile.text.Value()
-    with open(torrentfilename, "wb") as f:
-        f.write(torrentfile.content)
-
-
 """
 release = soup.select('.torrent_table tbody tr.group_torrent td')
 #print release
@@ -238,7 +221,7 @@ print tags
 tagsall = ",".join(tags)
 
 #Send data to SugoiMusic upload!
-def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, imagelink, groupdescription, filename, **kwargs):
+def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, tagsall, imagelink, groupdescription, filename, **kwargs):
     uploadurl = 'https://sugoimusic.me/upload.php'
     data =  {
         'submit': 'true',
@@ -275,7 +258,24 @@ def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, im
 
     SMres = SMs.retrieveContent(uploadurl,"post",data,postDataFiles)
 
-    with open("results.html", "w") as f:
+    with open("results." + torrentfilename + ".html", "w") as f:
         f.write(SMres.content)
 
-uploadtorrent(category, artist, title, date, releasedata[2], releasedata[0], releasedata[1], imagelink, groupdescription, 'ELRIS - SUMMER DREAM - MP3 - V0 (VBR) - CD.torrent')
+#uploadtorrent(category, artist, title, date, releasedata[2], releasedata[0], releasedata[1], tagsall, imagelink, groupdescription, 'ELRIS - SUMMER DREAM - MP3 - V0 (VBR) - CD.torrent')
+
+#releasedata[0] - format
+#releasedata[1] - bitrate
+#releasedata[2] - source
+for releasedata, torrentlinkescaped in zip(rel2data, torrentlinks):
+    print releasedata[0] , releasedata[1], releasedata[2]
+    #print torrentlink
+    torrentlink = HTMLParser.HTMLParser().unescape(torrentlinkescaped)
+    #Download JPS torrents
+    torrentfile = s.retrieveContent("https://jpopsuki.eu/%s" % torrentlink)
+    torrentfilename = "%s - %s - %s - %s - %s.torrent" % (artist, title, releasedata[0] , releasedata[1], releasedata[2])
+    #print torrentfile.text
+    #torrentdata = torrentfile.text.Value()
+    with open(torrentfilename, "wb") as f:
+        f.write(torrentfile.content)
+        
+    uploadtorrent(category, artist, title, date, releasedata[2], releasedata[0], releasedata[1], tagsall, imagelink, groupdescription, torrentfilename)
