@@ -236,3 +236,44 @@ tags = re.findall('searchtags=([^\"]+)', tagsget)
 print tags
 
 
+"""
+#Send data to SugoiMusic upload!
+
+uploadurl = 'https://sugoimusic.me/upload.php'
+data =  {
+	'submit': 'true',
+	'auth': '***REMOVED***',
+	'file_input': torrent, 
+	'type': category, #TODO Add feature to request cateogry as parameter as JPS cats do not all = SM cats
+	'title': title,
+	#'title_jp': title_jp, #TODO Extract Japanese title
+	'idols[]': artist,
+	'year': date,
+	#'remaster': true,
+	#'remasteryear': remasterdate,
+	#'remastertitle': remastertitle,
+	'media': releasedata[2],
+	'audioformat': releasedata[0],
+	'bitrate': releasedata[1],
+	'tags': tags #Prob needs extracting into just commas
+	'image': imagelink
+	'album_desc': groupdescription
+	#'release_desc': releasedescription
+}
+
+
+
+#SM MyLoginSession vars
+SMloginUrl = "https://sugoimusic.me/login.php"
+SMloginTestUrl = "https://sugoimusic.me/"
+SMsuccessStr = "Enabled users"
+
+SMloginData = {'username' : '***REMOVED***', 'password' : '***REMOVED***' }
+
+SMs = MyLoginSession(loginUrl, loginData, loginTestUrl, successStr)
+
+SMres = SMs.retrieveContent("https://sugoimusic.me/upload.php","post",data)
+
+with open("results.html", "w") as f:
+    f.write(SMres.read())
+"""
