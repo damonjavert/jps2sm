@@ -237,7 +237,7 @@ tags = re.findall('searchtags=([^\"]+)', tagsget)
 print tags
 
 
-"""
+
 #Send data to SugoiMusic upload!
 
 uploadurl = 'https://sugoimusic.me/upload.php'
@@ -264,7 +264,6 @@ data =  {
 postDataFiles = {
     'file_input': open('ELRIS - SUMMER DREAM - MP3 - V0 (VBR) - CD.torrent','rb')
 }
-
 
 
 #SM MyLoginSession vars
