@@ -207,7 +207,6 @@ for releasedata, torrentlinkescaped in zip(rel2data, torrentlinks):
     #torrentdata = torrentfile.text.Value()
     with open(torrentfilename, "wb") as f:
         f.write(torrentfile.content)
-	torrentfiles.append(torrentfile.content)
 
 
 """
