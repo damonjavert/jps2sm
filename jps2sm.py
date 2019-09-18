@@ -179,9 +179,9 @@ date = sqbrackets[1]
 print category
 print date
 
-artist = re.findall('<a[^>]+>(.*)<', artistlinelinktext)
+artist = re.findall('<a[^>]+>(.*)<', artistlinelinktext)[0]
 print artist
-title = re.findall('<a.*> - (.*) \[', text)
+title = re.findall('<a.*> - (.*) \[', text)[0]
 print title
 
 rel2 = str(soup.select('#content .thin .main_column .torrent_table tbody')[0])
