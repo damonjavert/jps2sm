@@ -239,44 +239,45 @@ print tags
 
 
 #Send data to SugoiMusic upload!
+def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, imagelink, groupdescription, filename, **kwargs):
+    uploadurl = 'https://sugoimusic.me/upload.php'
+    data =  {
+        'submit': 'true',
+        'auth': '***REMOVED***',
+        'type': category, #TODO Add feature to request cateogry as parameter as JPS cats do not all = SM cats
+        'title': title,
+        #'title_jp': title_jp, #TODO Extract Japanese title
+        'idols[]': artist,
+        'year': date,
+        #'remaster': true,
+        #'remasteryear': remasterdate,
+        #'remastertitle': remastertitle,
+        'media': media, #releasedata[2]
+        'audioformat': audioformat, #releasedata[0]
+        'bitrate': bitrate, #releasedata[1]
+        'tags': 'test, test2, test3, test4',
+        #'tags': tags #Prob needs extracting into just commas
+        'image': imagelink,
+        'album_desc': groupdescription,
+        #'release_desc': releasedescription
+    }
+    postDataFiles = {
+        'file_input': open(filename,'rb')
+    }
 
-uploadurl = 'https://sugoimusic.me/upload.php'
-data =  {
-    'submit': 'true',
-    'auth': '***REMOVED***',
-    'type': category, #TODO Add feature to request cateogry as parameter as JPS cats do not all = SM cats
-    'title': title,
-    #'title_jp': title_jp, #TODO Extract Japanese title
-    'idols[]': artist,
-    'year': date,
-    #'remaster': true,
-    #'remasteryear': remasterdate,
-    #'remastertitle': remastertitle,
-    'media': releasedata[2],
-    'audioformat': releasedata[0],
-    'bitrate': releasedata[1],
-    'tags': 'test, test2, test3, test4',
-    #'tags': tags #Prob needs extracting into just commas
-    'image': imagelink,
-    'album_desc': groupdescription,
-    #'release_desc': releasedescription
-}
-postDataFiles = {
-    'file_input': open('ELRIS - SUMMER DREAM - MP3 - V0 (VBR) - CD.torrent','rb')
-}
 
+    #SM MyLoginSession vars
+    SMloginUrl = "https://sugoimusic.me/login.php"
+    SMloginTestUrl = "https://sugoimusic.me/"
+    SMsuccessStr = "Enabled users"
 
-#SM MyLoginSession vars
-SMloginUrl = "https://sugoimusic.me/login.php"
-SMloginTestUrl = "https://sugoimusic.me/"
-SMsuccessStr = "Enabled users"
+    SMloginData = {'username' : '***REMOVED***', 'password' : '***REMOVED***' }
 
-SMloginData = {'username' : '***REMOVED***', 'password' : '***REMOVED***' }
+    SMs = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr)
 
-SMs = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr)
+    SMres = SMs.retrieveContent(uploadurl,"post",data,postDataFiles)
 
-SMres = SMs.retrieveContent("https://sugoimusic.me/upload.php","post",data,postDataFiles)
+    with open("results.html", "w") as f:
+        f.write(SMres.content)
 
-with open("results.html", "w") as f:
-    f.write(SMres.content)
-
+uploadtorrent(category, artist, title, date, releasedata[2], releasedata[0], releasedata[1], imagelink, groupdescription, 'ELRIS - SUMMER DREAM - MP3 - V0 (VBR) - CD.torrent')
