@@ -243,24 +243,27 @@ print tags
 
 uploadurl = 'https://sugoimusic.me/upload.php'
 data =  {
-	'submit': 'true',
-	'auth': '***REMOVED***',
-	'file_input': torrent, 
-	'type': category, #TODO Add feature to request cateogry as parameter as JPS cats do not all = SM cats
-	'title': title,
-	#'title_jp': title_jp, #TODO Extract Japanese title
-	'idols[]': artist,
-	'year': date,
-	#'remaster': true,
-	#'remasteryear': remasterdate,
-	#'remastertitle': remastertitle,
-	'media': releasedata[2],
-	'audioformat': releasedata[0],
-	'bitrate': releasedata[1],
-	'tags': tags #Prob needs extracting into just commas
-	'image': imagelink
-	'album_desc': groupdescription
-	#'release_desc': releasedescription
+    'submit': 'true',
+    'auth': '***REMOVED***',
+    'type': category, #TODO Add feature to request cateogry as parameter as JPS cats do not all = SM cats
+    'title': title,
+    #'title_jp': title_jp, #TODO Extract Japanese title
+    'idols[]': artist,
+    'year': date,
+    #'remaster': true,
+    #'remasteryear': remasterdate,
+    #'remastertitle': remastertitle,
+    'media': releasedata[2],
+    'audioformat': releasedata[0],
+    'bitrate': releasedata[1],
+    'tags': 'test, test2, test3, test4',
+    #'tags': tags #Prob needs extracting into just commas
+    'image': imagelink,
+    'album_desc': groupdescription,
+    #'release_desc': releasedescription
+}
+postDataFiles = {
+    'file_input': open('ELRIS - SUMMER DREAM - MP3 - V0 (VBR) - CD.torrent','rb')
 }
 
 
@@ -272,10 +275,10 @@ SMsuccessStr = "Enabled users"
 
 SMloginData = {'username' : '***REMOVED***', 'password' : '***REMOVED***' }
 
-SMs = MyLoginSession(loginUrl, loginData, loginTestUrl, successStr)
+SMs = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr)
 
-SMres = SMs.retrieveContent("https://sugoimusic.me/upload.php","post",data)
+SMres = SMs.retrieveContent("https://sugoimusic.me/upload.php","post",data,postDataFiles)
 
 with open("results.html", "w") as f:
-    f.write(SMres.read())
-"""
+    f.write(SMres.content)
+
