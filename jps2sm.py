@@ -174,7 +174,7 @@ artistlinelinktext = str(artistlinelink[0])
 sqbrackets = re.findall('\[(.*?)\]', text)
 print sqbrackets
 category = sqbrackets[0]
-date = sqbrackets[1]
+date = sqbrackets[1].replace(".","")
 
 print category
 print date
@@ -230,7 +230,7 @@ groupdescription = remove_html_tags(str(soup.select('#content .thin .main_column
 print groupdescription
 
 image = str(soup.select('#content .thin .sidebar .box p a'))
-imagelink = re.findall('<a\s+(?:[^>]*?\s+)?href=\"([^\"]*)\"', image)
+imagelink = "https://jpopsuki.eu/" + re.findall('<a\s+(?:[^>]*?\s+)?href=\"([^\"]*)\"', image)[0]
 print imagelink
 
 tagsget = str(soup.select('#content .thin .sidebar .box ul.stats.nobullet li'))
