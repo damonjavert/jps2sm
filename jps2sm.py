@@ -17,7 +17,7 @@ import HTMLParser
 class MyLoginSession:
     """
     https://stackoverflow.com/a/37118451/2115140
-    by https://stackoverflow.com/users/1150303/domtomcat
+    Added some features myself, originally by https://stackoverflow.com/users/1150303/domtomcat
 
     a class which handles and saves login sessions. It also keeps track of proxy settings.
     It does also maintine a cache-file for restoring session data from earlier
@@ -115,7 +115,7 @@ class MyLoginSession:
             if self.debug:
                 print('updated session cache-file %s' % self.sessionFile)
 
-    def retrieveContent(self, url, method = "get", postData = None, **kwargs):
+    def retrieveContent(self, url, method = "get", postData = None, postDataFiles = None, **kwargs):
         """
         return the content of the url with respect to the session.
 
@@ -125,7 +125,7 @@ class MyLoginSession:
         if method == 'get':
             res = self.session.get(url , proxies = self.proxies, **kwargs)
         else:
-            res = self.session.post(url , data = postData, proxies = self.proxies, **kwargs)
+            res = self.session.post(url , data = postData, proxies = self.proxies, files = postDataFiles, **kwargs)
 
         # the session has been updated on the server, so also update in cache
         self.saveSessionToCache()            
