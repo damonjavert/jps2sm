@@ -168,7 +168,10 @@ artistlinelinktext = str(artistlinelink[0])
 sqbrackets = re.findall('\[(.*?)\]', text)
 print sqbrackets
 category = sqbrackets[0]
-date = sqbrackets[1].replace(".","")
+
+#Extract date even if square brackets are used elsewhere in the title
+datepattern = re.compile("[12][09][0-9][0-9].*")
+date = filter(datepattern.match, sqbrackets)[0].replace(".","")
 
 print category
 print date
