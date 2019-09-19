@@ -1,12 +1,5 @@
-#from bs4 import BeautifulSoup
-#import requests
-#driver = webdriver.Firefox()
-#driver.get("file:///home/***REMOVED***/Downloads/minjps.html")
-
-import urllib2
 from bs4 import BeautifulSoup
 import re
-
 import pickle
 import datetime
 import os
@@ -186,12 +179,9 @@ title = re.findall('<a.*> - (.*) \[', text)[0]
 print title
 
 rel2 = str(soup.select('#content .thin .main_column .torrent_table tbody')[0])
-#print rel2
 rel2data = re.findall('\\xbb.* (.*) / (.*) / (.*)</a>', rel2)
-#print rel2data[0]
 
 torrentlinks = re.findall('href="(.*)" title="Download"', rel2)
-#print torrentlinks[0]
 
 """
 release = soup.select('.torrent_table tbody tr.group_torrent td')
@@ -262,7 +252,6 @@ def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, ta
     with open("results." + torrentfilename + ".html", "w") as f:
         f.write(SMres.content)
 
-#uploadtorrent(category, artist, title, date, releasedata[2], releasedata[0], releasedata[1], tagsall, imagelink, groupdescription, 'ELRIS - SUMMER DREAM - MP3 - V0 (VBR) - CD.torrent')
 
 #releasedata[0] - format
 #releasedata[1] - bitrate
