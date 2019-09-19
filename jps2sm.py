@@ -179,7 +179,10 @@ title = re.findall('<a.*> - (.*) \[', text)[0]
 print title
 
 rel2 = str(soup.select('#content .thin .main_column .torrent_table tbody')[0])
-rel2data = re.findall('\\xbb.* (.*) / (.*) / (.*)</a>', rel2)
+if category == 'DVD':
+    rel2data = re.findall('\\xbb.* (.*) / (.*)</a>', rel2) #TODO: Allow for freeleach
+else:
+    rel2data = re.findall('\\xbb.* (.*) / (.*) / (.*)</a>', rel2)
 
 torrentlinks = re.findall('href="(.*)" title="Download"', rel2)
 
@@ -257,15 +260,23 @@ def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, ta
 #releasedata[1] - bitrate
 #releasedata[2] - source
 for releasedata, torrentlinkescaped in zip(rel2data, torrentlinks):
-    print releasedata[0] , releasedata[1], releasedata[2]
+    print releasedata
+    if category == 'DVD':
+        media = releasedata[1]
+        audioformat = releasedata[0]
+        bitrate = ""
+    else:
+        media = releasedata[2]
+        audioformat = releasedata[0]
+        bitrate = releasedata[1]
     #print torrentlink
     torrentlink = HTMLParser.HTMLParser().unescape(torrentlinkescaped)
     #Download JPS torrents
     torrentfile = s.retrieveContent("https://jpopsuki.eu/%s" % torrentlink)
-    torrentfilename = get_valid_filename("%s - %s - %s - %s - %s.torrent" % (artist, title, releasedata[0] , releasedata[1], releasedata[2]))
+    torrentfilename = get_valid_filename("%s - %s - %s.torrent" % (artist, title, "-".join(releasedata)))
     #print torrentfile.text
     #torrentdata = torrentfile.text.Value()
     with open(torrentfilename, "wb") as f:
         f.write(torrentfile.content)
         
-    uploadtorrent(category, artist, title, date, releasedata[2], releasedata[0], releasedata[1], tagsall, imagelink, groupdescription, torrentfilename)
+    uploadtorrent(category, artist, title, date, media, audioformat, bitrate, tagsall, imagelink, groupdescription, torrentfilename)
