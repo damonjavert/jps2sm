@@ -13,6 +13,7 @@ import os
 from urlparse import urlparse
 import requests
 import HTMLParser
+from django.utils.text import get_valid_filename
 
 class MyLoginSession:
     """
@@ -272,7 +273,7 @@ for releasedata, torrentlinkescaped in zip(rel2data, torrentlinks):
     torrentlink = HTMLParser.HTMLParser().unescape(torrentlinkescaped)
     #Download JPS torrents
     torrentfile = s.retrieveContent("https://jpopsuki.eu/%s" % torrentlink)
-    torrentfilename = "%s - %s - %s - %s - %s.torrent" % (artist, title, releasedata[0] , releasedata[1], releasedata[2])
+    torrentfilename = get_valid_filename("%s - %s - %s - %s - %s.torrent" % (artist, title, releasedata[0] , releasedata[1], releasedata[2]))
     #print torrentfile.text
     #torrentdata = torrentfile.text.Value()
     with open(torrentfilename, "wb") as f:
