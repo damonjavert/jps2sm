@@ -220,7 +220,7 @@ def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, ta
     data =  {
         'submit': 'true',
         'auth': '***REMOVED***',
-        'type': category, #TODO Add feature to request cateogry as parameter as JPS cats do not all = SM cats
+        'type': Categories[category], #TODO Add feature to request cateogry as parameter as JPS cats do not all = SM cats
         'title': title,
         #'title_jp': title_jp, #TODO Extract Japanese title
         'idols[]': artist,
@@ -236,6 +236,15 @@ def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, ta
         'album_desc': groupdescription,
         #'release_desc': releasedescription
     }
+    if category in VideoCategories:
+        data['codec'] = 'h264' #assumed default
+        data['ressel'] = 'SD' #assumed default
+        data['container'] = audioformat #In JPS container and audioformat are the same field
+        data['sub'] = 'NoSubs' #assumed default
+        data['audioformat'] = 'AAC' #assumed default
+        data['lang'] = 'Japanese' #assumed default
+        del data['bitrate']
+
     postDataFiles = {
         'file_input': open(filename,'rb')
     }
@@ -255,16 +264,32 @@ def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, ta
     with open("results." + torrentfilename + ".html", "w") as f:
         f.write(SMres.content)
 
+Categories = {
+    'Album': 0,
+    #'EP': 1, #Does not exist on JPS
+    'Single': 2,
+    #'Bluray': 3, #Does not exist on JPS
+    'DVD': 4,
+    'PV': 5,
+    #'Music Performance': 6, #Does not exist on JPS
+    'TV-Music': 7, #Music Show
+    'TV-Variety': 8, #Talk Show
+    'TV-Drama': 9, #TV Drama
+    'Pictures': 10,
+    'Misc': 11,
+}
+VideoCategories = [
+    'DVD', 'PV', 'TV-Music', 'TV-Variety', 'TV-Drama' ]
 
 #releasedata[0] - format
 #releasedata[1] - bitrate
 #releasedata[2] - source
 for releasedata, torrentlinkescaped in zip(rel2data, torrentlinks):
     print releasedata
-    if category == 'DVD':
+    if category in VideoCategories:
         media = releasedata[1]
         audioformat = releasedata[0]
-        bitrate = ""
+        bitrate = "---"
     else:
         media = releasedata[2]
         audioformat = releasedata[0]
