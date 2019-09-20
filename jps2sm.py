@@ -7,6 +7,7 @@ from urlparse import urlparse
 import requests
 import HTMLParser
 from django.utils.text import get_valid_filename
+import sys
 
 class MyLoginSession:
     """
@@ -136,10 +137,7 @@ loginData = {'username' : '***REMOVED***', 'password' : '***REMOVED***' }
 
 s = MyLoginSession(loginUrl, loginData, loginTestUrl, successStr)
 
-res = s.retrieveContent("https://jpopsuki.eu/torrents.php?id=256527")
-
-#jps_page = "file:///home/***REMOVED***/Downloads/sgbuono.html"
-#page = urllib2.urlopen(jps_page)
+res = s.retrieveContent(sys.argv[1]) #TODO: Proper argument parsing
 
 soup = BeautifulSoup(res.text, 'html5lib')
 
