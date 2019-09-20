@@ -179,9 +179,13 @@ print artist
 title = re.findall('<a.*> - (.*) \[', text)[0]
 print title
 
+VideoCategories = [
+    'DVD', 'PV', 'TV-Music', 'TV-Variety', 'TV-Drama' ]
+
 rel2 = str(soup.select('#content .thin .main_column .torrent_table tbody')[0])
-if category == 'DVD':
-    rel2data = re.findall('\\xbb.* (.*) / (.*)</a>', rel2) #TODO: Allow for freeleach
+
+if category in VideoCategories:
+    rel2data = re.findall('\\xbb (\w+) / (\w+)', rel2) #Support Freeleach
 else:
     rel2data = re.findall('\\xbb.* (.*) / (.*) / (.*)</a>', rel2)
 
@@ -279,8 +283,6 @@ Categories = {
     'Pictures': 10,
     'Misc': 11,
 }
-VideoCategories = [
-    'DVD', 'PV', 'TV-Music', 'TV-Variety', 'TV-Drama' ]
 
 #releasedata[0] - format
 #releasedata[1] - bitrate
