@@ -254,7 +254,6 @@ def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, ta
         'file_input': open(filename,'rb')
     }
 
-
     #SM MyLoginSession vars
     SMloginUrl = "https://sugoimusic.me/login.php"
     SMloginTestUrl = "https://sugoimusic.me/"
@@ -284,9 +283,6 @@ Categories = {
     'Misc': 11,
 }
 
-#releasedata[0] - format
-#releasedata[1] - bitrate
-#releasedata[2] - source
 for releasedata, torrentlinkescaped in zip(rel2data, torrentlinks):
     print releasedata
     if category in VideoCategories:
@@ -297,7 +293,7 @@ for releasedata, torrentlinkescaped in zip(rel2data, torrentlinks):
         media = releasedata[2]
         audioformat = releasedata[0]
         bitrate = releasedata[1]
-    #print torrentlink
+
     torrentlink = HTMLParser.HTMLParser().unescape(torrentlinkescaped)
     #Download JPS torrents
     torrentfile = s.retrieveContent("https://jpopsuki.eu/%s" % torrentlink)
