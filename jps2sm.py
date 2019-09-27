@@ -331,3 +331,4 @@ for releasedata, torrentlinkescaped in zip(rel2data, torrentlinks):
         f.write(torrentfile.content)
         
     uploadtorrent(category, artist, title, date, media, audioformat, bitrate, tagsall, imagelink, groupdescription, torrentfilename)
+
