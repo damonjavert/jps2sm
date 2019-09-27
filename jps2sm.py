@@ -265,6 +265,16 @@ def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, ta
 
     SMres = SMs.retrieveContent(uploadurl,"post",data,postDataFiles)
 
+    try:
+        SMerrorTorrent = re.findall('red; text-align: center;">(.*)</p>', SMres.text)[0]
+        print SMerrorTorrent
+    except:
+        try:
+            SMerrorLogon = re.findall('<p>Invalid(.*)</p>', SMres.text)[0]
+            print 'Invalid ' + SMerrorLogon
+        except:
+            print 'OK'
+
     with open("results." + torrentfilename + ".html", "w") as f:
         f.write(SMres.content)
 
