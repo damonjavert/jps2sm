@@ -197,7 +197,7 @@ title = re.findall('<a.*> - (.*) \[', text)[0]
 print title
 
 VideoCategories = [
-    'DVD', 'PV', 'TV-Music', 'TV-Variety', 'TV-Drama' ]
+    'Bluray', 'DVD', 'PV', 'TV-Music', 'TV-Variety', 'TV-Drama', 'Music Performace']
 
 rel2 = str(soup.select('#content .thin .main_column .torrent_table tbody')[0])
 
@@ -299,10 +299,10 @@ Categories = {
     'Album': 0,
     #'EP': 1, #Does not exist on JPS
     'Single': 2,
-    #'Bluray': 3, #Does not exist on JPS
+    'Bluray': 3, #Does not exist on JPS
     'DVD': 4,
     'PV': 5,
-    #'Music Performance': 6, #Does not exist on JPS
+    'Music Performance': 6, #Does not exist on JPS
     'TV-Music': 7, #Music Show
     'TV-Variety': 8, #Talk Show
     'TV-Drama': 9, #TV Drama
