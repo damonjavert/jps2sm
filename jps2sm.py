@@ -144,13 +144,25 @@ jpspass = config.get('JPopSuki', 'Password')
 smuser = config.get('SugoiMusic', 'User')
 smpass = config.get('SugoiMusic', 'Password')
 
-
-#MyLoginSession vars
+#JPS MyLoginSession vars
 loginUrl = "https://jpopsuki.eu/login.php"
 loginTestUrl = "https://jpopsuki.eu"
 successStr = "Latest 5 Torrents"
-
 loginData = {'username' : jpsuser, 'password' : jpspass }
+
+#SM MyLoginSession vars
+SMloginUrl = "https://sugoimusic.me/login.php"
+SMloginTestUrl = "https://sugoimusic.me/"
+SMsuccessStr = "Enabled users"
+SMloginData = {'username' : smuser, 'password' : smpass }
+
+def getauthkey():
+    SMshome = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr)
+    SMreshome = SMshome.retrieveContent("https://sugoimusic.me/torrents.php?id=118")
+    soup = BeautifulSoup(SMreshome.text, 'html5lib')
+    rel2 = str(soup.select('#content .thin .main_column .torrent_table tbody')[0])
+    authkey = re.findall('authkey=(.*)&amp;torrent_pass=', rel2)[0]
+    return authkey
 
 s = MyLoginSession(loginUrl, loginData, loginTestUrl, successStr)
 
@@ -236,12 +248,14 @@ tags = re.findall('searchtags=([^\"]+)', tagsget)
 print tags
 tagsall = ",".join(tags)
 
+authkey = getauthkey()
+
 #Send data to SugoiMusic upload!
 def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, tagsall, imagelink, groupdescription, filename, **kwargs):
     uploadurl = 'https://sugoimusic.me/upload.php'
     data =  {
         'submit': 'true',
-        'auth': '***REMOVED***',
+        'auth': authkey,
         'type': Categories[category], #TODO Add feature to request cateogry as parameter as JPS cats do not all = SM cats
         'title': title,
         #'title_jp': title_jp, #TODO Extract Japanese title
@@ -270,16 +284,8 @@ def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, ta
     postDataFiles = {
         'file_input': open(filename,'rb')
     }
-
-    #SM MyLoginSession vars
-    SMloginUrl = "https://sugoimusic.me/login.php"
-    SMloginTestUrl = "https://sugoimusic.me/"
-    SMsuccessStr = "Enabled users"
-
-    SMloginData = {'username' : smuser, 'password' : smpass }
-
+ 
     SMs = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr)
-
     SMres = SMs.retrieveContent(uploadurl,"post",data,postDataFiles)
 
     try:
