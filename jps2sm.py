@@ -8,6 +8,7 @@ import requests
 import HTMLParser
 from django.utils.text import get_valid_filename
 import sys
+import ConfigParser
 
 class MyLoginSession:
     """
@@ -127,13 +128,29 @@ class MyLoginSession:
 
         return res
 
+#Get credentials from cfg file
+scriptdir = os.path.dirname(os.path.abspath(sys.argv[0]))
+config = ConfigParser.ConfigParser()
+configfile = scriptdir + '/jps2sm.cfg'
+try:
+    open(configfile)
+except IOError:
+    print 'Error: cannot read cfg - enter your JPS/SM credentials in jps2sm.cfg and check jps2sm.cfg.example to see the syntax.'
+    raise
+
+config.read(configfile)
+jpsuser = config.get('JPopSuki', 'User')
+jpspass = config.get('JPopSuki', 'Password')
+smuser = config.get('SugoiMusic', 'User')
+smpass = config.get('SugoiMusic', 'Password')
+
 
 #MyLoginSession vars
 loginUrl = "https://jpopsuki.eu/login.php"
 loginTestUrl = "https://jpopsuki.eu"
 successStr = "Latest 5 Torrents"
 
-loginData = {'username' : '***REMOVED***', 'password' : '***REMOVED***' }
+loginData = {'username' : jpsuser, 'password' : jpspass }
 
 s = MyLoginSession(loginUrl, loginData, loginTestUrl, successStr)
 
@@ -259,7 +276,7 @@ def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, ta
     SMloginTestUrl = "https://sugoimusic.me/"
     SMsuccessStr = "Enabled users"
 
-    SMloginData = {'username' : '***REMOVED***', 'password' : '***REMOVED***' }
+    SMloginData = {'username' : smuser, 'password' : smpass }
 
     SMs = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr)
 
