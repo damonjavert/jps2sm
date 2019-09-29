@@ -28,6 +28,7 @@ Go to SM and download your torrent files and add them to your torrent client. En
 * Support TV-Music
 * Support auto-merging / auto add to last group.
 * Migrate to using python3
+* Use pythonic `if __name__ == "__main__":`, defs for everything and general cleanup of the code
 
 ## Contributing
 * Contributors are welcomed! Please see the roadmap for ideas on how to contribute!
