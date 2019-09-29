@@ -8,6 +8,7 @@ jps2sm.py is a python 2.7 script that will automatically gather data from JPS fr
 ### Quickstart - for those familiar with python
 `pip install -r requirements.txt`
 `python jps2sm.py jps-group-url`
+Add your JPS and SM login credentials to **jps2sm.cfg**, using **jps2sm.cfg.example** as a template.
 Go to SM and download your torrent files and add them to your torrent client. Enjoy!
 ### Help! I dont know all this python stuff
 * Mac Users: python 2.7 is pre-installed and if you are not going to be doing any actual development of the code it should work for you just fine. Alternatively you can follow [this guide](https://docs.python-guide.org/starting/install/osx/)
