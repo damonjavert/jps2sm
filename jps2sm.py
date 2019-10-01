@@ -296,17 +296,19 @@ except:
 
 torrentlinks = gettorrentlinks(torrentid)
 
-#For single torrent urls use the swapTorrent JS to find the exact torrent release data, for group urls just find all of them in sequence
-if category in VideoCategories and torrentid is not None:
-    rel2data = re.findall('swapTorrent(?:.*)%s(?:.*)\xbb (\w+) / (\w+)' % (torrentid),rel2)
-elif category in VideoCategories and torrentid is None:
-    rel2data = re.findall('\\xbb (\w+) / (\w+)', rel2) #Support Freeleach
-elif category not in VideoCategories and torrentid is not None:
-    rel2data = re.findall('swapTorrent(?:.*)%s(?:.*)\xbb (.*) / (.*) / (.*)</a>' % (torrentid),rel2)
-elif category not in VideoCategories and torrentid is None:
-    rel2data = re.findall('\\xbb.* (.*) / (.*) / (.*)</a>', rel2)
+def getreleasedata(category, torrentid):
+    #For single torrent urls use the swapTorrent JS to find the exact torrent release data, for group urls just find all of them in sequence
+    if category in VideoCategories and torrentid is not None:
+        rel2data = re.findall('swapTorrent(?:.*)%s(?:.*)\xbb (\w+) / (\w+)' % (torrentid),rel2)
+    elif category in VideoCategories and torrentid is None:
+        rel2data = re.findall('\\xbb (\w+) / (\w+)', rel2) #Support Freeleach
+    elif category not in VideoCategories and torrentid is not None:
+        rel2data = re.findall('swapTorrent(?:.*)%s(?:.*)\xbb (.*) / (.*) / (.*)</a>' % (torrentid),rel2)
+    elif category not in VideoCategories and torrentid is None:
+        rel2data = re.findall('\\xbb.* (.*) / (.*) / (.*)</a>', rel2)
+    print rel2data
+    return rel2data
 
-print rel2data
 #print torrentlinks
 
 groupdescription = removehtmltags(str(soup.select('#content .thin .main_column .box .body')[0]))
@@ -323,7 +325,7 @@ tagsall = ",".join(tags)
 
 authkey = getauthkey()
 
-for releasedata, torrentlinkescaped in zip(rel2data, torrentlinks):
+for releasedata, torrentlinkescaped in zip(getreleasedata(category, torrentid), torrentlinks):
     print releasedata
     if category in VideoCategories:
         media = releasedata[1]
