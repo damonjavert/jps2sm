@@ -197,6 +197,19 @@ def gettorrentlinks(torrentid):
     else: #We have group url
         return torrentlinks
 
+def getreleasedata(category, torrentid):
+    #For single torrent urls use the swapTorrent JS to find the exact torrent release data, for group urls just find all of them in sequence
+    if category in VideoCategories and torrentid is not None:
+        rel2data = re.findall('swapTorrent(?:.*)%s(?:.*)\xbb (\w+) / (\w+)' % (torrentid),rel2)
+    elif category in VideoCategories and torrentid is None:
+        rel2data = re.findall('\\xbb (\w+) / (\w+)', rel2) #Support Freeleach
+    elif category not in VideoCategories and torrentid is not None:
+        rel2data = re.findall('swapTorrent(?:.*)%s(?:.*)\xbb (.*) / (.*) / (.*)</a>' % (torrentid),rel2)
+    elif category not in VideoCategories and torrentid is None:
+        rel2data = re.findall('\\xbb.* (.*) / (.*) / (.*)</a>', rel2)
+    print rel2data
+    return rel2data
+
 #Send data to SugoiMusic upload!
 def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, tagsall, imagelink, groupdescription, filename, **kwargs):
     uploadurl = 'https://sugoimusic.me/upload.php'
@@ -287,27 +300,11 @@ rel2 = str(soup.select('#content .thin .main_column .torrent_table tbody')[0])
 #fakeurl = 'https://jpopsuki.eu/torrents.php?id=181558&torrentid=251763'
 #fakeurl = 'blah'
 
-
 #Try to find torrentid in the url to determine if this is a group url or a specific torrent url.
 try:
     torrentid = re.findall('torrentid=(.*)$', url)[0]
 except:
     torrentid = None
-
-def getreleasedata(category, torrentid):
-    #For single torrent urls use the swapTorrent JS to find the exact torrent release data, for group urls just find all of them in sequence
-    if category in VideoCategories and torrentid is not None:
-        rel2data = re.findall('swapTorrent(?:.*)%s(?:.*)\xbb (\w+) / (\w+)' % (torrentid),rel2)
-    elif category in VideoCategories and torrentid is None:
-        rel2data = re.findall('\\xbb (\w+) / (\w+)', rel2) #Support Freeleach
-    elif category not in VideoCategories and torrentid is not None:
-        rel2data = re.findall('swapTorrent(?:.*)%s(?:.*)\xbb (.*) / (.*) / (.*)</a>' % (torrentid),rel2)
-    elif category not in VideoCategories and torrentid is None:
-        rel2data = re.findall('\\xbb.* (.*) / (.*) / (.*)</a>', rel2)
-    print rel2data
-    return rel2data
-
-#print torrentlinks
 
 groupdescription = removehtmltags(str(soup.select('#content .thin .main_column .box .body')[0]))
 print groupdescription
