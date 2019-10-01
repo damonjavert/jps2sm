@@ -294,8 +294,6 @@ try:
 except:
     torrentid = None
 
-torrentlinks = gettorrentlinks(torrentid)
-
 def getreleasedata(category, torrentid):
     #For single torrent urls use the swapTorrent JS to find the exact torrent release data, for group urls just find all of them in sequence
     if category in VideoCategories and torrentid is not None:
@@ -325,7 +323,7 @@ tagsall = ",".join(tags)
 
 authkey = getauthkey()
 
-for releasedata, torrentlinkescaped in zip(getreleasedata(category, torrentid), torrentlinks):
+for releasedata, torrentlinkescaped in zip(getreleasedata(category, torrentid), gettorrentlinks(torrentid)):
     print releasedata
     if category in VideoCategories:
         media = releasedata[1]
