@@ -128,6 +128,8 @@ class MyLoginSession:
 
         return res
 
+url = sys.argv[1]
+
 #Get credentials from cfg file
 scriptdir = os.path.dirname(os.path.abspath(sys.argv[0]))
 config = ConfigParser.ConfigParser()
@@ -166,7 +168,7 @@ def getauthkey():
 
 s = MyLoginSession(loginUrl, loginData, loginTestUrl, successStr)
 
-res = s.retrieveContent(sys.argv[1]) #TODO: Proper argument parsing
+res = s.retrieveContent(url) #TODO: Proper argument parsing
 
 soup = BeautifulSoup(res.text, 'html5lib')
 
@@ -213,12 +215,39 @@ VideoCategories = [
 
 rel2 = str(soup.select('#content .thin .main_column .torrent_table tbody')[0])
 
-if category in VideoCategories:
+#print rel2
+#fakeurl = 'https://jpopsuki.eu/torrents.php?id=181558&torrentid=251763'
+#fakeurl = 'blah'
+
+def gettorrentlinks(torrentid):
+    torrentlinks = re.findall('href="(.*)" title="Download"', rel2)
+    if torrentid is not None: #We have specific torrent url
+        #No ultra complex regex is needed here, we simply parse the array looking for the torrent url that has the torrentid in it
+        torrentlink = [i for i in torrentlinks if torrentid in i]
+        return torrentlink
+    else: #We have group url
+        return torrentlinks
+
+#Try to find torrentid in the url to determine if this is a group url or a specific torrent url.
+try:
+    torrentid = re.findall('torrentid=(.*)$', url)[0]
+except:
+    torrentid = None
+
+torrentlinks = gettorrentlinks(torrentid)
+
+#For single torrent urls use the swapTorrent JS to find the exact torrent release data, for group urls just find all of them in sequence
+if category in VideoCategories and torrentid is not None:
+    rel2data = re.findall('swapTorrent(?:.*)%s(?:.*)\xbb (\w+) / (\w+)' % (torrentid),rel2)
+elif category in VideoCategories and torrentid is None:
     rel2data = re.findall('\\xbb (\w+) / (\w+)', rel2) #Support Freeleach
-else:
+elif category not in VideoCategories and torrentid is not None:
+    rel2data = re.findall('swapTorrent(?:.*)%s(?:.*)\xbb (.*) / (.*) / (.*)</a>' % (torrentid),rel2)
+elif category not in VideoCategories and torrentid is None:
     rel2data = re.findall('\\xbb.* (.*) / (.*) / (.*)</a>', rel2)
 
-torrentlinks = re.findall('href="(.*)" title="Download"', rel2)
+print rel2data
+#print torrentlinks
 
 """
 release = soup.select('.torrent_table tbody tr.group_torrent td')
@@ -291,12 +320,15 @@ def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, ta
     try:
         SMerrorTorrent = re.findall('red; text-align: center;">(.*)</p>', SMres.text)[0]
         print SMerrorTorrent
+        groupid = re.findall('<input type="hidden" name="groupid" value="(.*)" />', SMres.text)[0]
+        print groupid
     except:
         try:
             SMerrorLogon = re.findall('<p>Invalid(.*)</p>', SMres.text)[0]
             print 'Invalid ' + SMerrorLogon
         except:
-            print 'OK'
+            groupid = re.findall('<input type="hidden" name="groupid" value="(.*)" />', SMres.text)[0]
+            print 'OK - groupid %s' % (groupid)
 
     with open("results." + torrentfilename + ".html", "w") as f:
         f.write(SMres.content)
