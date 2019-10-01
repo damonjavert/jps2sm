@@ -293,18 +293,11 @@ print artist
 title = re.findall('<a.*> - (.*) \[', text)[0]
 print title
 
-
 rel2 = str(soup.select('#content .thin .main_column .torrent_table tbody')[0])
 
 #print rel2
 #fakeurl = 'https://jpopsuki.eu/torrents.php?id=181558&torrentid=251763'
 #fakeurl = 'blah'
-
-#Try to find torrentid in the url to determine if this is a group url or a specific torrent url.
-try:
-    torrentid = re.findall('torrentid=(.*)$', url)[0]
-except:
-    torrentid = None
 
 groupdescription = removehtmltags(str(soup.select('#content .thin .main_column .box .body')[0]))
 print groupdescription
@@ -320,6 +313,12 @@ tagsall = ",".join(tags)
 
 authkey = getauthkey()
 
+#Try to find torrentid in the url to determine if this is a group url or a specific torrent url.
+try:
+    torrentid = re.findall('torrentid=(.*)$', url)[0]
+except:
+    torrentid = None
+
 for releasedata, torrentlinkescaped in zip(getreleasedata(category, torrentid), gettorrentlinks(torrentid)):
     print releasedata
     if category in VideoCategories:
@@ -332,14 +331,12 @@ for releasedata, torrentlinkescaped in zip(getreleasedata(category, torrentid), 
         bitrate = releasedata[1]
 
     torrentlink = HTMLParser.HTMLParser().unescape(torrentlinkescaped)
-    #Download JPS torrents
+    #Download JPS torrent
     torrentfile = s.retrieveContent("https://jpopsuki.eu/%s" % torrentlink)
     torrentfilename = get_valid_filename("%s - %s - %s.torrent" % (artist, title, "-".join(releasedata)))
-    #print torrentfile.text
-    #torrentdata = torrentfile.text.Value()
     with open(torrentfilename, "wb") as f:
         f.write(torrentfile.content)
     
-    #Upload torrents to SM
+    #Upload torrent to SM
     uploadtorrent(category, artist, title, date, media, audioformat, bitrate, tagsall, imagelink, groupdescription, torrentfilename)
 
