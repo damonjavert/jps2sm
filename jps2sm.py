@@ -158,6 +158,10 @@ SMloginTestUrl = "https://sugoimusic.me/"
 SMsuccessStr = "Enabled users"
 SMloginData = {'username' : smuser, 'password' : smpass }
 
+def removehtmltags(text):
+    clean = re.compile('<.*?>')
+    return re.sub(clean, '', text)
+
 def getauthkey():
     SMshome = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr)
     SMreshome = SMshome.retrieveContent("https://sugoimusic.me/torrents.php?id=118")
@@ -166,58 +170,23 @@ def getauthkey():
     authkey = re.findall('authkey=(.*)&amp;torrent_pass=', rel2)[0]
     return authkey
 
-s = MyLoginSession(loginUrl, loginData, loginTestUrl, successStr)
-
-res = s.retrieveContent(url) #TODO: Proper argument parsing
-
-soup = BeautifulSoup(res.text, 'html5lib')
-
-def remove_html_tags(text):
-    """Remove html tags from a string"""
-    import re
-    clean = re.compile('<.*?>')
-    return re.sub(clean, '', text)
-
-
-#testbox = soup.find('div#h2', attrs={'class': 'thin'})
-#artistline = artistlinebox.text.strip()
-#print (artistline)
-
-#testbox = soup.find('div', attrs={'id':'wrapper'})
-
-#testbox = soup.find('div', id="wrapper")
-
-artistline = soup.select('.thin h2')
-artistlinelink = soup.select('.thin h2 a')
-text = str(artistline[0])
-print artistline[0]
-
-artistlinelinktext = str(artistlinelink[0])
-
-sqbrackets = re.findall('\[(.*?)\]', text)
-print sqbrackets
-category = sqbrackets[0]
-
-#Extract date even if square brackets are used elsewhere in the title
-datepattern = re.compile("[12][09][0-9][0-9].*")
-date = filter(datepattern.match, sqbrackets)[0].replace(".","")
-
-print category
-print date
-
-artist = re.findall('<a[^>]+>(.*)<', artistlinelinktext)[0]
-print artist
-title = re.findall('<a.*> - (.*) \[', text)[0]
-print title
+Categories = {
+    'Album': 0,
+    #'EP': 1, #Does not exist on JPS
+    'Single': 2,
+    'Bluray': 3, #Does not exist on JPS
+    'DVD': 4,
+    'PV': 5,
+    'Music Performance': 6, #Does not exist on JPS
+    'TV-Music': 7, #Music Show
+    'TV-Variety': 8, #Talk Show
+    'TV-Drama': 9, #TV Drama
+    'Pictures': 10,
+    'Misc': 11,
+}
 
 VideoCategories = [
     'Bluray', 'DVD', 'PV', 'TV-Music', 'TV-Variety', 'TV-Drama', 'Music Performace']
-
-rel2 = str(soup.select('#content .thin .main_column .torrent_table tbody')[0])
-
-#print rel2
-#fakeurl = 'https://jpopsuki.eu/torrents.php?id=181558&torrentid=251763'
-#fakeurl = 'blah'
 
 def gettorrentlinks(torrentid):
     torrentlinks = re.findall('href="(.*)" title="Download"', rel2)
@@ -227,57 +196,6 @@ def gettorrentlinks(torrentid):
         return torrentlink
     else: #We have group url
         return torrentlinks
-
-#Try to find torrentid in the url to determine if this is a group url or a specific torrent url.
-try:
-    torrentid = re.findall('torrentid=(.*)$', url)[0]
-except:
-    torrentid = None
-
-torrentlinks = gettorrentlinks(torrentid)
-
-#For single torrent urls use the swapTorrent JS to find the exact torrent release data, for group urls just find all of them in sequence
-if category in VideoCategories and torrentid is not None:
-    rel2data = re.findall('swapTorrent(?:.*)%s(?:.*)\xbb (\w+) / (\w+)' % (torrentid),rel2)
-elif category in VideoCategories and torrentid is None:
-    rel2data = re.findall('\\xbb (\w+) / (\w+)', rel2) #Support Freeleach
-elif category not in VideoCategories and torrentid is not None:
-    rel2data = re.findall('swapTorrent(?:.*)%s(?:.*)\xbb (.*) / (.*) / (.*)</a>' % (torrentid),rel2)
-elif category not in VideoCategories and torrentid is None:
-    rel2data = re.findall('\\xbb.* (.*) / (.*) / (.*)</a>', rel2)
-
-print rel2data
-#print torrentlinks
-
-"""
-release = soup.select('.torrent_table tbody tr.group_torrent td')
-#print release
-release_text = str(release[0])
-print release_text
-
-
-releasedata = re.findall('\\xbb.* (.*) / (.*) / (.*)</a>', release_text)
-mformat = releasedata[0]
-bitrate = releasedata[1]
-media = releasedata[2]
-print mformat
-print bitrate
-print media
-"""
-
-groupdescription = remove_html_tags(str(soup.select('#content .thin .main_column .box .body')[0]))
-print groupdescription
-
-image = str(soup.select('#content .thin .sidebar .box p a'))
-imagelink = "https://jpopsuki.eu/" + re.findall('<a\s+(?:[^>]*?\s+)?href=\"([^\"]*)\"', image)[0]
-print imagelink
-
-tagsget = str(soup.select('#content .thin .sidebar .box ul.stats.nobullet li'))
-tags = re.findall('searchtags=([^\"]+)', tagsget)
-print tags
-tagsall = ",".join(tags)
-
-authkey = getauthkey()
 
 #Send data to SugoiMusic upload!
 def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, tagsall, imagelink, groupdescription, filename, **kwargs):
@@ -333,20 +251,77 @@ def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, ta
     with open("results." + torrentfilename + ".html", "w") as f:
         f.write(SMres.content)
 
-Categories = {
-    'Album': 0,
-    #'EP': 1, #Does not exist on JPS
-    'Single': 2,
-    'Bluray': 3, #Does not exist on JPS
-    'DVD': 4,
-    'PV': 5,
-    'Music Performance': 6, #Does not exist on JPS
-    'TV-Music': 7, #Music Show
-    'TV-Variety': 8, #Talk Show
-    'TV-Drama': 9, #TV Drama
-    'Pictures': 10,
-    'Misc': 11,
-}
+s = MyLoginSession(loginUrl, loginData, loginTestUrl, successStr)
+
+res = s.retrieveContent(url) #TODO: Proper argument parsing
+
+soup = BeautifulSoup(res.text, 'html5lib')
+
+artistline = soup.select('.thin h2')
+artistlinelink = soup.select('.thin h2 a')
+text = str(artistline[0])
+print artistline[0]
+
+artistlinelinktext = str(artistlinelink[0])
+
+sqbrackets = re.findall('\[(.*?)\]', text)
+print sqbrackets
+category = sqbrackets[0]
+
+#Extract date even if square brackets are used elsewhere in the title
+datepattern = re.compile("[12][09][0-9][0-9].*")
+date = filter(datepattern.match, sqbrackets)[0].replace(".","")
+
+print category
+print date
+
+artist = re.findall('<a[^>]+>(.*)<', artistlinelinktext)[0]
+print artist
+title = re.findall('<a.*> - (.*) \[', text)[0]
+print title
+
+
+rel2 = str(soup.select('#content .thin .main_column .torrent_table tbody')[0])
+
+#print rel2
+#fakeurl = 'https://jpopsuki.eu/torrents.php?id=181558&torrentid=251763'
+#fakeurl = 'blah'
+
+
+#Try to find torrentid in the url to determine if this is a group url or a specific torrent url.
+try:
+    torrentid = re.findall('torrentid=(.*)$', url)[0]
+except:
+    torrentid = None
+
+torrentlinks = gettorrentlinks(torrentid)
+
+#For single torrent urls use the swapTorrent JS to find the exact torrent release data, for group urls just find all of them in sequence
+if category in VideoCategories and torrentid is not None:
+    rel2data = re.findall('swapTorrent(?:.*)%s(?:.*)\xbb (\w+) / (\w+)' % (torrentid),rel2)
+elif category in VideoCategories and torrentid is None:
+    rel2data = re.findall('\\xbb (\w+) / (\w+)', rel2) #Support Freeleach
+elif category not in VideoCategories and torrentid is not None:
+    rel2data = re.findall('swapTorrent(?:.*)%s(?:.*)\xbb (.*) / (.*) / (.*)</a>' % (torrentid),rel2)
+elif category not in VideoCategories and torrentid is None:
+    rel2data = re.findall('\\xbb.* (.*) / (.*) / (.*)</a>', rel2)
+
+print rel2data
+#print torrentlinks
+
+groupdescription = removehtmltags(str(soup.select('#content .thin .main_column .box .body')[0]))
+print groupdescription
+
+image = str(soup.select('#content .thin .sidebar .box p a'))
+imagelink = "https://jpopsuki.eu/" + re.findall('<a\s+(?:[^>]*?\s+)?href=\"([^\"]*)\"', image)[0]
+print imagelink
+
+tagsget = str(soup.select('#content .thin .sidebar .box ul.stats.nobullet li'))
+tags = re.findall('searchtags=([^\"]+)', tagsget)
+print tags
+tagsall = ",".join(tags)
+
+authkey = getauthkey()
 
 for releasedata, torrentlinkescaped in zip(rel2data, torrentlinks):
     print releasedata
@@ -367,6 +342,7 @@ for releasedata, torrentlinkescaped in zip(rel2data, torrentlinks):
     #torrentdata = torrentfile.text.Value()
     with open(torrentfilename, "wb") as f:
         f.write(torrentfile.content)
-        
+    
+    #Upload torrents to SM
     uploadtorrent(category, artist, title, date, media, audioformat, bitrate, tagsall, imagelink, groupdescription, torrentfilename)
 
