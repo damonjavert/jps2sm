@@ -9,6 +9,7 @@ import HTMLParser
 from django.utils.text import get_valid_filename
 import sys
 import ConfigParser
+import argparse
 
 class MyLoginSession:
     """
@@ -128,7 +129,19 @@ class MyLoginSession:
 
         return res
 
-url = sys.argv[1]
+parser = argparse.ArgumentParser()
+parser.add_argument("-u", "--url", help="JPS URL for a group or individual release", type=str)
+parser.add_argument("-n", "--dryrun", help="Just parse url and show the output, do not add the torrent to SM", action="store_true")
+args = parser.parse_args()
+
+if args.url is None:
+    print 'JPS URL not specified'
+    exit()
+else:
+    url = args.url
+
+if args.dryrun:
+    dryrun = True
 
 #Get credentials from cfg file
 scriptdir = os.path.dirname(os.path.abspath(sys.argv[0]))
@@ -266,7 +279,7 @@ def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, ta
 
 s = MyLoginSession(loginUrl, loginData, loginTestUrl, successStr)
 
-res = s.retrieveContent(url) #TODO: Proper argument parsing
+res = s.retrieveContent(url) 
 
 soup = BeautifulSoup(res.text, 'html5lib')
 
@@ -338,5 +351,6 @@ for releasedata, torrentlinkescaped in zip(getreleasedata(category, torrentid), 
         f.write(torrentfile.content)
     
     #Upload torrent to SM
-    uploadtorrent(category, artist, title, date, media, audioformat, bitrate, tagsall, imagelink, groupdescription, torrentfilename)
+    if not dryrun:
+        uploadtorrent(category, artist, title, date, media, audioformat, bitrate, tagsall, imagelink, groupdescription, torrentfilename)
 
