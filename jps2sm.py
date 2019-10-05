@@ -274,7 +274,7 @@ def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, ta
             groupid = re.findall('<input type="hidden" name="groupid" value="(.*)" />', SMres.text)[0]
             print 'OK - groupid %s' % (groupid)
 
-    with open("results." + torrentfilename + ".html", "w") as f:
+    with open("SMuploadresult." + torrentfilename + ".html", "w") as f:
         f.write(SMres.content)
 
 s = MyLoginSession(loginUrl, loginData, loginTestUrl, successStr)
@@ -346,7 +346,7 @@ for releasedata, torrentlinkescaped in zip(getreleasedata(category, torrentid), 
     torrentlink = HTMLParser.HTMLParser().unescape(torrentlinkescaped)
     #Download JPS torrent
     torrentfile = s.retrieveContent("https://jpopsuki.eu/%s" % torrentlink)
-    torrentfilename = get_valid_filename("%s - %s - %s.torrent" % (artist, title, "-".join(releasedata)))
+    torrentfilename = get_valid_filename("JPS %s - %s - %s.torrent" % (artist, title, "-".join(releasedata)))
     with open(torrentfilename, "wb") as f:
         f.write(torrentfile.content)
     
