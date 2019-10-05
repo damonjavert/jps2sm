@@ -226,7 +226,7 @@ def getreleasedata(category, torrentid):
     return rel2data
 
 #Send data to SugoiMusic upload!
-def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, tagsall, imagelink, groupdescription, filename, **kwargs):
+def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, tagsall, imagelink, groupdescription, filename, groupid = None, **kwargs):
     uploadurl = 'https://sugoimusic.me/upload.php'
     data =  {
         'submit': 'true',
@@ -256,6 +256,9 @@ def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, ta
         data['lang'] = 'Japanese' #assumed default
         del data['bitrate']
 
+    if groupid:
+        data['groupid'] = groupid #Upload torrents into the same group
+
     postDataFiles = {
         'file_input': open(filename,'rb')
     }
@@ -263,21 +266,28 @@ def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, ta
     SMs = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr)
     SMres = SMs.retrieveContent(uploadurl,"post",data,postDataFiles)
 
+    #TODO: Need to sort out this error logic
     try:
         SMerrorTorrent = re.findall('red; text-align: center;">(.*)</p>', SMres.text)[0]
         print SMerrorTorrent
-        groupid = re.findall('<input type="hidden" name="groupid" value="(.*)" />', SMres.text)[0]
-        print groupid
+        if not groupid:
+            groupid = re.findall('<input type="hidden" name="groupid" value="(.*)" />', SMres.text)[0]
+            print groupid
     except:
         try:
             SMerrorLogon = re.findall('<p>Invalid(.*)</p>', SMres.text)[0]
             print 'Invalid ' + SMerrorLogon
         except:
-            groupid = re.findall('<input type="hidden" name="groupid" value="(.*)" />', SMres.text)[0]
-            print 'OK - groupid %s' % (groupid)
+            try:
+                groupid = re.findall('<input type="hidden" name="groupid" value="(.*)" />', SMres.text)[0]
+                print 'OK - groupid %s' % (groupid)
+            except:
+                print 'Error'
 
     with open("SMuploadresult." + torrentfilename + ".html", "w") as f:
         f.write(SMres.content)
+
+    return groupid
 
 s = MyLoginSession(loginUrl, loginData, loginTestUrl, successStr)
 
@@ -334,6 +344,8 @@ try:
 except:
     torrentid = None
 
+groupid = None
+
 for releasedata, torrentlinkescaped in zip(getreleasedata(category, torrentid), gettorrentlinks(torrentid)):
     print releasedata
     if category in VideoCategories:
@@ -354,5 +366,12 @@ for releasedata, torrentlinkescaped in zip(getreleasedata(category, torrentid), 
     
     #Upload torrent to SM
     if not dryrun:
-        uploadtorrent(category, artist, title, date, media, audioformat, bitrate, tagsall, imagelink, groupdescription, torrentfilename)
+        #If groupid was returned from a previous call of uploadtorrent() then use it to allow torrents
+        #to be uploaded to the same group, else get the groupid from the first run of uploadtorrent()
+        if groupid is None:
+            groupid = uploadtorrent(category, artist, title, date, media, audioformat, bitrate, tagsall, imagelink, groupdescription, torrentfilename)
+        else:
+            uploadtorrent(category, artist, title, date, media, audioformat, bitrate, tagsall, imagelink, groupdescription, torrentfilename, groupid)
+
+
 
