@@ -142,6 +142,8 @@ else:
 
 if args.dryrun:
     dryrun = True
+else:
+    dryrun = None
 
 #Get credentials from cfg file
 scriptdir = os.path.dirname(os.path.abspath(sys.argv[0]))
