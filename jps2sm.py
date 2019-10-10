@@ -136,7 +136,7 @@ args = parser.parse_args()
 
 if args.urls is None:
     print 'JPS URL(s) not specified'
-    exit()
+    sys.exit()
 else:
     jpsurl = args.urls
 
@@ -270,30 +270,33 @@ def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, ta
     postDataFiles = {
         'file_input': open(filename,'rb')
     }
- 
-    SMs = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr)
-    SMres = SMs.retrieveContent(uploadurl,"post",data,postDataFiles)
 
-    #TODO: Need to sort out this error logic
-    try:
-        SMerrorTorrent = re.findall('red; text-align: center;">(.*)</p>', SMres.text)[0]
-        print SMerrorTorrent
-        if not groupid:
-            groupid = re.findall('<input type="hidden" name="groupid" value="(.*)" />', SMres.text)[0]
-            print groupid
-    except:
+    if dryrun:
+        print data
+    else:
+        SMs = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr)
+        SMres = SMs.retrieveContent(uploadurl,"post",data,postDataFiles)
+
+        #TODO: Need to sort out this error logic
         try:
-            SMerrorLogon = re.findall('<p>Invalid(.*)</p>', SMres.text)[0]
-            print 'Invalid ' + SMerrorLogon
+            SMerrorTorrent = re.findall('red; text-align: center;">(.*)</p>', SMres.text)[0]
+            print SMerrorTorrent
+            if not groupid:
+                groupid = re.findall('<input type="hidden" name="groupid" value="(.*)" />', SMres.text)[0]
+                print groupid
         except:
             try:
-                groupid = re.findall('<input type="hidden" name="groupid" value="(.*)" />', SMres.text)[0]
-                print 'OK - groupid %s' % (groupid)
+                SMerrorLogon = re.findall('<p>Invalid(.*)</p>', SMres.text)[0]
+                print 'Invalid ' + SMerrorLogon
             except:
-                print 'Error'
+                try:
+                    groupid = re.findall('<input type="hidden" name="groupid" value="(.*)" />', SMres.text)[0]
+                    print 'OK - groupid %s' % (groupid)
+                except:
+                    print 'Error'
 
-    with open("SMuploadresult." + torrentfilename + ".html", "w") as f:
-        f.write(SMres.content)
+        with open("SMuploadresult." + torrentfilename + ".html", "w") as f:
+            f.write(SMres.content)
 
     return groupid
 
@@ -371,13 +374,12 @@ for releasedata, torrentlinkescaped in zip(getreleasedata(category, torrentids),
         f.write(torrentfile.content)
     
     #Upload torrent to SM
-    if not dryrun:
-        #If groupid was returned from a previous call of uploadtorrent() then use it to allow torrents
-        #to be uploaded to the same group, else get the groupid from the first run of uploadtorrent()
-        if groupid is None:
-            groupid = uploadtorrent(category, artist, title, date, media, audioformat, bitrate, tagsall, imagelink, groupdescription, torrentfilename)
-        else:
-            uploadtorrent(category, artist, title, date, media, audioformat, bitrate, tagsall, imagelink, groupdescription, torrentfilename, groupid)
+    #If groupid was returned from a previous call of uploadtorrent() then use it to allow torrents
+    #to be uploaded to the same group, else get the groupid from the first run of uploadtorrent()
+    if groupid is None:
+        groupid = uploadtorrent(category, artist, title, date, media, audioformat, bitrate, tagsall, imagelink, groupdescription, torrentfilename)
+    else:
+        uploadtorrent(category, artist, title, date, media, audioformat, bitrate, tagsall, imagelink, groupdescription, torrentfilename, groupid)
 
 
 
