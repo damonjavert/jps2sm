@@ -130,15 +130,15 @@ class MyLoginSession:
         return res
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-u", "--url", help="JPS URL for a group or individual release", type=str)
+parser.add_argument("-u", "--urls", help="JPS URL for a group, or multiple individual releases URLs to be added to the same group", type=str)
 parser.add_argument("-n", "--dryrun", help="Just parse url and show the output, do not add the torrent to SM", action="store_true")
 args = parser.parse_args()
 
-if args.url is None:
-    print 'JPS URL not specified'
+if args.urls is None:
+    print 'JPS URL(s) not specified'
     exit()
 else:
-    url = args.url
+    jpsurl = args.urls
 
 if args.dryrun:
     dryrun = True
@@ -203,25 +203,33 @@ Categories = {
 VideoCategories = [
     'Bluray', 'DVD', 'PV', 'TV-Music', 'TV-Variety', 'TV-Drama', 'Music Performace']
 
-def gettorrentlinks(torrentid):
-    torrentlinks = re.findall('href="(.*)" title="Download"', rel2)
-    if torrentid is not None: #We have specific torrent url
-        #No ultra complex regex is needed here, we simply parse the array looking for the torrent url that has the torrentid in it
-        torrentlink = [i for i in torrentlinks if torrentid in i]
-        return torrentlink
-    else: #We have group url
+def filterlist(string, substr): 
+    return [str for str in string if
+             any(sub in str for sub in substr)] 
+             
+def gettorrentlinks(torrentids):
+    alltorrentlinks = re.findall('href="(.*)" title="Download"', rel2)
+    if len(torrentids) != 0: #We have specific torrent (release) url(s)
+        #No ultra complex regex is needed here, we simply parse the array looking for the torrent url(s) that have the torrentid(s) in it
+        torrentlinks = filterlist(alltorrentlinks, torrentids)
         return torrentlinks
+    else: #We have group url
+        return alltorrentlinks
 
-def getreleasedata(category, torrentid):
-    #For single torrent urls use the swapTorrent JS to find the exact torrent release data, for group urls just find all of them in sequence
-    if category in VideoCategories and torrentid is not None:
-        rel2data = re.findall('swapTorrent(?:.*)%s(?:.*)\xbb (\w+) / (\w+)' % (torrentid),rel2)
-    elif category in VideoCategories and torrentid is None:
-        rel2data = re.findall('\\xbb (\w+) / (\w+)', rel2) #Support Freeleach
-    elif category not in VideoCategories and torrentid is not None:
-        rel2data = re.findall('swapTorrent(?:.*)%s(?:.*)\xbb (.*) / (.*) / (.*)</a>' % (torrentid),rel2)
-    elif category not in VideoCategories and torrentid is None:
-        rel2data = re.findall('\\xbb.* (.*) / (.*) / (.*)</a>', rel2)
+def getreleasedata(category, torrentids):
+    rel2data = []
+    if len(torrentids) == 0: #Group url
+        if category in VideoCategories:
+            rel2data = re.findall('\\xbb (\w+) / (\w+)', rel2) #Support Freeleach
+        else:
+            rel2data = re.findall('\\xbb.* (.*) / (.*) / (.*)</a>', rel2)
+    else: #Release url(s) given
+        for torrentid in torrentids:
+            if category in VideoCategories:
+                rel2data.extend(re.findall('swapTorrent(?:.*)%s(?:.*)\xbb (\w+) / (\w+)' % (torrentid),rel2))
+            else:
+                rel2data.extend(re.findall('swapTorrent(?:.*)%s(?:.*)\xbb (.*) / (.*) / (.*)</a>' % (torrentid),rel2))
+        
     print rel2data
     return rel2data
 
@@ -291,7 +299,8 @@ def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, ta
 
 s = MyLoginSession(loginUrl, loginData, loginTestUrl, successStr)
 
-res = s.retrieveContent(url) 
+#If there are multiple urls only the first url needs to be parsed
+res = s.retrieveContent(jpsurl.split()[0]) 
 
 soup = BeautifulSoup(res.text, 'html5lib')
 
@@ -338,15 +347,12 @@ tagsall = ",".join(tags)
 
 authkey = getauthkey()
 
-#Try to find torrentid in the url to determine if this is a group url or a specific torrent url.
-try:
-    torrentid = re.findall('torrentid=(.*)$', url)[0]
-except:
-    torrentid = None
+#Try to find torrentid(s) in the url(s) to determine if this is a group url or a specific torrent url(s).
+torrentids = re.findall('torrentid=([0-9]+)', jpsurl)
 
 groupid = None
 
-for releasedata, torrentlinkescaped in zip(getreleasedata(category, torrentid), gettorrentlinks(torrentid)):
+for releasedata, torrentlinkescaped in zip(getreleasedata(category, torrentids), gettorrentlinks(torrentids)):
     print releasedata
     if category in VideoCategories:
         media = releasedata[1]
