@@ -10,6 +10,7 @@ from django.utils.text import get_valid_filename
 import sys
 import ConfigParser
 import argparse
+import itertools
 
 class MyLoginSession:
     """
@@ -203,6 +204,9 @@ Categories = {
 VideoCategories = [
     'Bluray', 'DVD', 'PV', 'TV-Music', 'TV-Variety', 'TV-Drama', 'Music Performace']
 
+TVCategories = [
+    'TV-Music', 'TV-Variety', 'TV-Drama']
+
 def filterlist(string, substr): 
     return [str for str in string if
              any(sub in str for sub in substr)] 
@@ -318,16 +322,25 @@ sqbrackets = re.findall('\[(.*?)\]', text)
 print sqbrackets
 category = sqbrackets[0]
 
-#Extract date even if square brackets are used elsewhere in the title
-datepattern = re.compile("[12][09][0-9][0-9].*")
-date = filter(datepattern.match, sqbrackets)[0].replace(".","")
+#Extract date without using '[]' as it allows '[]' elsewhere in the title and it works with JPS TV-* categories
+date = re.findall('([12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01]))', text)[0].replace(".","")
 
 print category
 print date
 
 artist = re.findall('<a[^>]+>(.*)<', artistlinelinktext)[0]
 print artist
-title = re.findall('<a.*> - (.*) \[', text)[0]
+
+if category not in TVCategories:
+    title = re.findall('<a.*> - (.*) \[', text)[0]
+else:
+    #Using two sets of findall() as I cannot get the OR regex operator "|" to work 
+    title1 = re.findall('<a.*> - (?:[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])) - (.*)</h2>', text)
+    title2 = re.findall('<a.*> - (.*) \((.*) (?:[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01]))', text)
+    #title1 has 1 matching group, title2 has 2
+    titlemerged = [title1, " ".join(itertools.chain(*title2))]
+    title = "".join(itertools.chain(*titlemerged))
+
 print title
 
 rel2 = str(soup.select('#content .thin .main_column .torrent_table tbody')[0])
