@@ -260,9 +260,9 @@ def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, ta
         #'release_desc': releasedescription
     }
     if category in VideoCategories:
-        data['codec'] = 'h264' #assumed default
+        data['codec'] = audioformat
         data['ressel'] = 'SD' #assumed default
-        data['container'] = audioformat #In JPS container and audioformat are the same field
+        data['container'] = 'MKV' #assumed default
         data['sub'] = 'NoSubs' #assumed default
         data['audioformat'] = 'AAC' #assumed default
         data['lang'] = 'Japanese' #assumed default
@@ -379,7 +379,10 @@ groupid = None
 for releasedata, torrentlinkescaped in zip(getreleasedata(groupdata['category'], groupdata['torrentids']), gettorrentlinks(groupdata['torrentids'])):
     print releasedata
     if groupdata['category'] in VideoCategories:
-        media = releasedata[1]
+        if releasedata[1] == 'Blu':
+            media = 'Bluray'
+        else:
+            media = releasedata[1]
         audioformat = releasedata[0]
         bitrate = "---"
     else:
