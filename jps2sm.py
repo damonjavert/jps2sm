@@ -212,7 +212,7 @@ def filterlist(string, substr):
              any(sub in str for sub in substr)] 
              
 def gettorrentlinks(torrentids):
-    alltorrentlinks = re.findall('href="(.*)" title="Download"', rel2)
+    alltorrentlinks = re.findall('href="(.*)" title="Download"', groupdata['rel2'])
     if len(torrentids) != 0: #We have specific torrent (release) url(s)
         #No ultra complex regex is needed here, we simply parse the array looking for the torrent url(s) that have the torrentid(s) in it
         torrentlinks = filterlist(alltorrentlinks, torrentids)
@@ -224,15 +224,15 @@ def getreleasedata(category, torrentids):
     rel2data = []
     if len(torrentids) == 0: #Group url
         if category in VideoCategories:
-            rel2data = re.findall('\\xbb (\w+) / (\w+)', rel2) #Support Freeleach
+            rel2data = re.findall('\\xbb (\w+) / (\w+)', groupdata['rel2'] ) #Support Freeleach
         else:
-            rel2data = re.findall('\\xbb.* (.*) / (.*) / (.*)</a>', rel2)
+            rel2data = re.findall('\\xbb.* (.*) / (.*) / (.*)</a>', groupdata['rel2'] )
     else: #Release url(s) given
         for torrentid in torrentids:
             if category in VideoCategories:
-                rel2data.extend(re.findall('swapTorrent(?:.*)%s(?:.*)\xbb (\w+) / (\w+)' % (torrentid),rel2))
+                rel2data.extend(re.findall('swapTorrent(?:.*)%s(?:.*)\xbb (\w+) / (\w+)' % (torrentid),groupdata['rel2'] ))
             else:
-                rel2data.extend(re.findall('swapTorrent(?:.*)%s(?:.*)\xbb (.*) / (.*) / (.*)</a>' % (torrentid),rel2))
+                rel2data.extend(re.findall('swapTorrent(?:.*)%s(?:.*)\xbb (.*) / (.*) / (.*)</a>' % (torrentid),groupdata['rel2']))
         
     print rel2data
     return rel2data
@@ -306,71 +306,79 @@ def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, ta
 
 s = MyLoginSession(loginUrl, loginData, loginTestUrl, successStr)
 
-#If there are multiple urls only the first url needs to be parsed
-res = s.retrieveContent(jpsurl.split()[0]) 
+def getgroupdata(jpsurl):
+    groupdata= {}
+    #If there are multiple urls only the first url needs to be parsed
+    res = s.retrieveContent(jpsurl.split()[0]) 
 
-soup = BeautifulSoup(res.text, 'html5lib')
+    soup = BeautifulSoup(res.text, 'html5lib')
 
-artistline = soup.select('.thin h2')
-artistlinelink = soup.select('.thin h2 a')
-text = str(artistline[0])
-print artistline[0]
+    artistline = soup.select('.thin h2')
+    artistlinelink = soup.select('.thin h2 a')
+    text = str(artistline[0])
+    print artistline[0]
 
-artistlinelinktext = str(artistlinelink[0])
+    artistlinelinktext = str(artistlinelink[0])
 
-sqbrackets = re.findall('\[(.*?)\]', text)
-print sqbrackets
-category = sqbrackets[0]
+    sqbrackets = re.findall('\[(.*?)\]', text)
+    print sqbrackets
+    groupdata['category'] = sqbrackets[0]
 
-#Extract date without using '[]' as it allows '[]' elsewhere in the title and it works with JPS TV-* categories
-date = re.findall('([12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01]))', text)[0].replace(".","")
+    #Extract date without using '[]' as it allows '[]' elsewhere in the title and it works with JPS TV-* categories
+    groupdata['date'] = re.findall('([12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01]))', text)[0].replace(".","")
 
-print category
-print date
+    print groupdata['category']
+    print groupdata['date']
 
-artist = re.findall('<a[^>]+>(.*)<', artistlinelinktext)[0]
-print artist
+    groupdata['artist'] = re.findall('<a[^>]+>(.*)<', artistlinelinktext)[0]
+    print groupdata['artist']
 
-if category not in TVCategories:
-    title = re.findall('<a.*> - (.*) \[', text)[0]
-else:
-    #Using two sets of findall() as I cannot get the OR regex operator "|" to work 
-    title1 = re.findall('<a.*> - (?:[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])) - (.*)</h2>', text)
-    title2 = re.findall('<a.*> - (.*) \((.*) (?:[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01]))', text)
-    #title1 has 1 matching group, title2 has 2
-    titlemerged = [title1, " ".join(itertools.chain(*title2))]
-    title = "".join(itertools.chain(*titlemerged))
+    if groupdata['category'] not in TVCategories:
+        groupdata['title'] = re.findall('<a.*> - (.*) \[', text)[0]
+    else:
+        #Using two sets of findall() as I cannot get the OR regex operator "|" to work 
+        title1 = re.findall('<a.*> - (?:[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])) - (.*)</h2>', text)
+        title2 = re.findall('<a.*> - (.*) \((.*) (?:[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01]))', text)
+        #title1 has 1 matching group, title2 has 2
+        titlemerged = [title1, " ".join(itertools.chain(*title2))]
+        groupdata['title'] = "".join(itertools.chain(*titlemerged))
 
-print title
+    print groupdata['title']
 
-rel2 = str(soup.select('#content .thin .main_column .torrent_table tbody')[0])
+    groupdata['rel2'] = str(soup.select('#content .thin .main_column .torrent_table tbody')[0])
 
-#print rel2
-#fakeurl = 'https://jpopsuki.eu/torrents.php?id=181558&torrentid=251763'
-#fakeurl = 'blah'
+    #print rel2
+    #fakeurl = 'https://jpopsuki.eu/torrents.php?id=181558&torrentid=251763'
+    #fakeurl = 'blah'
 
-groupdescription = removehtmltags(str(soup.select('#content .thin .main_column .box .body')[0]))
-print groupdescription
+    groupdata['groupdescription'] = removehtmltags(str(soup.select('#content .thin .main_column .box .body')[0]))
+    print groupdata['groupdescription']
 
-image = str(soup.select('#content .thin .sidebar .box p a'))
-imagelink = "https://jpopsuki.eu/" + re.findall('<a\s+(?:[^>]*?\s+)?href=\"([^\"]*)\"', image)[0]
-print imagelink
+    image = str(soup.select('#content .thin .sidebar .box p a'))
+    groupdata['imagelink'] = "https://jpopsuki.eu/" + re.findall('<a\s+(?:[^>]*?\s+)?href=\"([^\"]*)\"', image)[0]
+    print groupdata['imagelink']
 
-tagsget = str(soup.select('#content .thin .sidebar .box ul.stats.nobullet li'))
-tags = re.findall('searchtags=([^\"]+)', tagsget)
-print tags
-tagsall = ",".join(tags)
+    tagsget = str(soup.select('#content .thin .sidebar .box ul.stats.nobullet li'))
+    tags = re.findall('searchtags=([^\"]+)', tagsget)
+    print tags
+    groupdata['tagsall'] = ",".join(tags)
+
+    #Try to find torrentid(s) in the url(s) to determine if this is a group url or a specific torrent url(s).
+    groupdata['torrentids'] = re.findall('torrentid=([0-9]+)', jpsurl)
+    
+    return groupdata
+
+groupdata = {}
+groupdata = getgroupdata(jpsurl)
+print groupdata
 
 authkey = getauthkey()
 
-#Try to find torrentid(s) in the url(s) to determine if this is a group url or a specific torrent url(s).
-torrentids = re.findall('torrentid=([0-9]+)', jpsurl)
-
 groupid = None
 
-for releasedata, torrentlinkescaped in zip(getreleasedata(category, torrentids), gettorrentlinks(torrentids)):
+for releasedata, torrentlinkescaped in zip(getreleasedata(groupdata['category'], groupdata['torrentids']), gettorrentlinks(groupdata['torrentids'])):
     print releasedata
-    if category in VideoCategories:
+    if groupdata['category'] in VideoCategories:
         media = releasedata[1]
         audioformat = releasedata[0]
         bitrate = "---"
@@ -382,7 +390,7 @@ for releasedata, torrentlinkescaped in zip(getreleasedata(category, torrentids),
     torrentlink = HTMLParser.HTMLParser().unescape(torrentlinkescaped)
     #Download JPS torrent
     torrentfile = s.retrieveContent("https://jpopsuki.eu/%s" % torrentlink)
-    torrentfilename = get_valid_filename("JPS %s - %s - %s.torrent" % (artist, title, "-".join(releasedata)))
+    torrentfilename = get_valid_filename("JPS %s - %s - %s.torrent" % (groupdata['artist'], groupdata['title'], "-".join(releasedata)))
     with open(torrentfilename, "wb") as f:
         f.write(torrentfile.content)
     
@@ -390,9 +398,10 @@ for releasedata, torrentlinkescaped in zip(getreleasedata(category, torrentids),
     #If groupid was returned from a previous call of uploadtorrent() then use it to allow torrents
     #to be uploaded to the same group, else get the groupid from the first run of uploadtorrent()
     if groupid is None:
-        groupid = uploadtorrent(category, artist, title, date, media, audioformat, bitrate, tagsall, imagelink, groupdescription, torrentfilename)
+        #TODO Use **groupdata and refactor uploadtorrent() to use it
+        groupid = uploadtorrent(groupdata['category'], groupdata['artist'], groupdata['title'], groupdata['date'], media, audioformat, bitrate, groupdata['tagsall'], groupdata['imagelink'], groupdata['groupdescription'], torrentfilename)
     else:
-        uploadtorrent(category, artist, title, date, media, audioformat, bitrate, tagsall, imagelink, groupdescription, torrentfilename, groupid)
+        uploadtorrent(groupdata['category'], groupdata['artist'], groupdata['title'], groupdata['date'], media, audioformat, bitrate, groupdata['tagsall'], groupdata['imagelink'], groupdata['groupdescription'], torrentfilename, groupid)
 
 
 
