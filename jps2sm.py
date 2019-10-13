@@ -1,16 +1,23 @@
-from bs4 import BeautifulSoup
+#jps2sm.py is a python script that will automatically gather data from JPS from a given group url, 
+#iterate through all the torrents and upload them to SM.
+
+#Standard library packages
 import re
-import pickle
-import datetime
 import os
-from urlparse import urlparse
-import requests
-import HTMLParser
-from django.utils.text import get_valid_filename
 import sys
-import ConfigParser
-import argparse
+import datetime
 import itertools
+import argparse
+import configparser
+import pickle
+import html
+from urllib.parse import urlparse
+
+#Third-party packages
+import requests
+import html5lib
+from bs4 import BeautifulSoup
+from django.utils.text import get_valid_filename
 
 class MyLoginSession:
     """
@@ -97,7 +104,7 @@ class MyLoginSession:
 
         # test login
         res = self.session.get(self.loginTestUrl)
-        #print res.text
+        #print (res.text)
         if res.text.lower().find(self.loginTestString.lower()) < 0:
             raise Exception("could not log into provided site '%s'"
                             " (did not find successful login string)"
@@ -136,7 +143,7 @@ parser.add_argument("-n", "--dryrun", help="Just parse url and show the output, 
 args = parser.parse_args()
 
 if args.urls is None:
-    print 'JPS URL(s) not specified'
+    print ('JPS URL(s) not specified')
     sys.exit()
 else:
     jpsurl = args.urls
@@ -148,12 +155,12 @@ else:
 
 #Get credentials from cfg file
 scriptdir = os.path.dirname(os.path.abspath(sys.argv[0]))
-config = ConfigParser.ConfigParser()
+config = configparser.ConfigParser()
 configfile = scriptdir + '/jps2sm.cfg'
 try:
     open(configfile)
 except IOError:
-    print 'Error: cannot read cfg - enter your JPS/SM credentials in jps2sm.cfg and check jps2sm.cfg.example to see the syntax.'
+    print ('Error: cannot read cfg - enter your JPS/SM credentials in jps2sm.cfg and check jps2sm.cfg.example to see the syntax.')
     raise
 
 config.read(configfile)
@@ -182,8 +189,8 @@ def getauthkey():
     SMshome = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr)
     SMreshome = SMshome.retrieveContent("https://sugoimusic.me/torrents.php?id=118")
     soup = BeautifulSoup(SMreshome.text, 'html5lib')
-    rel2 = str(soup.select('#content .thin .main_column .torrent_table tbody')[0])
-    authkey = re.findall('authkey=(.*)&amp;torrent_pass=', rel2)[0]
+    rel2 = str(soup.select('#content .thin .main_column .torrent_table tbody'))
+    authkey = re.findall('authkey=(.*)&amp;torrent_pass=', rel2)
     return authkey
 
 Categories = {
@@ -234,7 +241,7 @@ def getreleasedata(category, torrentids):
             else:
                 rel2data.extend(re.findall('swapTorrent(?:.*)%s(?:.*)\xbb (.*) / (.*) / (.*)</a>' % (torrentid),groupdata['rel2']))
         
-    print rel2data
+    print (rel2data)
     return rel2data
 
 #Send data to SugoiMusic upload!
@@ -276,7 +283,7 @@ def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, ta
     }
 
     if dryrun:
-        print data
+        print (data)
     else:
         SMs = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr)
         SMres = SMs.retrieveContent(uploadurl,"post",data,postDataFiles)
@@ -284,23 +291,23 @@ def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, ta
         #TODO: Need to sort out this error logic
         try:
             SMerrorTorrent = re.findall('red; text-align: center;">(.*)</p>', SMres.text)[0]
-            print SMerrorTorrent
+            print (SMerrorTorrent)
             if not groupid:
                 groupid = re.findall('<input type="hidden" name="groupid" value="(.*)" />', SMres.text)[0]
-                print groupid
+                print (groupid)
         except:
             try:
                 SMerrorLogon = re.findall('<p>Invalid(.*)</p>', SMres.text)[0]
-                print 'Invalid ' + SMerrorLogon
+                print ('Invalid ' + SMerrorLogon)
             except:
                 try:
                     groupid = re.findall('<input type="hidden" name="groupid" value="(.*)" />', SMres.text)[0]
-                    print 'OK - groupid %s' % (groupid)
+                    print ('OK - groupid %s' % (groupid))
                 except:
-                    print 'Error'
+                    print ('Error')
 
         with open("SMuploadresult." + torrentfilename + ".html", "w") as f:
-            f.write(SMres.content)
+            f.write(str(SMres.content))
 
     return groupid
 
@@ -316,22 +323,22 @@ def getgroupdata(jpsurl):
     artistline = soup.select('.thin h2')
     artistlinelink = soup.select('.thin h2 a')
     text = str(artistline[0])
-    print artistline[0]
+    print (artistline[0])
 
     artistlinelinktext = str(artistlinelink[0])
 
     sqbrackets = re.findall('\[(.*?)\]', text)
-    print sqbrackets
+    print (sqbrackets)
     groupdata['category'] = sqbrackets[0]
 
     #Extract date without using '[]' as it allows '[]' elsewhere in the title and it works with JPS TV-* categories
     groupdata['date'] = re.findall('([12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01]))', text)[0].replace(".","")
 
-    print groupdata['category']
-    print groupdata['date']
+    print (groupdata['category'])
+    print (groupdata['date'])
 
     groupdata['artist'] = re.findall('<a[^>]+>(.*)<', artistlinelinktext)[0]
-    print groupdata['artist']
+    print (groupdata['artist'])
 
     if groupdata['category'] not in TVCategories:
         groupdata['title'] = re.findall('<a.*> - (.*) \[', text)[0]
@@ -343,7 +350,7 @@ def getgroupdata(jpsurl):
         titlemerged = [title1, " ".join(itertools.chain(*title2))]
         groupdata['title'] = "".join(itertools.chain(*titlemerged))
 
-    print groupdata['title']
+    print (groupdata['title'])
 
     groupdata['rel2'] = str(soup.select('#content .thin .main_column .torrent_table tbody')[0])
 
@@ -352,15 +359,15 @@ def getgroupdata(jpsurl):
     #fakeurl = 'blah'
 
     groupdata['groupdescription'] = removehtmltags(str(soup.select('#content .thin .main_column .box .body')[0]))
-    print groupdata['groupdescription']
+    print (groupdata['groupdescription'])
 
     image = str(soup.select('#content .thin .sidebar .box p a'))
     groupdata['imagelink'] = "https://jpopsuki.eu/" + re.findall('<a\s+(?:[^>]*?\s+)?href=\"([^\"]*)\"', image)[0]
-    print groupdata['imagelink']
+    print (groupdata['imagelink'])
 
     tagsget = str(soup.select('#content .thin .sidebar .box ul.stats.nobullet li'))
     tags = re.findall('searchtags=([^\"]+)', tagsget)
-    print tags
+    print (tags)
     groupdata['tagsall'] = ",".join(tags)
 
     #Try to find torrentid(s) in the url(s) to determine if this is a group url or a specific torrent url(s).
@@ -370,14 +377,14 @@ def getgroupdata(jpsurl):
 
 groupdata = {}
 groupdata = getgroupdata(jpsurl)
-print groupdata
+print (groupdata)
 
 authkey = getauthkey()
 
 groupid = None
 
 for releasedata, torrentlinkescaped in zip(getreleasedata(groupdata['category'], groupdata['torrentids']), gettorrentlinks(groupdata['torrentids'])):
-    print releasedata
+    print (releasedata)
     if groupdata['category'] in VideoCategories:
         if releasedata[1] == 'Blu':
             media = 'Bluray'
@@ -390,7 +397,7 @@ for releasedata, torrentlinkescaped in zip(getreleasedata(groupdata['category'],
         audioformat = releasedata[0]
         bitrate = releasedata[1]
 
-    torrentlink = HTMLParser.HTMLParser().unescape(torrentlinkescaped)
+    torrentlink = html.unescape(torrentlinkescaped)
     #Download JPS torrent
     torrentfile = s.retrieveContent("https://jpopsuki.eu/%s" % torrentlink)
     torrentfilename = get_valid_filename("JPS %s - %s - %s.torrent" % (groupdata['artist'], groupdata['title'], "-".join(releasedata)))
@@ -405,6 +412,3 @@ for releasedata, torrentlinkescaped in zip(getreleasedata(groupdata['category'],
         groupid = uploadtorrent(groupdata['category'], groupdata['artist'], groupdata['title'], groupdata['date'], media, audioformat, bitrate, groupdata['tagsall'], groupdata['imagelink'], groupdata['groupdescription'], torrentfilename)
     else:
         uploadtorrent(groupdata['category'], groupdata['artist'], groupdata['title'], groupdata['date'], media, audioformat, bitrate, groupdata['tagsall'], groupdata['imagelink'], groupdata['groupdescription'], torrentfilename, groupid)
-
-
-
