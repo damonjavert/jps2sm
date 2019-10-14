@@ -30,13 +30,13 @@ To upload only the FLAC and MP3 320:
 * For video torrents some data is guessed as the data is not available with certainty from JPS. Some extra work with pattern matching may be able work-around this.
 
 ## Known bugs
-* TV-Music does not currently work. *JPS uses `()` instead of `[]` to show dates.*
+* ~~TV-Music does not currently work. *JPS uses `()` instead of `[]` to show dates.*~~
 * Pictures do not work as JPS does not have a release-date for them.
 * Fansubs are currently not support as these will probably be added to the group page either by adding a release type or integrating it into the group page ala BTN.
 
 ## Roadmap
 * ~~Support individual torrent links~~ DONE
-* Support TV-Music
+* ~~Support TV-Music~~ DONE
 * ~~Support auto-merging / auto add to last group.~~ DONE
 * Migrate to using python3
 * Use pythonic `if __name__ == "__main__":`, defs for everything and general cleanup of the code *Started, ongoing*
