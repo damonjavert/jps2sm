@@ -11,6 +11,8 @@ import sys
 import ConfigParser
 import argparse
 import itertools
+import collections
+import time
 
 class MyLoginSession:
     """
@@ -130,21 +132,75 @@ class MyLoginSession:
 
         return res
 
+def getbulktorrentids(user, first = 1, last = None):
+    res = s.retrieveContent("https://jpopsuki.eu/torrents.php?type=uploaded&userid=%s" % (user))
+    soup = BeautifulSoup(res.text, 'html5lib')
+
+    linkbox = str(soup.select('#content #ajax_torrents .linkbox')[0])
+    if not last:
+        try:
+            last = re.findall('page=([0-9]*)&amp;order_by=s3&amp;order_way=DESC&amp;type=uploaded&amp;userid=(?:[0-9]*)&amp;disablegrouping=1\'\);"><strong> Last &gt;&gt;<\/strong>', linkbox)[0]
+        except:
+            #There is only 1 page of uploads if the 'Last >>' link cannot be found
+            last = 1
+
+    useruploads = {}
+    useruploads = collections.defaultdict(list)
+
+    #Parse every torrent page and add to dict, to group together releases into the same group so that they work with the
+    #way that uploadtorrent() works.
+    #for i in range(1, int(3)+1):
+    for i in range(first, int(last)+1):
+        useruploadpage =  s.retrieveContent("https://jpopsuki.eu/torrents.php?page=%s&order_by=s3&order_way=DESC&type=uploaded&userid=%s&disablegrouping=1" % (i, user))
+        print "https://jpopsuki.eu/torrents.php?page=%s&order_by=s3&order_way=DESC&type=uploaded&userid=%s&disablegrouping=1" % (i, user)
+        #print useruploadpage.text
+        soup2 = BeautifulSoup(useruploadpage.text, 'html5lib')
+        try:
+            torrenttable = str(soup2.select('#content #ajax_torrents .torrent_table tbody')[0])
+        except IndexError:
+            #TODO: Need to add this to every request so it can be handled everywhere, for now it can exist here
+            quotaexceeded = re.findall('<title>Browse quota exceeded :: JPopsuki 2.0</title>', useruploadpage.text)
+            if quotaexceeded:
+                print 'Browse quota exceeded :: JPopsuki 2.0'
+                sys.exit(0)
+            else:
+                raise
+        alltorrentlinksidsonly = re.findall('torrents.php\?id=([0-9]+)\&amp;torrentid=([0-9]+)', torrenttable)
+        print alltorrentlinksidsonly
+        for groupid, torrentid in alltorrentlinksidsonly:
+            useruploads[groupid].append(torrentid)
+        time.sleep(5)  # Sleep as otherwise we hit JPS browse quota
+    print useruploads
+    return useruploads
+
 parser = argparse.ArgumentParser()
 parser.add_argument("-u", "--urls", help="JPS URL for a group, or multiple individual releases URLs to be added to the same group", type=str)
 parser.add_argument("-n", "--dryrun", help="Just parse url and show the output, do not add the torrent to SM", action="store_true")
+parser.add_argument("-b", "--batchuser", help="Upload all releases uploaded by a particular user id")
+parser.add_argument("-s", "--batchstart", help="(Batch mode only) Start at this page", type=int)
+parser.add_argument("-e", "--batchend", help="(Batch mode only) End at this page", type=int)
 args = parser.parse_args()
-
-if args.urls is None:
-    print 'JPS URL(s) not specified'
-    sys.exit()
-else:
-    jpsurl = args.urls
 
 if args.dryrun:
     dryrun = True
 else:
     dryrun = None
+
+usermode = None
+if args.urls is None and args.batchuser is None:
+    print 'JPS URL(s) nor batchuser specified'
+    sys.exit()
+elif args.urls:
+    jpsurl = args.urls
+elif args.batchuser:
+    if bool(args.batchstart) ^ bool(args.batchend):
+        print 'You have specified an incomplete page range.'
+        sys.exit()
+    elif bool(args.batchstart) and bool(args.batchend):
+        batchstart = args.batchstart
+        batchend = args.batchend
+    usermode = True
+    batchuser = args.batchuser
 
 #Get credentials from cfg file
 scriptdir = os.path.dirname(os.path.abspath(sys.argv[0]))
@@ -173,6 +229,8 @@ SMloginUrl = "https://sugoimusic.me/login.php"
 SMloginTestUrl = "https://sugoimusic.me/"
 SMsuccessStr = "Enabled users"
 SMloginData = {'username' : smuser, 'password' : smpass }
+
+s = MyLoginSession(loginUrl, loginData, loginTestUrl, successStr)
 
 def removehtmltags(text):
     clean = re.compile('<.*?>')
@@ -304,7 +362,6 @@ def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, ta
 
     return groupid
 
-s = MyLoginSession(loginUrl, loginData, loginTestUrl, successStr)
 
 def getgroupdata(jpsurl):
     groupdata= {}
@@ -364,47 +421,89 @@ def getgroupdata(jpsurl):
     groupdata['tagsall'] = ",".join(tags)
 
     #Try to find torrentid(s) in the url(s) to determine if this is a group url or a specific torrent url(s).
-    groupdata['torrentids'] = re.findall('torrentid=([0-9]+)', jpsurl)
+    #groupdata['torrentids'] = re.findall('torrentid=([0-9]+)', jpsurl)
     
     return groupdata
 
-groupdata = {}
-groupdata = getgroupdata(jpsurl)
-print groupdata
-
 authkey = getauthkey()
 
-groupid = None
+#groupid = None
 
-for releasedata, torrentlinkescaped in zip(getreleasedata(groupdata['category'], groupdata['torrentids']), gettorrentlinks(groupdata['torrentids'])):
-    print releasedata
-    if groupdata['category'] in VideoCategories:
-        if releasedata[1] == 'Blu':
-            media = 'Bluray'
+def collate(torrentids, groupdata):
+    groupid = None
+    for releasedata, torrentlinkescaped in zip(getreleasedata(groupdata['category'], torrentids), gettorrentlinks(torrentids)):
+        print releasedata
+        if groupdata['category'] in VideoCategories:
+            if releasedata[1] == 'Blu':
+                media = 'Bluray'
+            else:
+                media = releasedata[1]
+            audioformat = releasedata[0]
+            bitrate = "---"
         else:
-            media = releasedata[1]
-        audioformat = releasedata[0]
-        bitrate = "---"
+            media = releasedata[2]
+            audioformat = releasedata[0]
+            bitrate = releasedata[1]
+
+        torrentlink = HTMLParser.HTMLParser().unescape(torrentlinkescaped)
+        #Download JPS torrent
+        torrentfile = s.retrieveContent("https://jpopsuki.eu/%s" % torrentlink)
+        torrentfilename = get_valid_filename("JPS %s - %s - %s.torrent" % (groupdata['artist'], groupdata['title'], "-".join(releasedata)))
+        with open(torrentfilename, "wb") as f:
+            f.write(torrentfile.content)
+
+        #Upload torrent to SM
+        #If groupid was returned from a previous call of uploadtorrent() then use it to allow torrents
+        #to be uploaded to the same group, else get the groupid from the first run of uploadtorrent()
+        if groupid is None:
+            #TODO Use **groupdata and refactor uploadtorrent() to use it
+            groupid = uploadtorrent(groupdata['category'], groupdata['artist'], groupdata['title'], groupdata['date'], media, audioformat, bitrate, groupdata['tagsall'], groupdata['imagelink'], groupdata['groupdescription'], torrentfilename)
+        else:
+            uploadtorrent(groupdata['category'], groupdata['artist'], groupdata['title'], groupdata['date'], media, audioformat, bitrate, groupdata['tagsall'], groupdata['imagelink'], groupdata['groupdescription'], torrentfilename, groupid)
+
+
+if usermode:
+    if batchstart and batchend:
+        useruploads = getbulktorrentids(batchuser, batchstart, batchend)
     else:
-        media = releasedata[2]
-        audioformat = releasedata[0]
-        bitrate = releasedata[1]
+        useruploads = getbulktorrentids(batchuser)
+    #useruploadsgrouperrors = {}
+    useruploadsgrouperrors = collections.defaultdict(list)
+    useruploadscollateerrors = collections.defaultdict(list)
 
-    torrentlink = HTMLParser.HTMLParser().unescape(torrentlinkescaped)
-    #Download JPS torrent
-    torrentfile = s.retrieveContent("https://jpopsuki.eu/%s" % torrentlink)
-    torrentfilename = get_valid_filename("JPS %s - %s - %s.torrent" % (groupdata['artist'], groupdata['title'], "-".join(releasedata)))
-    with open(torrentfilename, "wb") as f:
-        f.write(torrentfile.content)
-    
-    #Upload torrent to SM
-    #If groupid was returned from a previous call of uploadtorrent() then use it to allow torrents
-    #to be uploaded to the same group, else get the groupid from the first run of uploadtorrent()
-    if groupid is None:
-        #TODO Use **groupdata and refactor uploadtorrent() to use it
-        groupid = uploadtorrent(groupdata['category'], groupdata['artist'], groupdata['title'], groupdata['date'], media, audioformat, bitrate, groupdata['tagsall'], groupdata['imagelink'], groupdata['groupdescription'], torrentfilename)
-    else:
-        uploadtorrent(groupdata['category'], groupdata['artist'], groupdata['title'], groupdata['date'], media, audioformat, bitrate, groupdata['tagsall'], groupdata['imagelink'], groupdata['groupdescription'], torrentfilename, groupid)
+    for key, value in useruploads.iteritems():
+        groupid = key
+        torrentids = value
+        try:
+            groupdata = getgroupdata("https://jpopsuki.eu/torrents.php?id=%s" % groupid)
+        except KeyboardInterrupt:  # Allow Ctrl-C to exit without showing the error multiple times and polluting the final error dict
+            raise
+        except:
+            print 'Error with retrieving group data for groupid %s trorrentid(s) %s, skipping upload' % (groupid, ",".join(torrentids))
+            useruploadsgrouperrors[groupid] = torrentids
+            continue
 
+        print groupdata
 
+        try:
+            collate(torrentids, groupdata)
+        except KeyboardInterrupt:  # Allow Ctrl-C to exit without showing the error multiple times and polluting the final error dict
+            raise
+        except:
+            print 'Error with collating/retrieving release data for groupid %s torrentid(s) %s, skipping upload' % (groupid, ",".join(torrentids))
+            useruploadscollateerrors[groupid] = torrentids
+            continue
+
+    if useruploadsgrouperrors:
+        print 'The following groupid(s) (torrentid(s) shown for reference) had errors in retrieving group data, keep this data safe and you can possibly retry with it in a later version:'
+        print useruploadsgrouperrors
+    if useruploadscollateerrors:
+        print 'The following groupid(s) and corresponding torrentid(s) had errors either in collating/retrieving release data or in performing the actual upload to SM (although group data was retrieved OK), keep this data safe and you can possibly retry with it in a later version:'
+        print useruploadscollateerrors
+
+else:
+    # Standard non-batch upload using --urls
+    groupdata = getgroupdata(jpsurl)
+    torrentids = re.findall('torrentid=([0-9]+)', jpsurl)
+    collate(torrentids, groupdata)
 
