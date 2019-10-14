@@ -357,7 +357,7 @@ def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, ta
                 except:
                     print 'Error'
 
-        with open("SMuploadresult." + torrentfilename + ".html", "w") as f:
+        with open("SMuploadresult." + filename + ".html", "w") as f:
             f.write(SMres.content)
 
     return groupid
