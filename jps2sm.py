@@ -76,7 +76,7 @@ class MyLoginSession:
         if self.debug:
             print('loading or generating session...')
         if os.path.exists(self.sessionFile) and not forceLogin:
-            time = self.modification_date(self.sessionFile)         
+            time = self.modification_date(self.sessionFile)
 
             # only load if file less than 30 minutes old
             lastModification = (datetime.datetime.now() - time).seconds
@@ -90,7 +90,7 @@ class MyLoginSession:
         if not wasReadFromCache:
             self.session = requests.Session()
             self.session.headers.update({'user-agent' : self.userAgent})
-            res = self.session.post(self.loginUrl, data = self.loginData, 
+            res = self.session.post(self.loginUrl, data = self.loginData,
                                     proxies = self.proxies, **kwargs)
 
             if self.debug:
@@ -128,7 +128,7 @@ class MyLoginSession:
             res = self.session.post(url , data = postData, proxies = self.proxies, files = postDataFiles, **kwargs)
 
         # the session has been updated on the server, so also update in cache
-        self.saveSessionToCache()            
+        self.saveSessionToCache()
 
         return res
 
@@ -265,10 +265,10 @@ VideoCategories = [
 TVCategories = [
     'TV-Music', 'TV-Variety', 'TV-Drama']
 
-def filterlist(string, substr): 
+def filterlist(string, substr):
     return [str for str in string if
-             any(sub in str for sub in substr)] 
-             
+             any(sub in str for sub in substr)]
+
 def gettorrentlinks(torrentids):
     alltorrentlinks = re.findall('href="(.*)" title="Download"', groupdata['rel2'])
     if len(torrentids) != 0: #We have specific torrent (release) url(s)
@@ -291,7 +291,7 @@ def getreleasedata(category, torrentids):
                 rel2data.extend(re.findall('swapTorrent(?:.*)%s(?:.*)\xbb (\w+) / (\w+)' % (torrentid),groupdata['rel2'] ))
             else:
                 rel2data.extend(re.findall('swapTorrent(?:.*)%s(?:.*)\xbb (.*) / (.*) / (.*)</a>' % (torrentid),groupdata['rel2']))
-        
+
     print rel2data
     return rel2data
 
@@ -366,7 +366,7 @@ def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, ta
 def getgroupdata(jpsurl):
     groupdata= {}
     #If there are multiple urls only the first url needs to be parsed
-    res = s.retrieveContent(jpsurl.split()[0]) 
+    res = s.retrieveContent(jpsurl.split()[0])
 
     soup = BeautifulSoup(res.text, 'html5lib')
 
@@ -393,7 +393,7 @@ def getgroupdata(jpsurl):
     if groupdata['category'] not in TVCategories:
         groupdata['title'] = re.findall('<a.*> - (.*) \[', text)[0]
     else:
-        #Using two sets of findall() as I cannot get the OR regex operator "|" to work 
+        #Using two sets of findall() as I cannot get the OR regex operator "|" to work
         title1 = re.findall('<a.*> - (?:[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])) - (.*)</h2>', text)
         title2 = re.findall('<a.*> - (.*) \((.*) (?:[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01]))', text)
         #title1 has 1 matching group, title2 has 2
@@ -422,7 +422,7 @@ def getgroupdata(jpsurl):
 
     #Try to find torrentid(s) in the url(s) to determine if this is a group url or a specific torrent url(s).
     #groupdata['torrentids'] = re.findall('torrentid=([0-9]+)', jpsurl)
-    
+
     return groupdata
 
 authkey = getauthkey()
