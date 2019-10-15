@@ -315,6 +315,7 @@ def getreleasedata(category, torrentids):
 def uploadtorrent(category, artist, title, date, tagsall, imagelink, groupdescription,
                   filename, groupid=None, **releasedata):
     uploadurl = 'https://sugoimusic.me/upload.php'
+    languages = ('Japanese', 'English', 'Korean', 'Chinese', 'Vietnamese')
     data = {
         'submit': 'true',
         'auth': authkey,
@@ -333,12 +334,15 @@ def uploadtorrent(category, artist, title, date, tagsall, imagelink, groupdescri
         # 'release_desc': releasedescription
     }
     if category in VideoCategories:
-        data['codec'] = 'h264'  # assumed default
-        data['ressel'] = 'SD'  # assumed default
-        data['container'] = 'MKV'  # assumed default
+        data['codec'] = releasedata['codec']
+        data['ressel'] = 'Other'
+        data['container'] = releasedata['container']
         data['sub'] = 'NoSubs'  # assumed default
         data['audioformat'] = 'AAC'  # assumed default
-        data['lang'] = 'Japanese'  # assumed default
+        data['lang'] = '---'
+        for language in languages:  # If we have language set, set the language field
+            if language.lower() in groupdata['tagsall']:
+                data['lang'] = language
         del data['bitrate']
 
     if 'remastertitle' in releasedata.keys():
@@ -459,13 +463,27 @@ def collate(torrentids, groupdata):
         # should be more 'dumb' for improved readability.
         releasedataout = {}
         if groupdata['category'] in VideoCategories:
-            # format / media
-            if releasedata[1] == 'Blu-Ray':  # JPS may actually be calling it the correct official name, but modern usage differs.
-                releasedataout['media'] = 'Bluray'
+            # container / media
+            # JPS uses the audioformat field for containers and codecs
+            badcontainers = ('ISO', 'VOB', 'MPEG', 'AVI', 'MKV', 'WMV', 'MP4')
+            badcodecs = ('MPEG2', 'h264')
+            if releasedata[0] in badcontainers:
+                releasedataout['container'] = releasedata[0]
+            else:
+                releasedataout['container'] = '---'
+            if releasedata[0] in badcodecs:
+                releasedataout['codec'] = releasedata[0]
+            else:
+                releasedataout['codec'] = 'h264'  # assume default
+            if releasedata[1] == 'Blu-Ray':
+                releasedataout['media'] = 'Bluray'  # JPS may actually be calling it the correct official name, but modern usage differs.
+                groupdata['category'] = 'Bluray'  # JPS only has a DVD category
+            elif releasedata[1] == 'WEB':
+                releasedataout['media'] = 'Web'
             else:
                 releasedataout['media'] = releasedata[1]
 
-            releasedataout['audioformat'] = releasedata[0]
+            releasedataout['audioformat'] = "---"
             releasedataout['bitrate'] = "---"
         else:
             # format / bitrate / media
