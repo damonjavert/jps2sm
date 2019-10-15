@@ -464,7 +464,8 @@ def collate(torrentids, groupdata):
         releasedataout = {}
         if groupdata['category'] in VideoCategories:
             # container / media
-            # JPS uses the audioformat field for containers and codecs
+            # JPS uses the audioformat field for containers and codecs, if we have a known codec or container set as
+            # media we can also set the container and codec here.
             badcontainers = ('ISO', 'VOB', 'MPEG', 'AVI', 'MKV', 'WMV', 'MP4')
             badcodecs = ('MPEG2', 'h264')
             if releasedata[0] in badcontainers:
@@ -475,14 +476,8 @@ def collate(torrentids, groupdata):
                 releasedataout['codec'] = releasedata[0]
             else:
                 releasedataout['codec'] = 'h264'  # assume default
-            if releasedata[1] == 'Blu-Ray':
-                releasedataout['media'] = 'Bluray'  # JPS may actually be calling it the correct official name, but modern usage differs.
-                groupdata['category'] = 'Bluray'  # JPS only has a DVD category
-            elif releasedata[1] == 'WEB':
-                releasedataout['media'] = 'Web'
-            else:
-                releasedataout['media'] = releasedata[1]
 
+            releasedataout['media'] = releasedata[1]
             releasedataout['audioformat'] = "---"
             releasedataout['bitrate'] = "---"
         else:
@@ -490,7 +485,7 @@ def collate(torrentids, groupdata):
             releasedataout['media'] = releasedata[2]
             releasedataout['audioformat'] = releasedata[0]
             releasedataout['bitrate'] = releasedata[1]
-            if releasedata[3]:  # Remastered
+            if len(releasedata) == 4:  # Remastered
                 remastertext = re.findall('(.*) - (.*)$', releasedata[3])[0]
                 releasedataout['remastertitle'] = remastertext[0]
                 # Year is mandatory on JPS so most releases have current year. This looks ugly on SM (and JPS) so if the
@@ -498,6 +493,12 @@ def collate(torrentids, groupdata):
                 year = re.findall('([0-9]{4})(?:.*)', groupdata['date'])[0]
                 if year != remastertext[1]:
                     releasedataout['remasteryear'] = remastertext[1]
+
+        if 'WEB' in releasedata:
+            releasedataout['media'] = 'Web'
+        elif 'Blu-Ray' in releasedata:
+            releasedataout['media'] = 'Bluray'  # JPS may actually be calling it the correct official name, but modern usage differs.
+            groupdata['category'] = 'Bluray'  # JPS only has a DVD category
 
         torrentlink = html.unescape(torrentlinkescaped)
         # Download JPS torrent
