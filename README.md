@@ -25,9 +25,9 @@ To upload only the FLAC and MP3 320:
 * Windows Users: If you are familiar using the shell, consider installing [cygwin](https://cygwin.com/install.html) and then select the python 3.6 packages. Or a python3 MSI installer can be found on the [offical python 3 downloads](https://www.python.org/downloads/windows/) page.
 
 ## Known limitations
-* Bluray torrents are not auto-detected, and these are uploaded as DVD.
+* ~~Bluray torrents are not auto-detected, and these are uploaded as DVD.~~ Fixed
 * The script does not automatically download your SM torrents - you need to navigate to SM and download them manually. *Perhaps this is a good idea as it forces the user to inspect the output*
-* For video torrents some data is guessed as the data is not available with certainty from JPS. Some extra work with pattern matching may be able work-around this.
+* For video torrents some data is guessed as the data is not available with certainty from JPS. ~~Some extra work with pattern matching may be able work-around this.~~ *All possible logic to gather data from JPS now done*
 
 ## Known bugs
 * ~~TV-Music does not currently work. *JPS uses `()` instead of `[]` to show dates.*~~
