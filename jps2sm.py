@@ -296,27 +296,24 @@ def gettorrentlinks(torrentids):
 
 def getreleasedata(category, torrentids):
     rel2data = []
+    freeleechtext = '<strong>Freeleech!</strong>'
     if len(torrentids) == 0:  # Group url
-        if category in VideoCategories:
-            rel2data = re.findall('\\xbb (\w+) / (\w+)', groupdata['rel2'])  # Support Freeleach
-        else:
-            rel2data = re.findall('\\xbb.* (.*) / (.*) / (.*)</a>', groupdata['rel2'])
+        slashdata = re.findall('\\xbb (.*)<\/a>',  groupdata['rel2'])
+        slashlist = [i.split(' / ') for i in slashdata]
+        if freeleechtext in slashlist:
+            slashlist.remove(freeleechtext)  # Remove Freeleech so it does not interfere with Remastered
     else:  # Release url(s) given
         for torrentid in torrentids:
-            if category in VideoCategories:
-                rel2data.extend(
-                    re.findall('swapTorrent(?:.*)%s(?:.*)\xbb (\w+) / (\w+)' % (torrentid), groupdata['rel2']))
-            else:
-                rel2data.extend(
-                    re.findall('swapTorrent(?:.*)%s(?:.*)\xbb (.*) / (.*) / (.*)</a>' % (torrentid), groupdata['rel2']))
+            slashdata = re.findall('swapTorrent(?:.*)%s(?:.*)\xbb (.*)<\/a>' % (torrentid), groupdata['rel2'])
+            slashlist = [i.split(' / ') for i in slashdata]
 
-    print(rel2data)
-    return rel2data
+    print(slashlist)
+    return slashlist
 
 
 # Send data to SugoiMusic upload!
-def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, tagsall, imagelink, groupdescription,
-                  filename, groupid=None, **kwargs):
+def uploadtorrent(category, artist, title, date, tagsall, imagelink, groupdescription,
+                  filename, groupid=None, **releasedata):
     uploadurl = 'https://sugoimusic.me/upload.php'
     data = {
         'submit': 'true',
@@ -327,25 +324,28 @@ def uploadtorrent(category, artist, title, date, media, audioformat, bitrate, ta
         # 'title_jp': title_jp, #TODO Extract Japanese title
         'idols[]': artist,
         'year': date,
-        # 'remaster': true,
-        # 'remasteryear': remasterdate,
-        # 'remastertitle': remastertitle,
-        'media': media,  # releasedata[2]
-        'audioformat': audioformat,  # releasedata[0]
-        'bitrate': bitrate,  # releasedata[1]
+        'media': releasedata['media'],  # releasedata[2]
+        'audioformat': releasedata['audioformat'],  # releasedata[0]
+        'bitrate': releasedata['bitrate'],  # releasedata[1]
         'tags': tagsall,
         'image': imagelink,
         'album_desc': groupdescription,
         # 'release_desc': releasedescription
     }
     if category in VideoCategories:
-        data['codec'] = audioformat
+        data['codec'] = 'h264'  # assumed default
         data['ressel'] = 'SD'  # assumed default
         data['container'] = 'MKV'  # assumed default
         data['sub'] = 'NoSubs'  # assumed default
         data['audioformat'] = 'AAC'  # assumed default
         data['lang'] = 'Japanese'  # assumed default
         del data['bitrate']
+
+    if 'remastertitle' in releasedata.keys():
+        data['remaster'] = 'remaster'
+        data['remastertitle'] = releasedata['remastertitle']
+    if 'remasteryear' in releasedata.keys():
+        data['remasteryear'] = releasedata['remasteryear']
 
     if groupid:
         data['groupid'] = groupid  # Upload torrents into the same group
@@ -455,17 +455,31 @@ def collate(torrentids, groupdata):
     for releasedata, torrentlinkescaped in zip(getreleasedata(groupdata['category'], torrentids),
                                                gettorrentlinks(torrentids)):
         print(releasedata)
+        # The collate logic here should probably be moved to getreleasedata() in the future for ease-of-use - collate
+        # should be more 'dumb' for improved readability.
+        releasedataout = {}
         if groupdata['category'] in VideoCategories:
-            if releasedata[1] == 'Blu':
-                media = 'Bluray'
+            # format / media
+            if releasedata[1] == 'Blu-Ray':  # JPS may actually be calling it the correct official name, but modern usage differs.
+                releasedataout['media'] = 'Bluray'
             else:
-                media = releasedata[1]
-            audioformat = releasedata[0]
-            bitrate = "---"
+                releasedataout['media'] = releasedata[1]
+
+            releasedataout['audioformat'] = releasedata[0]
+            releasedataout['bitrate'] = "---"
         else:
-            media = releasedata[2]
-            audioformat = releasedata[0]
-            bitrate = releasedata[1]
+            # format / bitrate / media
+            releasedataout['media'] = releasedata[2]
+            releasedataout['audioformat'] = releasedata[0]
+            releasedataout['bitrate'] = releasedata[1]
+            if releasedata[3]:  # Remastered
+                remastertext = re.findall('(.*) - (.*)$', releasedata[3])[0]
+                releasedataout['remastertitle'] = remastertext[0]
+                # Year is mandatory on JPS so most releases have current year. This looks ugly on SM (and JPS) so if the
+                # year is the groupdata['year'] we will not set it.
+                year = re.findall('([0-9]{4})(?:.*)', groupdata['date'])[0]
+                if year != remastertext[1]:
+                    releasedataout['remasteryear'] = remastertext[1]
 
         torrentlink = html.unescape(torrentlinkescaped)
         # Download JPS torrent
@@ -481,12 +495,12 @@ def collate(torrentids, groupdata):
         if groupid is None:
             # TODO Use **groupdata and refactor uploadtorrent() to use it
             groupid = uploadtorrent(groupdata['category'], groupdata['artist'], groupdata['title'], groupdata['date'],
-                                    media, audioformat, bitrate, groupdata['tagsall'], groupdata['imagelink'],
-                                    groupdata['groupdescription'], torrentfilename)
+                                    groupdata['tagsall'], groupdata['imagelink'],
+                                    groupdata['groupdescription'], torrentfilename, **releasedataout)
         else:
-            uploadtorrent(groupdata['category'], groupdata['artist'], groupdata['title'], groupdata['date'], media,
-                          audioformat, bitrate, groupdata['tagsall'], groupdata['imagelink'],
-                          groupdata['groupdescription'], torrentfilename, groupid)
+            uploadtorrent(groupdata['category'], groupdata['artist'], groupdata['title'], groupdata['date'],
+                          groupdata['tagsall'], groupdata['imagelink'],
+                          groupdata['groupdescription'], torrentfilename, groupid, **releasedataout)
 
 
 if usermode:
