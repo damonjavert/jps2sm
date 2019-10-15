@@ -160,7 +160,7 @@ def getbulktorrentids(user, first=1, last=None):
     # the way that uploadtorrent() works. for i in range(1, int(3)+1):
     for i in range(first, int(last) + 1):
         useruploadpage = s.retrieveContent("https://jpopsuki.eu/torrents.php?page=%s&order_by=s3&order_way=DESC&type=uploaded&userid=%s&disablegrouping=1" % (i, user))
-        print "https://jpopsuki.eu/torrents.php?page=%s&order_by=s3&order_way=DESC&type=uploaded&userid=%s&disablegrouping=1" % (i, user)
+        print("https://jpopsuki.eu/torrents.php?page=%s&order_by=s3&order_way=DESC&type=uploaded&userid=%s&disablegrouping=1" % (i, user))
         # print useruploadpage.text
         soup2 = BeautifulSoup(useruploadpage.text, 'html5lib')
         try:
@@ -169,16 +169,16 @@ def getbulktorrentids(user, first=1, last=None):
             # TODO: Need to add this to every request so it can be handled everywhere, for now it can exist here
             quotaexceeded = re.findall('<title>Browse quota exceeded :: JPopsuki 2.0</title>', useruploadpage.text)
             if quotaexceeded:
-                print 'Browse quota exceeded :: JPopsuki 2.0'
+                print('Browse quota exceeded :: JPopsuki 2.0')
                 sys.exit(0)
             else:
                 raise
         alltorrentlinksidsonly = re.findall('torrents.php\?id=([0-9]+)\&amp;torrentid=([0-9]+)', torrenttable)
-        print alltorrentlinksidsonly
+        print(alltorrentlinksidsonly)
         for groupid, torrentid in alltorrentlinksidsonly:
             useruploads[groupid].append(torrentid)
         time.sleep(5)  # Sleep as otherwise we hit JPS browse quota
-    print useruploads
+    print(useruploads)
     return useruploads
 
 
@@ -197,13 +197,13 @@ else:
 
 usermode = None
 if args.urls is None and args.batchuser is None:
-    print 'JPS URL(s) nor batchuser specified'
+    print('JPS URL(s) nor batchuser specified')
     sys.exit()
 elif args.urls:
     jpsurl = args.urls
 elif args.batchuser:
     if bool(args.batchstart) ^ bool(args.batchend):
-        print 'You have specified an incomplete page range.'
+        print('You have specified an incomplete page range.')
         sys.exit()
     elif bool(args.batchstart) and bool(args.batchend):
         batchstart = args.batchstart
@@ -218,7 +218,7 @@ configfile = scriptdir + '/jps2sm.cfg'
 try:
     open(configfile)
 except IOError:
-    print ('Error: cannot read cfg - enter your JPS/SM credentials in jps2sm.cfg and check jps2sm.cfg.example to see the syntax.')
+    print('Error: cannot read cfg - enter your JPS/SM credentials in jps2sm.cfg and check jps2sm.cfg.example to see the syntax.')
     raise
 
 config.read(configfile)
@@ -310,7 +310,7 @@ def getreleasedata(category, torrentids):
                 rel2data.extend(
                     re.findall('swapTorrent(?:.*)%s(?:.*)\xbb (.*) / (.*) / (.*)</a>' % (torrentid), groupdata['rel2']))
 
-    print (rel2data)
+    print(rel2data)
     return rel2data
 
 
@@ -454,7 +454,7 @@ def collate(torrentids, groupdata):
     groupid = None
     for releasedata, torrentlinkescaped in zip(getreleasedata(groupdata['category'], torrentids),
                                                gettorrentlinks(torrentids)):
-        print releasedata
+        print(releasedata)
         if groupdata['category'] in VideoCategories:
             if releasedata[1] == 'Blu':
                 media = 'Bluray'
@@ -467,7 +467,7 @@ def collate(torrentids, groupdata):
             audioformat = releasedata[0]
             bitrate = releasedata[1]
 
-        torrentlink = HTMLParser.HTMLParser().unescape(torrentlinkescaped)
+        torrentlink = html.unescape(torrentlinkescaped)
         # Download JPS torrent
         torrentfile = s.retrieveContent("https://jpopsuki.eu/%s" % torrentlink)
         torrentfilename = get_valid_filename(
@@ -497,7 +497,7 @@ if usermode:
     useruploadsgrouperrors = collections.defaultdict(list)
     useruploadscollateerrors = collections.defaultdict(list)
 
-    for key, value in useruploads.iteritems():
+    for key, value in useruploads.items():
         groupid = key
         torrentids = value
         try:
@@ -505,27 +505,27 @@ if usermode:
         except KeyboardInterrupt:  # Allow Ctrl-C to exit without showing the error multiple times and polluting the final error dict
             raise
         except:
-            print 'Error with retrieving group data for groupid %s trorrentid(s) %s, skipping upload' % (groupid, ",".join(torrentids))
+            print('Error with retrieving group data for groupid %s trorrentid(s) %s, skipping upload' % (groupid, ",".join(torrentids)))
             useruploadsgrouperrors[groupid] = torrentids
             continue
 
-        print groupdata
+        print(groupdata)
 
         try:
             collate(torrentids, groupdata)
         except KeyboardInterrupt:  # Allow Ctrl-C to exit without showing the error multiple times and polluting the final error dict
             raise
         except:
-            print 'Error with collating/retrieving release data for groupid %s torrentid(s) %s, skipping upload' % (groupid, ",".join(torrentids))
+            print('Error with collating/retrieving release data for groupid %s torrentid(s) %s, skipping upload' % (groupid, ",".join(torrentids)))
             useruploadscollateerrors[groupid] = torrentids
             continue
 
     if useruploadsgrouperrors:
-        print 'The following groupid(s) (torrentid(s) shown for reference) had errors in retrieving group data, keep this data safe and you can possibly retry with it in a later version:'
-        print useruploadsgrouperrors
+        print('The following groupid(s) (torrentid(s) shown for reference) had errors in retrieving group data, keep this data safe and you can possibly retry with it in a later version:')
+        print(useruploadsgrouperrors)
     if useruploadscollateerrors:
-        print 'The following groupid(s) and corresponding torrentid(s) had errors either in collating/retrieving release data or in performing the actual upload to SM (although group data was retrieved OK), keep this data safe and you can possibly retry with it in a later version:'
-        print useruploadscollateerrors
+        print('The following groupid(s) and corresponding torrentid(s) had errors either in collating/retrieving release data or in performing the actual upload to SM (although group data was retrieved OK), keep this data safe and you can possibly retry with it in a later version:')
+        print(useruploadscollateerrors)
 
 else:
     # Standard non-batch upload using --urls
