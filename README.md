@@ -40,7 +40,7 @@ To upload only the FLAC and MP3 320:
 * ~~Support auto-merging / auto add to last group.~~ DONE
 * ~~Migrate to using python3~~ DONE
 * Use pythonic `if __name__ == "__main__":`, defs for everything and general cleanup of the code *Started, ongoing*
-* Support remastered - this is a depenancy of allowing full-use of --batchuser
+* ~~Support remastered - this is a depenancy of allowing full-use of --batchuser~~
 * Allow some Cats to have < 3 tags, this could either be handled in gazelle or here - this is a depenancy of allowing full-use of --batchuser
 
 See also: https://git.sugoimusic.me/Sugoimusic/jps2sm/issues
