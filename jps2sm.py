@@ -295,7 +295,7 @@ def gettorrentlinks(torrentids):
 
 
 def getreleasedata(category, torrentids):
-    rel2data = []
+    slashlist = []
     freeleechtext = '<strong>Freeleech!</strong>'
     if len(torrentids) == 0:  # Group url
         slashdata = re.findall('\\xbb (.*)<\/a>',  groupdata['rel2'])
@@ -304,8 +304,8 @@ def getreleasedata(category, torrentids):
             slashlist.remove(freeleechtext)  # Remove Freeleech so it does not interfere with Remastered
     else:  # Release url(s) given
         for torrentid in torrentids:
-            slashdata = re.findall('swapTorrent(?:.*)%s(?:.*)\xbb (.*)<\/a>' % (torrentid), groupdata['rel2'])
-            slashlist = [i.split(' / ') for i in slashdata]
+            slashdata = re.findall('swapTorrent(?:.*)%s(?:.*)\\xbb (.*)<\/a>' % (torrentid), groupdata['rel2'])
+            slashlist.extend([i.split(' / ') for i in slashdata])
 
     print(slashlist)
     return slashlist
