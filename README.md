@@ -15,10 +15,10 @@ A **release-url** looks like `https://jpopsuki.eu/torrents.php?id=111284&torrent
 Add your JPS and SM login credentials to **jps2sm.cfg**, using **jps2sm.cfg.example** as a template.
 Go to SM and download your torrent files and add them to your torrent client. Enjoy!
 #### Examples
-To upload every release of AKB48 - 1830m:
+* To upload every release of AKB48 - 1830m:
 `python jps2sm.py --urls https://jpopsuki.eu/torrents.php?id=111284`
-To upload only the FLAC and MP3 320:
-`python jps2sm.py --urls https://jpopsuki.eu/torrents.php?id=111284&torrentid=148289 https://jpopsuki.eu/torrents.php?id=111284&torrentid=147830`
+* To upload only the FLAC and MP3 320:
+`python jps2sm.py --urls "https://jpopsuki.eu/torrents.php?id=111284&torrentid=148289 https://jpopsuki.eu/torrents.php?id=111284&torrentid=147830"`
 ### Help! I dont know all this python stuff
 
 * Mac Users: The best method is to install [Homebrew](https://brew.sh) and then `brew install python3`. See this guide: https://wsvincent.com/install-python3-mac/
@@ -32,7 +32,7 @@ To upload only the FLAC and MP3 320:
 ## Known bugs
 * ~~TV-Music does not currently work. *JPS uses `()` instead of `[]` to show dates.*~~
 * Pictures do not work as JPS does not have a release-date for them.
-* Fansubs are currently not support as these will probably be added to the group page either by adding a release type or integrating it into the group page ala BTN.
+* Fansubs are currently not support as these will probably be added to the group page either by adding a release type or integrating it into the group page ala BTN. Most Fansubs on JPS are subtitled video torrents and not actual subtitles, so perhaps these can just have a changed type
 
 ## Roadmap
 * ~~Support individual torrent links~~ DONE
@@ -42,6 +42,7 @@ To upload only the FLAC and MP3 320:
 * Use pythonic `if __name__ == "__main__":`, defs for everything and general cleanup of the code *Started, ongoing*
 * ~~Support remastered - this is a depenancy of allowing full-use of --batchuser~~
 * Allow some Cats to have < 3 tags, this could either be handled in gazelle or here - this is a depenancy of allowing full-use of --batchuser
+* Auto detect EP torrents
 
 See also: https://git.sugoimusic.me/Sugoimusic/jps2sm/issues
 
