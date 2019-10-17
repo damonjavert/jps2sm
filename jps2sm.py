@@ -21,7 +21,9 @@ import html5lib
 from bs4 import BeautifulSoup
 from django.utils.text import get_valid_filename
 
-__version__ = "0.6.1"
+__version__ = "0.6.2"
+
+sys.tracebacklimit = 0
 
 class MyLoginSession:
     """
@@ -220,7 +222,7 @@ config = configparser.ConfigParser()
 configfile = scriptdir + '/jps2sm.cfg'
 try:
     open(configfile)
-except IOError:
+except FileNotFoundError:
     print('Error: cannot read cfg - enter your JPS/SM credentials in jps2sm.cfg and check jps2sm.cfg.example to see the syntax.')
     raise
 
@@ -367,23 +369,23 @@ def uploadtorrent(category, artist, title, date, tagsall, imagelink, groupdescri
         SMs = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr)
         SMres = SMs.retrieveContent(uploadurl, "post", data, postDataFiles)
 
-        # TODO: Need to sort out this error logic
-        try:
-            SMerrorTorrent = re.findall('red; text-align: center;">(.*)</p>', SMres.text)[0]
-            print (SMerrorTorrent)
-            if not groupid:
-                groupid = re.findall('<input type="hidden" name="groupid" value="(.*)" />', SMres.text)[0]
-                print (groupid)
-        except:
-            try:
-                SMerrorLogon = re.findall('<p>Invalid(.*)</p>', SMres.text)[0]
-                print ('Invalid ' + SMerrorLogon)
-            except:
-                try:
-                    groupid = re.findall('<input type="hidden" name="groupid" value="(.*)" />', SMres.text)[0]
-                    print ('OK - groupid %s' % groupid)
-                except:
-                    print ('Error')
+        SMerrorTorrent = re.findall('red; text-align: center;">(.*)</p>', SMres.text)
+        if SMerrorTorrent:
+            dupe = re.findall('torrentid=([0-9]+)">The exact same torrent file already exists on the site!</a>$', SMerrorTorrent[0])
+            if dupe:
+                raise Exception(f'The exact same torrent file already exists on the site! See: https://sugoimusic.me/torrents.php?torrentid={dupe[0]}')
+            else:
+                raise Exception(SMerrorTorrent[0])
+
+        SMerrorLogon = re.findall('<p>Invalid (.*)</p>', SMres.text)
+        if SMerrorLogon:
+            raise Exception(f'Invalid {SMerrorLogon[0]}')
+
+        groupid = re.findall('<input type="hidden" name="groupid" value="(.*)" />', SMres.text)
+        if not groupid:
+            raise Exception('Error')
+        else:
+            print ('OK - groupid %s' % groupid)
 
         with open("SMuploadresult." + filename + ".html", "w") as f:
             f.write(str(SMres.content))
