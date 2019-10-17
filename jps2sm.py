@@ -323,7 +323,7 @@ def uploadtorrent(category, artist, title, date, tagsall, imagelink, groupdescri
     languages = ('Japanese', 'English', 'Korean', 'Chinese', 'Vietnamese')
     data = {
         'submit': 'true',
-        'auth': authkey,
+        'auth': getauthkey(),
         'type': Categories[category],
         # TODO Add feature to request cateogry as parameter as JPS cats do not all = SM cats
         'title': title,
@@ -456,7 +456,7 @@ def getgroupdata(jpsurl):
     return groupdata
 
 
-authkey = getauthkey()
+
 
 
 def collate(torrentids, groupdata):
