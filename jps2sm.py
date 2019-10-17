@@ -21,7 +21,7 @@ import html5lib
 from bs4 import BeautifulSoup
 from django.utils.text import get_valid_filename
 
-__version__ = "0.6.2"
+__version__ = "0.6.3"
 
 sys.tracebacklimit = 0
 
@@ -332,7 +332,6 @@ def uploadtorrent(category, artist, title, date, tagsall, imagelink, groupdescri
         'year': date,
         'media': releasedata['media'],  # releasedata[2]
         'audioformat': releasedata['audioformat'],  # releasedata[0]
-        'bitrate': releasedata['bitrate'],  # releasedata[1]
         'tags': tagsall,
         'image': imagelink,
         'album_desc': groupdescription,
@@ -343,12 +342,12 @@ def uploadtorrent(category, artist, title, date, tagsall, imagelink, groupdescri
         data['ressel'] = 'Other'
         data['container'] = releasedata['container']
         data['sub'] = 'NoSubs'  # assumed default
-        data['audioformat'] = 'AAC'  # assumed default
-        data['lang'] = '---'
+        data['lang'] = 'CHANGEME'
         for language in languages:  # If we have language set, set the language field
             if language.lower() in groupdata['tagsall']:
                 data['lang'] = language
-        del data['bitrate']
+    else:
+        data['bitrate'] = releasedata['bitrate']  # releasedata[1]
 
     if 'remastertitle' in releasedata.keys():
         data['remaster'] = 'remaster'
@@ -476,15 +475,18 @@ def collate(torrentids, groupdata):
             if releasedata[0] in badcontainers:
                 releasedataout['container'] = releasedata[0]
             else:
-                releasedataout['container'] = '---'
+                releasedataout['container'] = 'CHANGEME'
             if releasedata[0] in badcodecs:
                 releasedataout['codec'] = releasedata[0]
             else:
-                releasedataout['codec'] = 'h264'  # assume default
+                releasedataout['codec'] = 'CHANGEME'  # assume default
 
             releasedataout['media'] = releasedata[1]
-            releasedataout['audioformat'] = "---"
-            releasedataout['bitrate'] = "---"
+            if releasedata[0] == 'AAC':
+                releasedataout['audioformat'] == 'AAC'
+            else:
+                releasedataout['audioformat'] = "CHANGEME"
+                
         else:
             # format / bitrate / media
             releasedataout['media'] = releasedata[2]
