@@ -21,7 +21,7 @@ import html5lib
 from bs4 import BeautifulSoup
 from django.utils.text import get_valid_filename
 
-__version__ = "0.6.3"
+__version__ = "0.6.4"
 
 sys.tracebacklimit = 0
 
@@ -305,12 +305,13 @@ def getreleasedata(category, torrentids):
     if len(torrentids) == 0:  # Group url
         slashdata = re.findall('\\xbb (.*)<\/a>',  groupdata['rel2'])
         slashlist = [i.split(' / ') for i in slashdata]
-        if freeleechtext in slashlist:
-            slashlist.remove(freeleechtext)  # Remove Freeleech so it does not interfere with Remastered
     else:  # Release url(s) given
         for torrentid in torrentids:
             slashdata = re.findall('swapTorrent(?:.*)%s(?:.*)\\xbb (.*)<\/a>' % (torrentid), groupdata['rel2'])
             slashlist.extend([i.split(' / ') for i in slashdata])
+
+    if freeleechtext in slashlist:
+        slashlist.remove(freeleechtext)  # Remove Freeleech so it does not interfere with Remastered
 
     print(slashlist)
     return slashlist
