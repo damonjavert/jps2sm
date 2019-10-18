@@ -23,8 +23,6 @@ from django.utils.text import get_valid_filename
 
 __version__ = "0.6.4"
 
-sys.tracebacklimit = 0
-
 class MyLoginSession:
     """
     https://stackoverflow.com/a/37118451/2115140
@@ -188,6 +186,7 @@ def getbulktorrentids(user, first=1, last=None):
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + __version__)
+parser.add_argument('-d', '--debug', help='Enable debug mode', action='store_true')
 parser.add_argument("-u", "--urls", help="JPS URL for a group, or multiple individual releases URLs to be added to the same group", type=str)
 parser.add_argument("-n", "--dryrun", help="Just parse url and show the output, do not add the torrent to SM", action="store_true")
 parser.add_argument("-b", "--batchuser", help="Upload all releases uploaded by a particular user id")
@@ -199,6 +198,11 @@ if args.dryrun:
     dryrun = True
 else:
     dryrun = None
+if args.debug:
+    debug = True
+else:
+    sys.tracebacklimit = 0
+    debug = False
 
 usermode = None
 if args.urls is None and args.batchuser is None:
