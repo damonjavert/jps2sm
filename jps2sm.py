@@ -21,7 +21,7 @@ import html5lib
 from bs4 import BeautifulSoup
 from django.utils.text import get_valid_filename
 
-__version__ = "0.6.5"
+__version__ = "0.6.6"
 
 class MyLoginSession:
     """
@@ -555,10 +555,7 @@ def collate(torrentids, groupdata):
 
 
 if usermode:
-    if batchstart and batchend:
-        useruploads = getbulktorrentids(batchuser, batchstart, batchend)
-    else:
-        useruploads = getbulktorrentids(batchuser)
+    useruploads = getbulktorrentids(batchuser)
     useruploadsgrouperrors = collections.defaultdict(list)
     useruploadscollateerrors = collections.defaultdict(list)
 
