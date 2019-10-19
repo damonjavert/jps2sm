@@ -21,7 +21,7 @@ import html5lib
 from bs4 import BeautifulSoup
 from django.utils.text import get_valid_filename
 
-__version__ = "0.6.6"
+__version__ = "0.6.6.3"
 
 class MyLoginSession:
     """
@@ -150,16 +150,19 @@ def getbulktorrentids(user, first=1, last=None):
     linkbox = str(soup.select('#content #ajax_torrents .linkbox')[0])
     if not last:
         try:
-            last = re.findall('page=([0-9]*)&amp;order_by=s3&amp;order_way=DESC&amp;type=uploaded&amp;userid=(?:[0-9]*)&amp;disablegrouping=1\'\);"><strong> Last &gt;&gt;<\/strong>', linkbox)[0]
+            last = re.findall('page=([0-9]*)&amp;order_by=s3&amp;order_way=DESC&amp;type=uploaded&amp;userid=(?:[0-9]*)&amp;disablegrouping=1\'\);"><strong> Last &gt;&gt;</strong>', linkbox)[0]
         except:
             # There is only 1 page of uploads if the 'Last >>' link cannot be found
             last = 1
+
+    if debug:
+        print(f'First page is {first}, last page is {last}')
 
     useruploads = {}
     useruploads = collections.defaultdict(list)
 
     # Parse every torrent page and add to dict, to group together releases into the same group so that they work with
-    # the way that uploadtorrent() works. for i in range(1, int(3)+1):
+    # the way that uploadtorrent() works.
     for i in range(first, int(last) + 1):
         useruploadpage = s.retrieveContent("https://jpopsuki.eu/torrents.php?page=%s&order_by=s3&order_way=DESC&type=uploaded&userid=%s&disablegrouping=1" % (i, user))
         print("https://jpopsuki.eu/torrents.php?page=%s&order_by=s3&order_way=DESC&type=uploaded&userid=%s&disablegrouping=1" % (i, user))
@@ -218,6 +221,8 @@ else:
     excfiltermedia = None
 
 usermode = None
+batchstart = None
+batchend = None
 if args.urls is None and args.batchuser is None:
     print('JPS URL(s) nor batchuser specified')
     sys.exit()
@@ -555,7 +560,10 @@ def collate(torrentids, groupdata):
 
 
 if usermode:
-    useruploads = getbulktorrentids(batchuser)
+    if batchstart and batchend:
+        useruploads = getbulktorrentids(batchuser, batchstart, batchend)
+    else:
+        useruploads = getbulktorrentids(batchuser)
     useruploadsgrouperrors = collections.defaultdict(list)
     useruploadscollateerrors = collections.defaultdict(list)
 
