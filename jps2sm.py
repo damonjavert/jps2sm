@@ -21,7 +21,7 @@ import html5lib
 from bs4 import BeautifulSoup
 from django.utils.text import get_valid_filename
 
-__version__ = "0.6.4"
+__version__ = "0.6.5"
 
 class MyLoginSession:
     """
@@ -192,17 +192,30 @@ parser.add_argument("-n", "--dryrun", help="Just parse url and show the output, 
 parser.add_argument("-b", "--batchuser", help="Upload all releases uploaded by a particular user id")
 parser.add_argument("-s", "--batchstart", help="(Batch mode only) Start at this page", type=int)
 parser.add_argument("-e", "--batchend", help="(Batch mode only) End at this page", type=int)
+parser.add_argument("-f", "--excfilteraudioformat", help="Exclude a audioformat from upload", type=str)
+parser.add_argument("-F", "--excfiltermedia", help="Exclude a media from upload", type=str)
 args = parser.parse_args()
 
 if args.dryrun:
     dryrun = True
 else:
     dryrun = None
+
 if args.debug:
     debug = True
 else:
     sys.tracebacklimit = 0
     debug = False
+
+if args.excfilteraudioformat:
+    excfilteraudioformat = args.excfilteraudioformat
+else:
+    excfilteraudioformat = None
+
+if args.excfiltermedia:
+    excfiltermedia = args.excfiltermedia
+else:
+    excfiltermedia = None
 
 usermode = None
 if args.urls is None and args.batchuser is None:
@@ -460,13 +473,11 @@ def getgroupdata(jpsurl):
     return groupdata
 
 
-
-
-
 def collate(torrentids, groupdata):
     groupid = None
     for releasedata, torrentlinkescaped in zip(getreleasedata(groupdata['category'], torrentids),
                                                gettorrentlinks(torrentids)):
+
         print(releasedata)
         # The collate logic here should probably be moved to getreleasedata() in the future for ease-of-use - collate
         # should be more 'dumb' for improved readability.
@@ -487,6 +498,7 @@ def collate(torrentids, groupdata):
                 releasedataout['codec'] = 'CHANGEME'  # assume default
 
             releasedataout['media'] = releasedata[1]
+
             if releasedata[0] == 'AAC':
                 releasedataout['audioformat'] == 'AAC'
             else:
@@ -497,6 +509,14 @@ def collate(torrentids, groupdata):
             releasedataout['media'] = releasedata[2]
             releasedataout['audioformat'] = releasedata[0]
             releasedataout['bitrate'] = releasedata[1]
+
+            if releasedataout['audioformat'] == excfilteraudioformat:  # Exclude filters
+                print(f'Excluding {releasedata} as exclude audioformat {excfilteraudioformat} is set')
+                continue
+            elif releasedataout['media'] == excfiltermedia:
+                print(f'Excluding {releasedata} as exclude  {excfiltermedia} is set')
+                continue
+
             if len(releasedata) == 4:  # Remastered
                 remastertext = re.findall('(.*) - (.*)$', releasedata[3])[0]
                 releasedataout['remastertitle'] = remastertext[0]
@@ -506,7 +526,7 @@ def collate(torrentids, groupdata):
                 if year != remastertext[1]:
                     releasedataout['remasteryear'] = remastertext[1]
 
-        if 'WEB' in releasedata:
+        if 'WEB' in releasedata:  # Media validation
             releasedataout['media'] = 'Web'
         elif 'Blu-Ray' in releasedata:
             releasedataout['media'] = 'Bluray'  # JPS may actually be calling it the correct official name, but modern usage differs.
