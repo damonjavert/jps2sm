@@ -237,7 +237,7 @@ def getreleasedata(category, torrentids):
 
 
 # Send data to SugoiMusic upload!
-def uploadtorrent(category, artist, title, date, tagsall, imagelink, groupdescription,
+def uploadtorrent(category, artist, title, originaltitle, date, tagsall, imagelink, groupdescription,
                   filename, groupid=None, **releasedata):
     uploadurl = 'https://sugoimusic.me/upload.php'
     languages = ('Japanese', 'English', 'Korean', 'Chinese', 'Vietnamese')
@@ -247,7 +247,6 @@ def uploadtorrent(category, artist, title, date, tagsall, imagelink, groupdescri
         'type': Categories[category],
         # TODO Add feature to request cateogry as parameter as JPS cats do not all = SM cats
         'title': title,
-        # 'title_jp': title_jp, #TODO Extract Japanese title
         'idols[]': artist,
         'year': date,
         'media': releasedata['media'],  # releasedata[2]
@@ -277,6 +276,9 @@ def uploadtorrent(category, artist, title, date, tagsall, imagelink, groupdescri
 
     if groupid:
         data['groupid'] = groupid  # Upload torrents into the same group
+
+    if originaltitle:
+        data['title_jp'] = originaltitle
 
     postDataFiles = {
         'file_input': open(filename, 'rb')
@@ -321,6 +323,7 @@ def getgroupdata(jpsurl):
 
     artistline = soup.select('.thin h2')
     artistlinelink = soup.select('.thin h2 a')
+    originaltitleline = soup.select('.thin h3')
     text = str(artistline[0])
     print(artistline[0])
 
@@ -350,6 +353,11 @@ def getgroupdata(jpsurl):
         groupdata['title'] = "".join(itertools.chain(*titlemerged))
 
     print(groupdata['title'])
+
+    originaltitle = re.findall('\((?:.+) - (.*)\)', str(originaltitleline))
+    if originaltitle:
+        groupdata['originaltitle'] = originaltitle[0]
+        print(groupdata['originaltitle'])
 
     groupdata['rel2'] = str(soup.select('#content .thin .main_column .torrent_table tbody')[0])
 
@@ -446,11 +454,13 @@ def collate(torrentids, groupdata):
         # to be uploaded to the same group, else get the groupid from the first run of uploadtorrent()
         if groupid is None:
             # TODO Use **groupdata and refactor uploadtorrent() to use it
-            groupid = uploadtorrent(groupdata['category'], groupdata['artist'], groupdata['title'], groupdata['date'],
+            groupid = uploadtorrent(groupdata['category'], groupdata['artist'], groupdata['title'],
+                                    groupdata['originaltitle'], groupdata['date'],
                                     groupdata['tagsall'], groupdata['imagelink'],
                                     groupdata['groupdescription'], torrentfilename, **releasedataout)
         else:
-            uploadtorrent(groupdata['category'], groupdata['artist'], groupdata['title'], groupdata['date'],
+            uploadtorrent(groupdata['category'], groupdata['artist'], groupdata['title'],
+                          groupdata['originaltitle'], groupdata['date'],
                           groupdata['tagsall'], groupdata['imagelink'],
                           groupdata['groupdescription'], torrentfilename, groupid, **releasedataout)
 
