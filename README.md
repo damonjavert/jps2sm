@@ -6,8 +6,9 @@ jps2sm.py is a python ~~2.7~~ 3.6 script that will automatically gather data fro
 
 ## How to use
 ### Quickstart - for those familiar with python
-``pip3 install -r requirements.txt
-python3 jps2sm.py --urls group-url or release-urls``
+``pip3 install -r requirements.txt``
+
+``python3 jps2sm.py --urls group-url or release-urls``
 
 A **group-url** looks like `https://jpopsuki.eu/torrents.php?id=111284`
 A **release-url** looks like `https://jpopsuki.eu/torrents.php?id=111284&torrentid=148289`
