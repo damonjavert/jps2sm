@@ -1,7 +1,7 @@
-#jps2sm.py is a python script that will automatically gather data from JPS from a given group url, 
-#iterate through all the torrents and upload them to SM.
+# jps2sm.py is a python script that will automatically gather data from JPS from a given group url,
+# iterate through all the torrents and upload them to SM.
 
-#Standard library packages
+# Standard library packages
 import re
 import os
 import sys
@@ -15,7 +15,7 @@ import pickle
 import html
 from urllib.parse import urlparse
 
-#Third-party packages
+# Third-party packages
 import requests
 import html5lib
 from bs4 import BeautifulSoup
@@ -268,21 +268,6 @@ SMloginData = {'username': smuser, 'password': smpass}
 
 s = MyLoginSession(loginUrl, loginData, loginTestUrl, successStr)
 
-
-def removehtmltags(text):
-    clean = re.compile('<.*?>')
-    return re.sub(clean, '', text)
-
-
-def getauthkey():
-    SMshome = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr)
-    SMreshome = SMshome.retrieveContent("https://sugoimusic.me/torrents.php?id=118")
-    soup = BeautifulSoup(SMreshome.text, 'html5lib')
-    rel2 = str(soup.select('#content .thin .main_column .torrent_table tbody'))
-    authkey = re.findall('authkey=(.*)&amp;torrent_pass=', rel2)
-    return authkey
-
-
 Categories = {
     'Album': 0,
     # 'EP': 1, #Does not exist on JPS
@@ -303,6 +288,20 @@ VideoCategories = [
 
 TVCategories = [
     'TV-Music', 'TV-Variety', 'TV-Drama']
+
+
+def removehtmltags(text):
+    clean = re.compile('<.*?>')
+    return re.sub(clean, '', text)
+
+
+def getauthkey():
+    SMshome = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr)
+    SMreshome = SMshome.retrieveContent("https://sugoimusic.me/torrents.php?id=118")
+    soup = BeautifulSoup(SMreshome.text, 'html5lib')
+    rel2 = str(soup.select('#content .thin .main_column .torrent_table tbody'))
+    authkey = re.findall('authkey=(.*)&amp;torrent_pass=', rel2)
+    return authkey
 
 
 def filterlist(string, substr):
