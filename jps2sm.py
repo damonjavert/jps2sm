@@ -21,7 +21,8 @@ import html5lib
 from bs4 import BeautifulSoup
 from django.utils.text import get_valid_filename
 
-__version__ = "0.6.6.3"
+__version__ = "0.6.7"
+
 
 class MyLoginSession:
     """
@@ -185,102 +186,6 @@ def getbulktorrentids(user, first=1, last=None):
         time.sleep(5)  # Sleep as otherwise we hit JPS browse quota
     print(useruploads)
     return useruploads
-
-
-parser = argparse.ArgumentParser()
-parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + __version__)
-parser.add_argument('-d', '--debug', help='Enable debug mode', action='store_true')
-parser.add_argument("-u", "--urls", help="JPS URL for a group, or multiple individual releases URLs to be added to the same group", type=str)
-parser.add_argument("-n", "--dryrun", help="Just parse url and show the output, do not add the torrent to SM", action="store_true")
-parser.add_argument("-b", "--batchuser", help="Upload all releases uploaded by a particular user id")
-parser.add_argument("-s", "--batchstart", help="(Batch mode only) Start at this page", type=int)
-parser.add_argument("-e", "--batchend", help="(Batch mode only) End at this page", type=int)
-parser.add_argument("-f", "--excfilteraudioformat", help="Exclude an audioformat from upload", type=str)
-parser.add_argument("-F", "--excfiltermedia", help="Exclude a media from upload", type=str)
-args = parser.parse_args()
-
-# TODO consider calling args[] directly, we will then not need this line
-dryrun = debug = excfilteraudioformat = excfiltermedia = usermode = batchstart = batchend = None
-
-if args.dryrun:
-    dryrun = True
-
-if args.debug:
-    debug = True
-else:
-    sys.tracebacklimit = 0
-
-if args.excfilteraudioformat:
-    excfilteraudioformat = args.excfilteraudioformat
-
-if args.excfiltermedia:
-    excfiltermedia = args.excfiltermedia
-
-if args.urls is None and args.batchuser is None:
-    print('JPS URL(s) nor batchuser specified')
-    sys.exit()
-elif args.urls:
-    jpsurl = args.urls
-elif args.batchuser:
-    if bool(args.batchstart) ^ bool(args.batchend):
-        print('You have specified an incomplete page range.')
-        sys.exit()
-    elif bool(args.batchstart) and bool(args.batchend):
-        batchstart = args.batchstart
-        batchend = args.batchend
-    usermode = True
-    batchuser = args.batchuser
-
-# Get credentials from cfg file
-scriptdir = os.path.dirname(os.path.abspath(sys.argv[0]))
-config = configparser.ConfigParser()
-configfile = scriptdir + '/jps2sm.cfg'
-try:
-    open(configfile)
-except FileNotFoundError:
-    print('Error: cannot read cfg - enter your JPS/SM credentials in jps2sm.cfg and check jps2sm.cfg.example to see the syntax.')
-    raise
-
-config.read(configfile)
-jpsuser = config.get('JPopSuki', 'User')
-jpspass = config.get('JPopSuki', 'Password')
-smuser = config.get('SugoiMusic', 'User')
-smpass = config.get('SugoiMusic', 'Password')
-
-# JPS MyLoginSession vars
-loginUrl = "https://jpopsuki.eu/login.php"
-loginTestUrl = "https://jpopsuki.eu"
-successStr = "Latest 5 Torrents"
-loginData = {'username': jpsuser, 'password': jpspass}
-
-# SM MyLoginSession vars
-SMloginUrl = "https://sugoimusic.me/login.php"
-SMloginTestUrl = "https://sugoimusic.me/"
-SMsuccessStr = "Enabled users"
-SMloginData = {'username': smuser, 'password': smpass}
-
-s = MyLoginSession(loginUrl, loginData, loginTestUrl, successStr)
-
-Categories = {
-    'Album': 0,
-    # 'EP': 1, #Does not exist on JPS
-    'Single': 2,
-    'Bluray': 3,  # Does not exist on JPS
-    'DVD': 4,
-    'PV': 5,
-    'Music Performance': 6,  # Does not exist on JPS
-    'TV-Music': 7,  # Music Show
-    'TV-Variety': 8,  # Talk Show
-    'TV-Drama': 9,  # TV Drama
-    'Pictures': 10,
-    'Misc': 11,
-}
-
-VideoCategories = [
-    'Bluray', 'DVD', 'PV', 'TV-Music', 'TV-Variety', 'TV-Drama', 'Music Performace']
-
-TVCategories = [
-    'TV-Music', 'TV-Variety', 'TV-Drama']
 
 
 def removehtmltags(text):
@@ -551,46 +456,146 @@ def collate(torrentids, groupdata):
                           groupdata['groupdescription'], torrentfilename, groupid, **releasedataout)
 
 
-if usermode:
-    if batchstart and batchend:
-        useruploads = getbulktorrentids(batchuser, batchstart, batchend)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + __version__)
+    parser.add_argument('-d', '--debug', help='Enable debug mode', action='store_true')
+    parser.add_argument("-u", "--urls", help="JPS URL for a group, or multiple individual releases URLs to be added to the same group", type=str)
+    parser.add_argument("-n", "--dryrun", help="Just parse url and show the output, do not add the torrent to SM", action="store_true")
+    parser.add_argument("-b", "--batchuser", help="Upload all releases uploaded by a particular user id")
+    parser.add_argument("-s", "--batchstart", help="(Batch mode only) Start at this page", type=int)
+    parser.add_argument("-e", "--batchend", help="(Batch mode only) End at this page", type=int)
+    parser.add_argument("-f", "--excfilteraudioformat", help="Exclude an audioformat from upload", type=str)
+    parser.add_argument("-F", "--excfiltermedia", help="Exclude a media from upload", type=str)
+    args = parser.parse_args()
+
+    # TODO consider calling args[] directly, we will then not need this line
+    dryrun = debug = excfilteraudioformat = excfiltermedia = usermode = batchstart = batchend = None
+
+    if args.dryrun:
+        dryrun = True
+
+    if args.debug:
+        debug = True
     else:
-        useruploads = getbulktorrentids(batchuser)
-    useruploadsgrouperrors = collections.defaultdict(list)
-    useruploadscollateerrors = collections.defaultdict(list)
+        sys.tracebacklimit = 0
 
-    for key, value in useruploads.items():
-        groupid = key
-        torrentids = value
-        try:
-            groupdata = getgroupdata("https://jpopsuki.eu/torrents.php?id=%s" % groupid)
-        except KeyboardInterrupt:  # Allow Ctrl-C to exit without showing the error multiple times and polluting the final error dict
-            raise
-        except:
-            print('Error with retrieving group data for groupid %s trorrentid(s) %s, skipping upload' % (groupid, ",".join(torrentids)))
-            useruploadsgrouperrors[groupid] = torrentids
-            continue
+    if args.excfilteraudioformat:
+        excfilteraudioformat = args.excfilteraudioformat
 
-        print(groupdata)
+    if args.excfiltermedia:
+        excfiltermedia = args.excfiltermedia
 
-        try:
-            collate(torrentids, groupdata)
-        except KeyboardInterrupt:  # Allow Ctrl-C to exit without showing the error multiple times and polluting the final error dict
-            raise
-        except:
-            print('Error with collating/retrieving release data for groupid %s torrentid(s) %s, skipping upload' % (groupid, ",".join(torrentids)))
-            useruploadscollateerrors[groupid] = torrentids
-            continue
+    if args.urls is None and args.batchuser is None:
+        print('JPS URL(s) nor batchuser specified')
+        sys.exit()
+    elif args.urls:
+        jpsurl = args.urls
+    elif args.batchuser:
+        if bool(args.batchstart) ^ bool(args.batchend):
+            print('You have specified an incomplete page range.')
+            sys.exit()
+        elif bool(args.batchstart) and bool(args.batchend):
+            batchstart = args.batchstart
+            batchend = args.batchend
+        usermode = True
+        batchuser = args.batchuser
 
-    if useruploadsgrouperrors:
-        print('The following groupid(s) (torrentid(s) shown for reference) had errors in retrieving group data, keep this data safe and you can possibly retry with it in a later version:')
-        print(useruploadsgrouperrors)
-    if useruploadscollateerrors:
-        print('The following groupid(s) and corresponding torrentid(s) had errors either in collating/retrieving release data or in performing the actual upload to SM (although group data was retrieved OK), keep this data safe and you can possibly retry with it in a later version:')
-        print(useruploadscollateerrors)
+    # Get credentials from cfg file
+    scriptdir = os.path.dirname(os.path.abspath(sys.argv[0]))
+    config = configparser.ConfigParser()
+    configfile = scriptdir + '/jps2sm.cfg'
+    try:
+        open(configfile)
+    except FileNotFoundError:
+        print(
+            'Error: cannot read cfg - enter your JPS/SM credentials in jps2sm.cfg and check jps2sm.cfg.example to see the syntax.')
+        raise
 
-else:
-    # Standard non-batch upload using --urls
-    groupdata = getgroupdata(jpsurl)
-    torrentids = re.findall('torrentid=([0-9]+)', jpsurl)
-    collate(torrentids, groupdata)
+    config.read(configfile)
+    jpsuser = config.get('JPopSuki', 'User')
+    jpspass = config.get('JPopSuki', 'Password')
+    smuser = config.get('SugoiMusic', 'User')
+    smpass = config.get('SugoiMusic', 'Password')
+
+    # JPS MyLoginSession vars
+    loginUrl = "https://jpopsuki.eu/login.php"
+    loginTestUrl = "https://jpopsuki.eu"
+    successStr = "Latest 5 Torrents"
+    loginData = {'username': jpsuser, 'password': jpspass}
+
+    # SM MyLoginSession vars
+    SMloginUrl = "https://sugoimusic.me/login.php"
+    SMloginTestUrl = "https://sugoimusic.me/"
+    SMsuccessStr = "Enabled users"
+    SMloginData = {'username': smuser, 'password': smpass}
+
+    s = MyLoginSession(loginUrl, loginData, loginTestUrl, successStr)
+
+    Categories = {
+        'Album': 0,
+        # 'EP': 1, #Does not exist on JPS
+        'Single': 2,
+        'Bluray': 3,  # Does not exist on JPS
+        'DVD': 4,
+        'PV': 5,
+        'Music Performance': 6,  # Does not exist on JPS
+        'TV-Music': 7,  # Music Show
+        'TV-Variety': 8,  # Talk Show
+        'TV-Drama': 9,  # TV Drama
+        'Pictures': 10,
+        'Misc': 11,
+    }
+
+    VideoCategories = [
+        'Bluray', 'DVD', 'PV', 'TV-Music', 'TV-Variety', 'TV-Drama', 'Music Performace']
+
+    TVCategories = [
+        'TV-Music', 'TV-Variety', 'TV-Drama']
+
+    if usermode:
+        if batchstart and batchend:
+            useruploads = getbulktorrentids(batchuser, batchstart, batchend)
+        else:
+            useruploads = getbulktorrentids(batchuser)
+        useruploadsgrouperrors = collections.defaultdict(list)
+        useruploadscollateerrors = collections.defaultdict(list)
+
+        for key, value in useruploads.items():
+            groupid = key
+            torrentids = value
+            try:
+                groupdata = getgroupdata("https://jpopsuki.eu/torrents.php?id=%s" % groupid)
+            except KeyboardInterrupt:  # Allow Ctrl-C to exit without showing the error multiple times and polluting the final error dict
+                raise
+            except:
+                print('Error with retrieving group data for groupid %s trorrentid(s) %s, skipping upload' % (groupid, ",".join(torrentids)))
+                useruploadsgrouperrors[groupid] = torrentids
+                continue
+
+            print(groupdata)
+
+            try:
+                collate(torrentids, groupdata)
+            except KeyboardInterrupt:  # Allow Ctrl-C to exit without showing the error multiple times and polluting the final error dict
+                raise
+            except:
+                print('Error with collating/retrieving release data for groupid %s torrentid(s) %s, skipping upload' % (groupid, ",".join(torrentids)))
+                useruploadscollateerrors[groupid] = torrentids
+                continue
+
+        if useruploadsgrouperrors:
+            print('The following groupid(s) (torrentid(s) shown for reference) had errors in retrieving group data, '
+                  'keep this data safe and you can possibly retry with it in a later version:')
+            print(useruploadsgrouperrors)
+        if useruploadscollateerrors:
+            print('The following groupid(s) and corresponding torrentid(s) had errors either in collating/retrieving '
+                  'release data or in performing the actual upload to SM (although group data was retrieved OK), '
+                  'keep this data safe and you can possibly retry with it in a later version:')
+            print(useruploadscollateerrors)
+
+    else:
+        # Standard non-batch upload using --urls
+        groupdata = getgroupdata(jpsurl)
+        torrentids = re.findall('torrentid=([0-9]+)', jpsurl)
+        collate(torrentids, groupdata)
