@@ -306,7 +306,7 @@ def uploadtorrent(category, artist, title, originaltitle, date, tagsall, imageli
         if not groupid:
             raise Exception('Error')
         else:
-            print('OK - groupid %s' % groupid)
+            print(f'OK - groupid {groupid[0]}')
 
         with open("SMuploadresult." + filename + ".html", "w") as f:
             f.write(str(SMres.content))
