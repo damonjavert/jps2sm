@@ -4,22 +4,74 @@
 
 jps2sm.py is a python ~~2.7~~ 3.6 script that will automatically gather data from JPS from a given group url, iterate through all the torrents in and upload them to SM.
 
+## Features
+* Create upload to SM by automatically retrieving all data on JPS, including english and original titles, group description, release information (format / meida / bitrate etc.), group images and remaster information if applicable.
+* Upload all torrents in a torrent group or specify 1 or more release urls.
+* Upload all your personally uploaded torrents at JPS with `--batchuser` mode
+* Exclude certain audioformats or medias with `--excfilteraudioformat` and `--excfiltermedia`
+* Test your uploads with `--dryrun` mode.
+
 ## How to use
 ### Quickstart - for those familiar with python
-``pip3 install -r requirements.txt``
-
-``python3 jps2sm.py --urls group-url or release-urls``
-
-A **group-url** looks like `https://jpopsuki.eu/torrents.php?id=111284`
-A **release-url** looks like `https://jpopsuki.eu/torrents.php?id=111284&torrentid=148289`
 
 Add your JPS and SM login credentials to **jps2sm.cfg**, using **jps2sm.cfg.example** as a template.
+
+Install modules and run the script:
+
+    pip3 install -r requirements.txt
+    python3 jps2sm.py --urls <group-url or release-url(s)>
+
+A **group-url** looks like https://jpopsuki.eu/torrents.php?id=111284
+A **release-url** looks like https://jpopsuki.eu/torrents.php?id=111284&torrentid=148289
+
 Go to SM and download your torrent files and add them to your torrent client. Enjoy!
 #### Examples
-* To upload every release of AKB48 - 1830m:
-`python jps2sm.py --urls https://jpopsuki.eu/torrents.php?id=111284`
-* To upload only the FLAC and MP3 320:
-`python jps2sm.py --urls "https://jpopsuki.eu/torrents.php?id=111284&torrentid=148289 https://jpopsuki.eu/torrents.php?id=111284&torrentid=147830"`
+To upload every release of AKB48 - 1830m:
+
+    python3 jps2sm.py --urls "https://jpopsuki.eu/torrents.php?id=111284"
+
+To upload only the FLAC and MP3 320:
+
+    python3 jps2sm.py --urls "https://jpopsuki.eu/torrents.php?id=111284&torrentid=148289 https://jpopsuki.eu/torrents.php?id=111284&torrentid=147830"
+
+To upload every release of AKB48 - 1830m, excluding the ISOs *(in JPS ISO is considered an audio format)*:
+
+    python3 jps2sm.py --urls "https://jpopsuki.eu/torrents.php?id=111284" --excfilteraudioformat ISO
+
+To *test* upload all your personal uploads, `<userid>` is your JPS userid:
+
+    python3 jps2sm.py --batchuser <userid> --dryrun
+
+Once everything looks ok, to upload all your personal uploads, `<userid>` is your JPS userid:
+
+    python3 jps2sm.py --batchuser <userid>
+
+
+**Please only upload torrents you intend to SEED.**
+## Usage
+
+    usage: jps2sm.py [-h] [-v] [-d] [-u URLS] [-n] [-b BATCHUSER] [-s BATCHSTART]
+                 [-e BATCHEND] [-f EXCFILTERAUDIOFORMAT] [-F EXCFILTERMEDIA]
+
+arguments:
+
+    -h, --help            show this help message and exit
+    -v, --version         show program's version number and exit
+    -d, --debug           Enable debug mode
+    -u URLS, --urls URLS  JPS URL for a group, or multiple individual releases
+                        URLs to be added to the same group
+    -n, --dryrun          Just parse url and show the output, do not add the
+                        torrent to SM
+    -b BATCHUSER, --batchuser BATCHUSER
+                        Upload all releases uploaded by a particular user id
+    -s BATCHSTART, --batchstart BATCHSTART
+                        (Batch mode only) Start at this page
+    -e BATCHEND, --batchend BATCHEND
+                        (Batch mode only) End at this page
+    -f EXCFILTERAUDIOFORMAT, --excfilteraudioformat EXCFILTERAUDIOFORMAT
+                        Exclude an audioformat from upload
+    -F EXCFILTERMEDIA, --excfiltermedia EXCFILTERMEDIA
+                        Exclude a media from upload
 
 ## Help! I dont know all this python stuff
 * Mac Users: The best method is to install [Homebrew](https://brew.sh) and then `brew install python3`. See this guide: https://wsvincent.com/install-python3-mac/
