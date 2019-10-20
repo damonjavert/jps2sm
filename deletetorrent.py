@@ -12,6 +12,7 @@ import datetime
 import argparse
 import configparser
 import pickle
+import requests
 from urllib.parse import urlparse
 
 # Third-party packages
@@ -19,6 +20,7 @@ import html5lib
 from bs4 import BeautifulSoup
 
 __version__ = "0.1.0"
+
 
 class MyLoginSession:
     """
