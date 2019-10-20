@@ -195,34 +195,27 @@ parser.add_argument("-n", "--dryrun", help="Just parse url and show the output, 
 parser.add_argument("-b", "--batchuser", help="Upload all releases uploaded by a particular user id")
 parser.add_argument("-s", "--batchstart", help="(Batch mode only) Start at this page", type=int)
 parser.add_argument("-e", "--batchend", help="(Batch mode only) End at this page", type=int)
-parser.add_argument("-f", "--excfilteraudioformat", help="Exclude a audioformat from upload", type=str)
+parser.add_argument("-f", "--excfilteraudioformat", help="Exclude an audioformat from upload", type=str)
 parser.add_argument("-F", "--excfiltermedia", help="Exclude a media from upload", type=str)
 args = parser.parse_args()
 
+# TODO consider calling args[] directly, we will then not need this line
+dryrun = debug = excfilteraudioformat = excfiltermedia = usermode = batchstart = batchend = None
+
 if args.dryrun:
     dryrun = True
-else:
-    dryrun = None
 
 if args.debug:
     debug = True
 else:
     sys.tracebacklimit = 0
-    debug = False
 
 if args.excfilteraudioformat:
     excfilteraudioformat = args.excfilteraudioformat
-else:
-    excfilteraudioformat = None
 
 if args.excfiltermedia:
     excfiltermedia = args.excfiltermedia
-else:
-    excfiltermedia = None
 
-usermode = None
-batchstart = None
-batchend = None
 if args.urls is None and args.batchuser is None:
     print('JPS URL(s) nor batchuser specified')
     sys.exit()
