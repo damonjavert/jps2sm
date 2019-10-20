@@ -386,7 +386,7 @@ def uploadtorrent(category, artist, title, date, tagsall, imagelink, groupdescri
     }
 
     if dryrun:
-        print (data)
+        print(data)
     else:
         SMs = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr)
         SMres = SMs.retrieveContent(uploadurl, "post", data, postDataFiles)
@@ -407,7 +407,7 @@ def uploadtorrent(category, artist, title, date, tagsall, imagelink, groupdescri
         if not groupid:
             raise Exception('Error')
         else:
-            print ('OK - groupid %s' % groupid)
+            print('OK - groupid %s' % groupid)
 
         with open("SMuploadresult." + filename + ".html", "w") as f:
             f.write(str(SMres.content))
@@ -425,22 +425,22 @@ def getgroupdata(jpsurl):
     artistline = soup.select('.thin h2')
     artistlinelink = soup.select('.thin h2 a')
     text = str(artistline[0])
-    print (artistline[0])
+    print(artistline[0])
 
     artistlinelinktext = str(artistlinelink[0])
 
     sqbrackets = re.findall('\[(.*?)\]', text)
-    print (sqbrackets)
+    print(sqbrackets)
     groupdata['category'] = sqbrackets[0]
 
     # Extract date without using '[]' as it allows '[]' elsewhere in the title and it works with JPS TV-* categories
     groupdata['date'] = re.findall('([12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01]))', text)[0].replace(".", "")
 
-    print (groupdata['category'])
-    print (groupdata['date'])
+    print(groupdata['category'])
+    print(groupdata['date'])
 
     groupdata['artist'] = re.findall('<a[^>]+>(.*)<', artistlinelinktext)[0]
-    print (groupdata['artist'])
+    print(groupdata['artist'])
 
     if groupdata['category'] not in TVCategories:
         groupdata['title'] = re.findall('<a.*> - (.*) \[', text)[0]
@@ -452,7 +452,7 @@ def getgroupdata(jpsurl):
         titlemerged = [title1, " ".join(itertools.chain(*title2))]
         groupdata['title'] = "".join(itertools.chain(*titlemerged))
 
-    print (groupdata['title'])
+    print(groupdata['title'])
 
     groupdata['rel2'] = str(soup.select('#content .thin .main_column .torrent_table tbody')[0])
 
@@ -461,15 +461,15 @@ def getgroupdata(jpsurl):
     # fakeurl = 'blah'
 
     groupdata['groupdescription'] = removehtmltags(str(soup.select('#content .thin .main_column .box .body')[0]))
-    print (groupdata['groupdescription'])
+    print(groupdata['groupdescription'])
 
     image = str(soup.select('#content .thin .sidebar .box p a'))
     groupdata['imagelink'] = "https://jpopsuki.eu/" + re.findall('<a\s+(?:[^>]*?\s+)?href=\"([^\"]*)\"', image)[0]
-    print (groupdata['imagelink'])
+    print(groupdata['imagelink'])
 
     tagsget = str(soup.select('#content .thin .sidebar .box ul.stats.nobullet li'))
     tags = re.findall('searchtags=([^\"]+)', tagsget)
-    print (tags)
+    print(tags)
     groupdata['tagsall'] = ",".join(tags)
 
     # Try to find torrentid(s) in the url(s) to determine if this is a group url or a specific torrent url(s).
