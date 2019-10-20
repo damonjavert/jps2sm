@@ -21,7 +21,7 @@ import html5lib
 from bs4 import BeautifulSoup
 from django.utils.text import get_valid_filename
 
-__version__ = "0.6.7"
+__version__ = "0.7.0"
 
 
 class MyLoginSession:
@@ -401,9 +401,8 @@ def collate(torrentids, groupdata):
 
             releasedataout['media'] = releasedata[1]
 
-            if releasedata[0] == 'AAC':
-                releasedataout['audioformat'] == 'AAC'
-            else:
+            # For video torrents, the only correct audioformat is AAC
+            if releasedata[0] != 'AAC':
                 releasedataout['audioformat'] = "CHANGEME"
                 
         else:
