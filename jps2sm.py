@@ -436,7 +436,7 @@ def collate(torrentids, groupdata):
 
         if 'WEB' in releasedata:  # Media validation
             releasedataout['media'] = 'Web'
-        elif 'Blu-Ray' in releasedata:
+        elif 'Blu-Ray' in releasedata and groupdata['category'] == 'DVD':
             releasedataout['media'] = 'Bluray'  # JPS may actually be calling it the correct official name, but modern usage differs.
             groupdata['category'] = 'Bluray'  # JPS only has a DVD category
 
