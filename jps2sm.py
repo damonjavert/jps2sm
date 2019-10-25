@@ -237,48 +237,47 @@ def getreleasedata(category, torrentids):
 
 
 # Send data to SugoiMusic upload!
-def uploadtorrent(category, artist, title, originaltitle, date, tagsall, imagelink, groupdescription,
-                  filename, groupid=None, **releasedata):
+def uploadtorrent(filename, groupid=None, **uploaddata):
     uploadurl = 'https://sugoimusic.me/upload.php'
     languages = ('Japanese', 'English', 'Korean', 'Chinese', 'Vietnamese')
     data = {
         'submit': 'true',
         'auth': getauthkey(),
-        'type': Categories[category],
-        # TODO Add feature to request cateogry as parameter as JPS cats do not all = SM cats
-        'title': title,
-        'idols[]': artist,
-        'year': date,
-        'media': releasedata['media'],  # releasedata[2]
-        'audioformat': releasedata['audioformat'],  # releasedata[0]
-        'tags': tagsall,
-        'image': imagelink,
-        'album_desc': groupdescription,
+        'type': Categories[uploaddata['category']],
+        # TODO Add feature to request category as parameter as JPS cats do not all = SM cats
+        #  ^^ will probably never need to do this now due to improved validation logic
+        'title': uploaddata['title'],
+        'year': uploaddata['date'],
+        'media': uploaddata['media'],
+        'audioformat': uploaddata['audioformat'],
+        'tags': uploaddata['tagsall'],
+        'image': uploaddata['imagelink'],
+        'album_desc': uploaddata['groupdescription'],
         # 'release_desc': releasedescription
     }
-    if category in VideoCategories:
-        data['codec'] = releasedata['codec']
+    if uploaddata['category'] in VideoCategories:
+        data['codec'] = uploaddata['codec']
         data['ressel'] = 'Other'
-        data['container'] = releasedata['container']
+        data['container'] = uploaddata['container']
         data['sub'] = 'NoSubs'  # assumed default
         data['lang'] = 'CHANGEME'
         for language in languages:  # If we have language set, set the language field
-            if language.lower() in groupdata['tagsall']:
+            if language.lower() in uploaddata['tagsall']:
                 data['lang'] = language
     else:
-        data['bitrate'] = releasedata['bitrate']  # releasedata[1]
+        data['bitrate'] = uploaddata['bitrate']
 
-    if 'remastertitle' in releasedata.keys():
+    if 'remastertitle' in uploaddata.keys():
         data['remaster'] = 'remaster'
-        data['remastertitle'] = releasedata['remastertitle']
-    if 'remasteryear' in releasedata.keys():
-        data['remasteryear'] = releasedata['remasteryear']
+        data['remastertitle'] = uploaddata['remastertitle']
+    if 'remasteryear' in uploaddata.keys():
+        data['remasteryear'] = uploaddata['remasteryear']
 
     if groupid:
         data['groupid'] = groupid  # Upload torrents into the same group
 
-    if originaltitle:
-        data['title_jp'] = originaltitle
+    if 'originaltitle' in uploaddata.keys():
+        data['title_jp'] = uploaddata['originaltitle']
 
     postDataFiles = {
         'file_input': open(filename, 'rb')
@@ -449,20 +448,17 @@ def collate(torrentids, groupdata):
         with open(torrentfilename, "wb") as f:
             f.write(torrentfile.content)
 
+        # Collate groupdata[] and releasedata[] into 1 dict
+        # TODO create a class for this data
+        uploaddata = {**groupdata, **releasedataout}
+
         # Upload torrent to SM
         # If groupid was returned from a previous call of uploadtorrent() then use it to allow torrents
         # to be uploaded to the same group, else get the groupid from the first run of uploadtorrent()
         if groupid is None:
-            # TODO Use **groupdata and refactor uploadtorrent() to use it
-            groupid = uploadtorrent(groupdata['category'], groupdata['artist'], groupdata['title'],
-                                    groupdata['originaltitle'], groupdata['date'],
-                                    groupdata['tagsall'], groupdata['imagelink'],
-                                    groupdata['groupdescription'], torrentfilename, **releasedataout)
+            groupid = uploadtorrent(torrentfilename, **uploaddata)
         else:
-            uploadtorrent(groupdata['category'], groupdata['artist'], groupdata['title'],
-                          groupdata['originaltitle'], groupdata['date'],
-                          groupdata['tagsall'], groupdata['imagelink'],
-                          groupdata['groupdescription'], torrentfilename, groupid, **releasedataout)
+            uploadtorrent(torrentfilename, groupid, **uploaddata)
 
 
 if __name__ == "__main__":
