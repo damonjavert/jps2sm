@@ -219,6 +219,13 @@ def gettorrentlinks(torrentids):
 
 
 def getreleasedata(category, torrentids):
+    """
+    Retrieve all release data (slash separated data) whilst coping with 'noise' from FL torrents
+
+    :param category:
+    :param torrentids: list of torrentids to be processed
+    :return: slashlist: list of releasedata, with 1 sublist for each release
+    """
     slashlist = []
     freeleechtext = '<strong>Freeleech!</strong>'
     if len(torrentids) == 0:  # Group url
@@ -383,6 +390,18 @@ def getgroupdata(jpsurl):
 
 
 def collate(torrentids, groupdata):
+    """
+    Collate and validate data ready for upload to SM
+
+    Validate and process format, bitrate, media, container, codec, and remaster data to extract all available data from SM
+    Perform validation on some fields
+    Download JPS torrent
+    Apply filters
+    Send data to uploadtorrent()
+
+    :param torrentids: list of JPS torrentids to be processed
+    :param groupdata: dictionary with torrent group data from getgroupdata[]
+    """
     groupid = None
     for releasedata, torrentlinkescaped in zip(getreleasedata(groupdata['category'], torrentids),
                                                gettorrentlinks(torrentids)):
