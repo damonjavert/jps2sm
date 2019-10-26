@@ -21,7 +21,7 @@ import html5lib
 from bs4 import BeautifulSoup
 from django.utils.text import get_valid_filename
 
-__version__ = "0.7.0"
+__version__ = "0.7.1"
 
 
 class MyLoginSession:
@@ -218,7 +218,7 @@ def gettorrentlinks(torrentids):
         return alltorrentlinks
 
 
-def getreleasedata(category, torrentids):
+def getreleasedata(torrentids):
     """
     Retrieve all release data (slash separated data) whilst coping with 'noise' from FL torrents
 
@@ -403,8 +403,7 @@ def collate(torrentids, groupdata):
     :param groupdata: dictionary with torrent group data from getgroupdata[]
     """
     groupid = None
-    for releasedata, torrentlinkescaped in zip(getreleasedata(groupdata['category'], torrentids),
-                                               gettorrentlinks(torrentids)):
+    for releasedata, torrentlinkescaped in zip(getreleasedata(torrentids), gettorrentlinks(torrentids)):
 
         print(releasedata)
         # The collate logic here should probably be moved to getreleasedata() in the future for ease-of-use - collate
