@@ -254,6 +254,7 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
         # TODO Add feature to request category as parameter as JPS cats do not all = SM cats
         #  ^^ will probably never need to do this now due to improved validation logic
         'title': uploaddata['title'],
+        'idols[]': uploaddata['artist'],
         'year': uploaddata['date'],
         'media': uploaddata['media'],
         'audioformat': uploaddata['audioformat'],
