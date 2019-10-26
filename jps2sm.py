@@ -43,7 +43,7 @@ class MyLoginSession:
                  maxSessionTimeSeconds=30 * 60,
                  proxies=None,
                  userAgent='Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1',
-                 debug=True,
+                 debug=False,
                  forceLogin=False,
                  **kwargs):
         """
@@ -194,7 +194,7 @@ def removehtmltags(text):
 
 
 def getauthkey():
-    SMshome = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr)
+    SMshome = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr, debug=args.debug)
     SMreshome = SMshome.retrieveContent("https://sugoimusic.me/torrents.php?id=118")
     soup = BeautifulSoup(SMreshome.text, 'html5lib')
     rel2 = str(soup.select('#content .thin .main_column .torrent_table tbody'))
@@ -554,7 +554,7 @@ if __name__ == "__main__":
     SMsuccessStr = "Enabled users"
     SMloginData = {'username': smuser, 'password': smpass}
 
-    s = MyLoginSession(loginUrl, loginData, loginTestUrl, successStr)
+    s = MyLoginSession(loginUrl, loginData, loginTestUrl, successStr, debug=args.debug)
 
     Categories = {
         'Album': 0,
