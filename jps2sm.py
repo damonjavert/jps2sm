@@ -22,7 +22,7 @@ import html5lib
 from bs4 import BeautifulSoup
 from django.utils.text import get_valid_filename
 
-__version__ = "0.7.1"
+__version__ = "0.8.0"
 
 
 class MyLoginSession:
@@ -288,6 +288,7 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
 
     if 'originaltitle' in uploaddata.keys():
         data['title_jp'] = uploaddata['originaltitle']
+        data['artist_jp'] = uploaddata['originalartist']  # I think in JPS it is impossible to have orig title without an orig artist.
 
     postDataFiles = {
         'file_input': open(filename, 'rb')
@@ -362,11 +363,13 @@ def getgroupdata(jpsurl):
         groupdata['title'] = "".join(itertools.chain(*titlemerged))
 
     print(groupdata['title'])
-
-    originaltitle = re.findall('\((?:.+) - (.*)\)', str(originaltitleline))
-    if originaltitle:
-        groupdata['originaltitle'] = originaltitle[0]
-        print(groupdata['originaltitle'])
+    try:
+        originalchars = re.findall(r'<a href="artist.php\?id=(?:[0-9]+)">(.+)</a> - (.+)\)</h3>', str(originaltitleline))[0]
+        groupdata['originalartist'] = originalchars[0]
+        groupdata['originaltitle'] = originalchars[1]
+        print(f"Original artist: {groupdata['originalartist']} Original title: {groupdata['originaltitle']}")
+    except IndexError:  # Do nothing if group has no original artist/title
+        pass
 
     groupdata['rel2'] = str(soup.select('#content .thin .main_column .torrent_table tbody')[0])
 
@@ -375,7 +378,7 @@ def getgroupdata(jpsurl):
     # fakeurl = 'blah'
 
     groupdata['groupdescription'] = removehtmltags(str(soup.select('#content .thin .main_column .box .body')[0]))
-    print(groupdata['groupdescription'])
+    print(f"Group description:\n{groupdata['groupdescription']}")
 
     image = str(soup.select('#content .thin .sidebar .box p a'))
     groupdata['imagelink'] = "https://jpopsuki.eu/" + re.findall('<a\s+(?:[^>]*?\s+)?href=\"([^\"]*)\"', image)[0]
@@ -432,7 +435,7 @@ def collate(torrentids, groupdata):
             # For video torrents, the only correct audioformat is AAC
             if releasedata[0] != 'AAC':
                 releasedataout['audioformat'] = "CHANGEME"
-                
+
         else:
             # format / bitrate / media
             releasedataout['media'] = releasedata[2]
