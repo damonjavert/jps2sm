@@ -14,6 +14,7 @@ import configparser
 import pickle
 import html
 from urllib.parse import urlparse
+import json
 
 # Third-party packages
 import requests
@@ -292,9 +293,9 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
         'file_input': open(filename, 'rb')
     }
 
-    if dryrun:
-        print(data)
-    else:
+    if dryrun or debug:
+        print(json.dumps(data, indent=2))
+    if not dryrun:
         SMs = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr)
         SMres = SMs.retrieveContent(uploadurl, "post", data, postDataFiles)
 
