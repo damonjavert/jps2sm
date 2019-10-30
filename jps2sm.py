@@ -237,8 +237,9 @@ def getreleasedata(torrentids):
             slashdata = re.findall('swapTorrent(?:.*)%s(?:.*)\\xbb (.*)<\/a>' % (torrentid), torrentgroupdata.rel2)
             slashlist.extend([i.split(' / ') for i in slashdata])
 
-    if freeleechtext in slashlist:
-        slashlist.remove(freeleechtext)  # Remove Freeleech so it does not interfere with Remastered
+    for releasedata in slashlist:
+        if freeleechtext in releasedata:
+            releasedata.remove(freeleechtext)  # Remove Freeleech so it does not interfere with Remastered
 
     print(slashlist)
     return slashlist
