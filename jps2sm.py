@@ -210,7 +210,7 @@ def filterlist(string, substr):
 
 
 def gettorrentlinks(torrentids):
-    alltorrentlinks = re.findall('href="(.*)" title="Download"', groupdata['rel2'])
+    alltorrentlinks = re.findall('href="(.*)" title="Download"', torrentgroupdata.rel2)
     if len(torrentids) != 0:  # We have specific torrent (release) url(s)
         # No ultra complex regex is needed here, we simply parse the array looking for the torrent url(s) that have
         # the torrentid(s) in it
@@ -231,11 +231,11 @@ def getreleasedata(torrentids):
     slashlist = []
     freeleechtext = '<strong>Freeleech!</strong>'
     if len(torrentids) == 0:  # Group url
-        slashdata = re.findall('\\xbb (.*)<\/a>',  groupdata['rel2'])
+        slashdata = re.findall('\\xbb (.*)<\/a>', torrentgroupdata.rel2)
         slashlist = [i.split(' / ') for i in slashdata]
     else:  # Release url(s) given
         for torrentid in torrentids:
-            slashdata = re.findall('swapTorrent(?:.*)%s(?:.*)\\xbb (.*)<\/a>' % (torrentid), groupdata['rel2'])
+            slashdata = re.findall('swapTorrent(?:.*)%s(?:.*)\\xbb (.*)<\/a>' % (torrentid), torrentgroupdata.rel2)
             slashlist.extend([i.split(' / ') for i in slashdata])
 
     if freeleechtext in slashlist:
@@ -252,27 +252,27 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
     data = {
         'submit': 'true',
         'auth': getauthkey(),
-        'type': Categories[uploaddata['category']],
+        'type': Categories[torrentgroupdata.category],
         # TODO Add feature to request category as parameter as JPS cats do not all = SM cats
         #  ^^ will probably never need to do this now due to improved validation logic
-        'title': uploaddata['title'],
-        'idols[]': uploaddata['artist'],
-        'year': uploaddata['date'],
+        'title': torrentgroupdata.title,
+        'idols[]': torrentgroupdata.artist,
+        'year': torrentgroupdata.date,
         'media': uploaddata['media'],
         'audioformat': uploaddata['audioformat'],
-        'tags': uploaddata['tagsall'],
-        'image': uploaddata['imagelink'],
-        'album_desc': uploaddata['groupdescription'],
+        'tags': torrentgroupdata.tagsall,
+        'image': torrentgroupdata.imagelink,
+        'album_desc': torrentgroupdata.groupdescription,
         # 'release_desc': releasedescription
     }
-    if uploaddata['category'] in VideoCategories:
+    if torrentgroupdata.category in VideoCategories:
         data['codec'] = uploaddata['codec']
         data['ressel'] = 'Other'
         data['container'] = uploaddata['container']
         data['sub'] = 'NoSubs'  # assumed default
         data['lang'] = 'CHANGEME'
-        for language in languages:  # If we have language set, set the language field
-            if language.lower() in uploaddata['tagsall']:
+        for language in languages:  # If we have a language tag, set the language field
+            if language.lower() in torrentgroupdata.tagsall:
                 data['lang'] = language
     else:
         data['bitrate'] = uploaddata['bitrate']
@@ -286,9 +286,10 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
     if groupid:
         data['groupid'] = groupid  # Upload torrents into the same group
 
-    if 'originaltitle' in uploaddata.keys():
-        data['title_jp'] = uploaddata['originaltitle']
-        data['artist_jp'] = uploaddata['originalartist']  # I think in JPS it is impossible to have orig title without an orig artist.
+    try:
+        data['artist_jp'], data['title_jp'] = torrentgroupdata.originalchars()
+    except AttributeError:  # If no originalchars do nothing
+        pass
 
     postDataFiles = {
         'file_input': open(filename, 'rb')
@@ -323,79 +324,109 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
 
     return groupid
 
+class GetGroupData:
+    def __init__(self, jpsurl):
+        self.jpsurl = jpsurl
 
-def getgroupdata(jpsurl):
-    groupdata = {}
-    # If there are multiple urls only the first url needs to be parsed
-    res = s.retrieveContent(jpsurl.split()[0])
+        self.getdata(jpsurl)
 
-    soup = BeautifulSoup(res.text, 'html5lib')
+    def getdata(self, jpsurl):
 
-    artistline = soup.select('.thin h2')
-    artistlinelink = soup.select('.thin h2 a')
-    originaltitleline = soup.select('.thin h3')
-    text = str(artistline[0])
-    print(artistline[0])
+        # If there are multiple urls only the first url needs to be parsed
+        res = s.retrieveContent(self.jpsurl.split()[0])
 
-    artistlinelinktext = str(artistlinelink[0])
-
-    sqbrackets = re.findall('\[(.*?)\]', text)
-    print(sqbrackets)
-    groupdata['category'] = sqbrackets[0]
-
-    # Extract date without using '[]' as it allows '[]' elsewhere in the title and it works with JPS TV-* categories
-    groupdata['date'] = re.findall('([12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01]))', text)[0].replace(".", "")
-
-    print(groupdata['category'])
-    print(groupdata['date'])
-
-    groupdata['artist'] = re.findall('<a[^>]+>(.*)<', artistlinelinktext)[0]
-    print(groupdata['artist'])
-
-    if groupdata['category'] not in TVCategories:
-        groupdata['title'] = re.findall('<a.*> - (.*) \[', text)[0]
-    else:
-        # Using two sets of findall() as I cannot get the OR regex operator "|" to work
-        title1 = re.findall('<a.*> - (?:[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])) - (.*)</h2>', text)
-        title2 = re.findall('<a.*> - (.*) \((.*) (?:[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01]))', text)
-        # title1 has 1 matching group, title2 has 2
-        titlemerged = [title1, " ".join(itertools.chain(*title2))]
-        groupdata['title'] = "".join(itertools.chain(*titlemerged))
-
-    print(groupdata['title'])
-    try:
-        originalchars = re.findall(r'<a href="artist.php\?id=(?:[0-9]+)">(.+)</a> - (.+)\)</h3>', str(originaltitleline))[0]
-        groupdata['originalartist'] = originalchars[0]
-        groupdata['originaltitle'] = originalchars[1]
-        print(f"Original artist: {groupdata['originalartist']} Original title: {groupdata['originaltitle']}")
-    except IndexError:  # Do nothing if group has no original artist/title
-        pass
-
-    groupdata['rel2'] = str(soup.select('#content .thin .main_column .torrent_table tbody')[0])
-
-    # print rel2
-    # fakeurl = 'https://jpopsuki.eu/torrents.php?id=181558&torrentid=251763'
-    # fakeurl = 'blah'
-
-    groupdata['groupdescription'] = removehtmltags(str(soup.select('#content .thin .main_column .box .body')[0]))
-    print(f"Group description:\n{groupdata['groupdescription']}")
-
-    image = str(soup.select('#content .thin .sidebar .box p a'))
-    groupdata['imagelink'] = "https://jpopsuki.eu/" + re.findall('<a\s+(?:[^>]*?\s+)?href=\"([^\"]*)\"', image)[0]
-    print(groupdata['imagelink'])
-
-    tagsget = str(soup.select('#content .thin .sidebar .box ul.stats.nobullet li'))
-    tags = re.findall('searchtags=([^\"]+)', tagsget)
-    print(tags)
-    groupdata['tagsall'] = ",".join(tags)
-
-    # Try to find torrentid(s) in the url(s) to determine if this is a group url or a specific torrent url(s).
-    # groupdata['torrentids'] = re.findall('torrentid=([0-9]+)', jpsurl)
-
-    return groupdata
+        soup = BeautifulSoup(res.text, 'html5lib')
+        #soup = BeautifulSoup(open("1830.html"), 'html5lib')
 
 
-def collate(torrentids, groupdata):
+        artistline = soup.select('.thin h2')
+        artistlinelink = soup.select('.thin h2 a')
+        originaltitleline = soup.select('.thin h3')
+        text = str(artistline[0])
+        print(artistline[0])
+
+        artistlinelinktext = str(artistlinelink[0])
+
+        sqbrackets = re.findall('\[(.*?)\]', text)
+        print(sqbrackets)
+        self.category = sqbrackets[0]
+
+        # Extract date without using '[]' as it allows '[]' elsewhere in the title and it works with JPS TV-* categories
+        self.date = re.findall('([12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01]))', text)[0].replace(".", "")
+
+        print(self.category)
+        print(self.date)
+
+        self.artist = re.findall('<a[^>]+>(.*)<', artistlinelinktext)[0]
+        print(self.artist)
+
+        if self.category not in TVCategories:
+            self.title = re.findall('<a.*> - (.*) \[', text)[0]
+        else:
+            # Using two sets of findall() as I cannot get the OR regex operator "|" to work
+            title1 = re.findall('<a.*> - (?:[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])) - (.*)</h2>', text)
+            title2 = re.findall('<a.*> - (.*) \((.*) (?:[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01]))', text)
+            # title1 has 1 matching group, title2 has 2
+            titlemerged = [title1, " ".join(itertools.chain(*title2))]
+            self.title = "".join(itertools.chain(*titlemerged))
+
+        print(self.title)
+        try:
+            originalchars = re.findall(r'<a href="artist.php\?id=(?:[0-9]+)">(.+)</a> - (.+)\)</h3>', str(originaltitleline))[0]
+            self.originalartist = originalchars[0]
+            self.originaltitle = originalchars[1]
+            print(f"Original artist: {self.originalartist} Original title: {self.originaltitle}")
+        except IndexError:  # Do nothing if group has no original artist/title
+            pass
+
+        self.rel2 = str(soup.select('#content .thin .main_column .torrent_table tbody')[0])
+
+        # print rel2
+        # fakeurl = 'https://jpopsuki.eu/torrents.php?id=181558&torrentid=251763'
+        # fakeurl = 'blah'
+
+        self.groupdescription = removehtmltags(str(soup.select('#content .thin .main_column .box .body')[0]))
+        print(f"Group description:\n{self.groupdescription}")
+
+        image = str(soup.select('#content .thin .sidebar .box p a'))
+        self.imagelink = "https://jpopsuki.eu/" + re.findall('<a\s+(?:[^>]*?\s+)?href=\"([^\"]*)\"', image)[0]
+        print(self.imagelink)
+
+        tagsget = str(soup.select('#content .thin .sidebar .box ul.stats.nobullet li'))
+        tags = re.findall('searchtags=([^\"]+)', tagsget)
+        print(tags)
+        self.tagsall = ",".join(tags)
+
+    def category(self):
+        return self.category()
+
+    def date(self):
+        return self.date()
+
+    def artist(self):
+        return self.artist()
+
+    def title(self):
+        return self.title()
+
+    def originalchars(self):
+        return self.originalartist, self.originaltitle
+
+    def rel2(self):
+        return self.rel2()
+
+    def groupdescription(self):
+        return self.groupdescription()
+
+    def imagelink(self):
+        return self.imagelink()
+
+    def tagsall(self):
+        return self.tagsall()
+
+
+
+def collate(torrentids):
     """
     Collate and validate data ready for upload to SM
 
@@ -415,7 +446,7 @@ def collate(torrentids, groupdata):
         # The collate logic here should probably be moved to getreleasedata() in the future for ease-of-use - collate
         # should be more 'dumb' for improved readability.
         releasedataout = {}
-        if groupdata['category'] in VideoCategories:
+        if torrentgroupdata.category in VideoCategories:
             # container / media
             # JPS uses the audioformat field for containers and codecs, if we have a known codec or container set as
             # media we can also set the container and codec here.
@@ -454,7 +485,7 @@ def collate(torrentids, groupdata):
                 releasedataout['remastertitle'] = remastertext[0]
                 # Year is mandatory on JPS so most releases have current year. This looks ugly on SM (and JPS) so if the
                 # year is the groupdata['year'] we will not set it.
-                year = re.findall('([0-9]{4})(?:.*)', groupdata['date'])[0]
+                year = re.findall('([0-9]{4})(?:.*)', torrentgroupdata.date)[0]
                 if year != remastertext[1]:
                     releasedataout['remasteryear'] = remastertext[1]
 
@@ -462,28 +493,22 @@ def collate(torrentids, groupdata):
             releasedataout['media'] = 'Web'
         elif 'Blu-Ray' in releasedata:
             releasedataout['media'] = 'Bluray'  # JPS may actually be calling it the correct official name, but modern usage differs.
-            if groupdata['category'] == 'DVD':
-                groupdata['category'] = 'Bluray'  # JPS only has a DVD category
 
         torrentlink = html.unescape(torrentlinkescaped)
         # Download JPS torrent
         torrentfile = s.retrieveContent("https://jpopsuki.eu/%s" % torrentlink)
         torrentfilename = get_valid_filename(
-            "JPS %s - %s - %s.torrent" % (groupdata['artist'], groupdata['title'], "-".join(releasedata)))
+            "JPS %s - %s - %s.torrent" % (torrentgroupdata.artist, torrentgroupdata.title, "-".join(releasedata)))
         with open(torrentfilename, "wb") as f:
             f.write(torrentfile.content)
-
-        # Collate groupdata[] and releasedata[] into 1 dict
-        # TODO create a class for this data
-        uploaddata = {**groupdata, **releasedataout}
 
         # Upload torrent to SM
         # If groupid was returned from a previous call of uploadtorrent() then use it to allow torrents
         # to be uploaded to the same group, else get the groupid from the first run of uploadtorrent()
         if groupid is None:
-            groupid = uploadtorrent(torrentfilename, **uploaddata)
+            groupid = uploadtorrent(torrentfilename, **releasedataout)
         else:
-            uploadtorrent(torrentfilename, groupid, **uploaddata)
+            uploadtorrent(torrentfilename, groupid, **releasedataout)
 
 
 if __name__ == "__main__":
@@ -595,7 +620,7 @@ if __name__ == "__main__":
             groupid = key
             torrentids = value
             try:
-                groupdata = getgroupdata("https://jpopsuki.eu/torrents.php?id=%s" % groupid)
+                torrentgroupdata = GetGroupData("https://jpopsuki.eu/torrents.php?id=%s" % groupid)
             except KeyboardInterrupt:  # Allow Ctrl-C to exit without showing the error multiple times and polluting the final error dict
                 raise
             except:
@@ -603,10 +628,10 @@ if __name__ == "__main__":
                 useruploadsgrouperrors[groupid] = torrentids
                 continue
 
-            print(groupdata)
+            #print(groupdata)
 
             try:
-                collate(torrentids, groupdata)
+                collate(torrentids)
             except KeyboardInterrupt:  # Allow Ctrl-C to exit without showing the error multiple times and polluting the final error dict
                 raise
             except:
@@ -626,6 +651,7 @@ if __name__ == "__main__":
 
     else:
         # Standard non-batch upload using --urls
-        groupdata = getgroupdata(jpsurl)
+        torrentgroupdata = GetGroupData(jpsurl)
         torrentids = re.findall('torrentid=([0-9]+)', jpsurl)
-        collate(torrentids, groupdata)
+        collate(torrentids)
+
