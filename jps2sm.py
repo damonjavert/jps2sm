@@ -264,13 +264,15 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
         'album_desc': torrentgroupdata.groupdescription,
         # 'release_desc': releasedescription
     }
-    if torrentgroupdata.category in VideoCategories:
     if not debug:
         data['auth'] = getauthkey()
 
     if debug:
         print(uploaddata)
 
+    if torrentgroupdata.category in VideoCategories:
+        if Categories[torrentgroupdata.category] == "DVD" and uploaddata['media'] == 'Bluray':
+            data['type'] = 'Bluray'  # JPS has no Bluray category
         data['codec'] = uploaddata['codec']
         data['ressel'] = 'Other'
         data['container'] = uploaddata['container']
