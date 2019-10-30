@@ -251,7 +251,6 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
     languages = ('Japanese', 'English', 'Korean', 'Chinese', 'Vietnamese')
     data = {
         'submit': 'true',
-        'auth': getauthkey(),
         'type': Categories[torrentgroupdata.category],
         # TODO Add feature to request category as parameter as JPS cats do not all = SM cats
         #  ^^ will probably never need to do this now due to improved validation logic
@@ -266,6 +265,12 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
         # 'release_desc': releasedescription
     }
     if torrentgroupdata.category in VideoCategories:
+    if not debug:
+        data['auth'] = getauthkey()
+
+    if debug:
+        print(uploaddata)
+
         data['codec'] = uploaddata['codec']
         data['ressel'] = 'Other'
         data['container'] = uploaddata['container']
