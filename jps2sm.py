@@ -270,7 +270,7 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
     if debug:
         print(uploaddata)
 
-    if torrentgroupdata.category in VideoCategories:
+    if uploaddata['videotorrent']:
         if Categories[torrentgroupdata.category] == "DVD" and uploaddata['media'] == 'Bluray':
             data['type'] = 'Bluray'  # JPS has no Bluray category
         data['codec'] = uploaddata['codec']
@@ -453,8 +453,10 @@ def collate(torrentids):
         # The collate logic here should probably be moved to getreleasedata() in the future for ease-of-use - collate
         # should be more 'dumb' for improved readability.
         releasedataout = {}
-        if torrentgroupdata.category in VideoCategories:
+        if len(releasedata) == 2:  # VideoCategory torrent, this also detects VideoCategories in a non-VC group
             # container / media
+            releasedataout['videotorrent'] = True  # For processing by uploadtorrent()
+
             # JPS uses the audioformat field for containers and codecs, if we have a known codec or container set as
             # media we can also set the container and codec here.
             badcontainers = ('ISO', 'VOB', 'MPEG', 'AVI', 'MKV', 'WMV', 'MP4')
@@ -476,6 +478,8 @@ def collate(torrentids):
 
         else:
             # format / bitrate / media
+            releasedataout['videotorrent'] = False
+
             releasedataout['media'] = releasedata[2]
             releasedataout['audioformat'] = releasedata[0]
             releasedataout['bitrate'] = releasedata[1]
@@ -502,8 +506,7 @@ def collate(torrentids):
             releasedataout['media'] = 'Bluray'  # JPS may actually be calling it the correct official name, but modern usage differs.
 
         torrentlink = html.unescape(torrentlinkescaped)
-        # Download JPS torrent
-        torrentfile = s.retrieveContent("https://jpopsuki.eu/%s" % torrentlink)
+        torrentfile = s.retrieveContent("https://jpopsuki.eu/%s" % torrentlink)  # Download JPS torrent
         torrentfilename = get_valid_filename(
             "JPS %s - %s - %s.torrent" % (torrentgroupdata.artist, torrentgroupdata.title, "-".join(releasedata)))
         with open(torrentfilename, "wb") as f:
