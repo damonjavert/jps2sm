@@ -1,5 +1,5 @@
-# jps2sm.py is a python script that will automatically gather data from JPS from a given group url,
-# iterate through all the torrents and upload them to SM.
+# jps2sm.py is a python script that will automatically gather data from JPS from a given group url, release url,
+# or a user's uploaded torrents and iterate through them and upload them to SM.
 
 # Standard library packages
 import re
@@ -18,11 +18,10 @@ import json
 
 # Third-party packages
 import requests
-import html5lib
 from bs4 import BeautifulSoup
 from django.utils.text import get_valid_filename
 
-__version__ = "0.8.0"
+__version__ = "0.8.1"
 
 
 class MyLoginSession:
@@ -331,6 +330,7 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
 
     return groupid
 
+
 class GetGroupData:
     def __init__(self, jpsurl):
         self.jpsurl = jpsurl
@@ -338,13 +338,10 @@ class GetGroupData:
         self.getdata(jpsurl)
 
     def getdata(self, jpsurl):
-
-        # If there are multiple urls only the first url needs to be parsed
-        res = s.retrieveContent(self.jpsurl.split()[0])
+        res = s.retrieveContent(self.jpsurl.split()[0])  # If there are multiple urls only the first url needs to be parsed
 
         soup = BeautifulSoup(res.text, 'html5lib')
         #soup = BeautifulSoup(open("1830.html"), 'html5lib')
-
 
         artistline = soup.select('.thin h2')
         artistlinelink = soup.select('.thin h2 a')
@@ -432,7 +429,6 @@ class GetGroupData:
         return self.tagsall()
 
 
-
 def collate(torrentids):
     """
     Collate and validate data ready for upload to SM
@@ -472,8 +468,7 @@ def collate(torrentids):
 
             releasedataout['media'] = releasedata[1]
 
-            # For video torrents, the only correct audioformat is AAC
-            if releasedata[0] != 'AAC':
+            if releasedata[0] != 'AAC':  # For video torrents, the only correct audioformat is AAC
                 releasedataout['audioformat'] = "CHANGEME"
 
         else:
@@ -573,8 +568,7 @@ if __name__ == "__main__":
     try:
         open(configfile)
     except FileNotFoundError:
-        print(
-            'Error: cannot read cfg - enter your JPS/SM credentials in jps2sm.cfg and check jps2sm.cfg.example to see the syntax.')
+        print('Error: cannot read cfg - enter your JPS/SM credentials in jps2sm.cfg and check jps2sm.cfg.example to see the syntax.')
         raise
 
     config.read(configfile)
@@ -613,7 +607,7 @@ if __name__ == "__main__":
     }
 
     VideoCategories = [
-        'Bluray', 'DVD', 'PV', 'TV-Music', 'TV-Variety', 'TV-Drama', 'Music Performace']
+        'Bluray', 'DVD', 'PV', 'TV-Music', 'TV-Variety', 'TV-Drama', 'Music Performance']
 
     TVCategories = [
         'TV-Music', 'TV-Variety', 'TV-Drama']
