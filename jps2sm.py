@@ -264,8 +264,8 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
         'album_desc': torrentgroupdata.groupdescription,
         # 'release_desc': releasedescription
     }
-    if not debug:
-        data['auth'] = getauthkey()
+    if not dryrun:
+        data['auth'] = authkey
 
     if debug:
         print(uploaddata)
@@ -612,6 +612,9 @@ if __name__ == "__main__":
 
     TVCategories = [
         'TV-Music', 'TV-Variety', 'TV-Drama']
+
+    if not dryrun:
+        authkey = getauthkey()  # We only want this run ONCE per instance of the script
 
     if usermode:
         if batchstart and batchend:
