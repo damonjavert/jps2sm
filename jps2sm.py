@@ -15,6 +15,7 @@ import pickle
 import html
 from urllib.parse import urlparse
 import json
+import traceback
 
 # Third-party packages
 import requests
@@ -631,9 +632,11 @@ if __name__ == "__main__":
                 torrentgroupdata = GetGroupData("https://jpopsuki.eu/torrents.php?id=%s" % groupid)
             except KeyboardInterrupt:  # Allow Ctrl-C to exit without showing the error multiple times and polluting the final error dict
                 raise
-            except:
+            except Exception as exc:
                 print('Error with retrieving group data for groupid %s trorrentid(s) %s, skipping upload' % (groupid, ",".join(torrentids)))
                 useruploadsgrouperrors[groupid] = torrentids
+                print(exc)
+                traceback.print_exc()
                 continue
 
             #print(groupdata)
@@ -642,9 +645,11 @@ if __name__ == "__main__":
                 collate(torrentids)
             except KeyboardInterrupt:  # Allow Ctrl-C to exit without showing the error multiple times and polluting the final error dict
                 raise
-            except:
+            except Exception as exc:
                 print('Error with collating/retrieving release data for groupid %s torrentid(s) %s, skipping upload' % (groupid, ",".join(torrentids)))
                 useruploadscollateerrors[groupid] = torrentids
+                print(exc)
+                traceback.print_exc()
                 continue
 
         if useruploadsgrouperrors:
