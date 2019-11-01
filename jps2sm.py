@@ -22,16 +22,16 @@ import requests
 from bs4 import BeautifulSoup
 from django.utils.text import get_valid_filename
 
-__version__ = "0.8.1"
+__version__ = "0.8.2"
 
 
 class MyLoginSession:
     """
-    https://stackoverflow.com/a/37118451/2115140
-    Added some features myself, originally by https://stackoverflow.com/users/1150303/domtomcat
+    Taken from: https://stackoverflow.com/a/37118451/2115140
+    New features added in jps2sm originally by: https://stackoverflow.com/users/1150303/domtomcat
 
     a class which handles and saves login sessions. It also keeps track of proxy settings.
-    It does also maintine a cache-file for restoring session data from earlier
+    It does also maintains a cache-file for restoring session data from earlier
     script executions.
     """
 
@@ -147,6 +147,19 @@ class MyLoginSession:
 
 
 def getbulktorrentids(user, first=1, last=None):
+    """
+    Iterates through a users' uploads on JPS and gathers the groupids and corresponding torrentids and returns
+    a dict in the format of groupid: [torrentd1, torrentid2, ... ]
+
+    As we add a unique group id as the key this means that all uploads from a user to the same groupid are correlated
+    together so that they are uplaoded to the same group by uploadtorrent() even if they were not uploaded to JPS
+    at the same time. - uploadtorrent() requires torrents uplaoded to the same group by uploaded together.
+
+    :param user: JSP userid
+    :param first: upload page number to start at
+    :param last: upload page to finish at
+    :return: useruploads: dict
+    """
     res = s.retrieveContent("https://jpopsuki.eu/torrents.php?type=uploaded&userid=%s" % (user))
     soup = BeautifulSoup(res.text, 'html5lib')
 
@@ -191,13 +204,23 @@ def getbulktorrentids(user, first=1, last=None):
 
 
 def removehtmltags(text):
+    """
+    Strip html tags, used by GetGroupData() on the group description
+
+    """
     clean = re.compile('<.*?>')
     return re.sub(clean, '', text)
 
 
 def getauthkey():
+    """
+    Get SM session authkey for use by uploadtorrent() data dict.
+    Uses SM login data
+
+    :return: authkey
+    """
     SMshome = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr, debug=args.debug)
-    SMreshome = SMshome.retrieveContent("https://sugoimusic.me/torrents.php?id=118")
+    SMreshome = SMshome.retrieveContent("https://sugoimusic.me/torrents.php?id=118")  # Arbitrary page on JPS that has authkey
     soup = BeautifulSoup(SMreshome.text, 'html5lib')
     rel2 = str(soup.select('#content .thin .main_column .torrent_table tbody'))
     authkey = re.findall('authkey=(.*)&amp;torrent_pass=', rel2)
@@ -205,25 +228,40 @@ def getauthkey():
 
 
 def filterlist(string, substr):
+    """
+    Returns a filtered list where only items containing substr are returned.
+
+    :param string:
+    :param substr:
+    :return: filteredlist
+    """
     return [str for str in string if
             any(sub in str for sub in substr)]
 
 
 def gettorrentlink(torrentid):
+    """
+    Extract a torrent link for a given torrentid
+
+    :param torrentid:
+    :return: torrentlink: URI of torrent link
+    """
     torrentlink = re.findall(rf'torrents\.php\?action=download&amp;id={torrentid}&amp;authkey=(?:[^&]+)&amp;torrent_pass=(?:[^"]+)', torrentgroupdata.rel2)[0]
     return torrentlink
 
 
 def getreleasedata(torrentids):
     """
-    Retrieve all release data (slash separated data) whilst coping with 'noise' from FL torrents
+    Retrieve all torrent id and release data (slash separated data) whilst coping with 'noise' from FL torrents,
+    and either return all data if using a group URL or only return the relevant data if release url(s) were used
 
     :param torrentids: list of torrentids to be processed
     :return: releasedata: dict of release data in the format of torrentid: slashdata , with 1 sublist for each release
     """
     freeleechtext = '<strong>Freeleech!</strong>'
     slashdata = re.findall(r"swapTorrent\('([0-9]+)'\);\">» (.*)</a>", torrentgroupdata.rel2)
-    print(slashdata)
+    if debug:
+        print(f'Entire group contains: {slashdata}')
 
     releasedata = {}
     for release in slashdata:
@@ -241,13 +279,21 @@ def getreleasedata(torrentids):
             release.remove(freeleechtext)  # Remove Freeleech so it does not interfere with Remastered
     for torrentid in removetorrents:
         del(releasedata[torrentid])
-    print(releasedata)
+    print(f'Selected for upload: {releasedata}')
 
     return releasedata
 
 
-# Send data to SugoiMusic upload!
 def uploadtorrent(filename, groupid=None, **uploaddata):
+    """
+    Prepare POST data for the SM upload, performs additional validation, reports errors and performs the actual upload to
+    SM whilst saving the html result to investigate any errors if they are not reported correctly.
+
+    :param filename: filename of the JPS torrent to be uploaded
+    :param groupid: groupid to upload to - allows to upload torrents to the same group
+    :param uploaddata: dict of collated / validated release data from collate()
+    :return: groupid: groupid used in the upload, used by collate() in case of uploading several torrents to the same group
+    """
     uploadurl = 'https://sugoimusic.me/upload.php'
     languages = ('Japanese', 'English', 'Korean', 'Chinese', 'Vietnamese')
     data = {
@@ -334,6 +380,11 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
 
 
 class GetGroupData:
+    """
+    Retrieve group data of the group supplied from jpsurl
+    Group data is defined as data that is constant for every release, eg category, artist, title, groupdescription, tags etc.
+    Each property is gathered by calling a method of the class
+    """
     def __init__(self, jpsurl):
         self.jpsurl = jpsurl
 
@@ -447,8 +498,7 @@ def collate(torrentids):
     groupid = None
     for torrentid, releasedata in getreleasedata(torrentids).items():
 
-        print(torrentid)
-        print(releasedata)
+        print(f'Now processing: {torrentid} {releasedata}')
 
         releasedataout = {}
         if len(releasedata) == 2:  # VideoCategory torrent, this also detects VideoCategories in a non-VC group
