@@ -209,41 +209,41 @@ def filterlist(string, substr):
             any(sub in str for sub in substr)]
 
 
-def gettorrentlinks(torrentids):
-    alltorrentlinks = re.findall('href="(.*)" title="Download"', torrentgroupdata.rel2)
-    if len(torrentids) != 0:  # We have specific torrent (release) url(s)
-        # No ultra complex regex is needed here, we simply parse the array looking for the torrent url(s) that have
-        # the torrentid(s) in it
-        torrentlinks = filterlist(alltorrentlinks, torrentids)
-        return torrentlinks
-    else:  # We have group url
-        return alltorrentlinks
+def gettorrentlink(torrentid):
+    torrentlink = re.findall(rf'torrents\.php\?action=download&amp;id={torrentid}&amp;authkey=(?:[^&]+)&amp;torrent_pass=(?:[^"]+)', torrentgroupdata.rel2)[0]
+    return torrentlink
 
 
 def getreleasedata(torrentids):
     """
     Retrieve all release data (slash separated data) whilst coping with 'noise' from FL torrents
 
-    :param category:
     :param torrentids: list of torrentids to be processed
-    :return: slashlist: list of releasedata, with 1 sublist for each release
+    :return: releasedata: dict of release data in the format of torrentid: slashdata , with 1 sublist for each release
     """
-    slashlist = []
     freeleechtext = '<strong>Freeleech!</strong>'
-    if len(torrentids) == 0:  # Group url
-        slashdata = re.findall('\\xbb (.*)<\/a>', torrentgroupdata.rel2)
-        slashlist = [i.split(' / ') for i in slashdata]
-    else:  # Release url(s) given
-        for torrentid in torrentids:
-            slashdata = re.findall('swapTorrent(?:.*)%s(?:.*)\\xbb (.*)<\/a>' % (torrentid), torrentgroupdata.rel2)
-            slashlist.extend([i.split(' / ') for i in slashdata])
+    slashdata = re.findall(r"swapTorrent\('([0-9]+)'\);\">» (.*)</a>", torrentgroupdata.rel2)
+    print(slashdata)
 
-    for releasedata in slashlist:
-        if freeleechtext in releasedata:
-            releasedata.remove(freeleechtext)  # Remove Freeleech so it does not interfere with Remastered
+    releasedata = {}
+    for release in slashdata:
+        torrentid = release[0]
+        slashlist = ([i.split(' / ') for i in [release[1]]])[0]
+        releasedata[torrentid] = slashlist
 
-    print(slashlist)
-    return slashlist
+    removetorrents = []
+    for torrentid, release in releasedata.items():
+        if len(torrentids) != 0 and torrentid not in torrentids:
+            # If len(torrentids) != 0 then user has supplied a group url and every release is processed,
+            # otherwise iterate through releasedata{} and remove what is not needed
+            removetorrents.append(torrentid)
+        if freeleechtext in release:
+            release.remove(freeleechtext)  # Remove Freeleech so it does not interfere with Remastered
+    for torrentid in removetorrents:
+        del(releasedata[torrentid])
+    print(releasedata)
+
+    return releasedata
 
 
 # Send data to SugoiMusic upload!
@@ -435,7 +435,7 @@ def collate(torrentids):
     """
     Collate and validate data ready for upload to SM
 
-    Validate and process format, bitrate, media, container, codec, and remaster data to extract all available data from SM
+    Validate and process dict supplied by getreleasedata() with format, bitrate, media, container, codec, and remaster data to extract all available data from SM
     Perform validation on some fields
     Download JPS torrent
     Apply filters
@@ -445,11 +445,11 @@ def collate(torrentids):
     :param groupdata: dictionary with torrent group data from getgroupdata[]
     """
     groupid = None
-    for releasedata, torrentlinkescaped in zip(getreleasedata(torrentids), gettorrentlinks(torrentids)):
+    for torrentid, releasedata in getreleasedata(torrentids).items():
 
+        print(torrentid)
         print(releasedata)
-        # The collate logic here should probably be moved to getreleasedata() in the future for ease-of-use - collate
-        # should be more 'dumb' for improved readability.
+
         releasedataout = {}
         if len(releasedata) == 2:  # VideoCategory torrent, this also detects VideoCategories in a non-VC group
             # container / media
@@ -502,7 +502,8 @@ def collate(torrentids):
         elif 'Blu-Ray' in releasedata:
             releasedataout['media'] = 'Bluray'  # JPS may actually be calling it the correct official name, but modern usage differs.
 
-        torrentlink = html.unescape(torrentlinkescaped)
+        torrentlink = html.unescape(gettorrentlink(torrentid))
+
         torrentfile = s.retrieveContent("https://jpopsuki.eu/%s" % torrentlink)  # Download JPS torrent
         torrentfilename = get_valid_filename(
             "JPS %s - %s - %s.torrent" % (torrentgroupdata.artist, torrentgroupdata.title, "-".join(releasedata)))
