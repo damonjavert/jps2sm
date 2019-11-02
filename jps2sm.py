@@ -505,8 +505,8 @@ def collate(torrentids):
             # container / media
             releasedataout['videotorrent'] = True  # For processing by uploadtorrent()
 
-            # JPS uses the audioformat field for containers and codecs, if we have a known codec or container set as
-            # media we can also set the container and codec here.
+            # JPS uses the audioformat field for containers and codecs in video torrents, if we have a known
+            # codec or container set as media we can also set the container and codec here.
             badcontainers = ('ISO', 'VOB', 'MPEG', 'AVI', 'MKV', 'WMV', 'MP4')
             badcodecs = ('MPEG2', 'h264')
             if releasedata[0] in badcontainers:
@@ -514,7 +514,10 @@ def collate(torrentids):
             else:
                 releasedataout['container'] = 'CHANGEME'
             if releasedata[0] in badcodecs:
-                releasedataout['codec'] = releasedata[0]
+                if releasedata[0] == "MPEG2":
+                    releasedataout['codec'] = "MPEG-2"
+                else:
+                    releasedataout['codec'] = releasedata[0]
             else:
                 releasedataout['codec'] = 'CHANGEME'  # assume default
 
