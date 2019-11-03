@@ -501,20 +501,24 @@ def collate(torrentids):
         print(f'Now processing: {torrentid} {releasedata}')
 
         releasedataout = {}
-        if len(releasedata) == 2:  # VideoCategory torrent, this also detects VideoCategories in a non-VC group
+
+        # JPS uses the audioformat field (represented as releasedata[0] here) for containers and codecs in video torrents,
+        # and when combined with VideoMedias we can perform VideoTorrent detection.
+        VideoMedias = ('DVD', 'Blu-Ray', 'VHS', 'VCD', 'TV', 'HDTV', 'WEB')
+        badcontainers = ('ISO', 'VOB', 'MPEG', 'AVI', 'MKV', 'WMV', 'MP4')
+        badcodecs = ('MPEG2', 'h264')
+        badformats = badcontainers + badcodecs
+        if releasedata[0] in badformats and releasedata[1] in VideoMedias:  # VideoCategory torrent, this also detects VideoCategories in a non-VC group
             # container / media
             releasedataout['videotorrent'] = True  # For processing by uploadtorrent()
-
-            # JPS uses the audioformat field for containers and codecs in video torrents, if we have a known
-            # codec or container set as media we can also set the container and codec here.
-            badcontainers = ('ISO', 'VOB', 'MPEG', 'AVI', 'MKV', 'WMV', 'MP4')
-            badcodecs = ('MPEG2', 'h264')
+            # If a known container is used as audioformat set it as the container on SM
             if releasedata[0] in badcontainers:
                 releasedataout['container'] = releasedata[0]
             else:
                 releasedataout['container'] = 'CHANGEME'
+            # If a known codec is used as audioformat set it as the codec on SM
             if releasedata[0] in badcodecs:
-                if releasedata[0] == "MPEG2":
+                if releasedata[0] == "MPEG2":  # JPS uses 'MPEG2' for codec instead of the correct 'MPEG-2'
                     releasedataout['codec'] = "MPEG-2"
                 else:
                     releasedataout['codec'] = releasedata[0]
@@ -525,6 +529,11 @@ def collate(torrentids):
 
             if releasedata[0] != 'AAC':  # For video torrents, the only correct audioformat is AAC
                 releasedataout['audioformat'] = "CHANGEME"
+
+            if len(releasedata) == 3:  # Remastered
+                remasterdata = releasedata[2]
+            else:
+                remasterdata = False
 
         else:
             # format / bitrate / media
@@ -542,13 +551,18 @@ def collate(torrentids):
                 continue
 
             if len(releasedata) == 4:  # Remastered
-                remastertext = re.findall('(.*) - (.*)$', releasedata[3])[0]
-                releasedataout['remastertitle'] = remastertext[0]
-                # Year is mandatory on JPS so most releases have current year. This looks ugly on SM (and JPS) so if the
-                # year is the groupdata['year'] we will not set it.
-                year = re.findall('([0-9]{4})(?:.*)', torrentgroupdata.date)[0]
-                if year != remastertext[1]:
-                    releasedataout['remasteryear'] = remastertext[1]
+                remasterdata = releasedata[3]
+            else:
+                remasterdata = False
+
+        if remasterdata:
+            remastertext = re.findall('(.*) - (.*)$', remasterdata)[0]  # TODO Handle when there is year but no edition data
+            releasedataout['remastertitle'] = remastertext[0]
+            # Year is mandatory on JPS so most releases have current year. This looks ugly on SM (and JPS) so if the
+            # year is the groupdata['year'] we will not set it.
+            year = re.findall('([0-9]{4})(?:.*)', torrentgroupdata.date)[0]
+            if year != remastertext[1]:
+                releasedataout['remasteryear'] = remastertext[1]
 
         if 'WEB' in releasedata:  # Media validation
             releasedataout['media'] = 'Web'
