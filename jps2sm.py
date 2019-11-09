@@ -227,6 +227,30 @@ def getauthkey():
     return authkey
 
 
+def setorigartist(artist, origartist):
+    """
+    Set an artist's original artist with the string origartist
+
+    :param artist: string: String of the artist that needs it's original artist set
+    :param origartist: string: Original artist
+    """
+    SMs_artist = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr, debug=args.debug)
+    SMartistpage = SMs_artist.retrieveContent(f"https://sugoimusic.me/artist.php?artistname={artist}")
+    soup = BeautifulSoup(SMartistpage.text, 'html5lib')
+    linkbox = str(soup.select('#content .thin .header .linkbox'))
+    artistid = re.findall(r'href="artist\.php\?action=edit&amp;artistid=([0-9]+)"', linkbox)[0]
+
+    data = {
+        'action': 'edit',
+        'auth': authkey,
+        'artistid': artistid,
+        'name_jp': origartist
+    }
+
+    SMeditartistpage = SMs_artist.retrieveContent(f'https://sugoimusic.me/artist.php?artistname={artist}', 'post', data)
+    if debug:
+        print(f'Set artist {artist} original artist to {origartist}')
+
 def filterlist(string, substr):
     """
     Returns a filtered list where only items containing substr are returned.
@@ -606,6 +630,13 @@ def collate(torrentids):
             groupid = uploadtorrent(torrentfilename, **releasedataout)
         else:
             uploadtorrent(torrentfilename, groupid, **releasedataout)
+
+    # Add original artists for contrib artists
+    if torrentgroupdata.contribartists:
+        for artist, origartist in torrentgroupdata.contribartists.items():
+            # For every artist, go to its artist page to get artist ID, then use this to go to artist.php?action=edit with the orig artist
+            setorigartist(artist, origartist)
+
 
 
 if __name__ == "__main__":
