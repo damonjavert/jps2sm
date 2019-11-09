@@ -183,7 +183,7 @@ if __name__ == "__main__":
         'auth': getauthkey(),
         'torrentid': args.torrentid,
         'reason': 'Other',
-        'extra': f'Mass delete from deletetorrentid.py'
+        'extra': f'Mass delete from deletetorrent.py'
     }
 
     s = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr)
