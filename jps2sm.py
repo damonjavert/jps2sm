@@ -324,7 +324,6 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
         # TODO Add feature to request category as parameter as JPS cats do not all = SM cats
         #  ^^ will probably never need to do this now due to improved validation logic
         'title': torrentgroupdata.title,
-        'idols[]': torrentgroupdata.artist,
         'year': torrentgroupdata.date,
         'media': uploaddata['media'],
         'audioformat': uploaddata['audioformat'],
@@ -374,6 +373,16 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
         data['contrib_artists[]'] = contribartistsenglish
     except AttributeError:  # If no contrib artists do nothing
         pass
+
+    if torrentgroupdata.artist == "V.A.":  # At JPS Various Artists torrents have their artists as contrib artists
+        # TODO Recognise torrents that have >4 artists and keep them as contrib artists, this probably requires
+        # a Gazelle code change to handle torrent groups with no main artist
+        del data['contrib_artists[]']  # Error if null as if there is a V.A. torrent group with no contrib artists something is wrong
+        data['idols[]'] = contribartistsenglish
+        if debug:
+            print(f'Various Artists torrent, setting main artists to {contribartistsenglish}')
+    else:
+        data['idols[]'] = torrentgroupdata.artist  # Set the artist normally
 
     postDataFiles = {
         'file_input': open(filename, 'rb')
@@ -633,7 +642,6 @@ def collate(torrentids):
         for artist, origartist in torrentgroupdata.contribartists.items():
             # For every artist, go to its artist page to get artist ID, then use this to go to artist.php?action=edit with the orig artist
             setorigartist(artist, origartist)
-
 
 
 if __name__ == "__main__":
