@@ -345,6 +345,14 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
     except AttributeError:  # If no originalchars do nothing
         pass
 
+    try:
+        contribartistsenglish = []
+        for artist, origartist in torrentgroupdata.contribartists.items():
+            contribartistsenglish.append(artist)
+        data['contrib_artists[]'] = contribartistsenglish
+    except AttributeError:  # If no contrib artists do nothing
+        pass
+
     postDataFiles = {
         'file_input': open(filename, 'rb')
     }
@@ -454,6 +462,17 @@ class GetGroupData:
         print(tags)
         self.tagsall = ",".join(tags)
 
+        try:
+            contribartistsget = str(soup.select('#content .thin .sidebar .box .body ul.stats.nobullet li'))
+            contribartistslist = re.findall(r'<li><a href="artist\.php\?id=(?:[0-9]+?)" title="(.*?)">([\w ]+)</a>', contribartistsget)
+            self.contribartists = {}
+            for artistpair in contribartistslist:
+                self.contribartists[artistpair[1]] = artistpair[0] # Creates contribartists[artist] = origartist
+
+            print(f'Contributing artists: {self.contribartists}')
+        except IndexError:  # Do nothing if group has no contrib artists
+            pass
+
     def category(self):
         return self.category()
 
@@ -481,12 +500,15 @@ class GetGroupData:
     def tagsall(self):
         return self.tagsall()
 
+    def contribartists(self):
+        return self.contribartists
+
 
 def collate(torrentids):
     """
     Collate and validate data ready for upload to SM
 
-    Validate and process dict supplied by getreleasedata() with format, bitrate, media, container, codec, and remaster data to extract all available data from SM
+    Validate and process dict supplied by getreleasedata() with format, bitrate, media, container, codec, and remaster data to extract all available data from JPS
     Perform validation on some fields
     Download JPS torrent
     Apply filters
