@@ -638,11 +638,12 @@ def collate(torrentids):
         else:
             uploadtorrent(torrentfilename, groupid, **releasedataout)
 
-    # Add original artists for contrib artists
-    if torrentgroupdata.contribartists:
-        for artist, origartist in torrentgroupdata.contribartists.items():
-            # For every artist, go to its artist page to get artist ID, then use this to go to artist.php?action=edit with the orig artist
-            setorigartist(artist, origartist)
+    if not dryrun:
+        # Add original artists for contrib artists
+        if torrentgroupdata.contribartists:
+            for artist, origartist in torrentgroupdata.contribartists.items():
+                # For every artist, go to its artist page to get artist ID, then use this to go to artist.php?action=edit with the orig artist
+                setorigartist(artist, origartist)
 
 
 if __name__ == "__main__":
