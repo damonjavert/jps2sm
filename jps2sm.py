@@ -22,7 +22,7 @@ import requests
 from bs4 import BeautifulSoup
 from django.utils.text import get_valid_filename
 
-__version__ = "0.8.2"
+__version__ = "0.9.0"
 
 
 class MyLoginSession:
@@ -228,7 +228,8 @@ def getauthkey():
 
 def setorigartist(artist, origartist):
     """
-    Set an artist's original artist with the string origartist
+    Set an artist's original artist with the string origartist, currently used for contrib artists
+    # TODO Consider using this for main orig artist
 
     :param artist: string: String of the artist that needs it's original artist set
     :param origartist: string: Original artist
@@ -766,8 +767,6 @@ if __name__ == "__main__":
                     print(exc)
                     traceback.print_exc()
                 continue
-
-            #print(groupdata)
 
             try:
                 collate(torrentids)
