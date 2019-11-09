@@ -219,9 +219,8 @@ def getauthkey():
 
     :return: authkey
     """
-    SMshome = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr, debug=args.debug)
-    SMreshome = SMshome.retrieveContent("https://sugoimusic.me/torrents.php?id=118")  # Arbitrary page on JPS that has authkey
-    soup = BeautifulSoup(SMreshome.text, 'html5lib')
+    smpage = sm.retrieveContent("https://sugoimusic.me/torrents.php?id=118")  # Arbitrary page on JPS that has authkey
+    soup = BeautifulSoup(smpage.text, 'html5lib')
     rel2 = str(soup.select('#content .thin .main_column .torrent_table tbody'))
     authkey = re.findall('authkey=(.*)&amp;torrent_pass=', rel2)
     return authkey
@@ -234,8 +233,7 @@ def setorigartist(artist, origartist):
     :param artist: string: String of the artist that needs it's original artist set
     :param origartist: string: Original artist
     """
-    SMs_artist = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr, debug=args.debug)
-    SMartistpage = SMs_artist.retrieveContent(f"https://sugoimusic.me/artist.php?artistname={artist}")
+    SMartistpage = sm.retrieveContent(f"https://sugoimusic.me/artist.php?artistname={artist}")
     soup = BeautifulSoup(SMartistpage.text, 'html5lib')
     linkbox = str(soup.select('#content .thin .header .linkbox'))
     artistid = re.findall(r'href="artist\.php\?action=edit&amp;artistid=([0-9]+)"', linkbox)[0]
@@ -247,7 +245,7 @@ def setorigartist(artist, origartist):
         'name_jp': origartist
     }
 
-    SMeditartistpage = SMs_artist.retrieveContent(f'https://sugoimusic.me/artist.php?artistname={artist}', 'post', data)
+    SMeditartistpage = sm.retrieveContent(f'https://sugoimusic.me/artist.php?artistname={artist}', 'post', data)
     if debug:
         print(f'Set artist {artist} original artist to {origartist}')
 
@@ -384,8 +382,7 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
     if dryrun or debug:
         print(json.dumps(data, indent=2))
     if not dryrun:
-        SMs = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr)
-        SMres = SMs.retrieveContent(uploadurl, "post", data, postDataFiles)
+        SMres = sm.retrieveContent(uploadurl, "post", data, postDataFiles)
 
         SMerrorTorrent = re.findall('red; text-align: center;">(.*)</p>', SMres.text)
         if SMerrorTorrent:
@@ -736,6 +733,7 @@ if __name__ == "__main__":
         'TV-Music', 'TV-Variety', 'TV-Drama']
 
     if not dryrun:
+        sm = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr, debug=args.debug)
         authkey = getauthkey()  # We only want this run ONCE per instance of the script
 
     if usermode:
