@@ -594,7 +594,11 @@ def collate(torrentids):
 
             releasedataout['media'] = releasedata[2]
             releasedataout['audioformat'] = releasedata[0]
-            releasedataout['bitrate'] = releasedata[1]
+
+            if releasedata[1].startswith('24bit'):
+                releasedataout['bitrate'] = '24bit Lossless'
+            else:
+                releasedataout['bitrate'] = releasedata[1]
 
             if releasedataout['audioformat'] == excfilteraudioformat:  # Exclude filters
                 print(f'Excluding {releasedata} as exclude audioformat {excfilteraudioformat} is set')
