@@ -146,7 +146,7 @@ class MyLoginSession:
         return res
 
 
-def getbulktorrentids(user, first=1, last=None):
+def getbulktorrentids(mode, user, first=1, last=None):
     """
     Iterates through a users' uploads on JPS and gathers the groupids and corresponding torrentids and returns
     a dict in the format of groupid: [torrentd1, torrentid2, ... ]
@@ -155,24 +155,25 @@ def getbulktorrentids(user, first=1, last=None):
     together so that they are uplaoded to the same group by uploadtorrent() even if they were not uploaded to JPS
     at the same time. - uploadtorrent() requires torrents uplaoded to the same group by uploaded together.
 
-    :param user: JSP userid
+    :param mode: Area to get bulk torrent ids from, either 'uploaded' for a user's uploads or 'seeding' for torrents currently seeding
+    :param user: JPS userid
     :param first: upload page number to start at
     :param last: upload page to finish at
     :return: useruploads: dict
     """
-    res = s.retrieveContent("https://jpopsuki.eu/torrents.php?type=uploaded&userid=%s" % (user))
+    res = s.retrieveContent(f"https://jpopsuki.eu/torrents.php?type={mode}&userid={user}")
     soup = BeautifulSoup(res.text, 'html5lib')
 
     linkbox = str(soup.select('#content #ajax_torrents .linkbox')[0])
     if not last:
         try:
-            last = re.findall('page=([0-9]*)&amp;order_by=s3&amp;order_way=DESC&amp;type=uploaded&amp;userid=(?:[0-9]*)&amp;disablegrouping=1\'\);"><strong> Last &gt;&gt;</strong>', linkbox)[0]
+            last = re.findall(fr'page=([0-9]*)&amp;order_by=s3&amp;order_way=DESC&amp;type={mode}&amp;userid=(?:[0-9]*)&amp;disablegrouping=1\'\);"><strong> Last &gt;&gt;</strong>', linkbox)[0]
         except:
             # There is only 1 page of uploads if the 'Last >>' link cannot be found
             last = 1
 
     if debug:
-        print(f'First page is {first}, last page is {last}')
+        print(f'Batch user is {user}, batch mode is {mode}, first page is {first}, last page is {last}')
 
     useruploads = {}
     useruploads = collections.defaultdict(list)
@@ -180,8 +181,8 @@ def getbulktorrentids(user, first=1, last=None):
     # Parse every torrent page and add to dict, to group together releases into the same group so that they work with
     # the way that uploadtorrent() works.
     for i in range(first, int(last) + 1):
-        useruploadpage = s.retrieveContent("https://jpopsuki.eu/torrents.php?page=%s&order_by=s3&order_way=DESC&type=uploaded&userid=%s&disablegrouping=1" % (i, user))
-        print("https://jpopsuki.eu/torrents.php?page=%s&order_by=s3&order_way=DESC&type=uploaded&userid=%s&disablegrouping=1" % (i, user))
+        useruploadpage = s.retrieveContent(fr"https://jpopsuki.eu/torrents.php?page=%s&order_by=s3&order_way=DESC&type={mode}&userid=%s&disablegrouping=1" % (i, user))
+        print(f"https://jpopsuki.eu/torrents.php?page=%s&order_by=s3&order_way=DESC&type={mode}&userid=%s&disablegrouping=1" % (i, user))
         # print useruploadpage.text
         soup2 = BeautifulSoup(useruploadpage.text, 'html5lib')
         try:
@@ -656,7 +657,9 @@ if __name__ == "__main__":
     parser.add_argument('-d', '--debug', help='Enable debug mode', action='store_true')
     parser.add_argument("-u", "--urls", help="JPS URL for a group, or multiple individual releases URLs to be added to the same group", type=str)
     parser.add_argument("-n", "--dryrun", help="Just parse url and show the output, do not add the torrent to SM", action="store_true")
-    parser.add_argument("-b", "--batchuser", help="Upload all releases uploaded by a particular user id")
+    parser.add_argument("-b", "--batchuser", help="User id for batch user operations")
+    parser.add_argument("-U", "--batchuploaded", help="Upload all releases uploaded by user id specified by --batchuser", action="store_true")
+    parser.add_argument("-S", "--batchseeding", help="Upload all releases currently seeding by user id specified by --batchuser", action="store_true")
     parser.add_argument("-s", "--batchstart", help="(Batch mode only) Start at this page", type=int)
     parser.add_argument("-e", "--batchend", help="(Batch mode only) End at this page", type=int)
     parser.add_argument("-f", "--excfilteraudioformat", help="Exclude an audioformat from upload", type=str)
@@ -692,6 +695,18 @@ if __name__ == "__main__":
         elif bool(args.batchstart) and bool(args.batchend):
             batchstart = args.batchstart
             batchend = args.batchend
+        if bool(args.batchuploaded) and bool(args.batchseeding):
+            print('You have specified both batch modes of operation - only one can be used at the same time.')
+            sys.exit()
+        elif args.batchuploaded is False and args.batchseeding is False:
+            print('Batch user upload mode not specified.')
+            sys.exit()
+
+        if args.batchuploaded:
+            batchmode = "uploaded"
+        elif args.batchseeding:
+            batchmode = "seeding"
+
         usermode = True
         batchuser = args.batchuser
 
@@ -752,9 +767,9 @@ if __name__ == "__main__":
 
     if usermode:
         if batchstart and batchend:
-            useruploads = getbulktorrentids(batchuser, batchstart, batchend)
+            useruploads = getbulktorrentids(batchmode, batchuser, batchstart, batchend)
         else:
-            useruploads = getbulktorrentids(batchuser)
+            useruploads = getbulktorrentids(batchmode, batchuser)
         useruploadsgrouperrors = collections.defaultdict(list)
         useruploadscollateerrors = collections.defaultdict(list)
 
