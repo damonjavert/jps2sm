@@ -330,10 +330,10 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
     uploadurl = 'https://sugoimusic.me/upload.php'
     languages = ('Japanese', 'English', 'Korean', 'Chinese', 'Vietnamese')
 
-    try:
-        date = torrentgroupdata.date
-    except AttributeError:  # No release date in JPS, use upload date as release date
+    if torrentgroupdata.date is None:
         date = uploaddata['uploaddate']
+    else:
+        date = torrentgroupdata.date
 
     data = {
         'submit': 'true',
@@ -469,6 +469,7 @@ class GetGroupData:
         except IndexError:  # Cannot find date in the title, use upload date instead from getreleasedata()
             if debug:
                 print('Date not found from group data, will use upload date as the release date')
+            self.date = None
             pass
 
         print(self.category)
