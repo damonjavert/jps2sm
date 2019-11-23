@@ -487,8 +487,13 @@ class GetGroupData:
             title1 = re.findall('<a.*> - (?:[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])) - (.*)</h2>', text)
             title2 = re.findall('<a.*> - (.*) \((.*) (?:[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01]))', text)
             # title1 has 1 matching group, title2 has 2
-            titlemerged = [title1, " ".join(itertools.chain(*title2))]
-            self.title = "".join(itertools.chain(*titlemerged))
+            titlemergedpre = [title1, " ".join(itertools.chain(*title2))]
+            titlemerged = "".join(itertools.chain(*titlemergedpre))
+            if len(titlemerged) == 0:  # Non standard title, fallback on the whole string after the "-"
+                self.title = re.findall('<a.*> - (.*)</h2>', text)[0]
+            else:
+                self.title = titlemerged
+
 
         print(self.title)
         try:
