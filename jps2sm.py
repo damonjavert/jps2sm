@@ -276,33 +276,42 @@ def gettorrentlink(torrentid):
 
 def getreleasedata(torrentids):
     """
-    Retrieve all torrent id and release data (slash separated data) whilst coping with 'noise' from FL torrents,
-    and either return all data if using a group URL or only return the relevant data if release url(s) were used
+    Retrieve all torrent id and release data (slash separated data and upload date) whilst coping with 'noise' from FL torrents,
+    and either return all data if using a group URL or only return the relevant releases if release url(s) were used
 
-    :param torrentids: list of torrentids to be processed
-    :return: releasedata: dict of release data in the format of torrentid: slashdata , with 1 sublist for each release
+    :param torrentids: list of torrentids to be processed, NULL if group is used
+    :return: releasedata: 2d dict of release data in the format of torrentid: { "slashdata" : [ slashdatalist ] , "uploaddate": uploaddate } .
     """
+
     freeleechtext = '<strong>Freeleech!</strong>'
-    slashdata = re.findall(r"swapTorrent\('([0-9]+)'\);\">» (.*)</a>", torrentgroupdata.rel2)
-    if debug:
-        print(f'Entire group contains: {slashdata}')
+    releasedatapre = re.findall(r"swapTorrent\('([0-9]+)'\);\">» (.*?)</a>.*?<blockquote>(?:\s*)Uploaded by <a href=\"user.php\?id=(?:[0-9]+)\">(?:[\S]+)</a>  on <span title=\"(?:[^\"]+)\">([^<]+)</span>", torrentgroupdata.rel2, re.DOTALL)
+    # if debug:
+    #     print(f'Pre-processed releasedata: {json.dumps(releasedatapre, indent=2)}')
 
     releasedata = {}
-    for release in slashdata:
+    for release in releasedatapre:
         torrentid = release[0]
         slashlist = ([i.split(' / ') for i in [release[1]]])[0]
-        releasedata[torrentid] = slashlist
+        uploadeddate = release[2]
+        releasedata[torrentid] = {}
+        releasedata[torrentid]['slashdata'] = slashlist
+        releasedata[torrentid]['uploaddate'] = uploadeddate
+
+    if debug:
+        print(f'Entire group contains: {json.dumps(releasedata, indent=2)}')
+
 
     removetorrents = []
-    for torrentid, release in releasedata.items():
+    for torrentid, release in releasedata.items():  # Now release is a dict!
         if len(torrentids) != 0 and torrentid not in torrentids:
             # If len(torrentids) != 0 then user has supplied a group url and every release is processed,
             # otherwise iterate through releasedata{} and remove what is not needed
             removetorrents.append(torrentid)
-        if freeleechtext in release:
-            release.remove(freeleechtext)  # Remove Freeleech so it does not interfere with Remastered
+        if freeleechtext in release['slashdata']:
+            release['slashdata'].remove(freeleechtext)  # Remove Freeleech so it does not interfere with Remastered
     for torrentid in removetorrents:
         del(releasedata[torrentid])
+
     print(f'Selected for upload: {releasedata}')
 
     return releasedata
@@ -320,13 +329,19 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
     """
     uploadurl = 'https://sugoimusic.me/upload.php'
     languages = ('Japanese', 'English', 'Korean', 'Chinese', 'Vietnamese')
+
+    if torrentgroupdata.date is None:
+        date = uploaddata['uploaddate']
+    else:
+        date = torrentgroupdata.date
+
     data = {
         'submit': 'true',
         'type': Categories[torrentgroupdata.category],
         # TODO Add feature to request category as parameter as JPS cats do not all = SM cats
         #  ^^ will probably never need to do this now due to improved validation logic
         'title': torrentgroupdata.title,
-        'year': torrentgroupdata.date,
+        'year': date,
         'media': uploaddata['media'],
         'audioformat': uploaddata['audioformat'],
         'tags': torrentgroupdata.tagsall,
@@ -449,7 +464,13 @@ class GetGroupData:
         self.category = sqbrackets[0]
 
         # Extract date without using '[]' as it allows '[]' elsewhere in the title and it works with JPS TV-* categories
-        self.date = re.findall('([12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01]))', text)[0].replace(".", "")
+        try:
+            self.date = re.findall('([12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01]))', text)[0].replace(".", "")
+        except IndexError:  # Cannot find date in the title, use upload date instead from getreleasedata()
+            if debug:
+                print('Date not found from group data, will use upload date as the release date')
+            self.date = None
+            pass
 
         print(self.category)
         print(self.date)
@@ -550,10 +571,12 @@ def collate(torrentids):
     :param groupdata: dictionary with torrent group data from getgroupdata[]
     """
     groupid = None
-    for torrentid, releasedata in getreleasedata(torrentids).items():
+    for torrentid, releasedatafull in getreleasedata(torrentids).items():
 
-        print(f'Now processing: {torrentid} {releasedata}')
+        print(f'Now processing: {torrentid} {releasedatafull}')
 
+        releasedata = releasedatafull['slashdata']
+        uploaddatestr = releasedatafull['uploaddate']
         releasedataout = {}
 
         # JPS uses the audioformat field (represented as releasedata[0] here) for containers and codecs in video torrents,
@@ -627,8 +650,9 @@ def collate(torrentids):
         elif 'Blu-Ray' in releasedata:
             releasedataout['media'] = 'Bluray'  # JPS may actually be calling it the correct official name, but modern usage differs.
 
-        torrentlink = html.unescape(gettorrentlink(torrentid))
+        releasedataout['uploaddate'] = datetime.datetime.strptime(uploaddatestr, '%b %d %Y, %H:%M').strftime('%Y%m%d')  # Use if no release date
 
+        torrentlink = html.unescape(gettorrentlink(torrentid))
         torrentfile = s.retrieveContent("https://jpopsuki.eu/%s" % torrentlink)  # Download JPS torrent
         torrentfilename = get_valid_filename(
             "JPS %s - %s - %s.torrent" % (torrentgroupdata.artist, torrentgroupdata.title, "-".join(releasedata)))
