@@ -345,7 +345,6 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
         'media': uploaddata['media'],
         'audioformat': uploaddata['audioformat'],
         'tags': torrentgroupdata.tagsall,
-        'image': torrentgroupdata.imagelink,
         'album_desc': torrentgroupdata.groupdescription,
         # 'release_desc': releasedescription
     }
@@ -354,6 +353,9 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
 
     if debug:
         print(uploaddata)
+
+    if torrentgroupdata.imagelink is not None:
+        data['image'] = torrentgroupdata.imagelink
 
     if uploaddata['videotorrent']:
         if Categories[torrentgroupdata.category] == "DVD" and uploaddata['media'] == 'Bluray':
@@ -507,8 +509,11 @@ class GetGroupData:
         print(f"Group description:\n{self.groupdescription}")
 
         image = str(soup.select('#content .thin .sidebar .box p a'))
-        self.imagelink = "https://jpopsuki.eu/" + re.findall('<a\s+(?:[^>]*?\s+)?href=\"([^\"]*)\"', image)[0]
-        print(self.imagelink)
+        try:
+            self.imagelink = "https://jpopsuki.eu/" + re.findall('<a\s+(?:[^>]*?\s+)?href=\"([^\"]*)\"', image)[0]
+            print(self.imagelink)
+        except IndexError:  # No image for the group
+            self.imagelink = None
 
         tagsget = str(soup.select('#content .thin .sidebar .box ul.stats.nobullet li'))
         tags = re.findall('searchtags=([^\"]+)', tagsget)
