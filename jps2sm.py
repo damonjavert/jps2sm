@@ -335,15 +335,13 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
     else:
         date = torrentgroupdata.date
 
-    data = {
+    data = {  # Fields that are always required for upload
         'submit': 'true',
         'type': Categories[torrentgroupdata.category],
         # TODO Add feature to request category as parameter as JPS cats do not all = SM cats
         #  ^^ will probably never need to do this now due to improved validation logic
         'title': torrentgroupdata.title,
         'year': date,
-        'media': uploaddata['media'],
-        'audioformat': uploaddata['audioformat'],
         'tags': torrentgroupdata.tagsall,
         'album_desc': torrentgroupdata.groupdescription,
         # 'release_desc': releasedescription
@@ -353,6 +351,10 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
 
     if debug:
         print(uploaddata)
+
+    if torrentgroupdata.category not in NonReleaseDataCategories:
+        data['media'] = uploaddata['media']
+        data['audioformat'] = uploaddata['audioformat']
 
     if torrentgroupdata.imagelink is not None:
         data['image'] = torrentgroupdata.imagelink
@@ -368,7 +370,7 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
         for language in languages:  # If we have a language tag, set the language field
             if language.lower() in torrentgroupdata.tagsall:
                 data['lang'] = language
-    else:
+    elif torrentgroupdata.category not in NonReleaseDataCategories:  # Music Category torrent
         data['bitrate'] = uploaddata['bitrate']
 
     if 'remastertitle' in uploaddata.keys():
@@ -622,7 +624,7 @@ def collate(torrentids):
             else:
                 remasterdata = False
 
-        else:
+        elif torrentgroupdata.category not in NonReleaseDataCategories:  # Music torrent
             # format / bitrate / media
             releasedataout['videotorrent'] = False
 
@@ -645,6 +647,9 @@ def collate(torrentids):
                 remasterdata = releasedata[3]
             else:
                 remasterdata = False
+        elif torrentgroupdata.category in NonReleaseDataCategories:  # Pictures or Misc Category torrents
+            releasedataout['videotorrent'] = False
+            remasterdata = False
 
         if remasterdata:
             remastertext = re.findall('(.*) - (.*)$', remasterdata)[0]  # TODO Handle when there is year but no edition data
@@ -660,7 +665,9 @@ def collate(torrentids):
         elif 'Blu-Ray' in releasedata:
             releasedataout['media'] = 'Bluray'  # JPS may actually be calling it the correct official name, but modern usage differs.
 
-        releasedataout['uploaddate'] = datetime.datetime.strptime(uploaddatestr, '%b %d %Y, %H:%M').strftime('%Y%m%d')  # Use if no release date
+        # uploadtorrent() will use the upload date as release date if the torrent has no release date, usually for
+        # Picture Category torrents and some TV-Variety.
+        releasedataout['uploaddate'] = datetime.datetime.strptime(uploaddatestr, '%b %d %Y, %H:%M').strftime('%Y%m%d')
 
         torrentlink = html.unescape(gettorrentlink(torrentid))
         torrentfile = s.retrieveContent("https://jpopsuki.eu/%s" % torrentlink)  # Download JPS torrent
