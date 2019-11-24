@@ -793,6 +793,8 @@ if __name__ == "__main__":
 
     # JPS Categories where release date cannot be entered and therefore need to be processed differently
     NonDateCategories = ('TV-Music', 'TV-Variety', 'TV-Drama', 'Pictures', 'Misc')
+    # JPS Categories where no release data is processed and therefore need to be processed differently
+    NonReleaseDataCategories = ('Pictures', 'Misc')
 
     if not dryrun:
         sm = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr, debug=args.debug)
