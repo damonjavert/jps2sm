@@ -480,7 +480,7 @@ class GetGroupData:
         self.artist = re.findall('<a[^>]+>(.*)<', artistlinelinktext)[0]
         print(self.artist)
 
-        if self.category not in TVCategories:
+        if self.category not in NonDateCategories:
             self.title = re.findall('<a.*> - (.*) \[', text)[0]
         else:
             # Using two sets of findall() as I cannot get the OR regex operator "|" to work
@@ -789,11 +789,10 @@ if __name__ == "__main__":
         'Misc': 11,
     }
 
-    VideoCategories = [
-        'Bluray', 'DVD', 'PV', 'TV-Music', 'TV-Variety', 'TV-Drama', 'Music Performance']
+    VideoCategories = ('Bluray', 'DVD', 'PV', 'TV-Music', 'TV-Variety', 'TV-Drama', 'Music Performance')
 
-    TVCategories = [
-        'TV-Music', 'TV-Variety', 'TV-Drama']
+    # JPS Categories where release date cannot be entered and therefore need to be processed differently
+    NonDateCategories = ('TV-Music', 'TV-Variety', 'TV-Drama', 'Pictures', 'Misc')
 
     if not dryrun:
         sm = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr, debug=args.debug)
