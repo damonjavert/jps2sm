@@ -360,7 +360,7 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
         data['image'] = torrentgroupdata.imagelink
 
     if uploaddata['videotorrent']:
-        if Categories[torrentgroupdata.category] == "DVD" and uploaddata['media'] == 'Bluray':
+        if torrentgroupdata.category == "DVD" and uploaddata['media'] == 'Bluray':
             data['type'] = 'Bluray'  # JPS has no Bluray category
         data['codec'] = uploaddata['codec']
         data['ressel'] = 'Other'
