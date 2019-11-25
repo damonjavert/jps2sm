@@ -469,7 +469,7 @@ class GetGroupData:
 
         # Extract date without using '[]' as it allows '[]' elsewhere in the title and it works with JPS TV-* categories
         try:
-            self.date = re.findall('([12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01]))', text)[0].replace(".", "")
+            self.date = re.findall('[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])|(?:19|20)\d{2}', text)[0].replace(".", "")
             # Handle if cannot find date in the title, use upload date instead from getreleasedata() but error if the category should have it
         except IndexError as exc:
             if self.category not in NonReleaseDataCategories:
