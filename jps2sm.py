@@ -227,6 +227,44 @@ def getauthkey():
     return authkey
 
 
+def getalternatefansubcategoryid(artist):
+    """
+    Attempts to detect the actual category for JPS Fansubs category torrents and if not ask the user to select an alternate category.
+    If it is a TV show, this TV show category type is detected and returned, else query the user from a list of potential categories.
+
+    :param artist: str artist name
+    :return: int alternative category ID based on SMCategories()
+    """
+    NonTVCategories = ('Album', 'EP', 'Single', 'Bluray', 'DVD', 'PV')
+    JPSartistpage = s.retrieveContent(f"https://jpopsuki.eu/artist.php?name={artist}")
+    soup = BeautifulSoup(JPSartistpage.text, 'html5lib')
+    categoriesbox = str(soup.select('#content .thin .main_column .box.center'))
+    categories = re.findall(r'\[(.+)\]', categoriesbox)
+
+    if not any({*NonTVCategories} & {*categories}) and " ".join(categories).count('TV-') == 1:
+        # Artist has no music and only 1 TV Category, artist is a TV show and we can auto detect the category for FanSub releases
+        autodetectcategory = re.findall(r'(TV-(?:[^ ]+))', " ".join(categories))[0]
+        if debug:
+            print(f'Autodetected SM category {autodetectcategory} for JPS Fansubs torrent')
+        return autodetectcategory
+    else:  # Cannot autodetect
+        AlternateFanSubCategoriesIDs = (5, 6, 7, 8, 9)  #Matches indices in Categories()
+        print(f'Cannot auto-detect correct category for torrent group {torrentgroupdata.title}.\nSelect Category:')
+        option = 1
+        optionlookup = {}
+        for alternativefansubcategoryid in AlternateFanSubCategoriesIDs:
+            for cat, catid in SMCategories.items():
+                if alternativefansubcategoryid == catid:
+                    print(f'({option}) {cat}')
+                    optionlookup[option] = alternativefansubcategoryid
+                    option += 1
+        alternatecategoryoption = input('Choose alternate category or press ENTER to skip: ')
+        if alternatecategoryoption == "":
+            return "Fansubs"  # Allow upload to fail
+        else:
+            return optionlookup[int(alternatecategoryoption)]
+
+
 def setorigartist(artist, origartist):
     """
     Set an artist's original artist with the string origartist, currently used for contrib artists
@@ -250,6 +288,7 @@ def setorigartist(artist, origartist):
     SMeditartistpage = sm.retrieveContent(f'https://sugoimusic.me/artist.php?artistname={artist}', 'post', data)
     if debug:
         print(f'Set artist {artist} original artist to {origartist}')
+
 
 def filterlist(string, substr):
     """
@@ -300,7 +339,6 @@ def getreleasedata(torrentids):
     if debug:
         print(f'Entire group contains: {json.dumps(releasedata, indent=2)}')
 
-
     removetorrents = []
     for torrentid, release in releasedata.items():  # Now release is a dict!
         if len(torrentids) != 0 and torrentid not in torrentids:
@@ -313,7 +351,6 @@ def getreleasedata(torrentids):
         del(releasedata[torrentid])
 
     print(f'Selected for upload: {releasedata}')
-
     return releasedata
 
 
@@ -335,11 +372,8 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
     else:
         date = torrentgroupdata.date
 
-    data = {  # Fields that are always required for upload
+    data = {  # Fields that are never validated here
         'submit': 'true',
-        'type': Categories[torrentgroupdata.category],
-        # TODO Add feature to request category as parameter as JPS cats do not all = SM cats
-        #  ^^ will probably never need to do this now due to improved validation logic
         'title': torrentgroupdata.title,
         'year': date,
         'tags': torrentgroupdata.tagsall,
@@ -378,6 +412,12 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
         data['remastertitle'] = uploaddata['remastertitle']
     if 'remasteryear' in uploaddata.keys():
         data['remasteryear'] = uploaddata['remasteryear']
+
+    if torrentgroupdata.category == "Fansubs":
+        data['type'] = getalternatefansubcategoryid(torrentgroupdata.artist)
+        data['sub'] = 'Hardsubs'  # We have subtitles! Subs in JPS FanSubs are usually Hardsubs so guess as this TODO: Use torrent library to look for sub/srt files
+    else:
+        data['type'] = Categories[torrentgroupdata.category]
 
     if groupid:
         data['groupid'] = groupid  # Upload torrents into the same group
@@ -472,7 +512,7 @@ class GetGroupData:
             self.date = re.findall('[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])|(?:19|20)\d{2}', text)[0].replace(".", "")
             # Handle if cannot find date in the title, use upload date instead from getreleasedata() but error if the category should have it
         except IndexError as exc:
-            if self.category not in NonReleaseDataCategories:
+            if self.category not in NonDateCategories:
                 print(f'Group release date not found and not using upload date instead as {self.category} torrents should have it set')
                 if debug:
                     print(exc)
@@ -803,11 +843,26 @@ if __name__ == "__main__":
         'Misc': 11,
     }
 
+    SMCategories = {  # For use by HandleFanSub()
+        'Album': 0,
+        'EP': 1, #Does not exist on JPS
+        'Single': 2,
+        'Bluray': 3,  # Does not exist on JPS
+        'DVD': 4,
+        'PV': 5,
+        'Music Performance': 6,  # Does not exist on JPS
+        'Music Show': 7,  # TV-Music
+        'Talk Show': 8,  # TV-Variety
+        'TV Drama': 9,  # TV-Drama
+        'Pictures': 10,
+        'Misc': 11,
+    }
+
     VideoCategories = ('Bluray', 'DVD', 'PV', 'TV-Music', 'TV-Variety', 'TV-Drama', 'Music Performance')
 
     # JPS Categories where release date cannot be entered and therefore need to be processed differently
-    NonDateCategories = ('TV-Music', 'TV-Variety', 'TV-Drama', 'Pictures', 'Misc')
-    # JPS Categories where no release data is processed and therefore need to be processed differently
+    NonDateCategories = ('TV-Music', 'TV-Variety', 'TV-Drama', 'Fansubs', 'Pictures', 'Misc')
+    # JPS Categories where no release data is present and therefore need to be processed differently
     NonReleaseDataCategories = ('Pictures', 'Misc')
 
     if not dryrun:
