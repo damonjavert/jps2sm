@@ -470,7 +470,14 @@ class GetGroupData:
         # Extract date without using '[]' as it allows '[]' elsewhere in the title and it works with JPS TV-* categories
         try:
             self.date = re.findall('([12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01]))', text)[0].replace(".", "")
-        except IndexError:  # Cannot find date in the title, use upload date instead from getreleasedata()
+            # Handle if cannot find date in the title, use upload date instead from getreleasedata() but error if the category should have it
+        except IndexError as exc:
+            if self.category not in NonReleaseDataCategories:
+                print(f'Group release date not found and not using upload date instead as {self.category} torrents should have it set')
+                if debug:
+                    print(exc)
+                    traceback.print_exc()
+                sys.exit()
             if debug:
                 print('Date not found from group data, will use upload date as the release date')
             self.date = None
