@@ -742,7 +742,7 @@ def collate(torrentids):
                 setorigartist(artist, origartist)
 
 
-if __name__ == "__main__":
+def getargs():
     parser = argparse.ArgumentParser()
     parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + __version__)
     parser.add_argument('-d', '--debug', help='Enable debug mode', action='store_true')
@@ -755,8 +755,12 @@ if __name__ == "__main__":
     parser.add_argument("-e", "--batchend", help="(Batch mode only) End at this page", type=int)
     parser.add_argument("-f", "--excfilteraudioformat", help="Exclude an audioformat from upload", type=str)
     parser.add_argument("-F", "--excfiltermedia", help="Exclude a media from upload", type=str)
-    args = parser.parse_args()
 
+    return parser.parse_args()
+
+
+if __name__ == "__main__":
+    args = getargs()
     # TODO consider calling args[] directly, we will then not need this line
     dryrun = debug = excfilteraudioformat = excfiltermedia = usermode = batchstart = batchend = None
 
