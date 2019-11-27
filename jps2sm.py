@@ -499,13 +499,14 @@ class GetGroupData:
         artistlinelink = soup.select('.thin h2 a')
         originaltitleline = soup.select('.thin h3')
         text = str(artistline[0])
-        print(artistline[0])
+        if debug:
+            print(artistline[0])
 
         artistlinelinktext = str(artistlinelink[0])
 
         sqbrackets = re.findall('\[(.*?)\]', text)
-        print(sqbrackets)
         self.category = sqbrackets[0]
+        print(self.category)
 
         # Extract date without using '[]' as it allows '[]' elsewhere in the title and it works with JPS TV-* categories
         try:
@@ -523,11 +524,10 @@ class GetGroupData:
             self.date = None
             pass
 
-        print(self.category)
-        print(self.date)
+        print(f'Release date: {self.date}')
 
         self.artist = re.findall('<a[^>]+>(.*)<', artistlinelinktext)[0]
-        print(self.artist)
+        print(f'Artist: {self.artist}')
 
         if self.category not in NonDateCategories:
             self.title = re.findall('<a.*> - (.*) \[', text)[0]
@@ -543,8 +543,7 @@ class GetGroupData:
             else:
                 self.title = titlemerged
 
-
-        print(self.title)
+        print(f'Title: {self.title}')
         try:
             originalchars = re.findall(r'<a href="artist.php\?id=(?:[0-9]+)">(.+)</a> - (.+)\)</h3>', str(originaltitleline))[0]
             self.originalartist = originalchars[0]
