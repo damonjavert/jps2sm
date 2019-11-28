@@ -396,6 +396,12 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
     if uploaddata['videotorrent']:
         if torrentgroupdata.category == "DVD" and uploaddata['media'] == 'Bluray':
             data['type'] = 'Bluray'  # JPS has no Bluray category
+        if uploaddata['categorystatus'] == 'bad':  # Need to set a correct category
+            if uploaddata['media'] == 'Bluray':
+                data['type'] = Categories.JPStoSM['Bluray']
+            else:  # Still need to change the category to something, if not a Bluray then even if it is not a DVD the most sensible category is DVD in a music torrent group
+                data['type'] = Categories.JPStoSM['DVD']
+
         data['codec'] = uploaddata['codec']
         data['ressel'] = 'Other'
         data['container'] = uploaddata['container']
@@ -417,8 +423,7 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
     if torrentgroupdata.category == "Fansubs":
         data['type'] = getalternatefansubcategoryid(torrentgroupdata.artist)
         data['sub'] = 'Hardsubs'  # We have subtitles! Subs in JPS FanSubs are usually Hardsubs so guess as this TODO: Use torrent library to look for sub/srt files
-    else:
-        print(Categories.JPStoSM)
+    elif uploaddata['categorystatus'] == 'good':
         data['type'] = Categories.JPStoSM[torrentgroupdata.category]
 
     if groupid:
@@ -621,6 +626,46 @@ class GetGroupData:
         return self.contribartists
 
 
+def validatevideodata(releasedata, categorystatus):
+    """
+    Validate and process dict supplied by getreleasedata() via collate() to extract all available data
+    from JPS for video torrents, whilst handling weird cases qhere VideoTorrent is uploaded as a Music category
+
+    :param releasedata:
+    :param categorystatus: str: good or bad. good for correct category assigned and bad if this is a Music Torrent
+    mistakenly uploaded as a non-VC category!
+    :return: releasedataout{} validated container, codec, media, audioformat
+    """
+    releasedataout = {}
+    # JPS uses the audioformat field (represented as releasedata[0] here) for containers and codecs in video torrents
+
+    # If a known container is used as audioformat set it as the container on SM
+    if releasedata[0] in VideoOptions.badcontainers:
+        releasedataout['container'] = releasedata[0]
+    else:
+        releasedataout['container'] = 'CHANGEME'
+    # If a known codec is used as audioformat set it as the codec on SM
+    if releasedata[0] in VideoOptions.badcodecs:
+        if releasedata[0] == "MPEG2":  # JPS uses 'MPEG2' for codec instead of the correct 'MPEG-2'
+            releasedataout['codec'] = "MPEG-2"
+        else:
+            releasedataout['codec'] = releasedata[0]
+    else:
+        releasedataout['codec'] = 'CHANGEME'  # assume default
+
+    if categorystatus == "good":
+        releasedataout['media'] = releasedata[1]
+    else:
+        releasedataout['media'] = releasedata[2]
+
+    if releasedata[0] == 'AAC':  # For video torrents, the only correct audioformat in JPS is AAC
+        releasedataout['audioformat'] = "AAC"
+    else:
+        releasedataout['audioformat'] = "CHANGEME"
+
+    return releasedataout
+
+
 def collate(torrentids):
     """
     Collate and validate data ready for upload to SM
@@ -645,40 +690,38 @@ def collate(torrentids):
 
         # JPS uses the audioformat field (represented as releasedata[0] here) for containers and codecs in video torrents,
         # and when combined with VideoMedias we can perform VideoTorrent detection.
-        VideoMedias = ('DVD', 'Blu-Ray', 'VHS', 'VCD', 'TV', 'HDTV', 'WEB')
-        badcontainers = ('ISO', 'VOB', 'MPEG', 'AVI', 'MKV', 'WMV', 'MP4')
-        badcodecs = ('MPEG2', 'h264')
-        badformats = badcontainers + badcodecs
-        if releasedata[0] in badformats and releasedata[1] in VideoMedias:  # VideoCategory torrent, this also detects VideoCategories in a non-VC group
+        if releasedata[0] in VideoOptions.badformats and releasedata[1] in VideoOptions.VideoMedias:  # VideoCategory torrent, this also detects VideoCategories in a non-VC group
             # container / media
             releasedataout['videotorrent'] = True  # For processing by uploadtorrent()
-            # If a known container is used as audioformat set it as the container on SM
-            if releasedata[0] in badcontainers:
-                releasedataout['container'] = releasedata[0]
-            else:
-                releasedataout['container'] = 'CHANGEME'
-            # If a known codec is used as audioformat set it as the codec on SM
-            if releasedata[0] in badcodecs:
-                if releasedata[0] == "MPEG2":  # JPS uses 'MPEG2' for codec instead of the correct 'MPEG-2'
-                    releasedataout['codec'] = "MPEG-2"
-                else:
-                    releasedataout['codec'] = releasedata[0]
-            else:
-                releasedataout['codec'] = 'CHANGEME'  # assume default
+            releasedataout['categorystatus'] = "good"
 
-            releasedataout['media'] = releasedata[1]
-
-            if releasedata[0] != 'AAC':  # For video torrents, the only correct audioformat is AAC
-                releasedataout['audioformat'] = "CHANGEME"
+            videoreleasedatavalidated = validatevideodata(releasedata, releasedataout['categorystatus'])
+            for field, data in videoreleasedatavalidated.items():
+                releasedataout[field] = data
 
             if len(releasedata) == 3:  # Remastered
                 remasterdata = releasedata[2]
             else:
                 remasterdata = False
 
+        elif releasedata[0] in VideoOptions.badformats and releasedata[2] in VideoOptions.VideoMedias:  # Video torrent mistakenly uploaded as an Album/Single
+            # container / 'bitrate' / media   Bitrate is meaningless, users usually select Lossless
+            releasedataout['videotorrent'] = True  # For processing by uploadtorrent()
+            releasedataout['categorystatus'] = "bad"
+
+            videoreleasedatavalidated = validatevideodata(releasedata, releasedataout['categorystatus'])
+            for field, data in videoreleasedatavalidated.items():
+                releasedataout[field] = data
+
+            if len(releasedata) == 4:  # Remastered
+                remasterdata = releasedata[3]
+            else:
+                remasterdata = False
+
         elif torrentgroupdata.category not in Categories.NonReleaseData:  # Music torrent  
             # format / bitrate / media
             releasedataout['videotorrent'] = False
+            releasedataout['categorystatus'] = "good"
             
             releasedataout['media'] = releasedata[2]
             releasedataout['audioformat'] = releasedata[0]
@@ -699,8 +742,10 @@ def collate(torrentids):
                 remasterdata = releasedata[3]
             else:
                 remasterdata = False
+
         elif torrentgroupdata.category in Categories.NonReleaseData:  # Pictures or Misc Category torrents
             releasedataout['videotorrent'] = False
+            releasedataout['categorystatus'] = "good"
             remasterdata = False
 
         if remasterdata:
@@ -764,6 +809,17 @@ def getargs():
     parser.add_argument("-F", "--excfiltermedia", help="Exclude a media from upload", type=str)
 
     return parser.parse_args()
+
+
+class VideoOptions:
+    """
+    Store Video option constants
+    """
+
+    VideoMedias = ('DVD', 'Blu-Ray', 'VHS', 'VCD', 'TV', 'HDTV', 'WEB')
+    badcontainers = ('ISO', 'VOB', 'MPEG', 'AVI', 'MKV', 'WMV', 'MP4')
+    badcodecs = ('MPEG2', 'h264')
+    badformats = badcontainers + badcodecs
 
 
 class Categories:
