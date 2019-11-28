@@ -411,6 +411,7 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
         data['remaster'] = 'remaster'
         data['remastertitle'] = uploaddata['remastertitle']
     if 'remasteryear' in uploaddata.keys():
+        data['remaster'] = 'remaster'
         data['remasteryear'] = uploaddata['remasteryear']
 
     if torrentgroupdata.category == "Fansubs":
@@ -703,13 +704,18 @@ def collate(torrentids):
             remasterdata = False
 
         if remasterdata:
-            remastertext = re.findall('(.*) - (.*)$', remasterdata)[0]  # TODO Handle when there is year but no edition data
-            releasedataout['remastertitle'] = remastertext[0]
-            # Year is mandatory on JPS so most releases have current year. This looks ugly on SM (and JPS) so if the
+            try:
+                remastertext = re.findall('(.*) - (.*)$', remasterdata)[0]
+                releasedataout['remastertitle'] = remastertext[0]
+                remasteryear = remastertext[1]
+            except IndexError:  # Torrent is remastered and only has year set
+                remasteryear = remasterdata  # The whole string is just the year
+
+            # Year is mandatory on JPS so most remastered releases have current year set as year. This looks ugly on SM (and JPS) so if the
             # year is the groupdata['year'] we will not set it.
             year = re.findall('([0-9]{4})(?:.*)', torrentgroupdata.date)[0]
-            if year != remastertext[1]:
-                releasedataout['remasteryear'] = remastertext[1]
+            if year != remasteryear:
+                releasedataout['remasteryear'] = remasteryear
 
         if 'WEB' in releasedata:  # Media validation
             releasedataout['media'] = 'Web'
