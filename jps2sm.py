@@ -403,7 +403,19 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
                 data['type'] = Categories.JPStoSM['DVD']
 
         data['codec'] = uploaddata['codec']
-        data['ressel'] = 'Other'
+
+        foundresolutions720 = re.findall('1280 ?x ?720', torrentgroupdata.groupdescription)
+        foundresolutions1080 = re.findall('1920 ?x ?1080', torrentgroupdata.groupdescription)
+        if len(foundresolutions720) != 0:
+            data['ressel'] = "720p"
+        elif len(foundresolutions1080) != 0:
+            data['ressel'] = "1080p"
+        for resolution in VideoOptions.resolutions:  # Now set more specific resolutions if they are present
+            if resolution in torrentgroupdata.groupdescription:  # If we can see the resolution in the group description then set it
+                data['ressel'] = resolution
+            else:
+                data['ressel'] = 'Other'
+
         data['container'] = uploaddata['container']
         data['sub'] = 'NoSubs'  # assumed default
         data['lang'] = 'CHANGEME'
@@ -820,6 +832,7 @@ class VideoOptions:
     badcontainers = ('ISO', 'VOB', 'MPEG', 'AVI', 'MKV', 'WMV', 'MP4')
     badcodecs = ('MPEG2', 'h264')
     badformats = badcontainers + badcodecs
+    resolutions = ('720p', '1080i', '1080p')
 
 
 class Categories:
