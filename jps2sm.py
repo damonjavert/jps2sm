@@ -22,7 +22,7 @@ import requests
 from bs4 import BeautifulSoup
 from django.utils.text import get_valid_filename
 
-__version__ = "0.9.0"
+__version__ = "0.10.0"
 
 
 class MyLoginSession:
