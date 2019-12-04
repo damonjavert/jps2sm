@@ -22,7 +22,7 @@ import requests
 from bs4 import BeautifulSoup
 from django.utils.text import get_valid_filename
 
-__version__ = "0.10.1"
+__version__ = "0.10.1.1"
 
 
 class MyLoginSession:
@@ -541,7 +541,6 @@ class GetGroupData:
                     if debug:
                         print(dateexc)
                         traceback.print_exc()
-                    sys.exit()
                 if debug:
                     print('Date not found from group data, will use upload date as the release date')
                 self.date = None
