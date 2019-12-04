@@ -22,7 +22,7 @@ import requests
 from bs4 import BeautifulSoup
 from django.utils.text import get_valid_filename
 
-__version__ = "0.10.0"
+__version__ = "0.10.1"
 
 
 class MyLoginSession:
@@ -692,8 +692,10 @@ def collate(torrentids):
     :param groupdata: dictionary with torrent group data from getgroupdata[]
     """
     groupid = None
+    torrentcount = 0
     for torrentid, releasedatafull in getreleasedata(torrentids).items():
 
+        torrentcount += 1
         print(f'Now processing: {torrentid} {releasedatafull}')
 
         releasedata = releasedatafull['slashdata']
@@ -804,6 +806,35 @@ def collate(torrentids):
             for artist, origartist in torrentgroupdata.contribartists.items():
                 # For every artist, go to its artist page to get artist ID, then use this to go to artist.php?action=edit with the orig artist
                 setorigartist(artist, origartist)
+
+    return torrentcount  # For use by downloaduploadedtorrents()
+
+
+def downloaduploadedtorrents(torrentcount):
+    """
+    Get last torrentcount torrent DL links that user uploaded using SM API and download them
+
+    :param torrentcount: count of recent torrent links to be downloaded
+    :return:
+    """
+
+    if torrentcount == 0:
+        return
+
+    user_recents = sm.retrieveContent(f"https://sugoimusic.me/ajax.php?action=user_recents&limit={torrentcount}")
+    user_recents_json = json.loads(user_recents.text)
+
+    smtorrentlinks = {}
+    for torrentdata in user_recents_json['response']['uploads']:  # Get list of SM torrent links
+        smtorrentlinks[torrentdata['torrentid']] = torrentdata['torrentdl']
+
+    for torrentid, torrentlink in smtorrentlinks.items():
+        torrentfile = sm.retrieveContent(torrentlink)
+        torrentfilename = get_valid_filename(f'SM {torrentgroupdata.artist} - {torrentgroupdata.title} - {torrentid}.torrent')
+        with open(torrentfilename, "wb") as f:
+            f.write(torrentfile.content)
+        if debug:
+            print(f'Downloaded SM torrent as {torrentfilename}')
 
 
 def getargs():
@@ -985,7 +1016,9 @@ if __name__ == "__main__":
                 continue
 
             try:
-                collate(torrentids)
+                torrentcount = collate(torrentids)
+                if not dryrun:
+                    downloaduploadedtorrents(torrentcount)
             except KeyboardInterrupt:  # Allow Ctrl-C to exit without showing the error multiple times and polluting the final error dict
                 raise
             except Exception as exc:
@@ -1010,5 +1043,8 @@ if __name__ == "__main__":
         # Standard non-batch upload using --urls
         torrentgroupdata = GetGroupData(jpsurl)
         torrentids = re.findall('torrentid=([0-9]+)', jpsurl)
-        collate(torrentids)
+        torrentcount = collate(torrentids)
+        if not dryrun:
+            downloaduploadedtorrents(torrentcount)
+
 
