@@ -21,6 +21,8 @@ import traceback
 import requests
 from bs4 import BeautifulSoup
 from django.utils.text import get_valid_filename
+import torrent_parser as tp
+from pymediainfo import MediaInfo
 
 __version__ = "1.0"
 
@@ -386,9 +388,14 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
     if debug:
         print(uploaddata)
 
+    if args.mediainfo:
+        data['mediainfo'], releasedatamediainfo = getmediainfo(filename)
+        data.update(releasedatamediainfo)
+
     if torrentgroupdata.category not in Categories.NonReleaseData:
         data['media'] = uploaddata['media']
-        data['audioformat'] = uploaddata['audioformat']
+        if 'audioformat' not in data.keys():
+            data['audioformat'] = uploaddata['audioformat']
 
     if torrentgroupdata.imagelink is not None:
         data['image'] = torrentgroupdata.imagelink
@@ -402,21 +409,27 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
             else:  # Still need to change the category to something, if not a Bluray then even if it is not a DVD the most sensible category is DVD in a music torrent group
                 data['type'] = Categories.JPStoSM['DVD']
 
-        data['codec'] = uploaddata['codec']
+        # If not supplied by getmediainfo() use codec found by collate()
+        if 'codec' not in data.keys():
+            data['codec'] = uploaddata['codec']
 
-        foundresolutions720 = re.findall('1280 ?x ?720', torrentgroupdata.groupdescription)
-        foundresolutions1080 = re.findall('1920 ?x ?1080', torrentgroupdata.groupdescription)
-        if len(foundresolutions720) != 0:
-            data['ressel'] = "720p"
-        elif len(foundresolutions1080) != 0:
-            data['ressel'] = "1080p"
-        for resolution in VideoOptions.resolutions:  # Now set more specific resolutions if they are present
-            if resolution in torrentgroupdata.groupdescription:  # If we can see the resolution in the group description then set it
-                data['ressel'] = resolution
-            else:
-                data['ressel'] = 'Other'
+        # If not supplied by getmediainfo() try to detect resolution by searching the group description for resolutions
+        if 'ressel' not in data.keys():
+            foundresolutions720 = re.findall('1080 ?x ?720', torrentgroupdata.groupdescription)
+            foundresolutions1080 = re.findall('1920 ?x ?1080', torrentgroupdata.groupdescription)
+            if len(foundresolutions720) != 0:
+                data['ressel'] = "720p"
+            elif len(foundresolutions1080) != 0:
+                data['ressel'] = "1080p"
+            for resolution in VideoOptions.resolutions:  # Now set more specific resolutions if they are present
+                if resolution in torrentgroupdata.groupdescription:  # If we can see the resolution in the group description then set it
+                    data['ressel'] = resolution
+                else:
+                    data['ressel'] = 'Other'
 
-        data['container'] = uploaddata['container']
+        if 'container' not in data.keys():
+            data['container'] = uploaddata['container']
+
         data['sub'] = 'NoSubs'  # assumed default
         data['lang'] = 'CHANGEME'
         for language in languages:  # If we have a language tag, set the language field
@@ -469,7 +482,8 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
     }
 
     if dryrun or debug:
-        print(json.dumps(data, indent=2))
+        dataexcmediainfo = {x: data[x] for x in data if x not in 'mediainfo'}
+        print(json.dumps(dataexcmediainfo, indent=2))  # Mediainfo shows too much data
     if not dryrun:
         SMres = sm.retrieveContent(uploadurl, "post", data, postDataFiles)
 
@@ -637,7 +651,7 @@ class GetGroupData:
         return self.contribartists
 
 
-def validatevideodata(releasedata, categorystatus):
+def validatejpsvideodata(releasedata, categorystatus):
     """
     Validate and process dict supplied by getreleasedata() via collate() to extract all available data
     from JPS for video torrents, whilst handling weird cases where VideoTorrent is uploaded as a Music category
@@ -710,7 +724,7 @@ def collate(torrentids):
             releasedataout['videotorrent'] = True  # For processing by uploadtorrent()
             releasedataout['categorystatus'] = "good"
 
-            videoreleasedatavalidated = validatevideodata(releasedata, releasedataout['categorystatus'])
+            videoreleasedatavalidated = validatejpsvideodata(releasedata, releasedataout['categorystatus'])
             for field, data in videoreleasedatavalidated.items():
                 releasedataout[field] = data
 
@@ -724,7 +738,7 @@ def collate(torrentids):
             releasedataout['videotorrent'] = True  # For processing by uploadtorrent()
             releasedataout['categorystatus'] = "bad"
 
-            videoreleasedatavalidated = validatevideodata(releasedata, releasedataout['categorystatus'])
+            videoreleasedatavalidated = validatejpsvideodata(releasedata, releasedataout['categorystatus'])
             for field, data in videoreleasedatavalidated.items():
                 releasedataout[field] = data
 
@@ -838,6 +852,94 @@ def downloaduploadedtorrents(torrentcount):
             print(f'Downloaded SM torrent as {torrentfilename}')
 
 
+def getmediainfo(torrentfilename):
+    """
+    Get filename(s) of video files in the torrent and run mediainfo and capture the output, then set the appropriate fields for the upload
+
+    :param torrentfilename: str filename of torrent to parse from collate()
+    :return: mediainfo
+    """
+
+    torrentmetadata = tp.parse_torrent_file(torrentfilename)
+
+    if 'name' in torrentmetadata['info'].keys():
+        name = torrentmetadata['info']['name']  # Directory if >1 file, otherwise it is filename
+    #print(torrentmetadata)
+
+    # info = libtorrent.torrent_info(torrentfilename)
+    # for f in info.files():
+    #     print(f"file: {f.path} - {f.size}")
+
+    mediainfosall = ""
+
+
+    if 'files' in torrentmetadata['info'].keys():
+        for file in torrentmetadata['info']['files']:
+            if len(torrentmetadata['info']['files']) == 1:  # This might never happen, it could be just info.name if so
+                filename = os.path.join(*file['path'])
+            else:
+                filename = os.path.join(*[name, *file['path']])  # Directory if >1 file
+
+            mediainfosall += str(MediaInfo.parse(filename, text=True))
+            # Get biggest file and mediainfo on this to set the fields for the release
+            maxfile = max(torrentmetadata['info']['files'], key=lambda x: x['length'])  # returns {'length': int, 'path': [str]} of largest file
+            fileforsmfields = os.path.join(*[name, *maxfile['path']])
+    else:
+        filename = name
+        mediainfosall += str(MediaInfo.parse(filename, text=True))
+        fileforsmfields = torrentmetadata['info']['name']
+
+    mediainforeleasedata = MediaInfo.parse(fileforsmfields)
+    releasedataout = {}
+    for track in mediainforeleasedata.tracks:
+        if track.track_type == 'General':
+            releasedataout['container'] = track.file_extension.upper()
+            # releasedataout['language'] = track.audio_language_list  # Will need to check if this is reliable
+            #  track.duration is time in ms
+
+        if track.track_type == 'Video':
+            validatecodec = {
+                "MPEG Video": "MPEG-2",
+                "AVC": "h264",
+                "HEVC": "h265",
+                "MPEG-4 Visual": "DivX",  # MPEG-4 Part 2 / h263 , usually xvid / divx
+            }
+            for old, new in validatecodec.items():
+                if track.format == old:
+                    releasedataout['codec'] = new
+
+            standardresolutions = {
+                "3840": "1920",
+                "1920": "1080",
+                "1280": "720",
+                "640": "480",
+            }
+            for width, height in standardresolutions.items():
+                if str(track.width) == width and str(track.height) == height:
+                    releasedataout['ressel'] = height
+
+            if 'ressel' in releasedataout.keys():  # Known resolution type, try to determine if interlaced
+                if track.scan_type == "Interlaced" or track.scan_type == "MBAFF":
+                    releasedataout['ressel'] += "i"
+                else:
+                    releasedataout['ressel'] += "p"  # Sometimes a Progressive encode has no field set
+            else:  # Custom resolution
+                releasedataout['ressel'] = str(track.width) + "x" + str(track.height)
+
+        if track.track_type == 'Audio' or track.track_type == 'Audio #1':  # Handle multiple audio streams, we just get data from the first for now
+            if track.format in ["AAC", "DTS", "PCM", "AC-3"]:
+                releasedataout['audioformat'] = track.format
+            elif track.format == "MPEG Audio" and track.format_profile == "Layer 3":
+                releasedataout['audioformat'] = "MP3"
+            elif track.format == "MPEG Audio" and track.format_profile == "Layer 2":
+                releasedataout['audioformat'] = "MP2"
+
+    if debug:
+        print(f'Mediainfo interpreted data: {releasedataout}')
+
+    return mediainfosall, releasedataout
+
+
 def getargs():
     parser = argparse.ArgumentParser()
     parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + __version__)
@@ -851,6 +953,7 @@ def getargs():
     parser.add_argument("-e", "--batchend", help="(Batch mode only) End at this page", type=int)
     parser.add_argument("-f", "--excfilteraudioformat", help="Exclude an audioformat from upload", type=str)
     parser.add_argument("-F", "--excfiltermedia", help="Exclude a media from upload", type=str)
+    parser.add_argument("-m", "--mediainfo", help="Get mediainfo data and extract data to set codec, resolution, audio format and container fields", action="store_true")
 
     return parser.parse_args()
 

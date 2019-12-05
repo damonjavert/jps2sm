@@ -12,3 +12,5 @@ soupsieve==1.9.4
 sqlparse==0.3.0
 urllib3==1.25.6
 webencodings==0.5.1
+pymediainfo==4.1
+torrent-parser==0.3.0
