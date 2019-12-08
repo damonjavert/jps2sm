@@ -22,7 +22,7 @@ import requests
 from bs4 import BeautifulSoup
 from django.utils.text import get_valid_filename
 
-__version__ = "0.10.1.1"
+__version__ = "0.10.2"
 
 
 class MyLoginSession:
@@ -597,7 +597,7 @@ class GetGroupData:
 
         try:
             contribartistsget = str(soup.select('#content .thin .sidebar .box .body ul.stats.nobullet li'))
-            contribartistslist = re.findall(r'<li><a href="artist\.php\?id=(?:[0-9]+?)" title="(.*?)">([\w ]+)</a>', contribartistsget)
+            contribartistslist = re.findall(r'<li><a href="artist\.php\?id=(?:[0-9]+?)" title="([^"]+?)">([\w ]+)</a>', contribartistsget)
             self.contribartists = {}
             for artistpair in contribartistslist:
                 self.contribartists[artistpair[1]] = artistpair[0] # Creates contribartists[artist] = origartist
