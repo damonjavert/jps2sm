@@ -24,6 +24,8 @@ from django.utils.text import get_valid_filename
 import torrent_parser as tp
 from pymediainfo import MediaInfo
 import humanfriendly
+from pyunpack import Archive
+
 
 __version__ = "1.2"
 
@@ -953,47 +955,68 @@ def getmediainfo(torrentfilename):
     """
 
     torrentmetadata = tp.parse_torrent_file(torrentfilename)
-
-    if 'name' in torrentmetadata['info'].keys():
-        name = torrentmetadata['info']['name']  # Directory if >1 file, otherwise it is filename
+    torrentname = torrentmetadata['info']['name']  # Directory if >1 file, otherwise it is filename
     #print(torrentmetadata)
-
-    # info = libtorrent.torrent_info(torrentfilename)
-    # for f in info.files():
-    #     print(f"file: {f.path} - {f.size}")
-
     mediainfosall = ""
     releasedataout = {}
 
-    if 'files' in torrentmetadata['info'].keys():
+    if 'files' in torrentmetadata['info'].keys():  # Multiple files
+        directory = torrentname
         for file in torrentmetadata['info']['files']:
             if len(torrentmetadata['info']['files']) == 1:  # This might never happen, it could be just info.name if so
                 filename = os.path.join(*file['path'])
             else:
                 releasedataout['multiplefiles'] = True
-                filename = os.path.join(*[name, *file['path']])  # Directory if >1 file
+                filename = os.path.join(*[directory, *file['path']])  # Directory if >1 file
 
             mediainfosall += str(MediaInfo.parse(filename, text=True))
             # Get biggest file and mediainfo on this to set the fields for the release
             maxfile = max(torrentmetadata['info']['files'], key=lambda x: x['length'])  # returns {'length': int, 'path': [str]} of largest file
-            fileforsmfields = os.path.join(*[name, *maxfile['path']])
-    else:
+            fileforsmfields = os.path.join(*[directory, *maxfile['path']])  # Assume the largest file is the main file that should populate SM upload fields
+
+    else:  # Single file
         releasedataout['multiplefiles'] = False
-        filename = name
+        filename = torrentname
         if debug:
             print(f'Filename for mediainfo: {filename}')
         mediainfosall += str(MediaInfo.parse(filename, text=True))
         fileforsmfields = torrentmetadata['info']['name']
 
-    mediainforeleasedata = MediaInfo.parse(fileforsmfields)
+    if fileforsmfields.lower().endswith('.iso'):  # Extract the ISO and run mediainfo against appropriate files
+        releasedataout['container'] = 'ISO'
+        print(f'Extracting ISO {fileforsmfields} to obtain mediainfo on it...')
+        isodir = 'temp'
+        isovideoextensions = ('.vob', '.m2ts')
+        os.mkdir(isodir)
+        Archive(fileforsmfields).extractall(isodir)
+
+        dir_files = []
+        for root, subFolder, files in os.walk(isodir):
+            for item in files:
+                filenamewithpath = root + '/' + item
+                dir_files.append(filenamewithpath)
+                if list(filter(filenamewithpath.lower().endswith, isovideoextensions)):  # Only gather mediainfo for BR/DVD video files
+                    mediainfosall += str(MediaInfo.parse(filenamewithpath, text=True))
+
+        filesize = lambda f: os.path.getsize(f)
+        fileforsmfields = sorted(dir_files, key=filesize)[-1]  # Assume the largest file is the main file that should populate SM upload fields
+
+        mediainforeleasedata = MediaInfo.parse(fileforsmfields)
 
     releasedataout['duration'] = 0
 
     for track in mediainforeleasedata.tracks:
         if track.track_type == 'General':
-            releasedataout['container'] = track.file_extension.upper()
             # releasedataout['language'] = track.audio_language_list  # Will need to check if this is reliable
             releasedataout['duration'] += float(track.duration)  # time in ms
+            #  track.duration is time in ms
+            if 'container' not in releasedataout:  # Not an ISO, only set container if we do not already know its an ISO
+                releasedataout['container'] = track.file_extension.upper()
+            else:  # We have ISO - get category data based Mediainfo if we have it
+                if track.file_extension.upper() == 'VOB':
+                    releasedataout['category'] = 'DVD'
+                elif track.file_extension.upper() == 'M2TS':
+                    releasedataout['category'] = 'Bluray'
 
         if track.track_type == 'Video':
             validatecodec = {
@@ -1010,7 +1033,7 @@ def getmediainfo(torrentfilename):
                 "3840": "1920",
                 "1920": "1080",
                 "1280": "720",
-                "640": "480",
+                "720": "480",
             }
             for width, height in standardresolutions.items():
                 if str(track.width) == width and str(track.height) == height:
@@ -1022,7 +1045,8 @@ def getmediainfo(torrentfilename):
                 else:
                     releasedataout['ressel'] += "p"  # Sometimes a Progressive encode has no field set
             else:  # Custom resolution
-                releasedataout['ressel'] = str(track.width) + "x" + str(track.height)
+                releasedataout['ressel'] = 'Other'
+                releasedataout['resolution'] = str(track.width) + "x" + str(track.height)
 
         if track.track_type == 'Audio' or track.track_type == 'Audio #1':  # Handle multiple audio streams, we just get data from the first for now
             if track.format in ["AAC", "DTS", "PCM", "AC3"]:
