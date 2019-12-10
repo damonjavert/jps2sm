@@ -22,7 +22,7 @@ import requests
 from bs4 import BeautifulSoup
 from django.utils.text import get_valid_filename
 
-__version__ = "0.10.2"
+__version__ = "1.0"
 
 
 class MyLoginSession:
@@ -640,7 +640,7 @@ class GetGroupData:
 def validatevideodata(releasedata, categorystatus):
     """
     Validate and process dict supplied by getreleasedata() via collate() to extract all available data
-    from JPS for video torrents, whilst handling weird cases qhere VideoTorrent is uploaded as a Music category
+    from JPS for video torrents, whilst handling weird cases where VideoTorrent is uploaded as a Music category
 
     :param releasedata:
     :param categorystatus: str: good or bad. good for correct category assigned and bad if this is a Music Torrent
@@ -681,11 +681,13 @@ def collate(torrentids):
     """
     Collate and validate data ready for upload to SM
 
-    Validate and process dict supplied by getreleasedata() with format, bitrate, media, container, codec, and remaster data to extract all available data from JPS
+    Validate and process dict supplied by getreleasedata() with format, bitrate, media, container, codec, and remaster data to extract
+    all available data from JPS
     Perform validation on some fields
     Download JPS torrent
     Apply filters
     Send data to uploadtorrent()
+    Send data to setorigartists()
 
     :param torrentids: list of JPS torrentids to be processed
     :param groupdata: dictionary with torrent group data from getgroupdata[]
