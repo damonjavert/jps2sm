@@ -535,14 +535,19 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
         if SMerrorLogon:
             raise Exception(f'Invalid {SMerrorLogon[0]}')
 
-        groupid = re.findall('<input type="hidden" name="groupid" value="(.*)" />', SMres.text)
-        if not groupid:
-            raise Exception('Error')
-        else:
-            print(f'OK - groupid {groupid[0]}')
-
-        with open("SMuploadresult." + filename + ".html", "w") as f:
+        smuploadresultfilename = "SMuploadresult." + filename + ".html"
+        with open(smuploadresultfilename, "w") as f:
             f.write(str(SMres.content))
+
+        groupid = re.findall('<input type="hidden" name="groupid" value="([0-9]+)" />', SMres.text)
+        if not groupid:
+            # Find groupid if private torrent warning
+            groupid = re.findall(r'Your torrent has been uploaded; however, you must download your torrent from <a href="torrents\.php\?id=([0-9]+)">here</a>', SMres.text)
+            if not groupid:
+                raise Exception(f'Cannot find groupid in SM response - there was probably an unknown error. See {smuploadresultfilename} for potential errors')
+
+        if groupid:
+            print(f'OK - groupid {groupid[0]}')
 
     return groupid
 
