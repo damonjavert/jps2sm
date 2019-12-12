@@ -16,6 +16,7 @@ import html
 from urllib.parse import urlparse
 import json
 import traceback
+import tempfile
 
 # Third-party packages
 import requests
@@ -948,10 +949,14 @@ def decide_ep(torrentfilename):
 
 def getmediainfo(torrentfilename):
     """
-    Get filename(s) of video files in the torrent and run mediainfo and capture the output, then set the appropriate fields for the upload
+    Get filename(s) of video files in the torrent and run mediainfo and capture the output, extract if DVD found (Blurays not yet supported)
+    then set the appropriate fields for the upload
 
     :param torrentfilename: str filename of torrent to parse from collate()
-    :return: mediainfo
+    :return: mediainfo, releasedataout
+
+    mediainfo: Mediainfo text output of the file(s)
+    releaseadtaout: Fields gathered from mediainfo for SM upload
     """
 
     torrentmetadata = tp.parse_torrent_file(torrentfilename)
@@ -985,17 +990,16 @@ def getmediainfo(torrentfilename):
     if fileforsmfields.lower().endswith('.iso'):  # Extract the ISO and run mediainfo against appropriate files
         releasedataout['container'] = 'ISO'
         print(f'Extracting ISO {fileforsmfields} to obtain mediainfo on it...')
-        isodir = 'temp'
         isovideoextensions = ('.vob', '.m2ts')
-        os.mkdir(isodir)
-        Archive(fileforsmfields).extractall(isodir)
+        tempdir = tempfile.TemporaryDirectory()
+        Archive(fileforsmfields).extractall(tempdir.name)
 
         dir_files = []
-        for root, subFolder, files in os.walk(isodir):
+        for root, subFolder, files in os.walk(tempdir.name):
             for item in files:
-                filenamewithpath = root + '/' + item
+                filenamewithpath = os.path.join(root, item)
                 dir_files.append(filenamewithpath)
-                if list(filter(filenamewithpath.lower().endswith, isovideoextensions)):  # Only gather mediainfo for BR/DVD video files
+                if list(filter(filenamewithpath.lower().endswith, isovideoextensions)):  # Only gather mediainfo for DVD video files (BR when supported)
                     mediainfosall += str(MediaInfo.parse(filenamewithpath, text=True))
 
         filesize = lambda f: os.path.getsize(f)
@@ -1004,6 +1008,9 @@ def getmediainfo(torrentfilename):
         mediainforeleasedata = MediaInfo.parse(fileforsmfields)
 
     releasedataout['duration'] = 0
+
+    if fileforsmfields.lower().endswith('.iso'):
+        tempdir.cleanup()
 
     for track in mediainforeleasedata.tracks:
         if track.track_type == 'General':
