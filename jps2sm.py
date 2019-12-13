@@ -402,7 +402,7 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
 
     if uploaddata['videotorrent']:
         if torrentgroupdata.category == "DVD" and uploaddata['media'] == 'Bluray':
-            data['type'] = 'Bluray'  # JPS has no Bluray category
+            data['type'] = Categories.JPStoSM['Bluray']  # JPS has no Bluray category
         if uploaddata['categorystatus'] == 'bad':  # Need to set a correct category
             if uploaddata['media'] == 'Bluray':
                 data['type'] = Categories.JPStoSM['Bluray']
@@ -448,8 +448,6 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
     if torrentgroupdata.category == "Fansubs":
         data['type'] = getalternatefansubcategoryid(torrentgroupdata.artist)
         data['sub'] = 'Hardsubs'  # We have subtitles! Subs in JPS FanSubs are usually Hardsubs so guess as this TODO: Use torrent library to look for sub/srt files
-    elif uploaddata['categorystatus'] == 'good':
-        data['type'] = Categories.JPStoSM[torrentgroupdata.category]
 
     if groupid:
         data['groupid'] = groupid  # Upload torrents into the same group
