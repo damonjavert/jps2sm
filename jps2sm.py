@@ -24,7 +24,7 @@ from django.utils.text import get_valid_filename
 import torrent_parser as tp
 from pymediainfo import MediaInfo
 
-__version__ = "1.0"
+__version__ = "1.1"
 
 
 class MyLoginSession:
@@ -374,14 +374,18 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
     else:
         date = torrentgroupdata.date
 
-    data = {  # Fields that are never validated here
+    data = {
         'submit': 'true',
+        'type': Categories.JPStoSM[torrentgroupdata.category],
+        # Just a default, this may be validated later in decide_ip(), getalternatefansubcategoryid() or in uploadtorrent() here
+        # TODO need to collate the category validation logic
         'title': torrentgroupdata.title,
         'year': date,
         'tags': torrentgroupdata.tagsall,
         'album_desc': torrentgroupdata.groupdescription,
         # 'release_desc': releasedescription
     }
+
     if not dryrun:
         data['auth'] = authkey
 
@@ -445,9 +449,14 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
         data['remaster'] = 'remaster'
         data['remasteryear'] = uploaddata['remasteryear']
 
+    # Non-BR/DVD/TV-* category validation
+    # TODO Move this to a def
     if torrentgroupdata.category == "Fansubs":
         data['type'] = getalternatefansubcategoryid(torrentgroupdata.artist)
-        data['sub'] = 'Hardsubs'  # We have subtitles! Subs in JPS FanSubs are usually Hardsubs so guess as this TODO: Use torrent library to look for sub/srt files
+        data['sub'] = 'Hardsubs'  # We have subtitles! Subs in JPS FanSubs are usually Hardsubs so guess as this
+        # TODO: Use torrent library to look for sub/srt files
+    elif torrentgroupdata.category == "Album":  # Ascertain if upload is EP
+        data['type'] = Categories.JPStoSM[decide_ep(filename)]
 
     if groupid:
         data['groupid'] = groupid  # Upload torrents into the same group
@@ -850,6 +859,38 @@ def downloaduploadedtorrents(torrentcount):
             print(f'Downloaded SM torrent as {torrentfilename}')
 
 
+def decide_ep(torrentfilename):
+    """
+    Return if Album upload should be an EP or not.
+    EPs are considered to have < 7 tracks, excluding off-vocals and uploaded to JPS as an Album
+
+    We assume we are being called only if Cat = Album
+
+    :param torrentfilename:
+    :return: str: 'EP' or 'Album'
+    """
+
+    torrent_metadata = tp.parse_torrent_file(torrentfilename)
+    music_extensions = ['.flac', '.mp3', '.ogg', '.alac', '.m4a', '.wav', '.wma', '.ra']
+    off_vocal_phrases = ['off-vocal', 'offvocal', 'off vocal', 'inst.', 'instrumental']
+    track_count = 0
+    for file in torrent_metadata['info']['files']:
+        if list(filter(file['path'][-1].lower().endswith, music_extensions)) and \
+                not any(substring in file['path'][-1].lower() for substring in off_vocal_phrases):
+            #  Count music files which are not an off-vocal or instrumental
+            print(file['path'][-1])
+            track_count += 1
+
+    if track_count < 7:
+        if debug:
+            print(f'Upload is an EP as it has {track_count} standard tracks')
+        return 'EP'
+
+    else:
+        print(f'Upload is not an EP as it has {track_count} tracks')
+        return 'Album'
+
+
 def getmediainfo(torrentfilename):
     """
     Get filename(s) of video files in the torrent and run mediainfo and capture the output, then set the appropriate fields for the upload
@@ -978,7 +1019,7 @@ class Categories:
     # value: SM category ID
     JPStoSM = {
         'Album': 0,
-        # 'EP': 1, #Does not exist on JPS
+        'EP': 1,  # Does not exist on JPS
         'Single': 2,
         'Bluray': 3,  # Does not exist on JPS
         'DVD': 4,
