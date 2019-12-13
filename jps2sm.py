@@ -425,7 +425,7 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
                 if resolution in torrentgroupdata.groupdescription:  # If we can see the resolution in the group description then set it
                     data['ressel'] = resolution
                 else:
-                    data['ressel'] = 'Other'
+                    data['ressel'] = 'CHANGEME'
 
         if 'container' not in data.keys():
             data['container'] = uploaddata['container']
