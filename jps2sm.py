@@ -892,7 +892,7 @@ def decide_ep(torrentfilename):
 
     torrent_metadata = tp.parse_torrent_file(torrentfilename)
     music_extensions = ['.flac', '.mp3', '.ogg', '.alac', '.m4a', '.wav', '.wma', '.ra']
-    off_vocal_phrases = ['off-vocal', 'offvocal', 'off vocal', 'inst.', 'instrumental']
+    off_vocal_phrases = ['off-vocal', 'offvocal', 'off vocal', 'inst.', 'instrumental', 'english ver', 'japanese ver', 'korean ver']
     track_count = 0
     for file in torrent_metadata['info']['files']:
         if list(filter(file['path'][-1].lower().endswith, music_extensions)) and \
@@ -905,7 +905,6 @@ def decide_ep(torrentfilename):
         if debug:
             print(f'Upload is an EP as it has {track_count} standard tracks')
         return 'EP'
-
     else:
         print(f'Upload is not an EP as it has {track_count} tracks')
         return 'Album'
