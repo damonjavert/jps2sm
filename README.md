@@ -5,9 +5,10 @@
 jps2sm.py is a python3 script that will automatically gather data from JPS from a given group url, release url(s) or userid's uploads/seeding torrents and iterate through all the data in and upload them to SM.
 
 ## Features
-* Create upload to SM by automatically retrieving all data on JPS, including english and original titles, group description, release information (format / meida / bitrate etc.), group images, contributing artists, original titles and remaster information if applicable.
+* Create upload to SM by automatically retrieving all data on JPS, including english and original titles, group description, release information (format / meida / bitrate etc.), group images, contributing artists, original titles, mediainfo data and remaster information if applicable.
 * Upload all torrents in a torrent group or specify 1 or more release urls.
 * Upload all your personally uploaded or currently seeding torrents at JPS with `--batchuser` mode
+* Run [Mediainfo](https://mediaarea.net/en/MediaInfo) against your media files and save the output to the 'mediainfo' field and parse the data to populate the codec, container, audioformat and resolution fields. DVD/BR ISO images are not currently supported.
 * Exclude certain audioformats or medias with `--excfilteraudioformat` and `--excfiltermedia`
 * Test your uploads with `--dryrun` mode.
 
@@ -77,6 +78,8 @@ arguments:
                           Exclude an audioformat from upload
     -F EXCFILTERMEDIA, --excfiltermedia EXCFILTERMEDIA
                           Exclude a media from upload
+    -m, --mediainfo       Get mediainfo data and extract data to set codec,
+                          resolution, audio format and container fields
 
 ## Help! I dont know all this python stuff
 * Mac Users: The best method is to install [Homebrew](https://brew.sh) and then `brew install python3`. See this guide: https://wsvincent.com/install-python3-mac/
