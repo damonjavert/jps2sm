@@ -530,6 +530,8 @@ class GetGroupData:
         self.getdata(jpsurl)
 
     def getdata(self, jpsurl):
+        date_regex = r'[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])'  # YYYY.MM.DD format
+
         res = s.retrieveContent(self.jpsurl.split()[0])  # If there are multiple urls only the first url needs to be parsed
 
         soup = BeautifulSoup(res.text, 'html5lib')
@@ -542,15 +544,27 @@ class GetGroupData:
         if debug:
             print(artistline[0])
 
-        artistlinelinktext = str(artistlinelink[0])
-
         sqbrackets = re.findall('\[(.*?)\]', text)
         self.category = sqbrackets[0]
         print(self.category)
 
+        try:
+            artistlinelinktext = str(artistlinelink[0])
+            self.artist = re.findall('<a[^>]+>(.*)<', artistlinelinktext)[0]
+            print(f'Artist: {self.artist}')
+        except IndexError:  # Cannot find artist
+            if self.category == "Pictures":
+                # JPS allows Picture torrents to have no artist set, in this scenario try to infer the artist by examining the text
+                # immediately after the category string up to a YYYY.MM.DD string if available as this should be the magazine title
+                self.artist = re.findall(fr'\[Pictures\] ([A-Za-z ]+) (?:{date_regex})', text)
+            else:
+                print('JPS upload appears to have no artist set and artist cannot be autodetected')
+                raise
+
+
         # Extract date without using '[]' as it allows '[]' elsewhere in the title and it works with JPS TV-* categories
         try:
-            self.date = re.findall('[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])', text)[0].replace(".", "")
+            self.date = re.findall(date_regex, text)[0].replace(".", "")
         except IndexError:  # Handle YYYY dates, creating extra regex as I cannot get it working without causing issue #33
             try:
                 self.date = re.findall(r'[^\d]((?:19|20)\d{2})[^\d]', text)[0]
@@ -569,9 +583,6 @@ class GetGroupData:
 
         print(f'Release date: {self.date}')
 
-        self.artist = re.findall('<a[^>]+>(.*)<', artistlinelinktext)[0]
-        print(f'Artist: {self.artist}')
-
         if self.category not in Categories.NonDate:
             self.title = re.findall('<a.*> - (.*) \[', text)[0]
         else:
@@ -582,7 +593,16 @@ class GetGroupData:
             titlemergedpre = [title1, " ".join(itertools.chain(*title2))]
             titlemerged = "".join(itertools.chain(*titlemergedpre))
             if len(titlemerged) == 0:  # Non standard title, fallback on the whole string after the "-"
-                self.title = re.findall('<a.*> - (.*)</h2>', text)[0]
+                try:
+                    self.title = re.findall('<a.*> - (.*)</h2>', text)[0]
+                except IndexError:  # Pictures non-artist upload - for magazines
+                    if self.category == "Pictures":
+                        # Fallback to all the text after the category, we need to include the date stamp as magazines are often titled
+                        # with the same numbers each year - the first magazine each year appears to always be 'No. 1' for example
+                        self.title = re.findall(fr'\[Pictures\] (?:[A-Za-z ]+) ({date_regex} .+)</h2>', text)[0]
+                    else:
+                        print('Cannot find title from the JPS upload')
+                        raise
             else:
                 self.title = titlemerged
 
