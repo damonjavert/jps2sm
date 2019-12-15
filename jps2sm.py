@@ -24,7 +24,7 @@ from django.utils.text import get_valid_filename
 import torrent_parser as tp
 from pymediainfo import MediaInfo
 
-__version__ = "1.1"
+__version__ = "1.2"
 
 
 class MyLoginSession:
@@ -1160,6 +1160,7 @@ if __name__ == "__main__":
             useruploads = getbulktorrentids(batchmode, batchuser)
         useruploadsgrouperrors = collections.defaultdict(list)
         useruploadscollateerrors = collections.defaultdict(list)
+        user_upload_dupes = []
 
         for key, value in useruploads.items():
             groupid = key
@@ -1183,22 +1184,30 @@ if __name__ == "__main__":
             except KeyboardInterrupt:  # Allow Ctrl-C to exit without showing the error multiple times and polluting the final error dict
                 raise
             except Exception as exc:
-                print('Error with collating/retrieving release data for groupid %s torrentid(s) %s, skipping upload' % (groupid, ",".join(torrentids)))
-                useruploadscollateerrors[groupid] = torrentids
-                if debug:
-                    print(exc)
-                    traceback.print_exc()
+                if str(exc).startswith('The exact same torrent file already exists on the site!'):
+                    sm_dupe_torrentid = re.findall(r'The exact same torrent file already exists on the site! See: https://sugoimusic\.me/torrents\.php\?torrentid=([0-9]+)', str(exc))
+                    user_upload_dupes.append(sm_dupe_torrentid)
+                else:
+                    print('Error with collating/retrieving release data for groupid %s torrentid(s) %s, skipping upload' % (groupid, ",".join(torrentids)))
+                    useruploadscollateerrors[groupid] = torrentids
+                    if debug:
+                        print(exc)
+                        traceback.print_exc()
+
                 continue
 
         if useruploadsgrouperrors:
-            print('The following groupid(s) (torrentid(s) shown for reference) had errors in retrieving group data, '
+            print('The following JPS groupid(s) (torrentid(s) shown for reference) had errors in retrieving group data, '
                   'keep this data safe and you can possibly retry with it in a later version:')
             print(useruploadsgrouperrors)
         if useruploadscollateerrors:
-            print('The following groupid(s) and corresponding torrentid(s) had errors either in collating/retrieving '
+            print('The following JPS groupid(s) and corresponding torrentid(s) had errors either in collating/retrieving '
                   'release data or in performing the actual upload to SM (although group data was retrieved OK), '
                   'keep this data safe and you can possibly retry with it in a later version:')
             print(useruploadscollateerrors)
+        if user_upload_dupes:
+            print('The following SM torrentid(s) have already been uploaded to the site:')
+            print(user_upload_dupes)
 
     else:
         # Standard non-batch upload using --urls
