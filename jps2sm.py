@@ -376,9 +376,6 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
 
     data = {
         'submit': 'true',
-        'type': Categories.JPStoSM[torrentgroupdata.category],
-        # Just a default, this may be validated later in decide_ip(), getalternatefansubcategoryid() or in uploadtorrent() here
-        # TODO need to collate the category validation logic
         'title': torrentgroupdata.title,
         'year': date,
         'tags': torrentgroupdata.tagsall,
@@ -457,6 +454,9 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
         # TODO: Use torrent library to look for sub/srt files
     elif torrentgroupdata.category == "Album":  # Ascertain if upload is EP
         data['type'] = Categories.JPStoSM[decide_ep(filename)]
+
+    if 'type' not in data.keys():  # Set default value after all validation has been done
+        data['type'] = Categories.JPStoSM[torrentgroupdata.category]
 
     if groupid:
         data['groupid'] = groupid  # Upload torrents into the same group
@@ -929,7 +929,6 @@ def getmediainfo(torrentfilename):
     #     print(f"file: {f.path} - {f.size}")
 
     mediainfosall = ""
-
 
     if 'files' in torrentmetadata['info'].keys():
         for file in torrentmetadata['info']['files']:
