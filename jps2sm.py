@@ -1058,8 +1058,8 @@ class Categories:
         'DVD': 4,
         'PV': 5,
         'Music Performance': 6,  # Does not exist on JPS
-        'Music Show': 7,  # TV-Music
-        'Talk Show': 8,  # TV-Variety
+        'TV Music': 7,  # TV-Music
+        'TV Variety': 8,  # TV-Variety
         'TV Drama': 9,  # TV-Drama
         'Pictures': 10,
         'Misc': 11,
