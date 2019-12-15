@@ -1168,7 +1168,7 @@ if __name__ == "__main__":
             try:
                 torrentgroupdata = GetGroupData("https://jpopsuki.eu/torrents.php?id=%s" % groupid)
             except KeyboardInterrupt:  # Allow Ctrl-C to exit without showing the error multiple times and polluting the final error dict
-                raise
+                break  # Still continue to get error dicts and dupe list so far
             except Exception as exc:
                 print('Error with retrieving group data for groupid %s trorrentid(s) %s, skipping upload' % (groupid, ",".join(torrentids)))
                 useruploadsgrouperrors[groupid] = torrentids
@@ -1182,9 +1182,10 @@ if __name__ == "__main__":
                 if not dryrun:
                     downloaduploadedtorrents(torrentcount)
             except KeyboardInterrupt:  # Allow Ctrl-C to exit without showing the error multiple times and polluting the final error dict
-                raise
+                break  # Still continue to get error dicts and dupe list so far
             except Exception as exc:
                 if str(exc).startswith('The exact same torrent file already exists on the site!'):
+                    print(exc)
                     sm_dupe_torrentid = re.findall(r'The exact same torrent file already exists on the site! See: https://sugoimusic\.me/torrents\.php\?torrentid=([0-9]+)', str(exc))
                     user_upload_dupes.append(sm_dupe_torrentid)
                 else:
