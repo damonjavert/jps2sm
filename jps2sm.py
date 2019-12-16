@@ -23,6 +23,7 @@ from bs4 import BeautifulSoup
 from django.utils.text import get_valid_filename
 import torrent_parser as tp
 from pymediainfo import MediaInfo
+import humanfriendly
 
 __version__ = "1.2"
 
@@ -229,6 +230,30 @@ def getauthkey():
     return authkey
 
 
+def decide_music_performance(artist, multiplefiles, duration):
+    """
+    Return if upload should be a Music Performance or not
+    A music performance is a cut from a Music TV show and is 25 mins or less long and therefore also not a TV Show artist
+
+    We assume we are being called if Cat = TV Music
+
+    :return:  str: 'Music Performance' or 'TV Music'
+    """
+    if multiplefiles is True or duration > 1500000:  # 1 500 000 ms = 25 mins
+        return 'TV Music'
+    else:  # Single file that is < 25 mins, decide if Music Performance
+        JPSartistpage = s.retrieveContent(f"https://jpopsuki.eu/artist.php?name={artist}")
+        soup = BeautifulSoup(JPSartistpage.text, 'html5lib')
+        categoriesbox = str(soup.select('#content .thin .main_column .box.center'))
+        categories = re.findall(r'\[(.+)\]', categoriesbox)
+        if any({*Categories.NonTVCategories} & {*categories}):  # Exclude any TV Shows for being mislabeled as Music Performance
+            if debug:
+                print('Upload is a Music Performance as it is 25 mins or less and not a TV Show')
+            return 'Music Performance'
+        else:
+            return 'TV Music'
+
+
 def getalternatefansubcategoryid(artist):
     """
     Attempts to detect the actual category for JPS Fansubs category torrents and if not ask the user to select an alternate category.
@@ -237,13 +262,12 @@ def getalternatefansubcategoryid(artist):
     :param artist: str artist name
     :return: int alternative category ID based on Categories.SM()
     """
-    NonTVCategories = ('Album', 'EP', 'Single', 'Bluray', 'DVD', 'PV')
     JPSartistpage = s.retrieveContent(f"https://jpopsuki.eu/artist.php?name={artist}")
     soup = BeautifulSoup(JPSartistpage.text, 'html5lib')
     categoriesbox = str(soup.select('#content .thin .main_column .box.center'))
     categories = re.findall(r'\[(.+)\]', categoriesbox)
 
-    if not any({*NonTVCategories} & {*categories}) and " ".join(categories).count('TV-') == 1:
+    if not any({*Categories.NonTVCategories} & {*categories}) and " ".join(categories).count('TV-') == 1:
         # Artist has no music and only 1 TV Category, artist is a TV show and we can auto detect the category for FanSub releases
         autodetectcategory = re.findall(r'(TV-(?:[^ ]+))', " ".join(categories))[0]
         if debug:
@@ -369,7 +393,7 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
     uploadurl = 'https://sugoimusic.me/upload.php'
     languages = ('Japanese', 'English', 'Korean', 'Chinese', 'Vietnamese')
 
-    if torrentgroupdata.date is None:
+    if torrentgroupdata.date is None:  # If release date cannot be derived use upload date
         date = uploaddata['uploaddate']
     else:
         date = torrentgroupdata.date
@@ -392,10 +416,13 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
     if args.mediainfo:
         data['mediainfo'], releasedatamediainfo = getmediainfo(filename)
         data.update(releasedatamediainfo)
+        if 'duration' in data.keys():
+            duration_friendly_format = humanfriendly.format_timespan(datetime.timedelta(seconds=int(data['duration']/1000)))
+            data['album_desc'] += f"\n\nDuration: {duration_friendly_format}"
 
     if torrentgroupdata.category not in Categories.NonReleaseData:
         data['media'] = uploaddata['media']
-        if 'audioformat' not in data.keys():
+        if 'audioformat' not in data.keys():  # If not supplied by getmediainfo() use audioformat guessed by collate()
             data['audioformat'] = uploaddata['audioformat']
 
     if torrentgroupdata.imagelink is not None:
@@ -409,6 +436,8 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
                 data['type'] = Categories.JPStoSM['Bluray']
             else:  # Still need to change the category to something, if not a Bluray then even if it is not a DVD the most sensible category is DVD in a music torrent group
                 data['type'] = Categories.JPStoSM['DVD']
+        if torrentgroupdata.category == "TV-Music" and args.mediainfo:
+            data['type'] = Categories.JPStoSM[decide_music_performance(torrentgroupdata.artist, data['multiplefiles'], data['duration'])]
 
         # If not supplied by getmediainfo() use codec found by collate()
         if 'codec' not in data.keys():
@@ -929,12 +958,14 @@ def getmediainfo(torrentfilename):
     #     print(f"file: {f.path} - {f.size}")
 
     mediainfosall = ""
+    releasedataout = {}
 
     if 'files' in torrentmetadata['info'].keys():
         for file in torrentmetadata['info']['files']:
             if len(torrentmetadata['info']['files']) == 1:  # This might never happen, it could be just info.name if so
                 filename = os.path.join(*file['path'])
             else:
+                releasedataout['multiplefiles'] = True
                 filename = os.path.join(*[name, *file['path']])  # Directory if >1 file
 
             mediainfosall += str(MediaInfo.parse(filename, text=True))
@@ -942,17 +973,22 @@ def getmediainfo(torrentfilename):
             maxfile = max(torrentmetadata['info']['files'], key=lambda x: x['length'])  # returns {'length': int, 'path': [str]} of largest file
             fileforsmfields = os.path.join(*[name, *maxfile['path']])
     else:
+        releasedataout['multiplefiles'] = False
         filename = name
+        if debug:
+            print(f'Filename for mediainfo: {filename}')
         mediainfosall += str(MediaInfo.parse(filename, text=True))
         fileforsmfields = torrentmetadata['info']['name']
 
     mediainforeleasedata = MediaInfo.parse(fileforsmfields)
-    releasedataout = {}
+
+    releasedataout['duration'] = 0
+
     for track in mediainforeleasedata.tracks:
         if track.track_type == 'General':
             releasedataout['container'] = track.file_extension.upper()
             # releasedataout['language'] = track.audio_language_list  # Will need to check if this is reliable
-            #  track.duration is time in ms
+            releasedataout['duration'] += float(track.duration)  # time in ms
 
         if track.track_type == 'Video':
             validatecodec = {
@@ -1071,6 +1107,8 @@ class Categories:
     NonDate = ('TV-Music', 'TV-Variety', 'TV-Drama', 'Fansubs', 'Pictures', 'Misc')
     # JPS Categories where no release data is present and therefore need to be processed differently
     NonReleaseData = ('Pictures', 'Misc')
+    # Music and Music Video Torrents, for category validation. This must match the cateogry headers in JPS for an artist, hence they are in plural
+    NonTVCategories = ('Albums', 'Singles', 'DVDs', 'PVs')
 
 
 if __name__ == "__main__":
