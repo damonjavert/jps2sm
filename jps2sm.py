@@ -1020,7 +1020,7 @@ def getmediainfo(torrentfilename):
                 releasedataout['ressel'] = str(track.width) + "x" + str(track.height)
 
         if track.track_type == 'Audio' or track.track_type == 'Audio #1':  # Handle multiple audio streams, we just get data from the first for now
-            if track.format in ["AAC", "DTS", "PCM", "AC-3"]:
+            if track.format in ["AAC", "DTS", "PCM", "AC3"]:
                 releasedataout['audioformat'] = track.format
             elif track.format == "MPEG Audio" and track.format_profile == "Layer 3":
                 releasedataout['audioformat'] = "MP3"
