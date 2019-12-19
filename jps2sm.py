@@ -1005,7 +1005,7 @@ def getmediainfo(torrentfilename):
         filesize = lambda f: os.path.getsize(f)
         fileforsmfields = sorted(dir_files, key=filesize)[-1]  # Assume the largest file is the main file that should populate SM upload fields
 
-        mediainforeleasedata = MediaInfo.parse(fileforsmfields)
+    mediainforeleasedata = MediaInfo.parse(fileforsmfields)
 
     releasedataout['duration'] = 0
 
