@@ -28,7 +28,7 @@ import humanfriendly
 from pyunpack import Archive
 
 
-__version__ = "1.2"
+__version__ = "1.3"
 
 
 class MyLoginSession:
@@ -419,7 +419,7 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
     if args.mediainfo:
         data['mediainfo'], releasedatamediainfo = getmediainfo(filename)
         data.update(releasedatamediainfo)
-        if 'duration' in data.keys():
+        if 'duration' in data.keys() and data['duration'] > 1:
             duration_friendly_format = humanfriendly.format_timespan(datetime.timedelta(seconds=int(data['duration']/1000)))
             data['album_desc'] += f"\n\nDuration: {duration_friendly_format}"
 
@@ -460,6 +460,7 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
                 else:
                     data['ressel'] = 'CHANGEME'
 
+        # If not supplied by getmediainfo() use container found by collate()
         if 'container' not in data.keys():
             data['container'] = uploaddata['container']
 
@@ -489,6 +490,19 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
 
     if 'type' not in data.keys():  # Set default value after all validation has been done
         data['type'] = Categories.JPStoSM[torrentgroupdata.category]
+
+    # Now that all Category validation is complete decide if we should strip some mediainfo data
+    # Categories where mediainfo gathered data should be stripped if we have it, must match indices in Categories.SM
+    SMCategoryIDs_strip_all_mediainfo = (0, 1, 2, 11)  # Album, EP, Single, Misc
+    SMCategoryIDs_strip_all_exc_resolution = 10  # Pictures
+    mediainfo_non_resolution = ('container', 'mediainfo')
+    mediainfo_resolution = ('ressel', 'resolution')
+    if args.mediainfo and data['type'] in SMCategoryIDs_strip_all_mediainfo:
+        for field in (mediainfo_non_resolution + mediainfo_resolution):
+            data.pop(field, None)
+    elif args.mediainfo and data['type'] == SMCategoryIDs_strip_all_exc_resolution:
+        for field in mediainfo_non_resolution:
+            data.pop(field, None)
 
     if groupid:
         data['groupid'] = groupid  # Upload torrents into the same group
@@ -947,6 +961,23 @@ def decide_ep(torrentfilename):
         return 'Album'
 
 
+def get_mediainfo_duration(filename):
+    """
+    Get duration in mediainfo for filename
+
+    :param filename:
+    :return: float ms
+    """
+    mediainfo_for_duration = MediaInfo.parse(filename)
+    for track in mediainfo_for_duration.tracks:
+        if track.track_type == 'General':
+            if track.duration is None:
+                return 0
+            else:
+                if debug:
+                    print(f'Mediainfo duration: {filename} {track.duration}')
+                return float(track.duration)  # time in ms
+
 def getmediainfo(torrentfilename):
     """
     Get filename(s) of video files in the torrent and run mediainfo and capture the output, extract if DVD found (Blurays not yet supported)
@@ -964,6 +995,9 @@ def getmediainfo(torrentfilename):
     #print(torrentmetadata)
     mediainfosall = ""
     releasedataout = {}
+    releasedataout['duration'] = 0
+
+    # TODO Need to cleanup the logic to create an overall filename list to parse insteaad of the 3-way duplication we currently have
 
     if 'files' in torrentmetadata['info'].keys():  # Multiple files
         directory = torrentname
@@ -975,6 +1009,7 @@ def getmediainfo(torrentfilename):
                 filename = os.path.join(*[directory, *file['path']])  # Directory if >1 file
 
             mediainfosall += str(MediaInfo.parse(filename, text=True))
+            releasedataout['duration'] += get_mediainfo_duration(filename)
             # Get biggest file and mediainfo on this to set the fields for the release
             maxfile = max(torrentmetadata['info']['files'], key=lambda x: x['length'])  # returns {'length': int, 'path': [str]} of largest file
             fileforsmfields = os.path.join(*[directory, *maxfile['path']])  # Assume the largest file is the main file that should populate SM upload fields
@@ -985,6 +1020,7 @@ def getmediainfo(torrentfilename):
         if debug:
             print(f'Filename for mediainfo: {filename}')
         mediainfosall += str(MediaInfo.parse(filename, text=True))
+        releasedataout['duration'] += get_mediainfo_duration(filename)
         fileforsmfields = torrentmetadata['info']['name']
 
     if fileforsmfields.lower().endswith('.iso'):  # Extract the ISO and run mediainfo against appropriate files
@@ -1001,13 +1037,13 @@ def getmediainfo(torrentfilename):
                 dir_files.append(filenamewithpath)
                 if list(filter(filenamewithpath.lower().endswith, isovideoextensions)):  # Only gather mediainfo for DVD video files (BR when supported)
                     mediainfosall += str(MediaInfo.parse(filenamewithpath, text=True))
+                    releasedataout['duration'] += get_mediainfo_duration(filenamewithpath)
+
 
         filesize = lambda f: os.path.getsize(f)
         fileforsmfields = sorted(dir_files, key=filesize)[-1]  # Assume the largest file is the main file that should populate SM upload fields
 
     mediainforeleasedata = MediaInfo.parse(fileforsmfields)
-
-    releasedataout['duration'] = 0
 
     if fileforsmfields.lower().endswith('.iso'):
         tempdir.cleanup()
@@ -1015,14 +1051,12 @@ def getmediainfo(torrentfilename):
     for track in mediainforeleasedata.tracks:
         if track.track_type == 'General':
             # releasedataout['language'] = track.audio_language_list  # Will need to check if this is reliable
-            releasedataout['duration'] += float(track.duration)  # time in ms
-            #  track.duration is time in ms
             if 'container' not in releasedataout:  # Not an ISO, only set container if we do not already know its an ISO
                 releasedataout['container'] = track.file_extension.upper()
             else:  # We have ISO - get category data based Mediainfo if we have it
                 if track.file_extension.upper() == 'VOB':
                     releasedataout['category'] = 'DVD'
-                elif track.file_extension.upper() == 'M2TS':
+                elif track.file_extension.upper() == 'M2TS':  # Not used yet as we cannot handle Bluray / UDF
                     releasedataout['category'] = 'Bluray'
 
         if track.track_type == 'Video':
