@@ -1114,6 +1114,7 @@ def getargs():
     parser.add_argument("-S", "--batchseeding", help="Upload all releases currently seeding by user id specified by --batchuser", action="store_true")
     parser.add_argument("-s", "--batchstart", help="(Batch mode only) Start at this page", type=int)
     parser.add_argument("-e", "--batchend", help="(Batch mode only) End at this page", type=int)
+    parser.add_argument("-c", "--excfiltercategory", help="(Batch mode only) Exclude a JPS category from upload", type=str)
     parser.add_argument("-f", "--excfilteraudioformat", help="Exclude an audioformat from upload", type=str)
     parser.add_argument("-F", "--excfiltermedia", help="Exclude a media from upload", type=str)
     parser.add_argument("-m", "--mediainfo", help="Get mediainfo data and extract data to set codec, resolution, audio format and container fields", action="store_true")
@@ -1184,7 +1185,7 @@ class Categories:
 if __name__ == "__main__":
     args = getargs()
     # TODO consider calling args[] directly, we will then not need this line
-    dryrun = debug = excfilteraudioformat = excfiltermedia = usermode = batchstart = batchend = None
+    dryrun = debug = excfilteraudioformat = excfiltermedia = usermode = batchstart = batchend = excfiltercategory = None
 
     if args.dryrun:
         dryrun = True
@@ -1275,6 +1276,10 @@ if __name__ == "__main__":
             torrentids = value
             try:
                 torrentgroupdata = GetGroupData("https://jpopsuki.eu/torrents.php?id=%s" % groupid)
+                if torrentgroupdata.category == args.excfiltercategory:
+                    if debug:
+                        print(f'Excluding groupid {groupid} as it is {torrentgroupdata.category} group and these are being skipped')
+                    continue
             except KeyboardInterrupt:  # Allow Ctrl-C to exit without showing the error multiple times and polluting the final error dict
                 break  # Still continue to get error dicts and dupe list so far
             except Exception as exc:
