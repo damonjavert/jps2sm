@@ -440,7 +440,7 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
             else:  # Still need to change the category to something, if not a Bluray then even if it is not a DVD the most sensible category is DVD in a music torrent group
                 data['type'] = Categories.JPStoSM['DVD']
         if torrentgroupdata.category == "TV-Music" and args.mediainfo:
-            data['type'] = Categories.JPStoSM[decide_music_performance(torrentgroupdata.artist, data['multiplefiles'], data['duration'])]
+            data['type'] = Categories.SM[decide_music_performance(torrentgroupdata.artist, data['multiplefiles'], data['duration'])]
 
         # If not supplied by getmediainfo() use codec found by collate()
         if 'codec' not in data.keys():
