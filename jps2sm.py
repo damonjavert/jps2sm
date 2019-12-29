@@ -26,6 +26,7 @@ import torrent_parser as tp
 from pymediainfo import MediaInfo
 import humanfriendly
 from pyunpack import Archive
+from html2phpbbcode.parser import HTML2PHPBBCode
 
 
 __version__ = "1.3"
@@ -218,6 +219,26 @@ def removehtmltags(text):
     clean = re.compile('<.*?>')
     return re.sub(clean, '', text)
 
+def constructbbcode(html_input):
+    """
+    Construct BBCode using https://github.com/tdiam/html2phpbbcode
+    Currently does not properly construct some tags such as spoilers, text size and alignment
+    Due to this the function is not currently called and needs revision
+    """
+    parser = HTML2PHPBBCode()
+    bbcode = parser.feed(html_input)
+
+    return bbcode
+
+def getbbcode(groupid):
+    """
+    Retrieve original bbcode from edit group url
+    """
+    edit_group_page = s.retrieveContent(f"https://jpopsuki.eu/torrents.php?action=editgroup&groupid={groupid}")
+    soup = BeautifulSoup(edit_group_page.text, 'html5lib')
+    bbcode = soup.find("textarea", {"name": "body"}).string
+
+    return bbcode
 
 def getauthkey():
     """
@@ -577,13 +598,15 @@ class GetGroupData:
     """
     def __init__(self, jpsurl):
         self.jpsurl = jpsurl
-
+        print(jpsurl, '---jpsurl---')
         self.getdata(jpsurl)
 
     def getdata(self, jpsurl):
         date_regex = r'[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])'  # YYYY.MM.DD format
 
         res = s.retrieveContent(self.jpsurl.split()[0])  # If there are multiple urls only the first url needs to be parsed
+
+        self.groupid = re.findall(r"(?!id=)\d+", self.jpsurl)[0]
 
         soup = BeautifulSoup(res.text, 'html5lib')
         #soup = BeautifulSoup(open("1830.html"), 'html5lib')
@@ -618,7 +641,7 @@ class GetGroupData:
         except IndexError:  # Handle YYYY dates, creating extra regex as I cannot get it working without causing issue #33
             try:
                 self.date = re.findall(r'[^\d]((?:19|20)\d{2})[^\d]', text)[0]
-            
+
             # Handle if cannot find date in the title, use upload date instead from getreleasedata() but error if the category should have it
             except IndexError as dateexc:
                 if self.category not in Categories.NonDate:
@@ -671,8 +694,13 @@ class GetGroupData:
         # fakeurl = 'https://jpopsuki.eu/torrents.php?id=181558&torrentid=251763'
         # fakeurl = 'blah'
 
-        self.groupdescription = removehtmltags(str(soup.select('#content .thin .main_column .box .body')[0]))
-        print(f"Group description:\n{self.groupdescription}")
+        # Select group description and strip html
+        try:
+            self.groupdescription = getbbcode(self.groupid)
+            print(f"Group description:\n{self.groupdescription}")
+        except:
+            self.groupdescription = removehtmltags(str(soup.select('#content .thin .main_column .box .body')[0]))
+            print(f"Group description:\n{self.groupdescription}")
 
         image = str(soup.select('#content .thin .sidebar .box p a'))
         try:
@@ -824,11 +852,11 @@ def collate(torrentids):
             else:
                 remasterdata = False
 
-        elif torrentgroupdata.category not in Categories.NonReleaseData:  # Music torrent  
+        elif torrentgroupdata.category not in Categories.NonReleaseData:  # Music torrent
             # format / bitrate / media
             releasedataout['videotorrent'] = False
             releasedataout['categorystatus'] = "good"
-            
+
             releasedataout['media'] = releasedata[2]
             releasedataout['audioformat'] = releasedata[0]
 
@@ -1329,5 +1357,3 @@ if __name__ == "__main__":
         torrentcount = collate(torrentids)
         if not dryrun:
             downloaduploadedtorrents(torrentcount)
-
-
