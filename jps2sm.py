@@ -609,7 +609,6 @@ class GetGroupData:
     """
     def __init__(self, jpsurl):
         self.jpsurl = jpsurl
-        print(jpsurl, '---jpsurl---')
         self.getdata(jpsurl)
 
     def getdata(self, jpsurl):
