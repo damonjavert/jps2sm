@@ -26,6 +26,8 @@ import torrent_parser as tp
 from pymediainfo import MediaInfo
 import humanfriendly
 from pyunpack import Archive
+from html2phpbbcode.parser import HTML2PHPBBCode
+from pathlib import Path
 
 
 __version__ = "1.3"
@@ -395,7 +397,7 @@ def getreleasedata(torrentids):
     return releasedata
 
 
-def uploadtorrent(filename, groupid=None, **uploaddata):
+def uploadtorrent(filename, torrentfilename, groupid=None, **uploaddata):
     """
     Prepare POST data for the SM upload, performs additional validation, reports errors and performs the actual upload to
     SM whilst saving the html result to investigate any errors if they are not reported correctly.
@@ -564,8 +566,15 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
         if SMerrorLogon:
             raise Exception(f'Invalid {SMerrorLogon[0]}')
 
-        smuploadresultfilename = "SMuploadresult." + filename + ".html"
-        with open(smuploadresultfilename, "w") as f:
+        smuploadresultdir = Path(Path.cwd(),htmldir)
+        smuploadresultfilename = "SMuploadresult." + torrentfilename + ".html"
+        smuploadresultpath = Path(smuploadresultdir, smuploadresultfilename)
+
+        if not smuploadresultdir.is_dir():
+            smuploadresultdir.mkdir(parents=True, exist_ok=True)
+            os.chmod(str(smuploadresultdir), 511)
+
+        with open(smuploadresultpath, "w") as f:
             f.write(str(SMres.content))
 
         groupid = re.findall('<input type="hidden" name="groupid" value="([0-9]+)" />', SMres.text)
@@ -899,18 +908,25 @@ def collate(torrentids):
 
         torrentlink = html.unescape(gettorrentlink(torrentid))
         torrentfile = s.retrieveContent("https://jpopsuki.eu/%s" % torrentlink)  # Download JPS torrent
+        torrentdir = Path(Path.cwd(),jpstorrentdir)
         torrentfilename = get_valid_filename(
             "JPS %s - %s - %s.torrent" % (torrentgroupdata.artist, torrentgroupdata.title, "-".join(releasedata)))
-        with open(torrentfilename, "wb") as f:
+        torrentpath = Path(torrentdir, torrentfilename)
+
+        if not torrentdir.is_dir():
+            torrentdir.mkdir(parents=True, exist_ok=True)
+            os.chmod(str(torrentdir), 511)
+
+        with open(torrentpath, "wb") as f:
             f.write(torrentfile.content)
 
         # Upload torrent to SM
         # If groupid was returned from a previous call of uploadtorrent() then use it to allow torrents
         # to be uploaded to the same group, else get the groupid from the first run of uploadtorrent()
         if groupid is None:
-            groupid = uploadtorrent(torrentfilename, **releasedataout)
+            groupid = uploadtorrent(torrentpath, torrentfilename, **releasedataout)
         else:
-            uploadtorrent(torrentfilename, groupid, **releasedataout)
+            uploadtorrent(torrentpath, torrentfilename, groupid, **releasedataout)
 
     if not dryrun:
         # Add original artists for contrib artists
@@ -942,8 +958,15 @@ def downloaduploadedtorrents(torrentcount):
 
     for torrentid, torrentlink in smtorrentlinks.items():
         torrentfile = sm.retrieveContent(torrentlink)
+        torrentdir = Path(Path.cwd(),smtorrentdir)
         torrentfilename = get_valid_filename(f'SM {torrentgroupdata.artist} - {torrentgroupdata.title} - {torrentid}.torrent')
-        with open(torrentfilename, "wb") as f:
+        torrentpath = Path(torrentdir, torrentfilename)
+
+        if not torrentdir.is_dir():
+            torrentdir.mkdir(parents=True, exist_ok=True)
+            os.chmod(str(torrentdir), 511)
+
+        with open(torrentpath, "wb") as f:
             f.write(torrentfile.content)
         if debug:
             print(f'Downloaded SM torrent as {torrentfilename}')
@@ -1262,6 +1285,9 @@ if __name__ == "__main__":
     jpspass = config.get('JPopSuki', 'Password')
     smuser = config.get('SugoiMusic', 'User')
     smpass = config.get('SugoiMusic', 'Password')
+    smtorrentdir = config.get('Directories', 'SMTorrents')
+    jpstorrentdir = config.get('Directories', 'JPSTorrents')
+    htmldir = config.get('Directories', 'HTML')
 
     # JPS MyLoginSession vars
     loginUrl = "https://jpopsuki.eu/login.php"
