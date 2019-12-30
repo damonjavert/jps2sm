@@ -26,6 +26,8 @@ import torrent_parser as tp
 from pymediainfo import MediaInfo
 import humanfriendly
 from pyunpack import Archive
+from html2phpbbcode.parser import HTML2PHPBBCode
+from pathlib import Path
 
 
 __version__ = "1.3"
@@ -218,6 +220,29 @@ def removehtmltags(text):
     clean = re.compile('<.*?>')
     return re.sub(clean, '', text)
 
+def constructbbcode(html_input):
+    """
+    Construct BBCode using https://github.com/tdiam/html2phpbbcode
+    Currently does not properly construct some tags such as spoilers, text size and alignment
+    Due to this the function is not currently called and needs revision
+    """
+    parser = HTML2PHPBBCode()
+    bbcode = parser.feed(html_input)
+
+    return bbcode
+
+def getbbcode(groupid):
+    """
+    Retrieve original bbcode from edit group url
+    """
+    edit_group_page = s.retrieveContent(f"https://jpopsuki.eu/torrents.php?action=editgroup&groupid={groupid}")
+    soup = BeautifulSoup(edit_group_page.text, 'html5lib')
+    bbcode = soup.find("textarea", {"name": "body"}).string
+
+    # Remove youtube bbcode tags as they're currently not supported on SugoiMusic
+    bbcode = re.sub(r"\[youtube=[^]]*]", '', bbcode)
+
+    return bbcode
 
 def getauthkey():
     """
@@ -383,7 +408,7 @@ def getreleasedata(torrentids):
     return releasedata
 
 
-def uploadtorrent(filename, groupid=None, **uploaddata):
+def uploadtorrent(filename, torrentfilename, groupid=None, **uploaddata):
     """
     Prepare POST data for the SM upload, performs additional validation, reports errors and performs the actual upload to
     SM whilst saving the html result to investigate any errors if they are not reported correctly.
@@ -552,8 +577,15 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
         if SMerrorLogon:
             raise Exception(f'Invalid {SMerrorLogon[0]}')
 
-        smuploadresultfilename = "SMuploadresult." + filename + ".html"
-        with open(smuploadresultfilename, "w") as f:
+        smuploadresultdir = Path(Path.cwd(),htmldir)
+        smuploadresultfilename = "SMuploadresult." + torrentfilename + ".html"
+        smuploadresultpath = Path(smuploadresultdir, smuploadresultfilename)
+
+        if not smuploadresultdir.is_dir():
+            smuploadresultdir.mkdir(parents=True, exist_ok=True)
+            os.chmod(str(smuploadresultdir), 511)
+
+        with open(smuploadresultpath, "w") as f:
             f.write(str(SMres.content))
 
         groupid = re.findall('<input type="hidden" name="groupid" value="([0-9]+)" />', SMres.text)
@@ -577,13 +609,15 @@ class GetGroupData:
     """
     def __init__(self, jpsurl):
         self.jpsurl = jpsurl
-
+        print(jpsurl, '---jpsurl---')
         self.getdata(jpsurl)
 
     def getdata(self, jpsurl):
         date_regex = r'[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])'  # YYYY.MM.DD format
 
         res = s.retrieveContent(self.jpsurl.split()[0])  # If there are multiple urls only the first url needs to be parsed
+
+        self.groupid = re.findall(r"(?!id=)\d+", self.jpsurl)[0]
 
         soup = BeautifulSoup(res.text, 'html5lib')
         #soup = BeautifulSoup(open("1830.html"), 'html5lib')
@@ -619,7 +653,7 @@ class GetGroupData:
         except IndexError:  # Handle YYYY dates, creating extra regex as I cannot get it working without causing issue #33
             try:
                 self.date = re.findall(r'[^\d]((?:19|20)\d{2})[^\d]', text)[0]
-            
+
             # Handle if cannot find date in the title, use upload date instead from getreleasedata() but error if the category should have it
             except IndexError as dateexc:
                 if self.category not in Categories.NonDate:
@@ -672,8 +706,13 @@ class GetGroupData:
         # fakeurl = 'https://jpopsuki.eu/torrents.php?id=181558&torrentid=251763'
         # fakeurl = 'blah'
 
-        self.groupdescription = removehtmltags(str(soup.select('#content .thin .main_column .box .body')[0]))
-        print(f"Group description:\n{self.groupdescription}")
+        # Select group description and strip html
+        try:
+            self.groupdescription = getbbcode(self.groupid)
+            print(f"Group description:\n{self.groupdescription}")
+        except:
+            self.groupdescription = removehtmltags(str(soup.select('#content .thin .main_column .box .body')[0]))
+            print(f"Group description:\n{self.groupdescription}")
 
         image = str(soup.select('#content .thin .sidebar .box p a'))
         try:
@@ -825,11 +864,11 @@ def collate(torrentids):
             else:
                 remasterdata = False
 
-        elif torrentgroupdata.category not in Categories.NonReleaseData:  # Music torrent  
+        elif torrentgroupdata.category not in Categories.NonReleaseData:  # Music torrent
             # format / bitrate / media
             releasedataout['videotorrent'] = False
             releasedataout['categorystatus'] = "good"
-            
+
             releasedataout['media'] = releasedata[2]
             releasedataout['audioformat'] = releasedata[0]
 
@@ -880,18 +919,25 @@ def collate(torrentids):
 
         torrentlink = html.unescape(gettorrentlink(torrentid))
         torrentfile = s.retrieveContent("https://jpopsuki.eu/%s" % torrentlink)  # Download JPS torrent
+        torrentdir = Path(Path.cwd(),jpstorrentdir)
         torrentfilename = get_valid_filename(
             "JPS %s - %s - %s.torrent" % (torrentgroupdata.artist, torrentgroupdata.title, "-".join(releasedata)))
-        with open(torrentfilename, "wb") as f:
+        torrentpath = Path(torrentdir, torrentfilename)
+
+        if not torrentdir.is_dir():
+            torrentdir.mkdir(parents=True, exist_ok=True)
+            os.chmod(str(torrentdir), 511)
+
+        with open(torrentpath, "wb") as f:
             f.write(torrentfile.content)
 
         # Upload torrent to SM
         # If groupid was returned from a previous call of uploadtorrent() then use it to allow torrents
         # to be uploaded to the same group, else get the groupid from the first run of uploadtorrent()
         if groupid is None:
-            groupid = uploadtorrent(torrentfilename, **releasedataout)
+            groupid = uploadtorrent(torrentpath, torrentfilename, **releasedataout)
         else:
-            uploadtorrent(torrentfilename, groupid, **releasedataout)
+            uploadtorrent(torrentpath, torrentfilename, groupid, **releasedataout)
 
     if not dryrun:
         # Add original artists for contrib artists
@@ -923,8 +969,15 @@ def downloaduploadedtorrents(torrentcount):
 
     for torrentid, torrentlink in smtorrentlinks.items():
         torrentfile = sm.retrieveContent(torrentlink)
+        torrentdir = Path(Path.cwd(),smtorrentdir)
         torrentfilename = get_valid_filename(f'SM {torrentgroupdata.artist} - {torrentgroupdata.title} - {torrentid}.torrent')
-        with open(torrentfilename, "wb") as f:
+        torrentpath = Path(torrentdir, torrentfilename)
+
+        if not torrentdir.is_dir():
+            torrentdir.mkdir(parents=True, exist_ok=True)
+            os.chmod(str(torrentdir), 511)
+
+        with open(torrentpath, "wb") as f:
             f.write(torrentfile.content)
         if debug:
             print(f'Downloaded SM torrent as {torrentfilename}')
@@ -1242,6 +1295,9 @@ if __name__ == "__main__":
     jpspass = config.get('JPopSuki', 'Password')
     smuser = config.get('SugoiMusic', 'User')
     smpass = config.get('SugoiMusic', 'Password')
+    smtorrentdir = config.get('Directories', 'SMTorrents')
+    jpstorrentdir = config.get('Directories', 'JPSTorrents')
+    htmldir = config.get('Directories', 'HTML')
 
     # JPS MyLoginSession vars
     loginUrl = "https://jpopsuki.eu/login.php"
@@ -1325,5 +1381,3 @@ if __name__ == "__main__":
         torrentcount = collate(torrentids)
         if not dryrun:
             downloaduploadedtorrents(torrentcount)
-
-
