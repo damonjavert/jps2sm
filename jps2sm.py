@@ -612,7 +612,6 @@ class GetGroupData:
                 print('JPS upload appears to have no artist set and artist cannot be autodetected')
                 raise
 
-
         # Extract date without using '[]' as it allows '[]' elsewhere in the title and it works with JPS TV-* categories
         try:
             self.date = re.findall(date_regex, text)[0].replace(".", "")
@@ -1110,13 +1109,13 @@ def getargs():
     parser.add_argument("-u", "--urls", help="JPS URL for a group, or multiple individual releases URLs to be added to the same group", type=str)
     parser.add_argument("-n", "--dryrun", help="Just parse url and show the output, do not add the torrent to SM", action="store_true")
     parser.add_argument("-b", "--batchuser", help="User id for batch user operations")
-    parser.add_argument("-U", "--batchuploaded", help="Upload all releases uploaded by user id specified by --batchuser", action="store_true")
-    parser.add_argument("-S", "--batchseeding", help="Upload all releases currently seeding by user id specified by --batchuser", action="store_true")
+    parser.add_argument("-U", "--batchuploaded", help="(Batch mode only) Upload all releases uploaded by user id specified by --batchuser", action="store_true")
+    parser.add_argument("-S", "--batchseeding", help="(Batch mode only) Upload all releases currently seeding by user id specified by --batchuser", action="store_true")
     parser.add_argument("-s", "--batchstart", help="(Batch mode only) Start at this page", type=int)
     parser.add_argument("-e", "--batchend", help="(Batch mode only) End at this page", type=int)
-    parser.add_argument("-c", "--excfiltercategory", help="(Batch mode only) Exclude a JPS category from upload", type=str)
-    parser.add_argument("-f", "--excfilteraudioformat", help="Exclude an audioformat from upload", type=str)
-    parser.add_argument("-F", "--excfiltermedia", help="Exclude a media from upload", type=str)
+    parser.add_argument("-exc", "--exccategory", help="(Batch mode only) Exclude a JPS category from upload", type=str)
+    parser.add_argument("-exf", "--excaudioformat", help="(Batch mode only) Exclude an audioformat from upload", type=str)
+    parser.add_argument("-exm", "--excmedia", help="(Batch mode only) Exclude a media from upload", type=str)
     parser.add_argument("-m", "--mediainfo", help="Get mediainfo data and extract data to set codec, resolution, audio format and container fields", action="store_true")
 
     return parser.parse_args()
@@ -1185,7 +1184,7 @@ class Categories:
 if __name__ == "__main__":
     args = getargs()
     # TODO consider calling args[] directly, we will then not need this line
-    dryrun = debug = excfilteraudioformat = excfiltermedia = usermode = batchstart = batchend = excfiltercategory = None
+    dryrun = debug = excaudioformat = excmedia = usermode = batchstart = batchend = exccategory = None
 
     if args.dryrun:
         dryrun = True

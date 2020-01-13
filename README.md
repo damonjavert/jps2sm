@@ -52,8 +52,8 @@ Once everything looks ok, to upload all your personal uploads, `<userid>` is you
 ## Usage
 
     usage: jps2sm.py [-h] [-v] [-d] [-u URLS] [-n] [-b BATCHUSER] [-U] [-S]
-                 [-s BATCHSTART] [-e BATCHEND] [-f EXCFILTERAUDIOFORMAT]
-                 [-F EXCFILTERMEDIA]
+                 [-s BATCHSTART] [-e BATCHEND] [-exc EXCCATEGORY]
+                 [-exf EXCAUDIOFORMAT] [-exm EXCMEDIA] [-m]
 
 arguments:
 
@@ -66,20 +66,26 @@ arguments:
                           torrent to SM
     -b BATCHUSER, --batchuser BATCHUSER
                           User id for batch user operations
-    -U, --batchuploaded   Upload all releases uploaded by user id specified by
-                          --batchuser
-    -S, --batchseeding    Upload all releases currently seeding by user id
-                          specified by --batchuser
+    -U, --batchuploaded   (Batch mode only) Upload all releases uploaded by user
+                          id specified by --batchuser
+    -S, --batchseeding    (Batch mode only) Upload all releases currently
+                          seeding by user id specified by --batchuser
     -s BATCHSTART, --batchstart BATCHSTART
                           (Batch mode only) Start at this page
     -e BATCHEND, --batchend BATCHEND
                           (Batch mode only) End at this page
-    -f EXCFILTERAUDIOFORMAT, --excfilteraudioformat EXCFILTERAUDIOFORMAT
-                          Exclude an audioformat from upload
-    -F EXCFILTERMEDIA, --excfiltermedia EXCFILTERMEDIA
-                          Exclude a media from upload
+    -exc EXCCATEGORY, --exccategory EXCCATEGORY
+                          (Batch mode only) Exclude a JPS category from upload
+    -exf EXCAUDIOFORMAT, --excaudioformat EXCAUDIOFORMAT
+                          (Batch mode only) Exclude an audioformat from upload
+    -exm EXCMEDIA, --excmedia EXCMEDIA
+                          (Batch mode only) Exclude a media from upload
     -m, --mediainfo       Get mediainfo data and extract data to set codec,
                           resolution, audio format and container fields
+
+    usage: jps2sm.py [-h] [-v] [-d] [-u URLS] [-n] [-b BATCHUSER] [-U] [-S]
+                 [-s BATCHSTART] [-e BATCHEND] [-f EXCFILTERAUDIOFORMAT]
+                 [-F EXCFILTERMEDIA]
 
 ## Help! I dont know all this python stuff
 * Mac Users: The best method is to install [Homebrew](https://brew.sh) and then `brew install python3`. See this guide: https://wsvincent.com/install-python3-mac/
