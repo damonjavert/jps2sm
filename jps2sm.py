@@ -26,7 +26,6 @@ import torrent_parser as tp
 from pymediainfo import MediaInfo
 import humanfriendly
 from pyunpack import Archive
-from html2phpbbcode.parser import HTML2PHPBBCode
 
 
 __version__ = "1.3"
@@ -219,20 +218,12 @@ def removehtmltags(text):
     clean = re.compile('<.*?>')
     return re.sub(clean, '', text)
 
-def constructbbcode(html_input):
-    """
-    Construct BBCode using https://github.com/tdiam/html2phpbbcode
-    Currently does not properly construct some tags such as spoilers, text size and alignment
-    Due to this the function is not currently called and needs revision
-    """
-    parser = HTML2PHPBBCode()
-    bbcode = parser.feed(html_input)
-
-    return bbcode
-
-def getbbcode(groupid):
+def get_group_descrption_bbcode(groupid):
     """
     Retrieve original bbcode from edit group url
+
+    :param: groupid: JPS groupid to get group description with bbcode
+    :return: bbcode: group description with bbcode
     """
     edit_group_page = s.retrieveContent(f"https://jpopsuki.eu/torrents.php?action=editgroup&groupid={groupid}")
     soup = BeautifulSoup(edit_group_page.text, 'html5lib')
@@ -598,7 +589,8 @@ class GetGroupData:
     """
     def __init__(self, jpsurl):
         self.jpsurl = jpsurl
-        print(jpsurl, '---jpsurl---')
+        if debug:
+            print('Processing JPS URL: ', jpsurl)
         self.getdata(jpsurl)
 
     def getdata(self, jpsurl):
@@ -694,13 +686,13 @@ class GetGroupData:
         # fakeurl = 'https://jpopsuki.eu/torrents.php?id=181558&torrentid=251763'
         # fakeurl = 'blah'
 
-        # Select group description and strip html
+        # Get description with BB Code if user has group edit permissions on JPS, if not just use stripped html text.
         try:
-            self.groupdescription = getbbcode(self.groupid)
-            print(f"Group description:\n{self.groupdescription}")
+            self.groupdescription = get_group_descrption_bbcode(self.groupid)  # Requires PU+ at JPS
         except:
             self.groupdescription = removehtmltags(str(soup.select('#content .thin .main_column .box .body')[0]))
-            print(f"Group description:\n{self.groupdescription}")
+
+        print(f"Group description:\n{self.groupdescription}")
 
         image = str(soup.select('#content .thin .sidebar .box p a'))
         try:
