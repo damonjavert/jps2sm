@@ -1214,11 +1214,11 @@ if __name__ == "__main__":
     else:
         sys.tracebacklimit = 0
 
-    if args.excfilteraudioformat:
-        excfilteraudioformat = args.excfilteraudioformat
+    if args.excaudioformat:
+        excfilteraudioformat = args.excaudioformat
 
-    if args.excfiltermedia:
-        excfiltermedia = args.excfiltermedia
+    if args.excmedia:
+        excfiltermedia = args.excmedia
 
     if args.urls is None and args.batchuser is None:
         print('JPS URL(s) nor batchuser specified')
