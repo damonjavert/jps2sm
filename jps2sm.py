@@ -576,7 +576,7 @@ def uploadtorrent(filename, groupid=None, **uploaddata):
                 raise Exception(f'Cannot find groupid in SM response - there was probably an unknown error. See {smuploadresultfilename} for potential errors')
 
         if groupid:
-            print(f'OK - groupid {groupid[0]}')
+            print(f'OK - groupid {groupid[0]}  See https://sugoimusic.me/torrents.php?id={groupid[0]}')
 
     return groupid
 
