@@ -26,7 +26,6 @@ import torrent_parser as tp
 from pymediainfo import MediaInfo
 import humanfriendly
 from pyunpack import Archive
-from pathlib import Path
 
 
 __version__ = "1.3"
@@ -565,13 +564,12 @@ def uploadtorrent(filename, torrentfilename, groupid=None, **uploaddata):
         if SMerrorLogon:
             raise Exception(f'Invalid {SMerrorLogon[0]}')
 
-        smuploadresultdir = Path(Path.cwd(),htmldir)
         smuploadresultfilename = "SMuploadresult." + torrentfilename + ".html"
-        smuploadresultpath = Path(smuploadresultdir, smuploadresultfilename)
+        smuploadresultpath = os.path.join(htmldir, smuploadresultfilename)
 
-        if not smuploadresultdir.is_dir():
-            smuploadresultdir.mkdir(parents=True, exist_ok=True)
-            os.chmod(str(smuploadresultdir), 511)
+        #if not smuploadresultdir.is_dir():
+        #    smuploadresultdir.mkdir(parents=True, exist_ok=True)
+        #    os.chmod(str(smuploadresultdir), 511)
 
         with open(smuploadresultpath, "w") as f:
             f.write(str(SMres.content))
@@ -909,13 +907,12 @@ def collate(torrentids):
 
         torrentlink = html.unescape(gettorrentlink(torrentid))
         torrentfile = s.retrieveContent("https://jpopsuki.eu/%s" % torrentlink)  # Download JPS torrent
-        torrentdir = Path(Path.cwd(),jpstorrentdir)
         torrentfilename = get_valid_filename(
             "JPS %s - %s - %s.torrent" % (torrentgroupdata.artist, torrentgroupdata.title, "-".join(releasedata)))
-        torrentpath = Path(torrentdir, torrentfilename)
+        torrentpath = os.path.join(jpstorrentdir, torrentfilename)
 
-        if not torrentdir.is_dir():
-            torrentdir.mkdir(parents=True, exist_ok=True)
+        #if not torrentdir.is_dir():
+        #    torrentdir.mkdir(parents=True, exist_ok=True)
 
         with open(torrentpath, "wb") as f:
             f.write(torrentfile.content)
@@ -958,13 +955,12 @@ def downloaduploadedtorrents(torrentcount):
 
     for torrentid, torrentlink in smtorrentlinks.items():
         torrentfile = sm.retrieveContent(torrentlink)
-        torrentdir = Path(Path.cwd(),smtorrentdir)
         torrentfilename = get_valid_filename(f'SM {torrentgroupdata.artist} - {torrentgroupdata.title} - {torrentid}.torrent')
-        torrentpath = Path(torrentdir, torrentfilename)
+        torrentpath = os.path.join(smtorrentdir, torrentfilename)
 
-        if not torrentdir.is_dir():
-            torrentdir.mkdir(parents=True, exist_ok=True)
-            os.chmod(str(torrentdir), 511)
+        #if not torrentdir.is_dir():
+        #    torrentdir.mkdir(parents=True, exist_ok=True)
+        #    os.chmod(str(torrentdir), 511)
 
         with open(torrentpath, "wb") as f:
             f.write(torrentfile.content)
@@ -1285,9 +1281,21 @@ if __name__ == "__main__":
     jpspass = config.get('JPopSuki', 'Password')
     smuser = config.get('SugoiMusic', 'User')
     smpass = config.get('SugoiMusic', 'Password')
-    smtorrentdir = config.get('Directories', 'SMTorrents')
-    jpstorrentdir = config.get('Directories', 'JPSTorrents')
-    htmldir = config.get('Directories', 'HTML')
+    try:
+        smtorrentdir = config.get('Directories', 'SM-Torrents')
+    except configparser.NoOptionError:
+        smtorrentdir = os.path.join(scriptdir, 'SM-Torrents')
+    try:
+        jpstorrentdir = config.get('Directories', 'JPS-Torrents')
+    except configparser.NoOptionError:
+        jpstorrentdir = os.path.join(scriptdir, 'JPS-Torrents')
+    try:
+        htmldir = config.get('Directories', 'SM-Upload-HTML-Output')
+    except configparser.NoOptionError:
+        htmldir = os.path.join(scriptdir, 'SM-Upload-HTML-Output')
+
+    for createdir in [smtorrentdir, jpstorrentdir, htmldir]:
+        os.makedirs(createdir, exist_ok=True)
 
     # JPS MyLoginSession vars
     loginUrl = "https://jpopsuki.eu/login.php"

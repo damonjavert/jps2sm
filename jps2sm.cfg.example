@@ -4,7 +4,9 @@ Password: jps-pass-here
 [SugoiMusic]
 User: sm-user-here
 Password: sm-pass-here
+
 [Directories]
-SMTorrents: SMTorrents
-JPSTorrents: JPSTorrents
-HTML: HTML
+#Optional, default is script-dir/SM-Torrents, etc.
+#SM-Torrents: /full/path/to/dir/SM-Torrents
+#JPS-Torrents: /full/path/to/dir/JPS-Torrents
+#SM-Upload-HTML-Output: /full/path/to/dir/SM-Upload-HTML-Output
