@@ -1204,7 +1204,7 @@ class Categories:
 if __name__ == "__main__":
     args = getargs()
     # TODO consider calling args[] directly, we will then not need this line
-    dryrun = debug = excaudioformat = excmedia = usermode = batchstart = batchend = exccategory = None
+    dryrun = debug = excfilteraudioformat = excfiltermedia = usermode = batchstart = batchend = exccategory = None
 
     if args.dryrun:
         dryrun = True
