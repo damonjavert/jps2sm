@@ -395,7 +395,7 @@ def getreleasedata(torrentids):
     return releasedata
 
 
-def uploadtorrent(filename, torrentfilename, groupid=None, **uploaddata):
+def uploadtorrent(filename, groupid=None, **uploaddata):
     """
     Prepare POST data for the SM upload, performs additional validation, reports errors and performs the actual upload to
     SM whilst saving the html result to investigate any errors if they are not reported correctly.
@@ -564,12 +564,9 @@ def uploadtorrent(filename, torrentfilename, groupid=None, **uploaddata):
         if SMerrorLogon:
             raise Exception(f'Invalid {SMerrorLogon[0]}')
 
-        smuploadresultfilename = "SMuploadresult." + torrentfilename + ".html"
+        filename_split = os.path.split(filename)
+        smuploadresultfilename = "SMuploadresult." + filename_split[1] + ".html"
         smuploadresultpath = os.path.join(htmldir, smuploadresultfilename)
-
-        #if not smuploadresultdir.is_dir():
-        #    smuploadresultdir.mkdir(parents=True, exist_ok=True)
-        #    os.chmod(str(smuploadresultdir), 511)
 
         with open(smuploadresultpath, "w") as f:
             f.write(str(SMres.content))
@@ -905,25 +902,22 @@ def collate(torrentids):
         # Picture Category torrents and some TV-Variety.
         releasedataout['uploaddate'] = datetime.datetime.strptime(uploaddatestr, '%b %d %Y, %H:%M').strftime('%Y%m%d')
 
-        torrentlink = html.unescape(gettorrentlink(torrentid))
-        torrentfile = s.retrieveContent("https://jpopsuki.eu/%s" % torrentlink)  # Download JPS torrent
-        torrentfilename = get_valid_filename(
+        jpstorrentlinknouri = html.unescape(gettorrentlink(torrentid))
+        jpstorrentfile = s.retrieveContent("https://jpopsuki.eu/%s" % jpstorrentlinknouri)  # Download JPS torrent
+        jpstorrentfilename = get_valid_filename(
             "JPS %s - %s - %s.torrent" % (torrentgroupdata.artist, torrentgroupdata.title, "-".join(releasedata)))
-        torrentpath = os.path.join(jpstorrentdir, torrentfilename)
+        jpstorrentpath = os.path.join(jpstorrentdir, jpstorrentfilename)
 
-        #if not torrentdir.is_dir():
-        #    torrentdir.mkdir(parents=True, exist_ok=True)
-
-        with open(torrentpath, "wb") as f:
-            f.write(torrentfile.content)
+        with open(jpstorrentpath, "wb") as f:
+            f.write(jpstorrentfile.content)
 
         # Upload torrent to SM
         # If groupid was returned from a previous call of uploadtorrent() then use it to allow torrents
         # to be uploaded to the same group, else get the groupid from the first run of uploadtorrent()
         if groupid is None:
-            groupid = uploadtorrent(torrentpath, torrentfilename, **releasedataout)
+            groupid = uploadtorrent(jpstorrentpath, **releasedataout)
         else:
-            uploadtorrent(torrentpath, torrentfilename, groupid, **releasedataout)
+            uploadtorrent(jpstorrentpath, groupid, **releasedataout)
 
     if not dryrun:
         # Add original artists for contrib artists
@@ -935,18 +929,18 @@ def collate(torrentids):
     return torrentcount  # For use by downloaduploadedtorrents()
 
 
-def downloaduploadedtorrents(torrentcount):
+def downloaduploadedtorrents(smtorrentcount):
     """
     Get last torrentcount torrent DL links that user uploaded using SM API and download them
 
-    :param torrentcount: count of recent torrent links to be downloaded
+    :param smtorrentcount: count of recent torrent links to be downloaded
     :return:
     """
 
-    if torrentcount == 0:
+    if smtorrentcount == 0:
         return
 
-    user_recents = sm.retrieveContent(f"https://sugoimusic.me/ajax.php?action=user_recents&limit={torrentcount}")
+    user_recents = sm.retrieveContent(f"https://sugoimusic.me/ajax.php?action=user_recents&limit={smtorrentcount}")
     user_recents_json = json.loads(user_recents.text)
 
     smtorrentlinks = {}
@@ -954,18 +948,14 @@ def downloaduploadedtorrents(torrentcount):
         smtorrentlinks[torrentdata['torrentid']] = torrentdata['torrentdl']
 
     for torrentid, torrentlink in smtorrentlinks.items():
-        torrentfile = sm.retrieveContent(torrentlink)
-        torrentfilename = get_valid_filename(f'SM {torrentgroupdata.artist} - {torrentgroupdata.title} - {torrentid}.torrent')
-        torrentpath = os.path.join(smtorrentdir, torrentfilename)
+        smtorrentfile = sm.retrieveContent(torrentlink)
+        smtorrentfilename = get_valid_filename(f'SM {torrentgroupdata.artist} - {torrentgroupdata.title} - {torrentid}.torrent')
+        smtorrentpath = os.path.join(smtorrentdir, smtorrentfilename)
 
-        #if not torrentdir.is_dir():
-        #    torrentdir.mkdir(parents=True, exist_ok=True)
-        #    os.chmod(str(torrentdir), 511)
-
-        with open(torrentpath, "wb") as f:
-            f.write(torrentfile.content)
+        with open(smtorrentpath, "wb") as f:
+            f.write(smtorrentfile.content)
         if debug:
-            print(f'Downloaded SM torrent as {torrentfilename}')
+            print(f'Downloaded SM torrent as {smtorrentfilename}')
 
 
 def decide_ep(torrentfilename):
