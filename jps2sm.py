@@ -27,6 +27,7 @@ from pymediainfo import MediaInfo
 import humanfriendly
 from pyunpack import Archive
 
+from pkg_resources import py2_warn
 
 __version__ = "1.3"
 
