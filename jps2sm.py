@@ -397,12 +397,12 @@ def getreleasedata(torrentids):
     return releasedata
 
 
-def uploadtorrent(filename, torrentfilename, groupid=None, **uploaddata):
+def uploadtorrent(torrentpath, groupid=None, **uploaddata):
     """
     Prepare POST data for the SM upload, performs additional validation, reports errors and performs the actual upload to
     SM whilst saving the html result to investigate any errors if they are not reported correctly.
 
-    :param filename: filename of the JPS torrent to be uploaded
+    :param torrentpath: filename of the JPS torrent to be uploaded, also used as save path for JPS upload result
     :param groupid: groupid to upload to - allows to upload torrents to the same group
     :param uploaddata: dict of collated / validated release data from collate()
     :return: groupid: groupid used in the upload, used by collate() in case of uploading several torrents to the same group
@@ -431,7 +431,7 @@ def uploadtorrent(filename, torrentfilename, groupid=None, **uploaddata):
         print(uploaddata)
 
     if args.mediainfo:
-        data['mediainfo'], releasedatamediainfo = getmediainfo(filename)
+        data['mediainfo'], releasedatamediainfo = getmediainfo(torrentpath)
         data.update(releasedatamediainfo)
         if 'duration' in data.keys() and data['duration'] > 1:
             duration_friendly_format = humanfriendly.format_timespan(datetime.timedelta(seconds=int(data['duration']/1000)))
@@ -500,7 +500,7 @@ def uploadtorrent(filename, torrentfilename, groupid=None, **uploaddata):
         data['sub'] = 'Hardsubs'  # We have subtitles! Subs in JPS FanSubs are usually Hardsubs so guess as this
         # TODO: Use torrent library to look for sub/srt files
     elif torrentgroupdata.category == "Album":  # Ascertain if upload is EP
-        data['type'] = Categories.JPStoSM[decide_ep(filename)]
+        data['type'] = Categories.JPStoSM[decide_ep(torrentpath)]
 
     if 'type' not in data.keys():  # Set default value after all validation has been done
         data['type'] = Categories.JPStoSM[torrentgroupdata.category]
@@ -545,7 +545,7 @@ def uploadtorrent(filename, torrentfilename, groupid=None, **uploaddata):
         data['idols[]'] = torrentgroupdata.artist  # Set the artist normally
 
     postDataFiles = {
-        'file_input': open(filename, 'rb')
+        'file_input': open(torrentpath, 'rb')
     }
 
     if dryrun or debug:
@@ -566,8 +566,8 @@ def uploadtorrent(filename, torrentfilename, groupid=None, **uploaddata):
         if SMerrorLogon:
             raise Exception(f'Invalid {SMerrorLogon[0]}')
 
-        smuploadresultdir = Path(Path.cwd(),htmldir)
-        smuploadresultfilename = "SMuploadresult." + torrentfilename + ".html"
+        smuploadresultdir = Path(Path.cwd(), htmldir)
+        smuploadresultfilename = "SMuploadresult." + Path(torrentpath).stem + ".html"
         smuploadresultpath = Path(smuploadresultdir, smuploadresultfilename)
 
         if not smuploadresultdir.is_dir():
@@ -908,7 +908,7 @@ def collate(torrentids):
 
         torrentlink = html.unescape(gettorrentlink(torrentid))
         torrentfile = s.retrieveContent("https://jpopsuki.eu/%s" % torrentlink)  # Download JPS torrent
-        torrentdir = Path(Path.cwd(),jpstorrentdir)
+        torrentdir = Path(Path.cwd(), jpstorrentdir)
         torrentfilename = get_valid_filename(
             "JPS %s - %s - %s.torrent" % (torrentgroupdata.artist, torrentgroupdata.title, "-".join(releasedata)))
         torrentpath = Path(torrentdir, torrentfilename)
@@ -924,9 +924,9 @@ def collate(torrentids):
         # If groupid was returned from a previous call of uploadtorrent() then use it to allow torrents
         # to be uploaded to the same group, else get the groupid from the first run of uploadtorrent()
         if groupid is None:
-            groupid = uploadtorrent(torrentpath, torrentfilename, **releasedataout)
+            groupid = uploadtorrent(torrentpath, **releasedataout)
         else:
-            uploadtorrent(torrentpath, torrentfilename, groupid, **releasedataout)
+            uploadtorrent(torrentpath, groupid, **releasedataout)
 
     if not dryrun:
         # Add original artists for contrib artists
