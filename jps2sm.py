@@ -26,7 +26,6 @@ import torrent_parser as tp
 from pymediainfo import MediaInfo
 import humanfriendly
 from pyunpack import Archive
-from html2phpbbcode.parser import HTML2PHPBBCode
 from pathlib import Path
 
 
@@ -402,7 +401,7 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
     Prepare POST data for the SM upload, performs additional validation, reports errors and performs the actual upload to
     SM whilst saving the html result to investigate any errors if they are not reported correctly.
 
-    :param torrentpath: filename of the JPS torrent to be uploaded, also used as save path for JPS upload result
+    :param torrentpath: filename of the JPS torrent to be uploaded, also used as save path for SM upload result html page
     :param groupid: groupid to upload to - allows to upload torrents to the same group
     :param uploaddata: dict of collated / validated release data from collate()
     :return: groupid: groupid used in the upload, used by collate() in case of uploading several torrents to the same group
@@ -566,13 +565,8 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
         if SMerrorLogon:
             raise Exception(f'Invalid {SMerrorLogon[0]}')
 
-        smuploadresultdir = Path(Path.cwd(), htmldir)
         smuploadresultfilename = "SMuploadresult." + Path(torrentpath).stem + ".html"
-        smuploadresultpath = Path(smuploadresultdir, smuploadresultfilename)
-
-        if not smuploadresultdir.is_dir():
-            smuploadresultdir.mkdir(parents=True, exist_ok=True)
-            os.chmod(str(smuploadresultdir), 511)
+        smuploadresultpath = Path(output.file_dir['html'], smuploadresultfilename)
 
         with open(smuploadresultpath, "w") as f:
             f.write(str(SMres.content))
@@ -908,14 +902,9 @@ def collate(torrentids):
 
         torrentlink = html.unescape(gettorrentlink(torrentid))
         torrentfile = s.retrieveContent("https://jpopsuki.eu/%s" % torrentlink)  # Download JPS torrent
-        torrentdir = Path(Path.cwd(), jpstorrentdir)
         torrentfilename = get_valid_filename(
             "JPS %s - %s - %s.torrent" % (torrentgroupdata.artist, torrentgroupdata.title, "-".join(releasedata)))
-        torrentpath = Path(torrentdir, torrentfilename)
-
-        if not torrentdir.is_dir():
-            torrentdir.mkdir(parents=True, exist_ok=True)
-            os.chmod(str(torrentdir), 511)
+        torrentpath = Path(output.file_dir['jpstorrents'], torrentfilename)
 
         with open(torrentpath, "wb") as f:
             f.write(torrentfile.content)
@@ -958,18 +947,13 @@ def downloaduploadedtorrents(torrentcount):
 
     for torrentid, torrentlink in smtorrentlinks.items():
         torrentfile = sm.retrieveContent(torrentlink)
-        torrentdir = Path(Path.cwd(),smtorrentdir)
         torrentfilename = get_valid_filename(f'SM {torrentgroupdata.artist} - {torrentgroupdata.title} - {torrentid}.torrent')
-        torrentpath = Path(torrentdir, torrentfilename)
-
-        if not torrentdir.is_dir():
-            torrentdir.mkdir(parents=True, exist_ok=True)
-            os.chmod(str(torrentdir), 511)
+        torrentpath = Path(output.file_dir['smtorrents'], torrentfilename)
 
         with open(torrentpath, "wb") as f:
             f.write(torrentfile.content)
         if debug:
-            print(f'Downloaded SM torrent as {torrentfilename}')
+            print(f'Downloaded SM torrent as {torrentpath}')
 
 
 def decide_ep(torrentfilename):
@@ -1164,6 +1148,28 @@ def getargs():
     return parser.parse_args()
 
 
+class HandleCfgOutputDirs:
+    """
+    Handle all config dir logic
+
+    Get data, decide if relative or absolute path and create dir if required
+    TODO: Eventually move all cfg logic to a class
+
+    :param config_file_dirs_section: dict: Contents of 'Directories' section in jps2sm.cfg
+    """
+
+    def __init__(self, config_file_dirs_section):
+        self.config_file_dirs_section = config_file_dirs_section
+        self.file_dir = {}
+        for (cfg_key, cfg_value) in config_file_dirs_section.items('Directories'):
+            if Path(cfg_value).is_absolute():
+                self.file_dir[cfg_key] = cfg_value
+            else:
+                self.file_dir[cfg_key] = Path(Path.home(), cfg_value)
+            if not Path(self.file_dir[cfg_key]).is_dir():
+                Path(self.file_dir[cfg_key]).mkdir(parents=True, exist_ok=True)
+
+
 class VideoOptions:
     """
     Store Video option constants
@@ -1285,9 +1291,8 @@ if __name__ == "__main__":
     jpspass = config.get('JPopSuki', 'Password')
     smuser = config.get('SugoiMusic', 'User')
     smpass = config.get('SugoiMusic', 'Password')
-    smtorrentdir = config.get('Directories', 'SMTorrents')
-    jpstorrentdir = config.get('Directories', 'JPSTorrents')
-    htmldir = config.get('Directories', 'HTML')
+
+    output = HandleCfgOutputDirs(config)  # Get config dirs config, handle absolute/relative paths and create if not exist
 
     # JPS MyLoginSession vars
     loginUrl = "https://jpopsuki.eu/login.php"
