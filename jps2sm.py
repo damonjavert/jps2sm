@@ -860,7 +860,7 @@ def collate(torrentids):
             releasedataout['media'] = releasedata[2]
             releasedataout['audioformat'] = releasedata[0]
 
-            if releasedata[1].startswith('24bit'):
+            if re.match(r'24 ?[Bb]it', releasedata[1]):
                 releasedataout['bitrate'] = '24bit Lossless'
             else:
                 releasedataout['bitrate'] = releasedata[1]
