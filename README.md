@@ -13,7 +13,12 @@ jps2sm.py is a python3 script that will automatically gather data from JPS from 
 * Test your uploads with `--dryrun` mode.
 
 ## How to use
+
+Windows users can use the latest compiled binary (exe file) on the releases page: https://git.sugoimusic.me/Sugoimusic/jps2sm/releases
+
 ### Quickstart - for those familiar with python
+
+**jps2sm** requires python 3.4, although recent Dev and testing has been done using python 3.8, so it is storngly recommended that you use python 3.8.
 
 Add your JPS and SM login credentials to **jps2sm.cfg**, using **jps2sm.cfg.example** as a template.
 
@@ -26,7 +31,7 @@ A **group-url** looks like https://jpopsuki.eu/torrents.php?id=111284
 A **release-url** looks like https://jpopsuki.eu/torrents.php?id=111284&torrentid=148289
 
 Go to SM and download your torrent files and add them to your torrent client. Enjoy!
-#### Examples
+### Command line usage Examples
 To upload every release of AKB48 - 1830m:
 
     python3 jps2sm.py --urls "https://jpopsuki.eu/torrents.php?id=111284"
@@ -89,7 +94,17 @@ arguments:
 
 ## Help! I dont know all this python stuff
 * Mac Users: The best method is to install [Homebrew](https://brew.sh) and then `brew install python3`. See this guide: https://wsvincent.com/install-python3-mac/
-* Windows Users: If you are familiar using the shell, consider installing [cygwin](https://cygwin.com/install.html) and then select the python 3.6 packages. Or a python3 MSI installer can be found on the [offical python 3 downloads](https://www.python.org/downloads/windows/) page.
+* Windows Users: Use the compiled (exe) release: https://git.sugoimusic.me/Sugoimusic/jps2sm/releases
+
+## Development
+
+Pull requests are welcome!
+
+### Windows
+Windows 10 users can setup a Dev environment using [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10), for Windows 7 users the best option is to install [cygwin](https://cygwin.com/install.html) and then select the python 3.8 packages. Or a python3 MSI installer can be found on the [offical python 3 downloads](https://www.python.org/downloads/windows/) page.
+
+### Mac OSX
+Install [Homebrew](https://brew.sh) if you do not have it already and then `brew install python3`. See this guide: https://wsvincent.com/install-python3-mac/ 
 
 ## Roadmap
 
