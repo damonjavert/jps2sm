@@ -388,7 +388,12 @@ def getreleasedata(torrentids):
             # otherwise iterate through releasedata{} and remove what is not needed
             removetorrents.append(torrentid)
         if freeleechtext in release['slashdata']:
-            release['slashdata'].remove(freeleechtext)  # Remove Freeleech so it does not interfere with Remastered
+            release['slashdata'].remove(freeleechtext)  # Remove Freeleech whole match so it does not interfere with Remastered
+        for index, slashreleaseitem in enumerate(release['slashdata']):
+            if remaster_freeleech_removed := re.findall(r'(.*) - <strong>Freeleech!<\/strong>', slashreleaseitem):  # Handle Freeleech remastered torrents, issue #43
+                release['slashdata'][index] = f'{remaster_freeleech_removed[0]} - {torrentgroupdata.date[:4]}'  # Use the extracted value and append group JPS release year
+                if debug:
+                    print(f"Torrent {torrentid} is freeleech remastered, validated remasterdata to {release['slashdata'][index]}")
     for torrentid in removetorrents:
         del(releasedata[torrentid])
 
