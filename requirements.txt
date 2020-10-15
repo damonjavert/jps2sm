@@ -15,3 +15,4 @@ webencodings==0.5.1
 pymediainfo==4.1
 torrent-parser==0.3.0
 humanfriendly==4.18
+pyunpack==0.2.2
