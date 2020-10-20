@@ -2,7 +2,7 @@
 
 ### A project to migrate torrents from JPopSuki to SugoiMusic
 
-jps2sm.py is a python3 script that will automatically gather data from JPS from a given group url, release url(s) or userid's uploads/seeding torrents and iterate through all the data in and upload them to SM.
+jps2sm will automatically gather data from JPS from a given group url, release url(s) or userid's uploads/seeding torrents and iterate through all the data in and upload them to SM.
 
 ## Features
 * Create upload to SM by automatically retrieving all data on JPS, including english and original titles, group description, release information (format / meida / bitrate etc.), group images, contributing artists, original titles, mediainfo data and remaster information if applicable.
@@ -17,11 +17,13 @@ Windows and Mac users can use the latest compiled binary on the releases page: h
 
 ### Quickstart
 Download the binary release for your platform: https://git.sugoimusic.me/Sugoimusic/jps2sm/releases
+
 Extract the contents of the zip, add your JPS and SM login credentials to **jps2sm.cfg**
 
     jps2sm --help
 
 See Command line usge below
+
 The SM torrents are automatically downloaded to the $HOME/SMTorrents, or My Documents\SMTorrents if on Windows by default. Enjoy!
 
 ### Quickstart - for those familiar with python
@@ -38,9 +40,9 @@ Install modules and run the script:
     pip3 install -r requirements.txt
     python3 jps2sm.py --urls <group-url or release-url(s)>
 
-A **group-url** looks like https://jpopsuki.eu/torrents.php?id=111284
-A **release-url** looks like https://jpopsuki.eu/torrents.php?id=111284&torrentid=148289
-See Command line usage for batch processing options.
+* A **group-url** looks like https://jpopsuki.eu/torrents.php?id=111284
+* A **release-url** looks like https://jpopsuki.eu/torrents.php?id=111284&torrentid=148289
+* See Command line usage for batch processing options.
 
 ### Command line usage Examples
 To upload every release of AKB48 - 1830m:
@@ -106,7 +108,9 @@ arguments:
 
 ## Development
 Pull requests are welcome!
+
 It is strongly recommended to create a python virtual environment for your development. 
+
 See https://git.sugoimusic.me/Sugoimusic/jps2sm/issues for areas that you can contribute to.
 
 ### Windows
