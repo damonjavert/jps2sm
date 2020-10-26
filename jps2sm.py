@@ -219,9 +219,10 @@ def removehtmltags(text):
     clean = re.compile('<.*?>')
     return re.sub(clean, '', text)
 
+
 def get_group_descrption_bbcode(groupid):
     """
-    Retrieve original bbcode from edit group url
+    Retrieve original bbcode from edit group url and reformat any JPS style bbcode
 
     :param: groupid: JPS groupid to get group description with bbcode
     :return: bbcode: group description with bbcode
@@ -230,7 +231,10 @@ def get_group_descrption_bbcode(groupid):
     soup = BeautifulSoup(edit_group_page.text, 'html5lib')
     bbcode = soup.find("textarea", {"name": "body"}).string
 
-    return bbcode
+    bbcode_sanitised = re.sub(r'\[youtube=([^\]]+)]', r'[youtube]\1[/youtube]', bbcode)
+
+    return bbcode_sanitised
+
 
 def getauthkey():
     """
