@@ -1335,7 +1335,7 @@ if __name__ == "__main__":
             torrentids = value
             try:
                 torrentgroupdata = GetGroupData("https://jpopsuki.eu/torrents.php?id=%s" % groupid)
-                if torrentgroupdata.category == args.excfiltercategory:
+                if torrentgroupdata.category == args.exccategory:
                     if debug:
                         print(f'Excluding groupid {groupid} as it is {torrentgroupdata.category} group and these are being skipped')
                     continue
