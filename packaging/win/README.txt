@@ -24,7 +24,7 @@ To upload only the FLAC and MP3 320:
 jps2sm.exe --urls "https://jpopsuki.eu/torrents.php?id=111284&torrentid=148289 https://jpopsuki.eu/torrents.php?id=111284&torrentid=147830"
 
 To upload every release of AKB48 - 1830m, excluding the ISOs (in JPS ISO is considered an audio format):
-jps2sm.exe --urls "https://jpopsuki.eu/torrents.php?id=111284" --excfilteraudioformat ISO
+jps2sm.exe --urls "https://jpopsuki.eu/torrents.php?id=111284" --excaudioformat ISO
 
 To test upload all your personal uploads, <userid> is your JPS userid:
 jps2sm.exe --batchuser <userid> --batchuploaded --dryrun
@@ -43,11 +43,14 @@ FAQ:
 Help me! Its not working!
 Come to the SugoiMusic Discord where someone can help.
 
-Why are there so many files? Can everything be in one file?
-If all the required libraries are built into one packed exe file jps2sm becomes very slow.
+Why are there so many files? Can everything be in one exe file?
+If all the required libraries are built into one packed exe file jps2sm becomes very slow. Just ignore the extra files and run it as indicated. A nice and simple shortcut is created so you can run it from the root folder of the archive, to make it more intuitive on the command-line.
 
 Is there a GUI?
-No. It is not currently on the roadmaps but it could be done in the future
+No. It is not currently on the roadmap but it could be done in the future
+
+Could jps2sm be web-based?
+Yes it could be done potentially, using flask, and it is potentially not a particularly massive piece of work. This is actually far more likely to happen than a GUI. It is also not currently on the roadmap though.
 
 Does jps2sm send any login credentials to a 3rd-party?
 No, jps2sm only sends your JPS and SM credentials to the relevent trackers, no cloud / 3rd-party server is involved.
