@@ -29,7 +29,7 @@ from pyunpack import Archive
 from pathlib import Path
 
 
-__version__ = "1.3"
+__version__ = "1.4"
 
 
 class MyLoginSession:
@@ -984,7 +984,9 @@ def decide_ep(torrentfilename):
         if list(filter(file['path'][-1].lower().endswith, music_extensions)) and \
                 not any(substring in file['path'][-1].lower() for substring in off_vocal_phrases):
             #  Count music files which are not an off-vocal or instrumental
-            print(file['path'][-1])
+            if debug:
+                #Print each track for consideration
+                print(file['path'][-1])
             track_count += 1
 
     if track_count < 7:
