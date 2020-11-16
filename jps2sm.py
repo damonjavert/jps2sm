@@ -31,6 +31,9 @@ from pathlib import Path
 
 __version__ = "1.3"
 
+if not (sys.version_info[0] == 2 and sys.version_info[1] > 7):
+    sys.exit("Error: jps2sm requires python3.8 to run.")
+
 
 class MyLoginSession:
     """
