@@ -11,19 +11,10 @@ Created SugoiMusic uploads specified can either be:
 
 jps2sm is a command-line / console tool. There is currently no GUI.
 
-Quickstart - if you are familiar with the shell / terminal etc.
+Quickstart
 
-1. Extract the zip file
-2. Edit lib/jps2sm.cfg in your favourite text editor and enter your JPS and SM login details and save.
-3. From terminal run jps2sm --help to get started.
-
-Quickstart - for those not familiar with the shell / terminal etc.
-
-1. Extract the zip file, if you are using Finder you can do this simply by double-clicking it. Now double click to enter the newly created folder.
-2. Double click 'jps2sm.cfg', select Choose Application and choose TextEdit. Enter your JPS and SM login details using the template and save.
-3. Hold Command+Space and type 'terminal' press enter
-4. Change to the jps2sm directory, type 'cd <jps2sm dir>' this could be 'cd ~/Downloads/jps2sm-macosx-x86_64-x.x' (replacing x.x with your version)
-5. Type './jps2sm --help' to get started.
+1. Extract the archive and edit lib/jps2sm.cfg in your favourite text editor and enter your JPS and SM login details and save.
+2. From the terminal run ./jps2sm --help to get started.
 
 Command line usage Examples:
 
