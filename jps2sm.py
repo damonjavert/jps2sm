@@ -174,7 +174,7 @@ def getbulktorrentids(mode, user, first=1, last=None):
     linkbox = str(soup.select('#content #ajax_torrents .linkbox')[0])
     if not last:
         try:
-            last = re.findall(fr'page=([0-9]*)&amp;order_by=s3&amp;order_way=DESC&amp;type={mode}&amp;userid=(?:[0-9]*)&amp;disablegrouping=1\'\);"><strong> Last &gt;&gt;</strong>', linkbox)[0]
+            last = re.findall(fr'page=([0-9]*)&amp;order_by=s3&amp;order_way=DESC&amp;type={mode}&amp;userid=(?:[0-9]*)&amp;disablegrouping=1(?:\'\);|&amp;action=advanced)"><strong> Last &gt;&gt;</strong>', linkbox)[0]
         except:
             # There is only 1 page of uploads if the 'Last >>' link cannot be found
             last = 1
