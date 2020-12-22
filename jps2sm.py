@@ -1314,7 +1314,7 @@ if __name__ == "__main__":
     # JPS MyLoginSession vars
     loginUrl = "https://jpopsuki.eu/login.php"
     loginTestUrl = "https://jpopsuki.eu"
-    successStr = "Latest 5 Torrents"
+    successStr = '<div id="extra1"><span></span></div>'
     loginData = {'username': jpsuser, 'password': jpspass}
 
     # SM MyLoginSession vars
