@@ -3,8 +3,12 @@
 
 # Catch python2 being run here to get a relatively graceful error message, rather than a syntax error later on which causes confusion.
 import sys
-error_x, *error_y=1,2,3,4 # jps2sm requires requires python3, a SyntaxError here means you are running it in python2!
+error_x, *error_y=1,2,3,4 # jps2sm requires requires python3.8, a SyntaxError here means you are running it in python2!
 
+# Catch python < 3.8 being run here to get a relatively graceful error message, rather than a syntax error later on which causes confusion.
+print(walrus := "", end = '') # jps2sm requires python3.8, a SyntaxError ere means you are running it in python <= 3.7!
+
+# Standard version check that for now it pretty useless
 if sys.version_info < (3, 8):
     print("Error: jps2sm requires python 3.8 to run.", file=sys.stderr)
     exit(1)
