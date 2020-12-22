@@ -1,10 +1,17 @@
 # jps2sm.py is a python script that will automatically gather data from JPS from a given group url, release url,
 # or a user's uploaded torrents and iterate through them and upload them to SM.
 
+# Catch python2 being run here to get a relatively graceful error message, rather than a syntax error later on which causes confusion.
+import sys
+error_x, *error_y=1,2,3,4 # jps2sm requires requires python3, a SyntaxError here means you are running it in python2!
+
+if sys.version_info < (3, 8):
+    print("Error: jps2sm requires python 3.8 to run.", file=sys.stderr)
+    exit(1)
+
 # Standard library packages
 import re
 import os
-import sys
 import datetime
 import itertools
 import collections
@@ -28,14 +35,13 @@ import humanfriendly
 from pyunpack import Archive
 from pathlib import Path
 
-
 __version__ = "1.4"
-
 
 class MyLoginSession:
     """
     Taken from: https://stackoverflow.com/a/37118451/2115140
-    New features added in jps2sm originally by: https://stackoverflow.com/users/1150303/domtomcat
+    New features added in jps2sm
+    Originally by: https://stackoverflow.com/users/1150303/domtomcat
 
     a class which handles and saves login sessions. It also keeps track of proxy settings.
     It does also maintains a cache-file for restoring session data from earlier
