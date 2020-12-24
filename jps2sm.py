@@ -6,7 +6,7 @@ import sys
 error_x, *error_y=1,2,3,4 # jps2sm requires requires python3.8, a SyntaxError here means you are running it in python2!
 
 # Catch python < 3.8 being run here to get a relatively graceful error message, rather than a syntax error later on which causes confusion.
-print(walrus := "", end = '') # jps2sm requires python3.8, a SyntaxError ere means you are running it in python <= 3.7!
+print(walrus := "", end = '') # jps2sm requires python3.8, a SyntaxError here means you are running it in python <= 3.7!
 
 # Standard version check that for now it pretty useless
 if sys.version_info < (3, 8):
@@ -39,7 +39,7 @@ import humanfriendly
 from pyunpack import Archive
 from pathlib import Path
 
-__version__ = "1.4"
+__version__ = "1.4.1"
 
 class MyLoginSession:
     """
@@ -1271,23 +1271,23 @@ if __name__ == "__main__":
         excfiltermedia = args.excmedia
 
     if args.urls is None and args.batchuser is None:
-        print('JPS URL(s) nor batchuser specified')
-        sys.exit()
+        print('Error: Neither any JPS URL(s) (--urls) or batchuser (--batchuser) have been specified. See --help', file=sys.stderr)
+        sys.exit(1)
     elif args.urls:
         jpsurl = args.urls
     elif args.batchuser:
         if bool(args.batchstart) ^ bool(args.batchend):
-            print('You have specified an incomplete page range.')
-            sys.exit()
+            print('Error: You have specified an incomplete page range. See --help', file=sys.stderr)
+            sys.exit(1)
         elif bool(args.batchstart) and bool(args.batchend):
             batchstart = args.batchstart
             batchend = args.batchend
         if bool(args.batchuploaded) and bool(args.batchseeding):
-            print('You have specified both batch modes of operation - only one can be used at the same time.')
-            sys.exit()
+            print('Error: Both batch modes of operation specified - only one can be used at the same time. See --help', file=sys.stderr)
+            sys.exit(1)
         elif args.batchuploaded is False and args.batchseeding is False:
-            print('Batch user upload mode not specified.')
-            sys.exit()
+            print('Error: Batch user upload mode not specified. Choose --batchuploaded or --batchseeding. See --help', file=sys.stderr)
+            sys.exit(1)
 
         if args.batchuploaded:
             batchmode = "uploaded"
@@ -1304,7 +1304,7 @@ if __name__ == "__main__":
     try:
         open(configfile)
     except FileNotFoundError:
-        print('Error: cannot read cfg - enter your JPS/SM credentials in jps2sm.cfg and check jps2sm.cfg.example to see the syntax.')
+        print('Error: cannot read cfg - enter your JPS/SM credentials in jps2sm.cfg and check jps2sm.cfg.example to see the syntax.', file=sys.stderr)
         raise
 
     config.read(configfile)
