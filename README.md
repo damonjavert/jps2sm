@@ -13,7 +13,7 @@ jps2sm will automatically gather data from JPS from a given group url, release u
 * Test your uploads with `--dryrun` mode.
 
 ## How to use
-Windows and Mac users can use the latest compiled binary on the releases page: https://git.sugoimusic.me/Sugoimusic/jps2sm/releases
+Windows, Mac and Linux users can use the latest compiled binary on the releases page: https://git.sugoimusic.me/Sugoimusic/jps2sm/releases
 
 ### Quickstart
 Download the binary release for your platform: https://git.sugoimusic.me/Sugoimusic/jps2sm/releases
