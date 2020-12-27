@@ -518,7 +518,9 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
         data['sub'] = 'Hardsubs'  # We have subtitles! Subs in JPS FanSubs are usually Hardsubs so guess as this
         # TODO: Use torrent library to look for sub/srt files
     elif torrentgroupdata.category == "Album":  # Ascertain if upload is EP
-        data['type'] = Categories.JPStoSM[decide_ep(torrentpath)]
+	#fix to skip check if source medium is DVD/BD (so that they upload into the proper type instead) -- currently works
+	     if uploaddata['media'] != 'Bluray' and uploaddata['media'] != 'DVD':  #container != dvd/bd
+	         data['type'] = Categories.JPStoSM[decide_ep(torrentpath)]
 
     if 'type' not in data.keys():  # Set default value after all validation has been done
         data['type'] = Categories.JPStoSM[torrentgroupdata.category]
