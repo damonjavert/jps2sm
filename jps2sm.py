@@ -518,7 +518,7 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
         data['sub'] = 'Hardsubs'  # We have subtitles! Subs in JPS FanSubs are usually Hardsubs so guess as this
         # TODO: Use torrent library to look for sub/srt files
     elif torrentgroupdata.category == "Album":  # Ascertain if upload is EP
-        data['type'] = Categories.JPStoSM[decide_ep(torrentpath)]
+        data['type'] = Categories.JPStoSM[decide_ep(torrentpath), uploaddata]
 
     if 'type' not in data.keys():  # Set default value after all validation has been done
         data['type'] = Categories.JPStoSM[torrentgroupdata.category]
@@ -975,7 +975,7 @@ def downloaduploadedtorrents(torrentcount):
             print(f'Downloaded SM torrent as {torrentpath}')
 
 
-def decide_ep(torrentfilename):
+def decide_ep(torrentfilename, uploaddata):
     """
     Return if Album upload should be an EP or not.
     EPs are considered to have < 7 tracks, excluding off-vocals and uploaded to JPS as an Album
@@ -983,14 +983,21 @@ def decide_ep(torrentfilename):
     We assume we are being called only if Cat = Album
 
     :param torrentfilename:
+    :param uploaddata:
     :return: str: 'EP' or 'Album'
     """
+
+    if uploaddata['media'].lower() == 'bluray' or uploaddata['media'].lower() == 'dvd':
+        return 'Album'
 
     torrent_metadata = tp.parse_torrent_file(torrentfilename)
     music_extensions = ['.flac', '.mp3', '.ogg', '.alac', '.m4a', '.wav', '.wma', '.ra']
     off_vocal_phrases = ['off-vocal', 'offvocal', 'off vocal', 'inst.', 'instrumental', 'english ver', 'japanese ver', 'korean ver']
     track_count = 0
     for file in torrent_metadata['info']['files']:
+        if file['path'][-1].lower().endswith('.iso'):
+            return 'Album'
+
         if list(filter(file['path'][-1].lower().endswith, music_extensions)) and \
                 not any(substring in file['path'][-1].lower() for substring in off_vocal_phrases):
             #  Count music files which are not an off-vocal or instrumental
@@ -1276,6 +1283,12 @@ if __name__ == "__main__":
     elif args.urls:
         jpsurl = args.urls
     elif args.batchuser:
+        args.batchuser = args.batchuser.strip()
+
+        if args.batchuser.isnumeric() is False:
+            print('Error: "--batchuser" or short "-b" should be your profile ID. See --help', file=sys.stderr)
+            sys.exit(1)
+
         if bool(args.batchstart) ^ bool(args.batchend):
             print('Error: You have specified an incomplete page range. See --help', file=sys.stderr)
             sys.exit(1)
