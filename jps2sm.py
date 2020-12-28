@@ -995,7 +995,7 @@ def decide_ep(torrentfilename, uploaddata):
     off_vocal_phrases = ['off-vocal', 'offvocal', 'off vocal', 'inst.', 'instrumental', 'english ver', 'japanese ver', 'korean ver']
     track_count = 0
     for file in torrent_metadata['info']['files']:
-        if file['path'][-1].lower().endswith == '.iso':
+        if file['path'][-1].lower().endswith('.iso'):
             return 'Album'
 
         if list(filter(file['path'][-1].lower().endswith, music_extensions)) and \
