@@ -1276,6 +1276,12 @@ if __name__ == "__main__":
     elif args.urls:
         jpsurl = args.urls
     elif args.batchuser:
+        args.batchuser = args.batchuser.strip()
+
+        if args.batchuser.isnumeric() is False:
+            print('Error: "--batchuser" or short "-b" should be your profile ID. See --help', file=sys.stderr)
+            sys.exit(1)
+
         if bool(args.batchstart) ^ bool(args.batchend):
             print('Error: You have specified an incomplete page range. See --help', file=sys.stderr)
             sys.exit(1)
