@@ -18,6 +18,8 @@ Windows, Mac and Linux users can use the latest compiled binary on the releases 
 ### Quickstart
 Download the binary release for your platform: https://git.sugoimusic.me/Sugoimusic/jps2sm/releases
 
+**Due to bug #58, please ensure you have “Display original Artist/Album titles” switched OFF in your user settings!**
+
 Extract the contents of the zip, add your JPS and SM login credentials to **jps2sm.cfg**
 
     jps2sm --help
