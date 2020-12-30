@@ -39,7 +39,7 @@ import humanfriendly
 from pyunpack import Archive
 from pathlib import Path
 
-__version__ = "1.4.1"
+__version__ = "1.4.2"
 
 class MyLoginSession:
     """
@@ -1308,7 +1308,7 @@ if __name__ == "__main__":
         args.batchuser = args.batchuser.strip()
 
         if args.batchuser.isnumeric() is False:
-            print('Error: "--batchuser" or short "-b" should be your profile ID. See --help', file=sys.stderr)
+            print('Error: "--batchuser" or short "-b" should be your JPS profile ID. See --help', file=sys.stderr)
             sys.exit(1)
 
         if bool(args.batchstart) ^ bool(args.batchend):
