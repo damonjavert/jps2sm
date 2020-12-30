@@ -1364,15 +1364,16 @@ if __name__ == "__main__":
 
     s = MyLoginSession(loginUrl, loginData, loginTestUrl, successStr, debug=args.debug)
 
-    if detect_display_swapped_names(args.batchuser):
-        print("Error: 'Display original Artist/Album titles' is enabled in your JPS user profile. This must be disabled for jps2sm to run.", file=sys.stderr)
-        exit(1)
-
     if not dryrun:
         sm = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr, debug=args.debug)
         authkey = getauthkey()  # We only want this run ONCE per instance of the script
 
     if usermode:
+        if detect_display_swapped_names(args.batchuser):
+            print("Error: 'Display original Artist/Album titles' is enabled in your JPS user profile. This must be disabled for jps2sm to run.",
+                  file=sys.stderr)
+            exit(1)
+
         if batchstart and batchend:
             useruploads = getbulktorrentids(batchmode, batchuser, batchstart, batchend)
         else:
