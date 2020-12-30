@@ -163,6 +163,28 @@ class MyLoginSession:
         return res
 
 
+def detect_display_swapped_names(userid):
+    """
+    Detect if the user has original (Japanese/Chinese characters) names shown for Artists and Torrent groups in their torrents.php views
+    :param userid:
+    :return: True if enabled (bad) or False if disabled (OK)
+    """
+    user_profile_page = s.retrieveContent(f"https://jpopsuki.eu/user.php?action=edit&userid={userid}")
+    soup = BeautifulSoup(user_profile_page.text, 'html5lib')
+    user_form = str(soup.select('#content .thin #userform'))
+
+    # We do both string matches to be extra safe due to the havoc it causes if the user has original characters in torrent lists switched on
+    good_setting = user_form.find('<input id="browsejp" name="browsejp" type="checkbox"/>')
+    bad_setting = user_form.find('<input checked="checked" id="browsejp" name="browsejp" type="checkbox"/>')
+
+    if (good_setting != -1) and (bad_setting == -1):
+        # OK!
+        return False
+    else:
+        # Not OK!
+        return True
+
+
 def getbulktorrentids(mode, user, first=1, last=None):
     """
     Iterates through a users' uploads on JPS and gathers the groupids and corresponding torrentids and returns
@@ -1347,6 +1369,11 @@ if __name__ == "__main__":
         authkey = getauthkey()  # We only want this run ONCE per instance of the script
 
     if usermode:
+        if detect_display_swapped_names(args.batchuser):
+            print("Error: 'Display original Artist/Album titles' is enabled in your JPS user profile. This must be disabled for jps2sm to run.",
+                  file=sys.stderr)
+            exit(1)
+
         if batchstart and batchend:
             useruploads = getbulktorrentids(batchmode, batchuser, batchstart, batchend)
         else:
