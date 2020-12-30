@@ -35,7 +35,7 @@ def getauthkey():
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + __version__)
-    parser.add_argument('-e', '--email', help='Email address', type=str)
+    parser.add_argument('-e', '--emailfile', help='Email addresses file', type=str)
     args = parser.parse_args()
 
     # Get credentials from cfg file
@@ -58,18 +58,24 @@ if __name__ == "__main__":
     SMloginTestUrl = "https://sugoimusic.me/"
     SMsuccessStr = "Enabled users"
     SMloginData = {'username': smuser, 'password': smpass}
+    
+    authkey = getauthkey()
 
-    data = {
-        'action': 'take_invite',
-        'auth': getauthkey(),
-        'email': args.email,
-    }
+    with open(args.emailfile, "r") as a_file:
+        for line in a_file:
+            email = line.strip()
 
-    s = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr)
-    res = s.retrieveContent("https://sugoimusic.me/user.php?action=invite", "post", data)
+            data = {
+                'action': 'take_invite',
+                'auth': authkey,
+                'email': email,
+            }
 
-    error = re.findall('<h2>Error</h2>', res.text)
-    if error:
-        print(f'Error with {args.email}')
-    else:
-        print(f'Appears ok {args.email}')
+            s = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr)
+            res = s.retrieveContent("https://sugoimusic.me/user.php?action=invite", "post", data)
+
+            error = re.findall('<h2>Error</h2>', res.text)
+            if error:
+                print(f'Error with {email}')
+            else:
+                print(f'Appears ok {email}')
