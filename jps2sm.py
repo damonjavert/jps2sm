@@ -591,6 +591,7 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
 
     if dryrun or debug:
         dataexcmediainfo = {x: data[x] for x in data if x not in 'mediainfo'}
+        dataexcmediainfo['auth'] = '<scrubbed>'
         print(json.dumps(dataexcmediainfo, indent=2))  # Mediainfo shows too much data
     if not dryrun:
         SMres = sm.retrieveContent(uploadurl, "post", data, postDataFiles)
