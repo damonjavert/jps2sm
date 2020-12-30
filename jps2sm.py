@@ -1,3 +1,4 @@
+from pkg_resources import py2_warn
 # jps2sm.py is a python script that will automatically gather data from JPS from a given group url, release url,
 # or a user's uploaded torrents and iterate through them and upload them to SM.
 
@@ -540,7 +541,7 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
         data['sub'] = 'Hardsubs'  # We have subtitles! Subs in JPS FanSubs are usually Hardsubs so guess as this
         # TODO: Use torrent library to look for sub/srt files
     elif torrentgroupdata.category == "Album":  # Ascertain if upload is EP
-        data['type'] = Categories.JPStoSM[decide_ep(torrentpath), uploaddata]
+        data['type'] = Categories.JPStoSM[decide_ep(torrentpath, uploaddata)]
 
     if 'type' not in data.keys():  # Set default value after all validation has been done
         data['type'] = Categories.JPStoSM[torrentgroupdata.category]
