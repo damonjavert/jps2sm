@@ -1,4 +1,3 @@
-from pkg_resources import py2_warn
 # jps2sm.py is a python script that will automatically gather data from JPS from a given group url, release url,
 # or a user's uploaded torrents and iterate through them and upload them to SM.
 
