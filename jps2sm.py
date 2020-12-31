@@ -268,18 +268,34 @@ def get_group_descrption_bbcode(groupid):
     return bbcode_sanitised
 
 
-def getauthkey():
+def get_user_keys():
     """
-    Get SM session authkey for use by uploadtorrent() data dict.
+    Get SM session authkey and torrent_password_key for use by uploadtorrent()|download_sm_torrent() data dict.
     Uses SM login data
-
-    :return: authkey
     """
     smpage = sm.retrieveContent("https://sugoimusic.me/torrents.php?id=118")  # Arbitrary page on JPS that has authkey
     soup = BeautifulSoup(smpage.text, 'html5lib')
-    rel2 = str(soup.select('#content .thin .main_column .torrent_table tbody'))
-    authkey = re.findall('authkey=(.*)&amp;torrent_pass=', rel2)
-    return authkey
+    rel2 = str(soup.select_one('#torrent_details .group_torrent > td > span > .tooltip'))
+
+    return {
+        'authkey': re.findall('authkey=(.*)&amp;torrent_pass=', rel2)[0],
+        'torrent_password_key': re.findall(r"torrent_pass=(.+)\" title", rel2)[0]
+    }
+
+
+def download_sm_torrent(torrent_id):
+    file = s.retrieveContent(
+        'https://sugoimusic.me/torrents.php?action='
+        f'download&id={torrent_id}&authkey={authkey}&torrent_pass={torrent_password_key}'
+    )
+    name = get_valid_filename(
+        "SM %s - %s - %s.torrent" % (torrentgroupdata.artist, torrentgroupdata.title, torrent_id)
+    )
+    path = Path(output.file_dir['smtorrents'], name)
+    with open(path, "wb") as f:
+        f.write(file.content)
+
+    return name
 
 
 def decide_music_performance(artist, multiplefiles, duration):
@@ -599,7 +615,12 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
         if SMerrorTorrent:
             dupe = re.findall('torrentid=([0-9]+)">The exact same torrent file already exists on the site!</a>$', SMerrorTorrent[0])
             if dupe:
-                raise Exception(f'The exact same torrent file already exists on the site! See: https://sugoimusic.me/torrents.php?torrentid={dupe[0]}')
+                dupe_file_name = download_sm_torrent(dupe[0])
+                print(
+                    f'Torrent #{dupe[0]} already exists on SM.'
+                    f'The .torrent has been downloaded with name "{dupe_file_name}"'
+                )
+                return groupid
             else:
                 raise Exception(SMerrorTorrent[0])
 
@@ -1284,7 +1305,7 @@ class Categories:
 if __name__ == "__main__":
     args = getargs()
     # TODO consider calling args[] directly, we will then not need this line
-    dryrun = debug = excfilteraudioformat = excfiltermedia = usermode = batchstart = batchend = exccategory = None
+    dryrun = debug = excfilteraudioformat = excfiltermedia = usermode = batchstart = batchend = exccategory = torrent_password_key = None
 
     if args.dryrun:
         dryrun = True
@@ -1367,7 +1388,10 @@ if __name__ == "__main__":
 
     if not dryrun:
         sm = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr, debug=args.debug)
-        authkey = getauthkey()  # We only want this run ONCE per instance of the script
+        # We only want this run ONCE per instance of the script
+        userkeys = get_user_keys()
+        authkey = userkeys['authkey']
+        torrent_password_key = userkeys['torrent_password_key']
 
     if usermode:
         if detect_display_swapped_names(args.batchuser):
