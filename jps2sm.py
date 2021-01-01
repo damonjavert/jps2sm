@@ -8,7 +8,7 @@ error_x, *error_y=1,2,3,4 # jps2sm requires requires python3.8, a SyntaxError he
 # Catch python < 3.8 being run here to get a relatively graceful error message, rather than a syntax error later on which causes confusion.
 print(walrus := "", end = '') # jps2sm requires python3.8, a SyntaxError here means you are running it in python <= 3.7!
 
-# Standard version check that for now it pretty useless
+# Standard version check that for now is pretty useless
 if sys.version_info < (3, 8):
     print("Error: jps2sm requires python 3.8 to run.", file=sys.stderr)
     exit(1)
@@ -617,10 +617,10 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
             if dupe:
                 dupe_file_name = download_sm_torrent(dupe[0])
                 print(
-                    f'Torrent #{dupe[0]} already exists on SM.'
-                    f'The .torrent has been downloaded with name "{dupe_file_name}"'
+                    f'This torrent already exists on SugoiMusic - https://sugoimusic.me/torrents.php?torrentid={dupe[0]} '
+                    f'The .torrent has been downloaded with name "{Path(output.file_dir["smtorrents"], dupe_file_name)}"'
                 )
-                return groupid
+                raise Exception(f'The exact same torrent file already exists on the site! See: https://sugoimusic.me/torrents.php?torrentid={dupe[0]}')
             else:
                 raise Exception(SMerrorTorrent[0])
 
@@ -1456,7 +1456,7 @@ if __name__ == "__main__":
                   'keep this data safe and you can possibly retry with it in a later version:')
             print(useruploadscollateerrors)
         if user_upload_dupes:
-            print('The following SM torrentid(s) have already been uploaded to the site:')
+            print('The following SM torrentid(s) have already been uploaded to the site, but the SM torrents were downloaded so you can cross seed:')
             print(user_upload_dupes)
 
     else:
