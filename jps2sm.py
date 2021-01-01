@@ -1,4 +1,3 @@
-from pkg_resources import py2_warn
 # jps2sm.py is a python script that will automatically gather data from JPS from a given group url, release url,
 # or a user's uploaded torrents and iterate through them and upload them to SM.
 
@@ -980,6 +979,9 @@ def collate(torrentids):
 def guess_bitrate(raw_bitrate):
     raw_bitrate = raw_bitrate.lower()
 
+    if re.search(r"124 (vbr)", raw_bitrate) is not None:
+        return '_skip'
+
     if re.search(r"320 (vbr)", raw_bitrate) is not None:
         return 'Other'
 
@@ -1002,14 +1004,14 @@ def guess_bitrate(raw_bitrate):
     if re.search(r"24", raw_bitrate) is not None:
         return '24bit Lossless'
 
-    if re.search(r"192", raw_bitrate) is not None:
-        return '192'
-
     if re.search(r"hi-res", raw_bitrate) is not None:
         return 'Lossless'
 
     if re.search(r"128", raw_bitrate) is not None:
         return '128'
+
+    if re.search(r"192", raw_bitrate) is not None:
+        return '192'
 
     if re.search(r"lossless", raw_bitrate) is not None:
         return 'Lossless'
@@ -1031,6 +1033,12 @@ def guess_bitrate(raw_bitrate):
 
     if re.search(r"q8.x", raw_bitrate) is not None:
         return 'q8.x (VBR)'
+
+    if re.search(r"160", raw_bitrate) is not None:
+        return 'Other'
+
+    if re.search(r"other", raw_bitrate) is not None:
+        return 'Other'
 
     return '_skip'
 
