@@ -1020,7 +1020,7 @@ def guess_bitrate(raw_bitrate):
         return 'Lossless'
 
     if re.search(r"variable", raw_bitrate) is not None:
-        return 'Variable'
+        return 'Other'
 
     if re.search(r"v0", raw_bitrate) is not None:
         return 'V0 (VBR)'
