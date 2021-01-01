@@ -525,7 +525,14 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
             if language.lower() in torrentgroupdata.tagsall:
                 data['lang'] = language
     elif torrentgroupdata.category not in Categories.NonReleaseData:  # Music Category torrent
-        data['bitrate'] = uploaddata['bitrate']
+        music_bitrate = guess_bitrate(uploaddata['bitrate'])
+
+        if music_bitrate == '_skip':
+            text = uploaddata['bitrate']
+            print(f'Bitrate "{text}" is unsupported. Skipping torrent...')
+            return groupid
+
+        data['bitrate'] = music_bitrate
 
     if 'remastertitle' in uploaddata.keys():
         data['remaster'] = 'remaster'
@@ -967,6 +974,65 @@ def collate(torrentids):
                 setorigartist(artist, origartist)
 
     return torrentcount  # For use by downloaduploadedtorrents()
+
+
+# order matters
+def guess_bitrate(raw_bitrate):
+    raw_bitrate = raw_bitrate.lower()
+
+    if re.search(r"320 (vbr)", raw_bitrate) is not None:
+        return 'Other'
+
+    if re.search(r"256 (vbr)", raw_bitrate) is not None:
+        return 'APS (VBR)'
+
+    if re.search(r"320", raw_bitrate) is not None:
+        return '320'
+
+    if re.search(r"dsd", raw_bitrate) is not None:
+        return 'Lossless'
+
+    if re.search(r"256", raw_bitrate) is not None:
+        return '256'
+
+    # V1 LAME MP3 preset
+    if re.search(r"224", raw_bitrate) is not None:
+        return 'V1 (VBR)'
+
+    if re.search(r"24", raw_bitrate) is not None:
+        return '24bit Lossless'
+
+    if re.search(r"192", raw_bitrate) is not None:
+        return '192'
+
+    if re.search(r"hi-res", raw_bitrate) is not None:
+        return 'Lossless'
+
+    if re.search(r"128", raw_bitrate) is not None:
+        return '128'
+
+    if re.search(r"lossless", raw_bitrate) is not None:
+        return 'Lossless'
+
+    if re.search(r"mqa", raw_bitrate) is not None:
+        return 'Lossless'
+
+    if re.search(r"variable", raw_bitrate) is not None:
+        return 'Variable'
+
+    if re.search(r"v0", raw_bitrate) is not None:
+        return 'V0 (VBR)'
+
+    if re.search(r"v1", raw_bitrate) is not None:
+        return 'V1 (VBR)'
+
+    if re.search(r"v2", raw_bitrate) is not None:
+        return 'V2 (VBR)'
+
+    if re.search(r"q8.x", raw_bitrate) is not None:
+        return 'q8.x (VBR)'
+
+    return '_skip'
 
 
 def downloaduploadedtorrents(torrentcount):
