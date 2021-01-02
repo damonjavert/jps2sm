@@ -36,6 +36,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + __version__)
     parser.add_argument('-e', '--emailfile', help='Email addresses file', type=str)
+    #parser.add_argument('-d', '--debug', help='Debug', type=str)
+
     args = parser.parse_args()
 
     # Get credentials from cfg file
@@ -60,6 +62,7 @@ if __name__ == "__main__":
     SMloginData = {'username': smuser, 'password': smpass}
     
     authkey = getauthkey()
+    print(authkey)
 
     with open(args.emailfile, "r") as a_file:
         for line in a_file:
@@ -78,4 +81,9 @@ if __name__ == "__main__":
             if error:
                 print(f'Error with {email}')
             else:
-                print(f'Appears ok {email}')
+                good = re.findall(email, res.text)
+                if good:
+                    print(f'Likely ok - found email {email}')
+                else:
+                    print(f'No error text but no email in response either! {email}')
+                #print(res.text)
