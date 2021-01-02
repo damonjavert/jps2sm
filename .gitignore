@@ -2,3 +2,7 @@ SMuploadresult.*
 *.torrent
 jps2sm.cfg
 *session.dat
+
+.idea
+venv
+__pycache__/
