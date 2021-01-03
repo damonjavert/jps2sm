@@ -20,7 +20,7 @@ from urllib.parse import urlparse
 import html5lib
 from bs4 import BeautifulSoup
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 def getauthkey():
     SMshome = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr)
@@ -34,7 +34,7 @@ def getauthkey():
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + __version__)
-    parser.add_argument('-t', '--torrentid', help='SugoiMusic torrentid', type=str)
+    parser.add_argument('-t', '--torrentfile', help='File with torrentids in line break delimited', type=str)
     args = parser.parse_args()
 
     # Get credentials from cfg file
@@ -58,19 +58,25 @@ if __name__ == "__main__":
     SMsuccessStr = "Enabled users"
     SMloginData = {'username': smuser, 'password': smpass}
 
-    data = {
-        'action': 'takedelete',
-        'auth': getauthkey(),
-        'torrentid': args.torrentid,
-        'reason': 'Other',
-        'extra': f'Mass delete from deletetorrent.py'
-    }
+    authkey = getauthkey()
 
-    s = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr)
-    res = s.retrieveContent("https://sugoimusic.me/torrents.php", "post", data)
+    with open(args.torrentfile, "r") as a_file:
+        for line in a_file:
+            torrentid = line.strip()
 
-    deletesuccess = re.findall('Torrent was successfully (.*)\.', res.text)
-    if deletesuccess:
-        print(f'Torrent was successfully {deletesuccess[0]}')
-    else:
-        print(f'Unknown error, check https://sugoimusic.me/log.php?search=Torrent+{args.torrentid}')
+            data = {
+                'action': 'takedelete',
+                'auth': authkey,
+                'torrentid': torrentid,
+                'reason': 'Other',
+                'extra': f'Bulk deleted with deletetorrent.py.'  # This msg goes in log.php, the user will probably not see this.
+            }
+
+            s = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr)
+            res = s.retrieveContent("https://sugoimusic.me/torrents.php", "post", data)
+
+            deletesuccess = re.findall('Torrent was successfully (.*)\.', res.text)
+            if deletesuccess:
+                print(f'Torrent was successfully {deletesuccess[0]}')
+            else:
+                print(f'Unknown error, check https://sugoimusic.me/log.php?search=Torrent+{args.torrentid}')
