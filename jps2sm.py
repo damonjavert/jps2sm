@@ -1106,6 +1106,41 @@ def get_mediainfo_duration(filename):
                     print(f'Mediainfo duration: {filename} {track.duration}')
                 return float(track.duration)  # time in ms
 
+
+def get_media_location(media_name, directory):
+    """
+    Find the location of the directory or file of the source data for getmediainfo()
+
+    :param media_name: str name of the file or directory
+    :param directory: boolean true if dir, false if file
+    :param fall_back_file: str fall back search cor
+
+    Uses global 'media_roots'
+
+    :return: full path to file/dir
+    """
+
+    # Find the file/dir and stop on the first hit, hopefully OS-side disk cache will mean this will not take too long
+
+    media_location = None
+
+    for media_dir_search in media_roots:
+        for dirname, dirnames, filenames in os.walk(media_dir_search):
+            if directory is True:
+                for subdirname in dirnames:
+                    if subdirname == media_name:
+                        media_location = os.path.join(dirname, subdirname)
+                        return Path(media_dir_search, media_location)
+            else:
+                for filename in filenames:
+                    if filename == media_name:
+                        media_location = os.path.join(dirname, filename)
+                        return Path(media_dir_search, media_location)
+
+    if media_location is None:
+        raise Exception(f'Mediainfo error - file/directory not found: {media_name} in any of the MediaDirectories specified: {media_roots}')
+
+
 def getmediainfo(torrentfilename):
     """
     Get filename(s) of video files in the torrent and run mediainfo and capture the output, extract if DVD found (Blurays not yet supported)
@@ -1125,38 +1160,42 @@ def getmediainfo(torrentfilename):
     releasedataout = {}
     releasedataout['duration'] = 0
 
-    # TODO Need to cleanup the logic to create an overall filename list to parse insteaad of the 3-way duplication we currently have
+    # TODO Need to cleanup the logic to create an overall filename list to parse instead of the 3-way duplication we currently have
 
     if 'files' in torrentmetadata['info'].keys():  # Multiple files
         directory = torrentname
+        print(f'According to the torrent the dir is {directory}')
+        directory_path = get_media_location(directory, True)
+        print(f'dir is {directory_path}')
         for file in torrentmetadata['info']['files']:
             if len(torrentmetadata['info']['files']) == 1:  # This might never happen, it could be just info.name if so
                 filename = os.path.join(*file['path'])
             else:
                 releasedataout['multiplefiles'] = True
-                filename = os.path.join(*[directory, *file['path']])  # Directory if >1 file
+                filename = os.path.join(*[directory_path, *file['path']])  # Each file in the directory of source data for the torrent
 
             mediainfosall += str(MediaInfo.parse(filename, text=True))
             releasedataout['duration'] += get_mediainfo_duration(filename)
             # Get biggest file and mediainfo on this to set the fields for the release
             maxfile = max(torrentmetadata['info']['files'], key=lambda x: x['length'])  # returns {'length': int, 'path': [str]} of largest file
-            fileforsmfields = os.path.join(*[directory, *maxfile['path']])  # Assume the largest file is the main file that should populate SM upload fields
+            fileforsmfields = Path(*[directory_path, *maxfile['path']])  # Assume the largest file is the main file that should populate SM upload fields
 
     else:  # Single file
         releasedataout['multiplefiles'] = False
         filename = torrentname
+        file_path = get_media_location(filename, False)
         if debug:
-            print(f'Filename for mediainfo: {filename}')
-        mediainfosall += str(MediaInfo.parse(filename, text=True))
-        releasedataout['duration'] += get_mediainfo_duration(filename)
-        fileforsmfields = torrentmetadata['info']['name']
+            print(f'Filename for mediainfo: {file_path}')
+        mediainfosall += str(MediaInfo.parse(file_path, text=True))
+        releasedataout['duration'] += get_mediainfo_duration(file_path)
+        fileforsmfields = file_path
 
-    if fileforsmfields.lower().endswith('.iso'):  # Extract the ISO and run mediainfo against appropriate files
+    if fileforsmfields.suffix == '.iso':  # Extract the ISO and run mediainfo against appropriate files
         releasedataout['container'] = 'ISO'
-        print(f'Extracting ISO {fileforsmfields} to obtain mediainfo on it...')
+        print(f'Extracting ISO {file_path} to obtain mediainfo on it...')
         isovideoextensions = ('.vob', '.m2ts')
         tempdir = tempfile.TemporaryDirectory()
-        Archive(fileforsmfields).extractall(tempdir.name)
+        Archive(file_path).extractall(tempdir.name)
 
         dir_files = []
         for root, subFolder, files in os.walk(tempdir.name):
@@ -1167,13 +1206,13 @@ def getmediainfo(torrentfilename):
                     mediainfosall += str(MediaInfo.parse(filenamewithpath, text=True))
                     releasedataout['duration'] += get_mediainfo_duration(filenamewithpath)
 
-
         filesize = lambda f: os.path.getsize(f)
         fileforsmfields = sorted(dir_files, key=filesize)[-1]  # Assume the largest file is the main file that should populate SM upload fields
 
+    # Now we have decided which file will have its mediainfo parsed for SM fields, parse its mediainfo
     mediainforeleasedata = MediaInfo.parse(fileforsmfields)
 
-    if fileforsmfields.lower().endswith('.iso'):
+    if Path(fileforsmfields).suffix == '.iso':
         tempdir.cleanup()
 
     for track in mediainforeleasedata.tracks:
@@ -1384,7 +1423,7 @@ if __name__ == "__main__":
         usermode = True
         batchuser = args.batchuser
 
-    # Get credentials from cfg file
+    # Get configuration
     scriptdir = os.path.dirname(os.path.abspath(sys.argv[0]))
     config = configparser.ConfigParser()
     configfile = scriptdir + '/jps2sm.cfg'
@@ -1414,6 +1453,20 @@ if __name__ == "__main__":
     SMsuccessStr = "Enabled users"
     SMloginData = {'username': smuser, 'password': smpass}
 
+    if args.mediainfo:
+        try:
+            media_roots = [x.strip() for x in config.get('Media', 'MediaDirectories').split(',')]  # Remove whitespace after comma if any
+            for media_dir in media_roots:
+                if not os.path.exists(media_dir):
+                    print(f'Error: Media directory {media_dir} does not exist. Check your configuration in jps2sm.cfg.', file=sys.stderr)
+                    sys.exit(1)
+                if not os.path.isdir(media_dir):
+                    print(f'Error: Media directory {media_dir} is a file and not a directory. Check your configuration in jps2sm.cfg.', file=sys.stderr)
+                    sys.exit(1)
+        except configparser.NoSectionError:
+            print('Error: --mediainfo requires you confgure MediaDirectories in jps2sm.cfg for mediainfo to find your file(s).', file=sys.stderr)
+            sys.exit(1)
+
     s = MyLoginSession(loginUrl, loginData, loginTestUrl, successStr, debug=args.debug)
 
     if not dryrun:
@@ -1436,6 +1489,7 @@ if __name__ == "__main__":
         useruploadsgrouperrors = collections.defaultdict(list)
         useruploadscollateerrors = collections.defaultdict(list)
         user_upload_dupes = []
+        user_upload_source_data_not_found = []
 
         for key, value in useruploads.items():
             groupid = key
@@ -1467,6 +1521,11 @@ if __name__ == "__main__":
                     print(exc)
                     sm_dupe_torrentid = re.findall(r'The exact same torrent file already exists on the site! See: https://sugoimusic\.me/torrents\.php\?torrentid=([0-9]+)', str(exc))
                     user_upload_dupes.append(sm_dupe_torrentid)
+                elif str(exc).startswith('Could not run mediainfo on:'):
+                    print(exc)
+                    # Need to get filename that was not found
+                    missing_file = re.findall(r'Mediainfo error - file/directory not found: (.*)$', str(exc))
+                    user_upload_source_data_not_found.append(missing_file)
                 else:
                     print('Error with collating/retrieving release data for groupid %s torrentid(s) %s, skipping upload' % (groupid, ",".join(torrentids)))
                     useruploadscollateerrors[groupid] = torrentids
@@ -1488,6 +1547,9 @@ if __name__ == "__main__":
         if user_upload_dupes:
             print('The following SM torrentid(s) have already been uploaded to the site, but the SM torrents were downloaded so you can cross seed:')
             print(user_upload_dupes)
+        if user_upload_source_data_not_found:
+            print('The following file(s)/dir(s) were not found in your MediaDirectories specified in jps2sm.cfg and the upload was skipped:')
+            print(user_upload_source_data_not_found)
 
     else:
         # Standard non-batch upload using --urls
