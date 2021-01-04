@@ -3,6 +3,9 @@
 
 # Catch python2 being run here to get a relatively graceful error message, rather than a syntax error later on which causes confusion.
 import sys
+
+from utils import split_artists
+
 error_x, *error_y=1,2,3,4 # jps2sm requires requires python3.8, a SyntaxError here means you are running it in python2!
 
 # Catch python < 3.8 being run here to get a relatively graceful error message, rather than a syntax error later on which causes confusion.
@@ -663,6 +666,7 @@ class GetGroupData:
             artistlinelinktext = str(artistlinelink[0])
             self.artist = re.findall('<a[^>]+>(.*)<', artistlinelinktext)[0]
             print(f'Artist: {self.artist}')
+            list_of_artists = split_artists(self.artist)
         except IndexError:  # Cannot find artist
             if self.category == "Pictures":
                 # JPS allows Picture torrents to have no artist set, in this scenario try to infer the artist by examining the text

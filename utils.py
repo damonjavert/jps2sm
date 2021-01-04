@@ -1,4 +1,19 @@
-from typing import AnyStr, re
+import functools
+from typing import AnyStr, re, List
+
+
+def split_artists(artist: str) -> List[str]:
+    """
+    Splits the artist string on the specified delimiters.
+
+            Parameters:
+                    artist (str): A string containing artists
+            Returns:
+                    list (List(str)): List of artists
+    """
+    replacements = ('-', ',', 'x', '&')
+    artists = functools.reduce(lambda s, sep: s.replace(sep, ' '), replacements, artist)
+    return artists.split()
 
 
 def get_valid_filename(s: str) -> AnyStr:
