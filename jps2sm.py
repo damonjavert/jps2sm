@@ -203,6 +203,8 @@ def getbulktorrentids(mode, user, first=1, last=None):
     res = s.retrieveContent(f"https://jpopsuki.eu/torrents.php?type={mode}&userid={user}")
     soup = BeautifulSoup(res.text, 'html5lib')
 
+    time.sleep(5)  # Sleep as otherwise we hit JPS browse quota
+
     linkbox = str(soup.select('#content #ajax_torrents .linkbox')[0])
     if not last:
         try:
@@ -1285,6 +1287,23 @@ def getmediainfo(torrentfilename, media):
 
     return mediainfosall, releasedataout
 
+def get_jps_user_id():
+    """
+    Returns the JPopSuki user id
+    :return: int: user id
+    """
+
+    res = s.retrieveContent("https://jpopsuki.eu/")
+
+    soup = BeautifulSoup(res.text, 'html5lib')
+
+    href = soup.select('.username')[0]['href']
+
+    id = re.match(r"user\.php\?id=(\d+)", href).group(1)
+
+    time.sleep(5)  # Sleep as otherwise we hit JPS browse quota
+
+    return int(str(id))
 
 def getargs():
     parser = argparse.ArgumentParser()
@@ -1293,8 +1312,8 @@ def getargs():
     parser.add_argument("-u", "--urls", help="JPS URL for a group, or multiple individual releases URLs to be added to the same group", type=str)
     parser.add_argument("-n", "--dryrun", help="Just parse url and show the output, do not add the torrent to SM", action="store_true")
     parser.add_argument("-b", "--batchuser", help="User id for batch user operations")
-    parser.add_argument("-U", "--batchuploaded", help="(Batch mode only) Upload all releases uploaded by user id specified by --batchuser", action="store_true")
-    parser.add_argument("-S", "--batchseeding", help="(Batch mode only) Upload all releases currently seeding by user id specified by --batchuser", action="store_true")
+    parser.add_argument("-U", "--batchuploaded", help="(Batch mode only) Upload all releases uploaded by you or, if provided, user id specified by --batchuser", action="store_true")
+    parser.add_argument("-S", "--batchseeding", help="(Batch mode only) Upload all releases currently seeding by you or, if provided, user id specified by --batchuser", action="store_true")
     parser.add_argument("-s", "--batchstart", help="(Batch mode only) Start at this page", type=int)
     parser.add_argument("-e", "--batchend", help="(Batch mode only) End at this page", type=int)
     parser.add_argument("-exc", "--exccategory", help="(Batch mode only) Exclude a JPS category from upload", type=str)
@@ -1409,17 +1428,22 @@ if __name__ == "__main__":
     if args.excmedia:
         excfiltermedia = args.excmedia
 
-    if args.urls is None and args.batchuser is None:
-        print('Error: Neither any JPS URL(s) (--urls) or batchuser (--batchuser) have been specified. See --help', file=sys.stderr)
+    if args.urls is None and not (bool(args.batchuploaded) or bool(args.batchseeding)):
+        print('Error: Neither any JPS URL(s) (--urls) or batch parameters (--batchuploaded or --batchseeding) have been specified. See --help', file=sys.stderr)
+        sys.exit(1)
+    elif args.urls is not None and (bool(args.batchuploaded) or bool(args.batchseeding)):
+        print('Error: Both the JPS URL(s) (--urls) and batch parameters (--batchuploaded or --batchseeding) have been specified, but only one is allowed.', file=sys.stderr)
         sys.exit(1)
     elif args.urls:
         jpsurl = args.urls
-    elif args.batchuser:
-        args.batchuser = args.batchuser.strip()
+    elif bool(args.batchuploaded) or bool(args.batchseeding):
 
-        if args.batchuser.isnumeric() is False:
-            print('Error: "--batchuser" or short "-b" should be your JPS profile ID. See --help', file=sys.stderr)
-            sys.exit(1)
+        batchuser = None
+        if args.batchuser:
+            if args.batchuser.isnumeric() is False:
+                print('Error: "--batchuser" or short "-b" should be your JPS profile ID. See --help', file=sys.stderr)
+                sys.exit(1)
+            batchuser = int(args.batchuser)
 
         if bool(args.batchstart) ^ bool(args.batchend):
             print('Error: You have specified an incomplete page range. See --help', file=sys.stderr)
@@ -1430,17 +1454,15 @@ if __name__ == "__main__":
         if bool(args.batchuploaded) and bool(args.batchseeding):
             print('Error: Both batch modes of operation specified - only one can be used at the same time. See --help', file=sys.stderr)
             sys.exit(1)
-        elif args.batchuploaded is False and args.batchseeding is False:
-            print('Error: Batch user upload mode not specified. Choose --batchuploaded or --batchseeding. See --help', file=sys.stderr)
-            sys.exit(1)
 
         if args.batchuploaded:
             batchmode = "uploaded"
         elif args.batchseeding:
             batchmode = "seeding"
+        else:
+            raise RuntimeError("Expected some batch mode to be set")
 
         usermode = True
-        batchuser = args.batchuser
 
     # Get configuration
     scriptdir = os.path.dirname(os.path.abspath(sys.argv[0]))
@@ -1495,12 +1517,17 @@ if __name__ == "__main__":
         authkey = userkeys['authkey']
         torrent_password_key = userkeys['torrent_password_key']
 
-    if usermode:
-        if detect_display_swapped_names(args.batchuser):
-            print("Error: 'Display original Artist/Album titles' is enabled in your JPS user profile. This must be disabled for jps2sm to run.",
-                  file=sys.stderr)
-            sys.exit(1)
+    jps_user_id = get_jps_user_id()
+    if debug:
+        print("JPopsuki user id is %d" % jps_user_id)
 
+    if detect_display_swapped_names(jps_user_id):
+        print("Error: 'Display original Artist/Album titles' is enabled in your JPS user profile. This must be disabled for jps2sm to run.",
+              file=sys.stderr)
+        sys.exit(1)
+
+    if usermode:
+        batchuser = batchuser or jps_user_id
         if batchstart and batchend:
             useruploads = getbulktorrentids(batchmode, batchuser, batchstart, batchend)
         else:
