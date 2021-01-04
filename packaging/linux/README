@@ -45,7 +45,7 @@ Help me! Its not working!
 Come to the SugoiMusic Discord where someone can help.
 
 Why are there so many files? Can everything be in one file?
-If all the required libraries are built into one packed file jps2sm becomes very slow. Just ignore the extra files and run it as indicated. A nice and simple shortcut is created so you can run it from the root folder of the archive, to make it more intuitive on the command-line.
+If all the required libraries are built into one packed file jps2sm becomes very slow. Just ignore the extra files and run it as indicated. A nice and simple wrapper script is created so you can run it from the root folder of the archive, to make it more intuitive on the command-line.
 
 Is there a GUI?
 No. It is not currently on the roadmap but it could be done in the future
