@@ -486,12 +486,21 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
     if debug:
         print(uploaddata)
 
+    # TODO Most of this can be in getmediainfo()
     if args.mediainfo:
-        data['mediainfo'], releasedatamediainfo = getmediainfo(torrentpath)
-        data.update(releasedatamediainfo)
-        if 'duration' in data.keys() and data['duration'] > 1:
-            duration_friendly_format = humanfriendly.format_timespan(datetime.timedelta(seconds=int(data['duration']/1000)))
-            data['album_desc'] += f"\n\nDuration: {duration_friendly_format}"
+        try:
+            data['mediainfo'], releasedatamediainfo = getmediainfo(torrentpath)
+            data.update(releasedatamediainfo)
+            if 'duration' in data.keys() and data['duration'] > 1:
+                duration_friendly_format = humanfriendly.format_timespan(datetime.timedelta(seconds=int(data['duration']/1000)))
+                data['album_desc'] += f"\n\nDuration: {duration_friendly_format} - {str(data['duration'])}ms"
+        except Exception as mediainfo_exc:
+            if not str(mediainfo_exc).startswith('Mediainfo error - file/directory not found'):
+                raise
+            elif torrentgroupdata.category in Categories.Video:
+                raise  # Only allow Video torrents to fail without mediainfo
+            if debug:
+                print(f'Skipping exception on mediainfo failing as {torrentgroupdata.title} is not a Video category.')
 
     if torrentgroupdata.category not in Categories.NonReleaseData:
         data['media'] = uploaddata['media']
@@ -562,15 +571,12 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
         data['type'] = Categories.JPStoSM[torrentgroupdata.category]
 
     # Now that all Category validation is complete decide if we should strip some mediainfo data
-    # Categories where mediainfo gathered data should be stripped if we have it, must match indices in Categories.SM
-    SMCategoryIDs_strip_all_mediainfo = (0, 1, 2, 11)  # Album, EP, Single, Misc
-    SMCategoryIDs_strip_all_exc_resolution = 10  # Pictures
     mediainfo_non_resolution = ('container', 'mediainfo')
     mediainfo_resolution = ('ressel', 'resolution')
-    if args.mediainfo and data['type'] in SMCategoryIDs_strip_all_mediainfo:
+    if args.mediainfo and data['type'] in Categories.SM_StripAllMediainfo:
         for field in (mediainfo_non_resolution + mediainfo_resolution):
             data.pop(field, None)
-    elif args.mediainfo and data['type'] == SMCategoryIDs_strip_all_exc_resolution:
+    elif args.mediainfo and data['type'] == Categories.SM_StripAllMediainfoExcResolution:
         for field in mediainfo_non_resolution:
             data.pop(field, None)
 
@@ -1123,6 +1129,7 @@ def get_media_location(media_name, directory):
     # Find the file/dir and stop on the first hit, hopefully OS-side disk cache will mean this will not take too long
 
     media_location = None
+    print(f'Searching for {media_name}...')
 
     for media_dir_search in media_roots:
         for dirname, dirnames, filenames in os.walk(media_dir_search):
@@ -1165,20 +1172,20 @@ def getmediainfo(torrentfilename):
     if 'files' in torrentmetadata['info'].keys():  # Multiple files
         directory = torrentname
         print(f'According to the torrent the dir is {directory}')
-        directory_path = get_media_location(directory, True)
-        print(f'dir is {directory_path}')
+        file_path = get_media_location(directory, True)
+        print(f'dir is {file_path}')
         for file in torrentmetadata['info']['files']:
             if len(torrentmetadata['info']['files']) == 1:  # This might never happen, it could be just info.name if so
                 filename = os.path.join(*file['path'])
             else:
                 releasedataout['multiplefiles'] = True
-                filename = os.path.join(*[directory_path, *file['path']])  # Each file in the directory of source data for the torrent
+                filename = os.path.join(*[file_path, *file['path']])  # Each file in the directory of source data for the torrent
 
             mediainfosall += str(MediaInfo.parse(filename, text=True))
             releasedataout['duration'] += get_mediainfo_duration(filename)
             # Get biggest file and mediainfo on this to set the fields for the release
             maxfile = max(torrentmetadata['info']['files'], key=lambda x: x['length'])  # returns {'length': int, 'path': [str]} of largest file
-            fileforsmfields = Path(*[directory_path, *maxfile['path']])  # Assume the largest file is the main file that should populate SM upload fields
+            fileforsmfields = Path(*[file_path, *maxfile['path']])  # Assume the largest file is the main file that should populate SM upload fields
 
     else:  # Single file
         releasedataout['multiplefiles'] = False
@@ -1211,6 +1218,9 @@ def getmediainfo(torrentfilename):
 
     # Now we have decided which file will have its mediainfo parsed for SM fields, parse its mediainfo
     mediainforeleasedata = MediaInfo.parse(fileforsmfields)
+    # Remove path to file in case it reveals usernames etc.
+    replacement = str(Path(file_path).parent)
+    mediainfosall = mediainfosall.replace(replacement, '')
 
     if Path(fileforsmfields).suffix == '.iso':
         tempdir.cleanup()
@@ -1259,6 +1269,8 @@ def getmediainfo(torrentfilename):
         if track.track_type == 'Audio' or track.track_type == 'Audio #1':  # Handle multiple audio streams, we just get data from the first for now
             if track.format in ["AAC", "DTS", "PCM", "AC3"]:
                 releasedataout['audioformat'] = track.format
+            elif track.format == "AC-3":
+                releasedataout['audioformat'] = "AC3"
             elif track.format == "MPEG Audio" and track.format_profile == "Layer 3":
                 releasedataout['audioformat'] = "MP3"
             elif track.format == "MPEG Audio" and track.format_profile == "Layer 2":
@@ -1361,7 +1373,7 @@ class Categories:
         'Misc': 11,
     }
 
-    # Video = ('Bluray', 'DVD', 'PV', 'TV-Music', 'TV-Variety', 'TV-Drama', 'Music Performance')  # was VideoCategories
+    Video = ('Bluray', 'DVD', 'PV', 'TV-Music', 'TV-Variety', 'TV-Drama', 'Music Performance')
 
     # JPS Categories where release date cannot be entered and therefore need to be processed differently
     NonDate = ('TV-Music', 'TV-Variety', 'TV-Drama', 'Fansubs', 'Pictures', 'Misc')
@@ -1369,6 +1381,9 @@ class Categories:
     NonReleaseData = ('Pictures', 'Misc')
     # Music and Music Video Torrents, for category validation. This must match the cateogry headers in JPS for an artist, hence they are in plural
     NonTVCategories = ('Albums', 'Singles', 'DVDs', 'PVs')
+    # Categories that should have some of their mediainfo stripped if present, must match indices in Categories.SM
+    SM_StripAllMediainfo = (0, 1, 2, 11)  # Album, EP, Single, Misc - useful to have duration if we have it added to the description
+    SM_StripAllMediainfoExcResolution = 10  # Pictures - useful to have resolution if we have it
 
 
 if __name__ == "__main__":
@@ -1521,10 +1536,10 @@ if __name__ == "__main__":
                     print(exc)
                     sm_dupe_torrentid = re.findall(r'The exact same torrent file already exists on the site! See: https://sugoimusic\.me/torrents\.php\?torrentid=([0-9]+)', str(exc))
                     user_upload_dupes.append(sm_dupe_torrentid)
-                elif str(exc).startswith('Could not run mediainfo on:'):
+                elif str(exc).startswith('Mediainfo error - file/directory not found'):
                     print(exc)
                     # Need to get filename that was not found
-                    missing_file = re.findall(r'Mediainfo error - file/directory not found: (.*)$', str(exc))
+                    missing_file = re.findall(r'Mediainfo error - file/directory not found: (.+) in any of the MediaDirectories', str(exc))
                     user_upload_source_data_not_found.append(missing_file)
                 else:
                     print('Error with collating/retrieving release data for groupid %s torrentid(s) %s, skipping upload' % (groupid, ",".join(torrentids)))
