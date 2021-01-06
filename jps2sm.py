@@ -486,12 +486,19 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
     if debug:
         print(uploaddata)
 
+    # TODO Most of this can be in getmediainfo()
     if args.mediainfo:
-        data['mediainfo'], releasedatamediainfo = getmediainfo(torrentpath)
-        data.update(releasedatamediainfo)
-        if 'duration' in data.keys() and data['duration'] > 1:
-            duration_friendly_format = humanfriendly.format_timespan(datetime.timedelta(seconds=int(data['duration']/1000)))
-            data['album_desc'] += f"\n\nDuration: {duration_friendly_format}"
+        try:
+            data['mediainfo'], releasedatamediainfo = getmediainfo(torrentpath)
+            data.update(releasedatamediainfo)
+            if 'duration' in data.keys() and data['duration'] > 1:
+                duration_friendly_format = humanfriendly.format_timespan(datetime.timedelta(seconds=int(data['duration']/1000)))
+                data['album_desc'] += f"\n\nDuration: {duration_friendly_format} - {str(data['duration'])}ms"
+        except Exception as mediainfo_exc:
+            if str(mediainfo_exc).startswith('Could not run mediainfo on:') and torrentgroupdata.category in Categories.Video:
+                raise  # Only allow Video torrents to fail without mediainfo
+            if debug:
+                print(f'File/dir not found but uploading anyway as {torrentgroupdata.title} is not a Video category.')
 
     if torrentgroupdata.category not in Categories.NonReleaseData:
         data['media'] = uploaddata['media']
@@ -562,15 +569,12 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
         data['type'] = Categories.JPStoSM[torrentgroupdata.category]
 
     # Now that all Category validation is complete decide if we should strip some mediainfo data
-    # Categories where mediainfo gathered data should be stripped if we have it, must match indices in Categories.SM
-    SMCategoryIDs_strip_all_mediainfo = (0, 1, 2, 11)  # Album, EP, Single, Misc
-    SMCategoryIDs_strip_all_exc_resolution = 10  # Pictures
     mediainfo_non_resolution = ('container', 'mediainfo')
     mediainfo_resolution = ('ressel', 'resolution')
-    if args.mediainfo and data['type'] in SMCategoryIDs_strip_all_mediainfo:
+    if args.mediainfo and data['type'] in Categories.SM_StripAllMediainfo:
         for field in (mediainfo_non_resolution + mediainfo_resolution):
             data.pop(field, None)
-    elif args.mediainfo and data['type'] == SMCategoryIDs_strip_all_exc_resolution:
+    elif args.mediainfo and data['type'] == Categories.SM_StripAllMediainfoExcResolution:
         for field in mediainfo_non_resolution:
             data.pop(field, None)
 
@@ -1093,6 +1097,7 @@ def get_media_location(media_name, directory):
     # Find the file/dir and stop on the first hit, hopefully OS-side disk cache will mean this will not take too long
 
     media_location = None
+    print(f'Searching for {media_name}...')
 
     for media_dir_search in media_roots:
         for dirname, dirnames, filenames in os.walk(media_dir_search):
@@ -1331,7 +1336,7 @@ class Categories:
         'Misc': 11,
     }
 
-    # Video = ('Bluray', 'DVD', 'PV', 'TV-Music', 'TV-Variety', 'TV-Drama', 'Music Performance')  # was VideoCategories
+    Video = ('Bluray', 'DVD', 'PV', 'TV-Music', 'TV-Variety', 'TV-Drama', 'Music Performance')
 
     # JPS Categories where release date cannot be entered and therefore need to be processed differently
     NonDate = ('TV-Music', 'TV-Variety', 'TV-Drama', 'Fansubs', 'Pictures', 'Misc')
@@ -1339,6 +1344,9 @@ class Categories:
     NonReleaseData = ('Pictures', 'Misc')
     # Music and Music Video Torrents, for category validation. This must match the cateogry headers in JPS for an artist, hence they are in plural
     NonTVCategories = ('Albums', 'Singles', 'DVDs', 'PVs')
+    # Categories that should have some of their mediainfo stripped if present, must match indices in Categories.SM
+    SM_StripAllMediainfo = (0, 1, 2, 11)  # Album, EP, Single, Misc - useful to have duration if we have it added to the description
+    SM_StripAllMediainfoExcResolution = 10  # Pictures - useful to have resolution if we have it
 
 
 if __name__ == "__main__":
