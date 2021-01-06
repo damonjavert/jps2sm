@@ -495,10 +495,12 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
                 duration_friendly_format = humanfriendly.format_timespan(datetime.timedelta(seconds=int(data['duration']/1000)))
                 data['album_desc'] += f"\n\nDuration: {duration_friendly_format} - {str(data['duration'])}ms"
         except Exception as mediainfo_exc:
-            if str(mediainfo_exc).startswith('Could not run mediainfo on:') and torrentgroupdata.category in Categories.Video:
+            if not str(mediainfo_exc).startswith('Could not run mediainfo on:'):
+                raise
+            elif torrentgroupdata.category in Categories.Video:
                 raise  # Only allow Video torrents to fail without mediainfo
             if debug:
-                print(f'File/dir not found but uploading anyway as {torrentgroupdata.title} is not a Video category.')
+                print(f'Skipping exception on mediainfo failing as {torrentgroupdata.title} is not a Video category.')
 
     if torrentgroupdata.category not in Categories.NonReleaseData:
         data['media'] = uploaddata['media']
@@ -1140,20 +1142,20 @@ def getmediainfo(torrentfilename):
     if 'files' in torrentmetadata['info'].keys():  # Multiple files
         directory = torrentname
         print(f'According to the torrent the dir is {directory}')
-        directory_path = get_media_location(directory, True)
-        print(f'dir is {directory_path}')
+        file_path = get_media_location(directory, True)
+        print(f'dir is {file_path}')
         for file in torrentmetadata['info']['files']:
             if len(torrentmetadata['info']['files']) == 1:  # This might never happen, it could be just info.name if so
                 filename = os.path.join(*file['path'])
             else:
                 releasedataout['multiplefiles'] = True
-                filename = os.path.join(*[directory_path, *file['path']])  # Each file in the directory of source data for the torrent
+                filename = os.path.join(*[file_path, *file['path']])  # Each file in the directory of source data for the torrent
 
             mediainfosall += str(MediaInfo.parse(filename, text=True))
             releasedataout['duration'] += get_mediainfo_duration(filename)
             # Get biggest file and mediainfo on this to set the fields for the release
             maxfile = max(torrentmetadata['info']['files'], key=lambda x: x['length'])  # returns {'length': int, 'path': [str]} of largest file
-            fileforsmfields = Path(*[directory_path, *maxfile['path']])  # Assume the largest file is the main file that should populate SM upload fields
+            fileforsmfields = Path(*[file_path, *maxfile['path']])  # Assume the largest file is the main file that should populate SM upload fields
 
     else:  # Single file
         releasedataout['multiplefiles'] = False
@@ -1186,6 +1188,9 @@ def getmediainfo(torrentfilename):
 
     # Now we have decided which file will have its mediainfo parsed for SM fields, parse its mediainfo
     mediainforeleasedata = MediaInfo.parse(fileforsmfields)
+    # Remove path to file in case it reveals usernames etc.
+    replacement = str(Path(file_path).parent)
+    mediainfosall = mediainfosall.replace(replacement, '')
 
     if Path(fileforsmfields).suffix == '.iso':
         tempdir.cleanup()
@@ -1234,6 +1239,8 @@ def getmediainfo(torrentfilename):
         if track.track_type == 'Audio' or track.track_type == 'Audio #1':  # Handle multiple audio streams, we just get data from the first for now
             if track.format in ["AAC", "DTS", "PCM", "AC3"]:
                 releasedataout['audioformat'] = track.format
+            elif track.format == "AC-3":
+                releasedataout['audioformat'] = "AC3"
             elif track.format == "MPEG Audio" and track.format_profile == "Layer 3":
                 releasedataout['audioformat'] = "MP3"
             elif track.format == "MPEG Audio" and track.format_profile == "Layer 2":
