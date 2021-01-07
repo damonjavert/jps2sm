@@ -854,6 +854,39 @@ def validatejpsvideodata(releasedata, categorystatus):
     return releasedataout
 
 
+def validate_jps_bitrate(jps_bitrate):
+    """
+    Validate JPS bad bitrates to sensible bitrates ready for upload to SM
+
+    :param jps_bitrate:
+    :return: sm_bitrate
+    """
+
+    bitrates = {
+        "Hi-Res 96/24": "24bit Lossless 96kHz",
+        "24bit/48kHz": "24bit Lossless 48kHz",
+        "Hi-Res": "24bit Lossless",
+        "24bit Lossless": "24bit Lossless 96kHz",
+        "Hi-Res 48/24": "24bit Lossless 48kHz",
+        "24bit/96kHz": "24bit Lossless 96kHz",
+        "24bit/48Khz": "24bit Lossless 48kHz",
+        "24bit/96Khz": "24bit Lossless 96kHz",
+        "24bit/48khz": "24bit Lossless 48kHz",
+        "Hi-Res Lossless": "24bit Lossless",
+        "160": "Other",
+        "Variable": "Other",
+        "320 (VBR)": "Other",
+        "Scans": "",
+        "Booklet": "",
+        "1080p": "",
+        "720p": "",
+        "256 (VBR)": "APS (VBR)",
+        "155": "Other"
+    }
+
+    return bitrates.get(jps_bitrate)
+
+
 def collate(torrentids):
     """
     Collate and validate data ready for upload to SM
@@ -918,10 +951,7 @@ def collate(torrentids):
             releasedataout['media'] = releasedata[2]
             releasedataout['audioformat'] = releasedata[0]
 
-            if re.match(r'24 ?[Bb]it', releasedata[1]):
-                releasedataout['bitrate'] = '24bit Lossless'
-            else:
-                releasedataout['bitrate'] = releasedata[1]
+            releasedataout['bitrate'] = validate_jps_bitrate(releasedata[1])
 
             if releasedataout['audioformat'] == excfilteraudioformat:  # Exclude filters
                 print(f'Excluding {releasedata} as exclude audioformat {excfilteraudioformat} is set')
