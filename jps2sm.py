@@ -495,12 +495,18 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
                 duration_friendly_format = humanfriendly.format_timespan(datetime.timedelta(seconds=int(data['duration']/1000)))
                 data['album_desc'] += f"\n\nDuration: {duration_friendly_format} - {str(data['duration'])}ms"
         except Exception as mediainfo_exc:
-            if not str(mediainfo_exc).startswith('Mediainfo error - file/directory not found'):
-                raise
-            elif torrentgroupdata.category in Categories.Video:
-                raise  # Only allow Video torrents to fail without mediainfo
-            if debug:
-                print(f'Skipping exception on mediainfo failing as {torrentgroupdata.title} is not a Video category.')
+            if str(mediainfo_exc).startswith('Mediainfo error - file/directory not found'):
+                pass
+            if str(mediainfo_exc).startswith('Mediainfo error - unable to extract what appears to be a Bluray disc:'):
+                pass
+            if torrentgroupdata.category in Categories.Video:
+                if uploaddata['media'] == 'Bluray': # Allow BRs to fail as pyunpack cannot extract them
+                    print(mediainfo_exc)
+                    pass
+                else:
+                    if debug:
+                        print(f'Skipping exception on mediainfo failing as {torrentgroupdata.title} is not a Video category.')
+                    raise
 
     if torrentgroupdata.category not in Categories.NonReleaseData:
         data['media'] = uploaddata['media']
@@ -1118,6 +1124,22 @@ def get_media_location(media_name, directory):
         raise Exception(f'Mediainfo error - file/directory not found: {media_name} in any of the MediaDirectories specified: {media_roots}')
 
 
+def get_torrent_file_size(filename, torrentmetadata):
+    """
+    Get length of a given filename inside a torrent. Used by getmediainfo() to determine if an ISO is a BR
+    and can therefore not fail the upload as pyunpack does not support BRs yet.
+
+    :param filename: str
+    :param torrentmetadata: dict of torrent data
+    :return: size in bytes
+    """
+    print(filename)
+    for dictitem in torrentmetadata['info']['files']:
+        print(f"trying: {dictitem['path']}")
+        if dictitem['path'][-1] == filename:
+            return dictitem['length']
+
+
 def getmediainfo(torrentfilename):
     """
     Get filename(s) of video files in the torrent and run mediainfo and capture the output, extract if DVD found (Blurays not yet supported)
@@ -1169,10 +1191,18 @@ def getmediainfo(torrentfilename):
 
     if fileforsmfields.suffix == '.iso':  # Extract the ISO and run mediainfo against appropriate files
         releasedataout['container'] = 'ISO'
-        print(f'Extracting ISO {file_path} to obtain mediainfo on it...')
+        print(f'Extracting ISO {fileforsmfields} to obtain mediainfo on it...')
         isovideoextensions = ('.vob', '.m2ts')
         tempdir = tempfile.TemporaryDirectory()
-        Archive(file_path).extractall(tempdir.name)
+        try:
+            Archive(fileforsmfields).extractall(tempdir.name)
+        except:
+            if get_torrent_file_size(Path(fileforsmfields).name, torrentmetadata) < 10000000000:  # File is not a Bluray and extracting should work
+                print(f'Error in extracting DVD ISO {fileforsmfields} and cannot obtain mediainfo, skipping upload.')
+                raise
+            else:
+                raise Exception(f'Mediainfo error - unable to extract what appears to be a Bluray disc: {fileforsmfields}. '
+                                f'Allowing upload to proceed anyway as pyunpack does not support BRs. Please edit the torrent to input missing data')
 
         dir_files = []
         for root, subFolder, files in os.walk(tempdir.name):
