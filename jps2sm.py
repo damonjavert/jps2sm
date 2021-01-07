@@ -1544,6 +1544,10 @@ if __name__ == "__main__":
         user_upload_dupes = []
         user_upload_source_data_not_found = []
 
+        user_uploads_found = len(useruploads)
+        user_uploads_done = 0
+        print(f'Now attempting to upload {user_uploads_found} torrents.')
+
         for key, value in useruploads.items():
             groupid = key
             torrentids = value
@@ -1567,6 +1571,7 @@ if __name__ == "__main__":
                 torrentcount = collate(torrentids)
                 if not dryrun:
                     downloaduploadedtorrents(torrentcount)
+                    user_uploads_done += 1
             except KeyboardInterrupt:  # Allow Ctrl-C to exit without showing the error multiple times and polluting the final error dict
                 break  # Still continue to get error dicts and dupe list so far
             except Exception as exc:
@@ -1592,18 +1597,28 @@ if __name__ == "__main__":
             print('The following JPS groupid(s) (torrentid(s) shown for reference) had errors in retrieving group data, '
                   'keep this data safe and you can possibly retry with it in a later version:')
             print(useruploadsgrouperrors)
+            print(f'Total: {len(useruploadsgrouperrors)}')
         if useruploadscollateerrors:
             print('The following JPS groupid(s) and corresponding torrentid(s) had errors either in collating/retrieving '
                   'release data or in performing the actual upload to SM (although group data was retrieved OK), '
                   'keep this data safe and you can possibly retry with it in a later version:')
             print(useruploadscollateerrors)
+            print(f'Total: {len(useruploadscollateerrors)}')
         if user_upload_dupes:
             print('The following SM torrentid(s) have already been uploaded to the site, but the SM torrents were downloaded so you can cross seed:')
             print(user_upload_dupes)
+            print(f'Total: {len(user_upload_dupes)}')
         if user_upload_source_data_not_found:
             print('The following file(s)/dir(s) were not found in your MediaDirectories specified in jps2sm.cfg and the upload was skipped:')
-            print(user_upload_source_data_not_found)
+            print(f'Total: {len(user_upload_source_data_not_found)}')
 
+        print(f'Finished batch upload\n--------------------------------------------------------\nOverall stats:'
+              f'\nTorrents found at JPS: {user_uploads_found}\nGroup data errors: {len(useruploadsgrouperrors)}'
+              f'\nRelease data (or any other) errors: {len(useruploadscollateerrors)}'
+              f'\nMediaInfo source data missing: {len(user_upload_source_data_not_found)}')
+        if not dryrun:
+            print(f'\nNew uploads successfully created: {user_uploads_done}'
+                  f'\nDuplicates found (torrents downloaded for cross-seeding): {len(user_upload_dupes)}')
     else:
         # Standard non-batch upload using --urls
         torrentgroupdata = GetGroupData(jpsurl)
