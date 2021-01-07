@@ -489,18 +489,21 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
     # TODO Most of this can be in getmediainfo()
     if args.mediainfo:
         try:
-            data['mediainfo'], releasedatamediainfo = getmediainfo(torrentpath)
+            data['mediainfo'], releasedatamediainfo = getmediainfo(torrentpath, uploaddata['media'])
             data.update(releasedatamediainfo)
             if 'duration' in data.keys() and data['duration'] > 1:
                 duration_friendly_format = humanfriendly.format_timespan(datetime.timedelta(seconds=int(data['duration']/1000)))
                 data['album_desc'] += f"\n\nDuration: {duration_friendly_format} - {str(data['duration'])}ms"
         except Exception as mediainfo_exc:
-            if not str(mediainfo_exc).startswith('Mediainfo error - file/directory not found'):
+            if str(mediainfo_exc).startswith('Mediainfo error - file/directory not found'):
+                pass
+            if str(mediainfo_exc).startswith('Mediainfo error - unable to extract what appears to be a Bluray disc:'):
+                pass
+            if torrentgroupdata.category in Categories.Video:
                 raise
-            elif torrentgroupdata.category in Categories.Video:
-                raise  # Only allow Video torrents to fail without mediainfo
-            if debug:
-                print(f'Skipping exception on mediainfo failing as {torrentgroupdata.title} is not a Video category.')
+            else:
+                if debug:
+                    print(f'Skipping exception on mediainfo failing as {torrentgroupdata.title} is not a Video category.')
 
     if torrentgroupdata.category not in Categories.NonReleaseData:
         data['media'] = uploaddata['media']
@@ -1148,12 +1151,13 @@ def get_media_location(media_name, directory):
         raise Exception(f'Mediainfo error - file/directory not found: {media_name} in any of the MediaDirectories specified: {media_roots}')
 
 
-def getmediainfo(torrentfilename):
+def getmediainfo(torrentfilename, media):
     """
     Get filename(s) of video files in the torrent and run mediainfo and capture the output, extract if DVD found (Blurays not yet supported)
     then set the appropriate fields for the upload
 
     :param torrentfilename: str filename of torrent to parse from collate()
+    :param media: str Validated media from collate()
     :return: mediainfo, releasedataout
 
     mediainfo: Mediainfo text output of the file(s)
@@ -1197,13 +1201,13 @@ def getmediainfo(torrentfilename):
         releasedataout['duration'] += get_mediainfo_duration(file_path)
         fileforsmfields = file_path
 
-    if fileforsmfields.suffix == '.iso':  # Extract the ISO and run mediainfo against appropriate files
+    if fileforsmfields.suffix == '.iso' and media == 'DVD':
+        # If DVD, extract the ISO and run mediainfo against appropriate files, if BR we skip as pyunpack (patool/7z) cannot extract them
         releasedataout['container'] = 'ISO'
-        print(f'Extracting ISO {file_path} to obtain mediainfo on it...')
+        print(f'Extracting ISO {fileforsmfields} to obtain mediainfo on it...')
         isovideoextensions = ('.vob', '.m2ts')
         tempdir = tempfile.TemporaryDirectory()
-        Archive(file_path).extractall(tempdir.name)
-
+        Archive(fileforsmfields).extractall(tempdir.name)
         dir_files = []
         for root, subFolder, files in os.walk(tempdir.name):
             for item in files:
@@ -1222,7 +1226,7 @@ def getmediainfo(torrentfilename):
     replacement = str(Path(file_path).parent)
     mediainfosall = mediainfosall.replace(replacement, '')
 
-    if Path(fileforsmfields).suffix == '.iso':
+    if Path(fileforsmfields).suffix == '.iso' and media == 'DVD':
         tempdir.cleanup()
 
     for track in mediainforeleasedata.tracks:
