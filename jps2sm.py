@@ -1509,7 +1509,7 @@ if __name__ == "__main__":
                 elif str(exc).startswith('Mediainfo error - file/directory not found'):
                     print(exc)
                     # Need to get filename that was not found
-                    missing_file = re.findall(r'Mediainfo error - file/directory not found: (.*)$', str(exc))
+                    missing_file = re.findall(r'Mediainfo error - file/directory not found: (.+) in any of the MediaDirectories', str(exc))
                     user_upload_source_data_not_found.append(missing_file)
                 else:
                     print('Error with collating/retrieving release data for groupid %s torrentid(s) %s, skipping upload' % (groupid, ",".join(torrentids)))
