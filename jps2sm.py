@@ -495,7 +495,7 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
                 duration_friendly_format = humanfriendly.format_timespan(datetime.timedelta(seconds=int(data['duration']/1000)))
                 data['album_desc'] += f"\n\nDuration: {duration_friendly_format} - {str(data['duration'])}ms"
         except Exception as mediainfo_exc:
-            if not str(mediainfo_exc).startswith('Could not run mediainfo on:'):
+            if not str(mediainfo_exc).startswith('Mediainfo error - file/directory not found'):
                 raise
             elif torrentgroupdata.category in Categories.Video:
                 raise  # Only allow Video torrents to fail without mediainfo
@@ -1506,7 +1506,7 @@ if __name__ == "__main__":
                     print(exc)
                     sm_dupe_torrentid = re.findall(r'The exact same torrent file already exists on the site! See: https://sugoimusic\.me/torrents\.php\?torrentid=([0-9]+)', str(exc))
                     user_upload_dupes.append(sm_dupe_torrentid)
-                elif str(exc).startswith('Could not run mediainfo on:'):
+                elif str(exc).startswith('Mediainfo error - file/directory not found'):
                     print(exc)
                     # Need to get filename that was not found
                     missing_file = re.findall(r'Mediainfo error - file/directory not found: (.*)$', str(exc))
