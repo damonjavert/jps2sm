@@ -687,6 +687,9 @@ class GetGroupData:
 
         sqbrackets = re.findall('\[(.*?)\]', text)
         self.category = sqbrackets[0]
+        #hack temp
+        if self.category != 'DVD':
+            raise RuntimeError('We are skipping DVDs')
         print(self.category)
 
         try:
