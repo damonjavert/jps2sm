@@ -1179,9 +1179,7 @@ def getmediainfo(torrentfilename, media):
         print(f'Extracting ISO {fileforsmfields} to obtain mediainfo on it...')
         isovideoextensions = ('.vob', '.m2ts')
         tempdir = tempfile.TemporaryDirectory()
-        try:
-            Archive(fileforsmfields).extractall(tempdir.name)
-
+        Archive(fileforsmfields).extractall(tempdir.name)
         dir_files = []
         for root, subFolder, files in os.walk(tempdir.name):
             for item in files:
