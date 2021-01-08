@@ -1195,7 +1195,7 @@ def getmediainfo(torrentfilename, media):
     replacement = str(Path(file_path).parent)
     mediainfosall = mediainfosall.replace(replacement, '')
 
-    if Path(fileforsmfields).suffix == '.iso':
+    if Path(fileforsmfields).suffix == '.iso' and media == 'DVD':
         tempdir.cleanup()
 
     for track in mediainforeleasedata.tracks:
