@@ -967,6 +967,10 @@ def collate(torrentids):
             releasedataout['media'] = 'Web'
         elif 'Blu-Ray' in releasedata:
             releasedataout['media'] = 'Bluray'  # JPS may actually be calling it the correct official name, but modern usage differs.
+        # hack temp
+        if releasedataout['media'] != 'Bluray':
+            print('hack temp we are only doing BRs')
+            return 0
 
         # uploadtorrent() will use the upload date as release date if the torrent has no release date, usually for
         # Picture Category torrents and some TV-Variety.
@@ -1484,6 +1488,9 @@ if __name__ == "__main__":
             torrentids = value
             try:
                 torrentgroupdata = GetGroupData("https://jpopsuki.eu/torrents.php?id=%s" % groupid)
+                if torrentgroupdata.category != "DVD":
+                    print('Hack temp we are only doing DVDs')
+                    continue
                 if torrentgroupdata.category == args.exccategory:
                     if debug:
                         print(f'Excluding groupid {groupid} as it is {torrentgroupdata.category} group and these are being skipped')
