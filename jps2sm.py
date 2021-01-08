@@ -489,7 +489,7 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
     # TODO Most of this can be in getmediainfo()
     if args.mediainfo:
         try:
-            data['mediainfo'], releasedatamediainfo = getmediainfo(torrentpath, data['media'])
+            data['mediainfo'], releasedatamediainfo = getmediainfo(torrentpath, uploaddata['media'])
             data.update(releasedatamediainfo)
             if 'duration' in data.keys() and data['duration'] > 1:
                 duration_friendly_format = humanfriendly.format_timespan(datetime.timedelta(seconds=int(data['duration']/1000)))
