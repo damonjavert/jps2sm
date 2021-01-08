@@ -880,7 +880,8 @@ def validate_jps_bitrate(jps_bitrate):
         "Booklet": "",
         "1080p": "",
         "720p": "",
-        "256 (VBR)": "APS (VBR)"
+        "256 (VBR)": "APS (VBR)",
+        "155": "Other"
     }
 
     for old, new in bitrates.items():
