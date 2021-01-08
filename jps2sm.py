@@ -1287,6 +1287,7 @@ def getmediainfo(torrentfilename, media):
 
     return mediainfosall, releasedataout
 
+
 def get_jps_user_id():
     """
     Returns the JPopSuki user id
@@ -1294,16 +1295,13 @@ def get_jps_user_id():
     """
 
     res = s.retrieveContent("https://jpopsuki.eu/")
-
     soup = BeautifulSoup(res.text, 'html5lib')
-
     href = soup.select('.username')[0]['href']
-
-    id = re.match(r"user\.php\?id=(\d+)", href).group(1)
-
+    jps_user_id = re.match(r"user\.php\?id=(\d+)", href).group(1)
     time.sleep(5)  # Sleep as otherwise we hit JPS browse quota
 
-    return int(str(id))
+    return int(str(jps_user_id))
+
 
 def getargs():
     parser = argparse.ArgumentParser()
@@ -1311,7 +1309,7 @@ def getargs():
     parser.add_argument('-d', '--debug', help='Enable debug mode', action='store_true')
     parser.add_argument("-u", "--urls", help="JPS URL for a group, or multiple individual releases URLs to be added to the same group", type=str)
     parser.add_argument("-n", "--dryrun", help="Just parse url and show the output, do not add the torrent to SM", action="store_true")
-    parser.add_argument("-b", "--batchuser", help="User id for batch user operations")
+    parser.add_argument("-b", "--batchuser", help="User id for batch user operations, default is user id of SM Username specified in jps2sm.cfg")
     parser.add_argument("-U", "--batchuploaded", help="(Batch mode only) Upload all releases uploaded by you or, if provided, user id specified by --batchuser", action="store_true")
     parser.add_argument("-S", "--batchseeding", help="(Batch mode only) Upload all releases currently seeding by you or, if provided, user id specified by --batchuser", action="store_true")
     parser.add_argument("-s", "--batchstart", help="(Batch mode only) Start at this page", type=int)
@@ -1441,7 +1439,7 @@ if __name__ == "__main__":
         batchuser = None
         if args.batchuser:
             if args.batchuser.isnumeric() is False:
-                print('Error: "--batchuser" or short "-b" should be your JPS profile ID. See --help', file=sys.stderr)
+                print('Error: "--batchuser" or short "-b" should be a JPS profile ID. See --help', file=sys.stderr)
                 sys.exit(1)
             batchuser = int(args.batchuser)
 
@@ -1519,7 +1517,7 @@ if __name__ == "__main__":
 
     jps_user_id = get_jps_user_id()
     if debug:
-        print("JPopsuki user id is %d" % jps_user_id)
+        print(f"JPopsuki user id is {jps_user_id}")
 
     if detect_display_swapped_names(jps_user_id):
         print("Error: 'Display original Artist/Album titles' is enabled in your JPS user profile. This must be disabled for jps2sm to run.",
