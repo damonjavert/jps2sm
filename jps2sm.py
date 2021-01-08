@@ -899,6 +899,10 @@ def collate(torrentids):
             videoreleasedatavalidated = validatejpsvideodata(releasedata, releasedataout['categorystatus'])
             for field, data in videoreleasedatavalidated.items():
                 releasedataout[field] = data
+            #hack temp
+            if releasedataout['container'] != 'ISO':
+                print('hack temp we are only doing BR ISOs, we check if DVD at groupdata')
+                return 0
 
             if len(releasedata) == 3:  # Remastered
                 remasterdata = releasedata[2]
