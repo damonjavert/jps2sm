@@ -488,7 +488,6 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
 
     # TODO Most of this can be in getmediainfo()
     if args.mediainfo:
-        print('ghghghgh')
         try:
             data['mediainfo'], releasedatamediainfo = getmediainfo(torrentpath, data['media'])
             data.update(releasedatamediainfo)
@@ -501,13 +500,10 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
             if str(mediainfo_exc).startswith('Mediainfo error - unable to extract what appears to be a Bluray disc:'):
                 pass
             if torrentgroupdata.category in Categories.Video:
-                if uploaddata['media'] == 'Bluray': # Allow BRs to fail as pyunpack cannot extract them
-                    print(mediainfo_exc)
-                    pass
-                else:
-                    if debug:
-                        print(f'Skipping exception on mediainfo failing as {torrentgroupdata.title} is not a Video category.')
-                    raise
+                raise
+            else:
+                if debug:
+                    print(f'Skipping exception on mediainfo failing as {torrentgroupdata.title} is not a Video category.')
 
     if torrentgroupdata.category not in Categories.NonReleaseData:
         data['media'] = uploaddata['media']
