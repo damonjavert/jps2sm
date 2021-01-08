@@ -488,6 +488,7 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
 
     # TODO Most of this can be in getmediainfo()
     if args.mediainfo:
+        print('ghghghgh')
         try:
             data['mediainfo'], releasedatamediainfo = getmediainfo(torrentpath, data['media'])
             data.update(releasedatamediainfo)
