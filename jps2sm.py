@@ -884,9 +884,7 @@ def validate_jps_bitrate(jps_bitrate):
         "155": "Other"
     }
 
-    for old, new in bitrates.items():
-        if jps_bitrate == old:
-            return new
+    return bitrates.get(jps_bitrate)
 
 
 def collate(torrentids):
