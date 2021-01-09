@@ -1,16 +1,16 @@
 import functools
-from typing import AnyStr, re, List
+import re
+from typing import AnyStr, List
 
 
 def split_artists(artist: str) -> List[str]:
     """
     Splits the artist string on the specified delimiters.
 
-            Parameters:
-                    artist (str): A string containing artists
-            Returns:
-                    list (List(str)): List of artists
+    :param artist: str: A string containing artists
+    :return: artists: list: List of artists
     """
+
     replacements = ('-', ',', 'x', '&')
     artists = functools.reduce(lambda s, sep: s.replace(sep, ' '), replacements, artist)
     return artists.split()
@@ -22,10 +22,10 @@ def get_valid_filename(s: str) -> AnyStr:
     filename. Remove leading and trailing spaces; convert other spaces to
     underscores; and remove anything that is not an alphanumeric, dash,
     underscore, or dot.
-            Parameters:
-                    s (str): A string that needs to be converted
-            Returns:
-                    s (str): A string with a clean filename
+
+    :param s: str: A string that needs to be converted
+    :return: str: A string with a clean filename
     """
+
     s = str(s).strip().replace(' ', '_')
     return re.sub(r'(?u)[^-\w.]', '', s)

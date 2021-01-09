@@ -2,16 +2,13 @@
 # or a user's uploaded torrents and iterate through them and upload them to SM.
 
 # Catch python2 being run here to get a relatively graceful error message, rather than a syntax error later on which causes confusion.
-import sys
-
-from utils import split_artists
-
-error_x, *error_y=1,2,3,4 # jps2sm requires requires python3.8, a SyntaxError here means you are running it in python2!
+error_x, *error_y = 1, 2, 3, 4  # jps2sm requires requires python3.8, a SyntaxError here means you are running it in python2!
 
 # Catch python < 3.8 being run here to get a relatively graceful error message, rather than a syntax error later on which causes confusion.
 print(walrus := "", end = '') # jps2sm requires python3.8, a SyntaxError here means you are running it in python <= 3.7!
 
-# Standard version check that for now is pretty useless
+# Standard version check that for now it pretty useless
+import sys
 if sys.version_info < (3, 8):
     print("Error: jps2sm requires python 3.8 to run.", file=sys.stderr)
     exit(1)
@@ -35,14 +32,18 @@ import tempfile
 # Third-party packages
 import requests
 from bs4 import BeautifulSoup
-from django.utils.text import get_valid_filename
 import torrent_parser as tp
 from pymediainfo import MediaInfo
 import humanfriendly
 from pyunpack import Archive
 from pathlib import Path
 
+# jps2sm modules
+from utils import split_artists
+from utils import get_valid_filename
+
 __version__ = "1.4.2"
+
 
 class MyLoginSession:
     """
@@ -696,9 +697,9 @@ class GetGroupData:
 
         try:
             artistlinelinktext = str(artistlinelink[0])
-            self.artist = re.findall('<a[^>]+>(.*)<', artistlinelinktext)[0]
+            artist_raw = re.findall('<a[^>]+>(.*)<', artistlinelinktext)[0]
+            self.artist = split_artists(artist_raw)
             print(f'Artist: {self.artist}')
-            list_of_artists = split_artists(self.artist)
         except IndexError:  # Cannot find artist
             if self.category == "Pictures":
                 # JPS allows Picture torrents to have no artist set, in this scenario try to infer the artist by examining the text
