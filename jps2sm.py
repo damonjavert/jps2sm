@@ -39,7 +39,6 @@ from pyunpack import Archive
 from pathlib import Path
 
 # jps2sm modules
-from utils import split_artists
 from utils import get_valid_filename
 
 __version__ = "1.4.2"
@@ -698,8 +697,8 @@ class GetGroupData:
         try:
             artistlinelinktext = str(artistlinelink[0])
             artist_raw = re.findall('<a[^>]+>(.*)<', artistlinelinktext)[0]
-            self.artist = split_artists(artist_raw)
-            print(f'Artist: {self.artist}')
+            self.artist = re.split(', | x | & ', artist_raw)
+            print(f'Artist(s): {self.artist}')
         except IndexError:  # Cannot find artist
             if self.category == "Pictures":
                 # JPS allows Picture torrents to have no artist set, in this scenario try to infer the artist by examining the text
