@@ -41,7 +41,7 @@ from pathlib import Path
 # jps2sm modules
 from utils import get_valid_filename
 
-__version__ = "1.4.2"
+__version__ = "1.5"
 
 
 class MyLoginSession:
@@ -250,7 +250,7 @@ def getbulktorrentids(mode, user, first=1, last=None):
 
 def removehtmltags(text):
     """
-    Strip html tags, used by GetGroupData() on the group description
+    Strip html tags, used by GetGroupData() on the group description if unable to get bbcode
 
     """
     clean = re.compile('<.*?>')
@@ -289,6 +289,13 @@ def get_user_keys():
 
 
 def download_sm_torrent(torrent_id):
+    """
+    Downloads the SM torrent if it is a dupe, in this scenario we cannot use downloaduploadedtorrents() as the user
+    has not actually uploaded it.
+
+    :param torrent_id: SM torrentid to be downloaded
+    :return: name: int: filename of torrent downloaded
+    """
     file = s.retrieveContent(
         'https://sugoimusic.me/torrents.php?action='
         f'download&id={torrent_id}&authkey={authkey}&torrent_pass={torrent_password_key}'
@@ -347,7 +354,7 @@ def getalternatefansubcategoryid(artist):
             print(f'Autodetected SM category {autodetectcategory} for JPS Fansubs torrent')
         return autodetectcategory
     else:  # Cannot autodetect
-        AlternateFanSubCategoriesIDs = (5, 6, 7, 8, 9)  #Matches indices in Categories()
+        AlternateFanSubCategoriesIDs = (5, 6, 7, 8, 9)  # Matches indices in Categories()
         print(f'Cannot auto-detect correct category for torrent group {torrentgroupdata.title}.\nSelect Category:')
         option = 1
         optionlookup = {}
