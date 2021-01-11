@@ -611,9 +611,7 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
     except AttributeError:  # If no contrib artists do nothing
         pass
 
-    if torrentgroupdata.artist == "V.A.":  # At JPS Various Artists torrents have their artists as contrib artists
-        # TODO Recognise torrents that have >4 artists and keep them as contrib artists, this probably requires
-        # a Gazelle code change to handle torrent groups with no main artist
+    if "V.A." in torrentgroupdata.artist:  # At JPS Various Artists torrents have their artists as contrib artists
         del data['contrib_artists[]']  # Error if null as if there is a V.A. torrent group with no contrib artists something is wrong
         data['idols[]'] = contribartistsenglish
         if debug:
