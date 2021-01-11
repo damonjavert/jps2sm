@@ -8,7 +8,7 @@ jps2sm will automatically gather data from JPS from a given group url, release u
 * Create upload to SM by automatically retrieving all data on JPS, including english and original titles, group description, release information (format / meida / bitrate etc.), group images, contributing artists, original titles, mediainfo data and remaster information if applicable.
 * Upload all torrents in a torrent group or specify 1 or more release urls in a gorup.
 * Upload all your (or someone elses) personally uploaded or currently seeding torrents at JPS with `--batchuser` mode
-* Run [Mediainfo](https://mediaarea.net/en/MediaInfo) against your media files and save the output to the 'mediainfo' field and parse the data to populate the codec, container, audioformat and resolution fields. DVD ISOs are automatically extracted and Mediainfo is run againdst the VOB files, BR ISO images are not currently supported in the pyunpack module.
+* Search for your media files specified in `MediaDirectories` and run [Mediainfo](https://mediaarea.net/en/MediaInfo) against them and save the output to the 'mediainfo' field and parse the data to populate the codec, container, audioformat and resolution fields. DVD ISOs are automatically extracted and Mediainfo is run against the VOB files, BR ISO images are not currently supported in the pyunpack module.
 * Exclude certain audioformats, medias or categories with `--excaudioformat` , `--excmedia` and `--exccategory`
 * Test your uploads with `--dryrun` mode.
 
@@ -18,15 +18,20 @@ Windows, Mac and Linux users can use the latest compiled binary on the releases 
 ### Quickstart
 Download the binary release for your platform: https://git.sugoimusic.me/Sugoimusic/jps2sm/releases
 
-**Due to bug #58, please ensure you have “Display original Artist/Album titles” switched OFF in your user settings!**
-
-Extract the contents of the zip, add your JPS and SM login credentials to **jps2sm.cfg**
+Extract the contents of the zip, add your JPS & SM login credentials and the directories where your media is stored to **jps2sm.cfg**
 
     jps2sm --help
 
 See Command line usge below
 
-The SM torrents are automatically downloaded to the $HOME/SMTorrents, or My Documents\SMTorrents if on Windows by default. If uploading video torrents please consider using the **mediainfo** option `-m`; this will extract mediainfo from the source file(s) in the ***current directory***. Enjoy!
+The SM torrents are automatically downloaded to the $HOME/SMTorrents, or My Documents\SMTorrents if on Windows by default. All video torrents MUST have mediainfo extracted to be uploaded - you must setup `MediaDirectories` as below in order for jps2sm to find your media files:
+
+```text
+    [Media]
+    MediaDirectories: d:\Music, e:\BR-Rips, .....
+```
+
+or use Linux/Mac OSX ecquivalent paths. The MediaInfo library is bundled with the Windows and Mac OSX releases, if using the Linux release you will need to install MediaInfo, jps2sm/pymediainfo will locate the library. Enjoy!
 
 ### Quickstart - for those familiar with python
 **jps2sm** requires python 3.8
@@ -35,7 +40,7 @@ The latest Dev release can be used instead by cloning the repo:
 
     git clone https://git.sugoimusic.me/Sugoimusic/jps2sm
 
-Add your JPS and SM login credentials to **jps2sm.cfg**, using **jps2sm.cfg.example** as a template.
+Add your JPS & SM login credentials and the directories where your media is stored to **jps2sm.cfg**, using **jps2sm.cfg.example** as a template.
 
 Install modules and run the script, adjusting the exact commands if required by your environment:
 
@@ -59,16 +64,16 @@ To upload every release of AKB48 - 1830m, excluding the ISOs *(in JPS ISO is con
 
     python3 jps2sm.py --urls "https://jpopsuki.eu/torrents.php?id=111284" --excaudioformat ISO
 
-To *test* upload all your personal uploads, `<userid>` is your JPS userid:
+To *test* upload all your personal uploads:
 
-    python3 jps2sm.py --batchuser <userid> --batchuploaded --dryrun
+    python3 jps2sm.py --batchuploaded --dryrun
 
 Once everything looks ok, to upload all your personal uploads, `<userid>` is your JPS userid:
 
-    python3 jps2sm.py --batchuser <userid> --batchuploaded
+    python3 jps2sm.py --batchuploaded
 
 
-**Please only upload torrents you intend to SEED.**
+**Please only upload torrents you intend to SEED.** Never-seeded torrents are deleted after 48 hours.
 ## Usage
 
 ```text
@@ -93,7 +98,7 @@ Help for arguments for group/release uploads:
 Help for required arguments for batch processing:
 
   -b BATCHUSER, --batchuser BATCHUSER
-                        User id for batch user operations
+                        User id for batch user operations, default is user id of SM Username specified in jps2sm.cfg
   -U, --batchuploaded   Upload all releases uploaded by user id specified by --batchuser
         **or**
   -S, --batchseeding    Upload all releases currently seeding by user id specified by --batchuser
@@ -117,7 +122,7 @@ Help for optional arguments:
 
   -h, --help            show this help message and exit
   -v, --version         show program's version number and exit
-  -d, --debug           Enable debug mode
+  -d, --debug           Enable debug mode. Run your command with this before submitting bugs.
   -n, --dryrun          Just parse data and show the output, do not add the torrent to SM
   -m, --mediainfo       Get mediainfo data from the source file(s) in the current directory.
                         Extract data to set codec, resolution, audio format and container fields
@@ -138,5 +143,4 @@ Windows 10 users can setup a Dev environment using [Windows Subsystem for Linux]
 Install [Homebrew](https://brew.sh) if you do not have it already and then `brew install python3`. See this guide: https://wsvincent.com/install-python3-mac/
 
 ### Linux
-Your distro's primary repos may not include packages for python3.8. Using `apt-get install python3` for example may only install python3.6 (or even earlier) and due to the use of the walrus operator jps2sm requires python 3.8. Debian and Fedora based distros can follow this guide: https://docs.python-guide.org/starting/install3/linux/ . Or you can complain and we might make jps2sm python3.6 compatible, we are actively considering this as linux non-Devs prefer to use the source and not anything compiled.
-
+Your distro's primary repos may not include packages for python3.8. Using `apt-get install python3` for example may only install python3.6 (or even earlier) and due to the use of the walrus operator jps2sm requires python 3.8. Debian and Fedora based distros can follow this guide: https://docs.python-guide.org/starting/install3/linux/ .

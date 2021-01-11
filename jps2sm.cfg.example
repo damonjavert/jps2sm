@@ -8,3 +8,7 @@ Password: sm-pass-here
 SMTorrents: SMTorrents
 JPSTorrents: JPSTorrents
 HTML: HTML
+[Media]
+# Specify a comma-delimitied list of all the directories that jps2sm should search for your media
+# Examples:
+#MediaDirectories: d:\Music, e:\BR-Rips
