@@ -124,9 +124,9 @@ Help for optional arguments:
   -v, --version         show program's version number and exit
   -d, --debug           Enable debug mode. Run your command with this before submitting bugs.
   -n, --dryrun          Just parse data and show the output, do not add the torrent to SM
-  -m, --mediainfo       Get mediainfo data from the source file(s) in the current directory.
-                        Extract data to set codec, resolution, audio format and container fields
-                        as well as the mediainfo field itself.
+  -m, --mediainfo       Search and get mediainfo data from the source file(s) in the directories
+                        specified by MediaDirectories. Extract data to set codec, resolution,
+                        audio format and container fields as well as the mediainfo field itself.
 ```
 
 ## Development

@@ -1332,7 +1332,7 @@ def getargs():
     parser.add_argument("-exc", "--exccategory", help="(Batch mode only) Exclude a JPS category from upload", type=str)
     parser.add_argument("-exf", "--excaudioformat", help="(Batch mode only) Exclude an audioformat from upload", type=str)
     parser.add_argument("-exm", "--excmedia", help="(Batch mode only) Exclude a media from upload", type=str)
-    parser.add_argument("-m", "--mediainfo", help="Get mediainfo data from the source file(s) in the current directory. Extract data to set codec, resolution, audio format and container fields as well as the mediainfo field itself.", action="store_true")
+    parser.add_argument("-m", "--mediainfo", help="Search and get mediainfo data from the source file(s) in the directories specified by MediaDirectories. Extract data to set codec, resolution, audio format and container fields as well as the mediainfo field itself.", action="store_true")
 
     return parser.parse_args()
 
