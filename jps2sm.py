@@ -794,7 +794,7 @@ class GetGroupData:
 
         try:
             contribartistsget = str(soup.select('#content .thin .sidebar .box .body ul.stats.nobullet li'))
-            contribartistslist = re.findall(r'<li><a href="artist\.php\?id=(?:[0-9]+?)" title="([^"]*?)">([\w ]+)</a>', contribartistsget)
+            contribartistslist = re.findall(r'<li><a href="artist\.php\?id=(?:[0-9]+?)" title="([^"]*?)">([\w .-]+)</a>', contribartistsget)
             self.contribartists = {}
             for artistpair in contribartistslist:
                 self.contribartists[artistpair[1]] = artistpair[0] # Creates contribartists[artist] = origartist
