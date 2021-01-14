@@ -1,0 +1,75 @@
+loading or generating session...
+loaded session from cache (last access 187s ago) 
+updated session cache-file jpopsuki.eu_session.dat
+JPopsuki user id is xyz
+updated session cache-file jpopsuki.eu_session.dat
+Processing JPS URL:  https://jpopsuki.eu/torrents.php?id=251299&torrentid=358233
+updated session cache-file jpopsuki.eu_session.dat
+<h2>[Album] <a href="artist.php?id=429">V.A.</a> - Mishmash Sunshower EP [2018.02.21]</h2>
+Album
+Artist(s): ['V.A.']
+Release date: 20180221
+Title: Mishmash Sunshower EP
+Original artist: オムニバス Original title: Mishmash Sunshower EP
+updated session cache-file jpopsuki.eu_session.dat
+Group description:
+IHST-024
+
+Tracklist:
+1. imai - WOOF 1
+2. KONCOS - Sunshower
+3. aaps - Tower
+4. THE FULL TEENZ - Baby (KONCOS cover)
+5. 台風クラブ - 江ノ島
+6. imai - WOOF 2
+https://jpopsuki.eu/static/images/torrents/251299.jpg
+['japanese']
+Contributing artists: {'KONCOS': '', 'THE FULL TEENZ': ''}
+Entire group contains: {
+  "358233": {
+    "slashdata": [
+      "MP3",
+      "V0 (VBR)",
+      "WEB"
+    ],
+    "uploaddate": "Apr 06 2018, 19:55"
+  },
+  "358232": {
+    "slashdata": [
+      "FLAC",
+      "Lossless",
+      "WEB"
+    ],
+    "uploaddate": "Apr 06 2018, 19:54"
+  }
+}
+Selected for upload: {'358233': {'slashdata': ['MP3', 'V0 (VBR)', 'WEB'], 'uploaddate': 'Apr 06 2018, 19:55'}}
+Now processing: 358233 {'slashdata': ['MP3', 'V0 (VBR)', 'WEB'], 'uploaddate': 'Apr 06 2018, 19:55'}
+updated session cache-file jpopsuki.eu_session.dat
+{'videotorrent': False, 'categorystatus': 'good', 'media': 'Web', 'audioformat': 'MP3', 'bitrate': 'V0 (VBR)', 'uploaddate': '20180406'}
+03 - aaps - Tower.mp3
+02 - KONCOS - Sunshower.mp3
+01 - imai - WOOF 1.mp3
+04 - THE FULL TEENZ - Baby (KONCOS cover).mp3
+05 - 台風クラブ - 江ノ島.mp3
+06 - imai - WOOF 2.mp3
+Upload is an EP as it has 6 standard tracks
+Various Artists torrent, setting main artists to ['KONCOS', 'THE FULL TEENZ']
+{
+  "submit": "true",
+  "title": "Mishmash Sunshower EP",
+  "year": "20180221",
+  "tags": "japanese",
+  "album_desc": "IHST-024\n\nTracklist:\n1. imai - WOOF 1\n2. KONCOS - Sunshower\n3. aaps - Tower\n4. THE FULL TEENZ - Baby (KONCOS cover)\n5. \u53f0\u98a8\u30af\u30e9\u30d6 - \u6c5f\u30ce\u5cf6\n6. imai - WOOF 2",
+  "audioformat": "MP3",
+  "image": "https://jpopsuki.eu/static/images/torrents/251299.jpg",
+  "bitrate": "V0 (VBR)",
+  "type": 1,
+  "artist_jp": "\u30aa\u30e0\u30cb\u30d0\u30b9",
+  "title_jp": "Mishmash Sunshower EP",
+  "idols[]": [
+    "KONCOS",
+    "THE FULL TEENZ"
+  ],
+  "auth": "<scrubbed>"
+}
