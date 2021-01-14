@@ -41,7 +41,7 @@ from pathlib import Path
 # jps2sm modules
 from utils import get_valid_filename
 
-__version__ = "1.5"
+__version__ = "1.5.1"
 
 
 class MyLoginSession:
@@ -1101,7 +1101,7 @@ def decide_ep(torrentfilename, uploaddata):
                 not any(substring in file['path'][-1].lower() for substring in off_vocal_phrases):
             #  Count music files which are not an off-vocal or instrumental
             if debug:
-                #Print each track for consideration
+                # Print each track for consideration
                 print(file['path'][-1])
             track_count += 1
 
@@ -1110,7 +1110,8 @@ def decide_ep(torrentfilename, uploaddata):
             print(f'Upload is an EP as it has {track_count} standard tracks')
         return 'EP'
     else:
-        print(f'Upload is not an EP as it has {track_count} tracks')
+        if debug:
+            print(f'Upload is not an EP as it has {track_count} tracks')
         return 'Album'
 
 
