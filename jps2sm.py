@@ -132,11 +132,17 @@ class MyLoginSession:
         # test login
         res = self.session.get(self.loginTestUrl)
         if res.text.lower().find(self.loginTestString.lower()) < 0:
+            os.remove(self.sessionFile)
+            print("could not log in, destroying session and retrying")
             if args.debug:
                 print(res.text)
-            raise Exception("could not log into provided site '%s'"
-                            " (did not find successful login string)"
-                            % self.loginUrl)
+            res = self.session.get(self.loginTestUrl)
+            if res.text.lower().find(self.loginTestString.lower()) < 0:
+                if args.debug:
+                    print(res.text)
+                raise Exception("could not log into provided site after multiple attempts'%s'"
+                                " (did not find successful login string)"
+                                % self.loginUrl)
 
     def saveSessionToCache(self):
         """
@@ -1484,7 +1490,7 @@ if __name__ == "__main__":
     try:
         open(configfile)
     except FileNotFoundError:
-        print('Error: cannot read cfg - enter your JPS/SM credentials in jps2sm.cfg and check jps2sm.cfg.example to see the syntax.', file=sys.stderr)
+        print('Error: cannot read cfg - enter your JPS/SM credentials in jps2sm.cfg and check jps2sm.cfg to see the syntax.', file=sys.stderr)
         raise
 
     config.read(configfile)
