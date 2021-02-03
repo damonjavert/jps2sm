@@ -310,7 +310,7 @@ def download_sm_torrent(torrent_id):
     return name
 
 
-def decide_music_performance(artist, multiplefiles, duration):
+def decide_music_performance(artists, multiplefiles, duration):
     """
     Return if upload should be a Music Performance or not
     A music performance is a cut from a Music TV show and is 25 mins or less long and therefore also not a TV Show artist
@@ -322,7 +322,11 @@ def decide_music_performance(artist, multiplefiles, duration):
     if multiplefiles is True or duration > 1500000:  # 1 500 000 ms = 25 mins
         return 'TV Music'
     else:  # Single file that is < 25 mins, decide if Music Performance
-        JPSartistpage = s.retrieveContent(f"https://jpopsuki.eu/artist.php?name={artist}")
+        if len(artists) > 1:  # Multiple artists
+            if debug:
+                print('Upload is a Music Performance as it has derived multiple artists and is 25 mins or less')
+            return 'Music Performance'  # JPS TV Show artists never have multiple artists
+        JPSartistpage = s.retrieveContent(f"https://jpopsuki.eu/artist.php?name={artists[0]}")
         soup = BeautifulSoup(JPSartistpage.text, 'html5lib')
         categoriesbox = str(soup.select('#content .thin .main_column .box.center'))
         categories = re.findall(r'\[(.+)\]', categoriesbox)
@@ -331,6 +335,8 @@ def decide_music_performance(artist, multiplefiles, duration):
                 print('Upload is a Music Performance as it is 25 mins or less and not a TV Show')
             return 'Music Performance'
         else:
+            if debug:
+                print('Upload is not a Music Performance')
             return 'TV Music'
 
 
