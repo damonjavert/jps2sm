@@ -323,7 +323,7 @@ def decide_music_performance(artists, multiplefiles, duration):
         return 'TV Music'
     else:  # Single file that is < 25 mins, decide if Music Performance
         if len(artists) > 1:  # Multiple artists
-            if debug:
+            if args.parsed.debug:
                 print('Upload is a Music Performance as it has derived multiple artists and is 25 mins or less')
             return 'Music Performance'  # JPS TV Show artists never have multiple artists
         JPSartistpage = s.retrieveContent(f"https://jpopsuki.eu/artist.php?name={artists[0]}")
@@ -335,7 +335,7 @@ def decide_music_performance(artists, multiplefiles, duration):
                 print('Upload is a Music Performance as it is 25 mins or less and not a TV Show')
             return 'Music Performance'
         else:
-            if debug:
+            if args.parsed.debug:
                 print('Upload is not a Music Performance')
             return 'TV Music'
 
