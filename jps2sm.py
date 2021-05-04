@@ -497,7 +497,7 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
         info = data[b'info']
         hashed_info = hashlib.sha1(bencoding.bencode(info)).hexdigest()
         
-    if debug:
+    if args.parsed.debug:
         print("made hash")
         print(hashed_info)
     
@@ -507,11 +507,11 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
     #print(hashcheckjson.text)
     
     if hashcheckjson.text == '{"status":"failure","error":"bad hash parameter"}':
-        if debug:
+        if args.parsed.debug:
             print("Hash check failure - file does not exist")
         hashcheck = False
     else:
-        if debug:
+        if args.parsed.debug:
             print("Hash check successful - file exists")
         hashcheck = True
         torrentgroupdata.category = "Misc"
