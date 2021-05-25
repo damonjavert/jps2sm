@@ -1547,7 +1547,7 @@ if __name__ == "__main__":
                     print(f'Error: Media directory {media_dir} is a file and not a directory. Check your configuration in jps2sm.cfg.', file=sys.stderr)
                     sys.exit(1)
         except configparser.NoSectionError:
-            print('Error: --mediainfo requires you confgure MediaDirectories in jps2sm.cfg for mediainfo to find your file(s).', file=sys.stderr)
+            print('Error: --mediainfo requires you to configure MediaDirectories in jps2sm.cfg for mediainfo to find your file(s).', file=sys.stderr)
             sys.exit(1)
 
     s = MyLoginSession(loginUrl, loginData, loginTestUrl, successStr, debug=args.parsed.debug)

@@ -5,8 +5,8 @@
 jps2sm will automatically gather data from JPS from a given group url, release url(s) or userid's uploaded/seeding torrents and iterate through all the data in and upload them to SM.
 
 ## Features
-* Create upload to SM by automatically retrieving all data on JPS, including english and original titles, group description, release information (format / meida / bitrate etc.), group images, contributing artists, original titles, mediainfo data and remaster information if applicable.
-* Upload all torrents in a torrent group or specify 1 or more release urls in a gorup.
+* Create upload to SM by automatically retrieving all data on JPS, including english and original titles, group description, release information (format / media / bitrate etc.), group images, contributing artists, original titles, mediainfo data and remaster information if applicable.
+* Upload all torrents in a torrent group or specify 1 or more release urls in a group.
 * Upload all your (or someone elses) personally uploaded or currently seeding torrents at JPS with `--batchuser` mode
 * Search for your media files specified in `MediaDirectories` and run [Mediainfo](https://mediaarea.net/en/MediaInfo) against them and save the output to the 'mediainfo' field and parse the data to populate the codec, container, audioformat and resolution fields. DVD ISOs are automatically extracted and Mediainfo is run against the VOB files, BR ISO images are not currently supported in the pyunpack module.
 * Exclude certain audioformats, medias or categories with `--excaudioformat` , `--excmedia` and `--exccategory`
@@ -22,7 +22,7 @@ Extract the contents of the zip, add your JPS & SM login credentials and the dir
 
     jps2sm --help
 
-See Command line usge below
+See Command line usage below
 
 The SM torrents are automatically downloaded to the $HOME/SMTorrents, or My Documents\SMTorrents if on Windows by default. All video torrents MUST have mediainfo extracted to be uploaded - you must setup `MediaDirectories` as below in order for jps2sm to find your media files:
 
@@ -78,7 +78,7 @@ Once everything looks ok, to upload all your personal uploads, `<userid>` is you
 
 ```text
 usage: jps2sm.py [--help] [--version] [--debug] [--dryrun] [--mediainfo]
-                 
+
 Single group / release mode arguments:
 
   --urls URLS
@@ -132,7 +132,7 @@ Help for optional arguments:
 ## Development
 Pull requests are welcome!
 
-It is strongly recommended to create a python virtual environment for your development. 
+It is strongly recommended to create a python virtual environment for your development.
 
 See https://git.sugoimusic.me/Sugoimusic/jps2sm/issues for areas that you can contribute to.
 
