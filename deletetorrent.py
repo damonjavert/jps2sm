@@ -77,6 +77,6 @@ if __name__ == "__main__":
 
             deletesuccess = re.findall('Torrent was successfully (.*)\.', res.text)
             if deletesuccess:
-                print(f'Torrent was successfully {deletesuccess[0]}')
+                print(f'Torrent {torrentid} was successfully {deletesuccess[0]}')
             else:
-                print(f'Unknown error, check https://sugoimusic.me/log.php?search=Torrent+{args.torrentid}')
+                print(f'Unknown error with torrentid {torrentid} , check https://sugoimusic.me/log.php?search=Torrent+{torrentid}')
