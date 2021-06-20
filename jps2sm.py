@@ -360,7 +360,7 @@ def getalternatefansubcategoryid(artist):
             print(f'Autodetected SM category {autodetectcategory} for JPS Fansubs torrent')
         return autodetectcategory
     else:  # Cannot autodetect
-        AlternateFanSubCategoriesIDs = (5, 6, 7, 8, 9)  # Matches indices in Categories()
+        AlternateFanSubCategoriesIDs = (5, 6, 7, 8, 9, 11)  # Matches indices in Categories()
         print(f'Cannot auto-detect correct category for torrent group {torrentgroupdata.title}.\nSelect Category:')
         option = 1
         optionlookup = {}
