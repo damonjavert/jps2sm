@@ -1608,6 +1608,7 @@ if __name__ == "__main__":
             print(f'Total: {len(user_upload_dupes)}')
         if user_upload_source_data_not_found:
             print('The following file(s)/dir(s) were not found in your MediaDirectories specified in jps2sm.cfg and the upload was skipped:')
+            print(user_upload_source_data_not_found)
             print(f'Total: {len(user_upload_source_data_not_found)}')
 
         print(f'Finished batch upload\n--------------------------------------------------------\nOverall stats:'
