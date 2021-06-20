@@ -686,6 +686,8 @@ class GetGroupData:
 
     def getdata(self, jpsurl):
         date_regex = r'[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])'  # YYYY.MM.DD format
+        # YYYY.MM.DD OR YYYY format, for Pictures only
+        date_regex2 =r'(?:[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])|(?:19|20)\d\d)'
 
         res = s.retrieveContent(self.jpsurl.split()[0])  # If there are multiple urls only the first url needs to be parsed
 
@@ -714,7 +716,7 @@ class GetGroupData:
             if self.category == "Pictures":
                 # JPS allows Picture torrents to have no artist set, in this scenario try to infer the artist by examining the text
                 # immediately after the category string up to a YYYY.MM.DD string if available as this should be the magazine title
-                self.artist = re.findall(fr'\[Pictures\] ([A-Za-z ]+) (?:{date_regex})', text)
+                self.artist = re.findall(fr'\[Pictures\] ([A-Za-z ]+) (?:{date_regex2})', text)
             else:
                 print('JPS upload appears to have no artist set and artist cannot be autodetected')
                 raise
@@ -756,7 +758,7 @@ class GetGroupData:
                     if self.category == "Pictures":
                         # Fallback to all the text after the category, we need to include the date stamp as magazines are often titled
                         # with the same numbers each year - the first magazine each year appears to always be 'No. 1' for example
-                        self.title = re.findall(fr'\[Pictures\] (?:[A-Za-z ]+) ({date_regex} .+)</h2>', text)[0]
+                        self.title = re.findall(fr'\[Pictures\] (?:[A-Za-z ]+) ({date_regex2}(?:.*))</h2>', text)[0]
                     else:
                         print('Cannot find title from the JPS upload')
                         raise
