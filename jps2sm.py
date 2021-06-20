@@ -1553,6 +1553,7 @@ if __name__ == "__main__":
             groupid = key
             torrentids = value
             try:
+                print('-------------------------')
                 torrentgroupdata = GetGroupData("https://jpopsuki.eu/torrents.php?id=%s" % groupid)
                 if torrentgroupdata.category == args.parsed.exccategory:
                     if args.parsed.debug:
