@@ -225,8 +225,8 @@ def getbulktorrentids(mode, user, first=1, last=None):
     # Parse every torrent page and add to dict, to group together releases into the same group so that they work with
     # the way that uploadtorrent() works.
     for i in range(first, int(last) + 1):
-        useruploadpage = s.retrieveContent(fr"https://jpopsuki.eu/torrents.php?page=%s&order_by=s1&order_way=ASC&type={mode}&userid=%s&disablegrouping=1" % (i, user))
-        print(f"https://jpopsuki.eu/torrents.php?page=%s&order_by=s1&order_way=ASC&type={mode}&userid=%s&disablegrouping=1" % (i, user))
+        useruploadpage = s.retrieveContent(fr"https://jpopsuki.eu/torrents.php?page=%s&order_by=s1&order_way=ASC&type={mode}&userid=%s&disablegrouping=1&filter_cat[1]=1&filter_cat[2]=1" % (i, user))
+        print(f"https://jpopsuki.eu/torrents.php?page=%s&order_by=s1&order_way=ASC&type={mode}&userid=%s&disablegrouping=1&filter_cat[1]=1&filter_cat[2]=1" % (i, user))
         # print useruploadpage.text
         soup2 = BeautifulSoup(useruploadpage.text, 'html5lib')
         try:
@@ -645,7 +645,7 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
                     f'This torrent already exists on SugoiMusic - https://sugoimusic.me/torrents.php?torrentid={dupe[0]} '
                     f'The .torrent has been downloaded with name "{Path(output.file_dir["smtorrents"], dupe_file_name)}"'
                 )
-                raise Exception(f'The exact same torrent file already exists on the site! See: https://sugoimusic.me/torrents.php?torrentid={dupe[0]}')
+                raise Exception(f'The exact same torrent file already exists on the site! See: https://sugoimusic.me/torrents.php?torrentid={dupe[0]} JPS torrent id: {uploaddata["jpstorrentid"]}')
             else:
                 raise Exception(SMerrorTorrent[0])
 
@@ -945,6 +945,7 @@ def collate(torrentids):
         releasedata = releasedatafull['slashdata']
         uploaddatestr = releasedatafull['uploaddate']
         releasedataout = {}
+        releasedataout['jpstorrentid'] = torrentid  # Not needed for uploadtorrent(), purely for logging purposes
 
         # JPS uses the audioformat field (represented as releasedata[0] here) for containers and codecs in video torrents,
         # and when combined with VideoMedias we can perform VideoTorrent detection.
@@ -1542,6 +1543,7 @@ if __name__ == "__main__":
         useruploadsgrouperrors = collections.defaultdict(list)
         useruploadscollateerrors = collections.defaultdict(list)
         user_upload_dupes = []
+        user_upload_dupes_jps = []
         user_upload_source_data_not_found = []
         user_upload_mediainfo_not_submitted = 0
 
@@ -1573,14 +1575,15 @@ if __name__ == "__main__":
                 torrentcount = collate(torrentids)
                 if not args.parsed.dryrun:
                     downloaduploadedtorrents(torrentcount)
-                    user_uploads_done += 1
+                    user_uploads_done += torrentcount
             except KeyboardInterrupt:  # Allow Ctrl-C to exit without showing the error multiple times and polluting the final error dict
                 break  # Still continue to get error dicts and dupe list so far
             except Exception as exc:
                 if str(exc).startswith('The exact same torrent file already exists on the site!'):
                     print(exc)
-                    sm_dupe_torrentid = re.findall(r'The exact same torrent file already exists on the site! See: https://sugoimusic\.me/torrents\.php\?torrentid=([0-9]+)', str(exc))
+                    sm_dupe_torrentid, jps_dupe_torrentid = re.findall(r'The exact same torrent file already exists on the site! See: https://sugoimusic\.me/torrents\.php\?torrentid=([0-9]+) JPS torrent id\: ([0-9]+)', str(exc))[0]
                     user_upload_dupes.append(sm_dupe_torrentid)
+                    user_upload_dupes_jps.append(jps_dupe_torrentid)
                 elif str(exc).startswith('Mediainfo error - file/directory not found'):
                     print(exc)
                     # Need to get filename that was not found
@@ -1611,7 +1614,7 @@ if __name__ == "__main__":
             print(f'Total: {count_values_dict(useruploadscollateerrors)}')
         if user_upload_dupes:
             print('The following SM torrentid(s) have already been uploaded to the site, but the SM torrents were downloaded so you can cross seed:')
-            print(user_upload_dupes)
+            print(f'SM duplicate torrent ids: {user_upload_dupes}\nJPS duplicate torrent ids: {user_upload_dupes_jps}')
             print(f'Total: {len(user_upload_dupes)}')
         if user_upload_source_data_not_found:
             print('The following file(s)/dir(s) were not found in your MediaDirectories specified in jps2sm.cfg and the upload was skipped:')
