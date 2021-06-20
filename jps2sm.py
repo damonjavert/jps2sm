@@ -1543,6 +1543,7 @@ if __name__ == "__main__":
         useruploadscollateerrors = collections.defaultdict(list)
         user_upload_dupes = []
         user_upload_source_data_not_found = []
+        user_upload_mediainfo_not_submitted = 0
 
         user_uploads_found = len(useruploads)
         user_uploads_done = 0
@@ -1584,6 +1585,9 @@ if __name__ == "__main__":
                     # Need to get filename that was not found
                     missing_file = re.findall(r'Mediainfo error - file/directory not found: (.+) in any of the MediaDirectories', str(exc))
                     user_upload_source_data_not_found.append(missing_file)
+                elif str(exc).startswith('You do not appear to have entered any MediaInfo data for your video upload.'):
+                    print(exc)
+                    user_upload_mediainfo_not_submitted += 1
                 else:
                     print('Error with collating/retrieving release data for groupid %s torrentid(s) %s, skipping upload' % (groupid, ",".join(torrentids)))
                     useruploadscollateerrors[groupid] = torrentids
@@ -1616,7 +1620,8 @@ if __name__ == "__main__":
         print(f'Finished batch upload\n--------------------------------------------------------\nOverall stats:'
               f'\nTorrents found at JPS: {user_uploads_found}\nGroup data errors: {len(useruploadsgrouperrors)}'
               f'\nRelease data (or any other) errors: {len(useruploadscollateerrors)}'
-              f'\nMediaInfo source data missing: {len(user_upload_source_data_not_found)}')
+              f'\nMediaInfo source data missing: {len(user_upload_source_data_not_found)}'
+              f'\nMediaInfo not submitted errors (use \"--mediainfo\"): {user_upload_mediainfo_not_submitted}')
         if not args.parsed.dryrun:
             print(f'\nNew uploads successfully created: {user_uploads_done}'
                   f'\nDuplicates found (torrents downloaded for cross-seeding): {len(user_upload_dupes)}')
