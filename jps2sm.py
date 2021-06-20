@@ -39,7 +39,7 @@ from pyunpack import Archive
 from pathlib import Path
 
 # jps2sm modules
-from utils import get_valid_filename
+from utils import get_valid_filename, count_values_dict
 
 __version__ = "1.5.1"
 
@@ -1545,7 +1545,7 @@ if __name__ == "__main__":
         user_upload_source_data_not_found = []
         user_upload_mediainfo_not_submitted = 0
 
-        user_uploads_found = len(useruploads)
+        user_uploads_found = count_values_dict(useruploads)
         user_uploads_done = 0
         print(f'Now attempting to upload {user_uploads_found} torrents.')
 
@@ -1602,13 +1602,13 @@ if __name__ == "__main__":
             print('The following JPS groupid(s) (torrentid(s) shown for reference) had errors in retrieving group data, '
                   'keep this data safe and you can possibly retry with it in a later version:')
             print(useruploadsgrouperrors)
-            print(f'Total: {len(useruploadsgrouperrors)}')
+            print(f'Total: {count_values_dict(useruploadsgrouperrors)}')
         if useruploadscollateerrors:
             print('The following JPS groupid(s) and corresponding torrentid(s) had errors either in collating/retrieving '
                   'release data or in performing the actual upload to SM (although group data was retrieved OK), '
                   'keep this data safe and you can possibly retry with it in a later version:')
             print(useruploadscollateerrors)
-            print(f'Total: {len(useruploadscollateerrors)}')
+            print(f'Total: {count_values_dict(useruploadscollateerrors)}')
         if user_upload_dupes:
             print('The following SM torrentid(s) have already been uploaded to the site, but the SM torrents were downloaded so you can cross seed:')
             print(user_upload_dupes)
@@ -1619,10 +1619,10 @@ if __name__ == "__main__":
             print(f'Total: {len(user_upload_source_data_not_found)}')
 
         print(f'Finished batch upload\n--------------------------------------------------------\nOverall stats:'
-              f'\nTorrents found at JPS: {user_uploads_found}\nGroup data errors: {len(useruploadsgrouperrors)}'
-              f'\nRelease data (or any other) errors: {len(useruploadscollateerrors)}'
+              f'\nTorrents found at JPS: {user_uploads_found}\nGroup data errors: {count_values_dict(useruploadsgrouperrors)}'
+              f'\nRelease data (or any other) errors: {count_values_dict(useruploadscollateerrors)}'
               f'\nMediaInfo source data missing: {len(user_upload_source_data_not_found)}'
-              f'\nMediaInfo not submitted errors (use \"--mediainfo\"): {user_upload_mediainfo_not_submitted}')
+              f'\nMediaInfo not submitted errors (use \"--mediainfo\" to fix): {user_upload_mediainfo_not_submitted}')
         if not args.parsed.dryrun:
             print(f'\nNew uploads successfully created: {user_uploads_done}'
                   f'\nDuplicates found (torrents downloaded for cross-seeding): {len(user_upload_dupes)}')
