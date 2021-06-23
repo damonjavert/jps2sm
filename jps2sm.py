@@ -225,8 +225,9 @@ def getbulktorrentids(mode, user, first=1, last=None):
     # Parse every torrent page and add to dict, to group together releases into the same group so that they work with
     # the way that uploadtorrent() works.
     for i in range(first, int(last) + 1):
-        useruploadpage = s.retrieveContent(fr"https://jpopsuki.eu/torrents.php?page=%s&order_by=s1&order_way=ASC&type={mode}&userid=%s&disablegrouping=1&filter_cat[1]=1&filter_cat[2]=1" % (i, user))
-        print(f"https://jpopsuki.eu/torrents.php?page=%s&order_by=s1&order_way=ASC&type={mode}&userid=%s&disablegrouping=1&filter_cat[1]=1&filter_cat[2]=1" % (i, user))
+        useruploadurl = fr"https://jpopsuki.eu/torrents.php?page={i}&order_by=s1&order_way=ASC&type={mode}&userid={user}&disablegrouping=1"
+        useruploadpage = s.retrieveContent(useruploadurl)
+        print(useruploadurl)
         # print useruploadpage.text
         soup2 = BeautifulSoup(useruploadpage.text, 'html5lib')
         try:
