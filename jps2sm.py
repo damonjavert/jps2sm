@@ -1,11 +1,11 @@
 # jps2sm.py is a python script that will automatically gather data from JPS from a given group url, release url,
-# or a user's uploaded torrents and iterate through them and upload them to SM.
+# or a user's uploaded / seeding torrents and iterate through them and upload them to SM.
 
 # Catch python2 being run here to get a relatively graceful error message, rather than a syntax error later on which causes confusion.
 error_x, *error_y = 1, 2, 3, 4  # jps2sm requires requires python3.8, a SyntaxError here means you are running it in python2!
 
 # Catch python < 3.8 being run here to get a relatively graceful error message, rather than a syntax error later on which causes confusion.
-print(walrus := "", end = '') # jps2sm requires python3.8, a SyntaxError here means you are running it in python <= 3.7!
+print(walrus := "", end='')  # jps2sm requires python3.8, a SyntaxError here means you are running it in python <= 3.7!
 
 # Standard version check that for now it pretty useless
 import sys
@@ -22,148 +22,23 @@ import collections
 import time
 import argparse
 import configparser
-import pickle
 import html
-from urllib.parse import urlparse
 import json
 import traceback
-import tempfile
 
 # Third-party packages
-import requests
 from bs4 import BeautifulSoup
 import torrent_parser as tp
-from pymediainfo import MediaInfo
 import humanfriendly
-from pyunpack import Archive
 from pathlib import Path
 
 # jps2sm modules
-from utils import get_valid_filename, count_values_dict
+from modules.utils import get_valid_filename, count_values_dict
+from modules.myloginsession import MyLoginSession
+from modules.constants import Categories, VideoOptions
+from modules.mediainfo import get_mediainfo
 
 __version__ = "1.5.1"
-
-
-class MyLoginSession:
-    """
-    Taken from: https://stackoverflow.com/a/37118451/2115140
-    New features added in jps2sm
-    Originally by: https://stackoverflow.com/users/1150303/domtomcat
-
-    a class which handles and saves login sessions. It also keeps track of proxy settings.
-    It does also maintains a cache-file for restoring session data from earlier
-    script executions.
-    """
-
-    def __init__(self,
-                 loginUrl,
-                 loginData,
-                 loginTestUrl,
-                 loginTestString,
-                 sessionFileAppendix='_session.dat',
-                 maxSessionTimeSeconds=30 * 60,
-                 proxies=None,
-                 userAgent='Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1',
-                 debug=False,
-                 forceLogin=False,
-                 **kwargs):
-        """
-        save some information needed to login the session
-
-        you'll have to provide 'loginTestString' which will be looked for in the
-        responses html to make sure, you've properly been logged in
-
-        'proxies' is of format { 'https' : 'https://user:pass@server:port', 'http' : ...
-        'loginData' will be sent as post data (dictionary of id : value).
-        'maxSessionTimeSeconds' will be used to determine when to re-login.
-        """
-        urlData = urlparse(loginUrl)
-
-        self.proxies = proxies
-        self.loginData = loginData
-        self.loginUrl = loginUrl
-        self.loginTestUrl = loginTestUrl
-        self.maxSessionTime = maxSessionTimeSeconds
-        self.sessionFile = urlData.netloc + sessionFileAppendix
-        self.userAgent = userAgent
-        self.loginTestString = loginTestString
-        self.debug = debug
-
-        self.login(forceLogin, **kwargs)
-
-    def modification_date(self, filename):
-        """
-        return last file modification date as datetime object
-        """
-        t = os.path.getmtime(filename)
-        return datetime.datetime.fromtimestamp(t)
-
-    def login(self, forceLogin=False, **kwargs):
-        """
-        login to a session. Try to read last saved session from cache file. If this fails
-        do proper login. If the last cache access was too old, also perform a proper login.
-        Always updates session cache file.
-        """
-        wasReadFromCache = False
-        if self.debug:
-            print('loading or generating session...')
-        if os.path.exists(self.sessionFile) and not forceLogin:
-            time = self.modification_date(self.sessionFile)
-
-            # only load if file less than 30 minutes old
-            lastModification = (datetime.datetime.now() - time).seconds
-            if lastModification < self.maxSessionTime:
-                with open(self.sessionFile, "rb") as f:
-                    self.session = pickle.load(f)
-                    wasReadFromCache = True
-                    if self.debug:
-                        print("loaded session from cache (last access %ds ago) "
-                              % lastModification)
-        if not wasReadFromCache:
-            self.session = requests.Session()
-            self.session.headers.update({'user-agent': self.userAgent})
-            res = self.session.post(self.loginUrl, data=self.loginData,
-                                    proxies=self.proxies, **kwargs)
-
-            if self.debug:
-                print('created new session with login')
-            self.saveSessionToCache()
-
-        # test login
-        res = self.session.get(self.loginTestUrl)
-        if res.text.lower().find(self.loginTestString.lower()) < 0:
-            if args.parsed.debug:
-                print(res.text)
-            raise Exception("could not log into provided site '%s'"
-                            " (did not find successful login string)"
-                            % self.loginUrl)
-
-    def saveSessionToCache(self):
-        """
-        save session to a cache file
-        """
-        # always save (to update timeout)
-        with open(self.sessionFile, "wb") as f:
-            pickle.dump(self.session, f)
-            if self.debug:
-                print('updated session cache-file %s' % self.sessionFile)
-
-    def retrieveContent(self, url, method="get", postData=None, postDataFiles=None, **kwargs):
-        """
-        return the content of the url with respect to the session.
-
-        If 'method' is not 'get', the url will be called with 'postData'
-        as a post request.
-        """
-        if method == 'get':
-            res = self.session.get(url, proxies=self.proxies, **kwargs)
-        else:
-            res = self.session.post(url, data=postData, proxies=self.proxies, files=postDataFiles, **kwargs)
-
-        # the session has been updated on the server, so also update in cache
-        self.saveSessionToCache()
-
-        return res
 
 
 def detect_display_swapped_names(userid):
@@ -466,7 +341,7 @@ def getreleasedata(torrentids):
                 if args.parsed.debug:
                     print(f"Torrent {torrentid} is freeleech remastered, validated remasterdata to {release['slashdata'][index]}")
     for torrentid in removetorrents:
-        del(releasedata[torrentid])
+        del (releasedata[torrentid])
 
     print(f'Selected for upload: {releasedata}')
     return releasedata
@@ -508,10 +383,10 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
     # TODO Most of this can be in getmediainfo()
     if args.parsed.mediainfo:
         try:
-            data['mediainfo'], releasedatamediainfo = getmediainfo(torrentpath, uploaddata['media'])
+            data['mediainfo'], releasedatamediainfo = get_mediainfo(torrentpath, uploaddata['media'], media_roots, args.parsed.debug)
             data.update(releasedatamediainfo)
             if 'duration' in data.keys() and data['duration'] > 1:
-                duration_friendly_format = humanfriendly.format_timespan(datetime.timedelta(seconds=int(data['duration']/1000)))
+                duration_friendly_format = humanfriendly.format_timespan(datetime.timedelta(seconds=int(data['duration'] / 1000)))
                 data['album_desc'] += f"\n\nDuration: {duration_friendly_format} - {str(data['duration'])}ms"
         except Exception as mediainfo_exc:
             if str(mediainfo_exc).startswith('Mediainfo error - file/directory not found'):
@@ -682,6 +557,7 @@ class GetGroupData:
     Group data is defined as data that is constant for every release, eg category, artist, title, groupdescription, tags etc.
     Each property is gathered by calling a method of the class
     """
+
     def __init__(self, jpsurl):
         self.jpsurl = jpsurl
         if args.parsed.debug:
@@ -691,14 +567,13 @@ class GetGroupData:
     def getdata(self, jpsurl):
         date_regex = r'[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])'  # YYYY.MM.DD format
         # YYYY.MM.DD OR YYYY format, for Pictures only
-        date_regex2 =r'(?:[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])|(?:19|20)\d\d)'
+        date_regex2 = r'(?:[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])|(?:19|20)\d\d)'
 
         res = s.retrieveContent(self.jpsurl.split()[0])  # If there are multiple urls only the first url needs to be parsed
 
         self.groupid = re.findall(r"(?!id=)\d+", self.jpsurl)[0]
 
         soup = BeautifulSoup(res.text, 'html5lib')
-        #soup = BeautifulSoup(open("1830.html"), 'html5lib')
 
         artistline = soup.select('.thin h2')
         artistlinelink = soup.select('.thin h2 a')
@@ -1135,194 +1010,6 @@ def decide_ep(torrentfilename, uploaddata):
         return 'Album'
 
 
-def get_mediainfo_duration(filename):
-    """
-    Get duration in mediainfo for filename
-
-    :param filename:
-    :return: float ms
-    """
-    mediainfo_for_duration = MediaInfo.parse(filename)
-    for track in mediainfo_for_duration.tracks:
-        if track.track_type == 'General':
-            if track.duration is None:
-                return 0
-            else:
-                if args.parsed.debug:
-                    print(f'Mediainfo duration: {filename} {track.duration}')
-                return float(track.duration)  # time in ms
-
-
-def get_media_location(media_name, directory):
-    """
-    Find the location of the directory or file of the source data for getmediainfo()
-
-    :param media_name: str name of the file or directory
-    :param directory: boolean true if dir, false if file
-    :param fall_back_file: str fall back search cor
-
-    Uses global 'media_roots'
-
-    :return: full path to file/dir
-    """
-
-    # Find the file/dir and stop on the first hit, hopefully OS-side disk cache will mean this will not take too long
-
-    media_location = None
-    print(f'Searching for {media_name}...')
-
-    for media_dir_search in media_roots:
-        for dirname, dirnames, filenames in os.walk(media_dir_search):
-            if directory is True:
-                for subdirname in dirnames:
-                    if subdirname == media_name:
-                        media_location = os.path.join(dirname, subdirname)
-                        return Path(media_dir_search, media_location)
-            else:
-                for filename in filenames:
-                    if filename == media_name:
-                        media_location = os.path.join(dirname, filename)
-                        return Path(media_dir_search, media_location)
-
-    if media_location is None:
-        raise Exception(f'Mediainfo error - file/directory not found: {media_name} in any of the MediaDirectories specified: {media_roots}')
-
-
-def getmediainfo(torrentfilename, media):
-    """
-    Get filename(s) of video files in the torrent and run mediainfo and capture the output, extract if DVD found (Blurays not yet supported)
-    then set the appropriate fields for the upload
-
-    :param torrentfilename: str filename of torrent to parse from collate()
-    :param media: str Validated media from collate()
-    :return: mediainfo, releasedataout
-
-    mediainfo: Mediainfo text output of the file(s)
-    releaseadtaout: Fields gathered from mediainfo for SM upload
-    """
-
-    torrentmetadata = tp.parse_torrent_file(torrentfilename)
-    torrentname = torrentmetadata['info']['name']  # Directory if >1 file, otherwise it is filename
-    #print(torrentmetadata)
-    mediainfosall = ""
-    releasedataout = {}
-    releasedataout['duration'] = 0
-
-    # TODO Need to cleanup the logic to create an overall filename list to parse instead of the 3-way duplication we currently have
-
-    if 'files' in torrentmetadata['info'].keys():  # Multiple files
-        directory = torrentname
-        print(f'According to the torrent the dir is {directory}')
-        file_path = get_media_location(directory, True)
-        print(f'dir is {file_path}')
-        for file in torrentmetadata['info']['files']:
-            if len(torrentmetadata['info']['files']) == 1:  # This might never happen, it could be just info.name if so
-                filename = os.path.join(*file['path'])
-            else:
-                releasedataout['multiplefiles'] = True
-                filename = os.path.join(*[file_path, *file['path']])  # Each file in the directory of source data for the torrent
-
-            mediainfosall += str(MediaInfo.parse(filename, text=True))
-            releasedataout['duration'] += get_mediainfo_duration(filename)
-            # Get biggest file and mediainfo on this to set the fields for the release
-            maxfile = max(torrentmetadata['info']['files'], key=lambda x: x['length'])  # returns {'length': int, 'path': [str]} of largest file
-            fileforsmfields = Path(*[file_path, *maxfile['path']])  # Assume the largest file is the main file that should populate SM upload fields
-
-    else:  # Single file
-        releasedataout['multiplefiles'] = False
-        filename = torrentname
-        file_path = get_media_location(filename, False)
-        if args.parsed.debug:
-            print(f'Filename for mediainfo: {file_path}')
-        mediainfosall += str(MediaInfo.parse(file_path, text=True))
-        releasedataout['duration'] += get_mediainfo_duration(file_path)
-        fileforsmfields = file_path
-
-    if fileforsmfields.suffix == '.iso' and media == 'DVD':
-        # If DVD, extract the ISO and run mediainfo against appropriate files, if BR we skip as pyunpack (patool/7z) cannot extract them
-        releasedataout['container'] = 'ISO'
-        print(f'Extracting ISO {fileforsmfields} to obtain mediainfo on it...')
-        isovideoextensions = ('.vob', '.m2ts')
-        tempdir = tempfile.TemporaryDirectory()
-        Archive(fileforsmfields).extractall(tempdir.name)
-        dir_files = []
-        for root, subFolder, files in os.walk(tempdir.name):
-            for item in files:
-                filenamewithpath = os.path.join(root, item)
-                dir_files.append(filenamewithpath)
-                if list(filter(filenamewithpath.lower().endswith, isovideoextensions)):  # Only gather mediainfo for DVD video files (BR when supported)
-                    mediainfosall += str(MediaInfo.parse(filenamewithpath, text=True))
-                    releasedataout['duration'] += get_mediainfo_duration(filenamewithpath)
-
-        filesize = lambda f: os.path.getsize(f)
-        fileforsmfields = sorted(dir_files, key=filesize)[-1]  # Assume the largest file is the main file that should populate SM upload fields
-
-    # Now we have decided which file will have its mediainfo parsed for SM fields, parse its mediainfo
-    mediainforeleasedata = MediaInfo.parse(fileforsmfields)
-    # Remove path to file in case it reveals usernames etc.
-    replacement = str(Path(file_path).parent)
-    mediainfosall = mediainfosall.replace(replacement, '')
-
-    if Path(fileforsmfields).suffix == '.iso' and media == 'DVD':
-        tempdir.cleanup()
-
-    for track in mediainforeleasedata.tracks:
-        if track.track_type == 'General':
-            # releasedataout['language'] = track.audio_language_list  # Will need to check if this is reliable
-            if 'container' not in releasedataout:  # Not an ISO, only set container if we do not already know its an ISO
-                releasedataout['container'] = track.file_extension.upper()
-            else:  # We have ISO - get category data based Mediainfo if we have it
-                if track.file_extension.upper() == 'VOB':
-                    releasedataout['category'] = 'DVD'
-                elif track.file_extension.upper() == 'M2TS':  # Not used yet as we cannot handle Bluray / UDF
-                    releasedataout['category'] = 'Bluray'
-
-        if track.track_type == 'Video':
-            validatecodec = {
-                "MPEG Video": "MPEG-2",
-                "AVC": "h264",
-                "HEVC": "h265",
-                "MPEG-4 Visual": "DivX",  # MPEG-4 Part 2 / h263 , usually xvid / divx
-            }
-            for old, new in validatecodec.items():
-                if track.format == old:
-                    releasedataout['codec'] = new
-
-            standardresolutions = {
-                "3840": "1920",
-                "1920": "1080",
-                "1280": "720",
-                "720": "480",
-            }
-            for width, height in standardresolutions.items():
-                if str(track.width) == width and str(track.height) == height:
-                    releasedataout['ressel'] = height
-
-            if 'ressel' in releasedataout.keys():  # Known resolution type, try to determine if interlaced
-                if track.scan_type == "Interlaced" or track.scan_type == "MBAFF":
-                    releasedataout['ressel'] += "i"
-                else:
-                    releasedataout['ressel'] += "p"  # Sometimes a Progressive encode has no field set
-            else:  # Custom resolution
-                releasedataout['ressel'] = 'Other'
-                releasedataout['resolution'] = str(track.width) + "x" + str(track.height)
-
-        if track.track_type == 'Audio' or track.track_type == 'Audio #1':  # Handle multiple audio streams, we just get data from the first for now
-            if track.format in ["AAC", "DTS", "PCM", "AC3"]:
-                releasedataout['audioformat'] = track.format
-            elif track.format == "AC-3":
-                releasedataout['audioformat'] = "AC3"
-            elif track.format == "MPEG Audio" and track.format_profile == "Layer 3":
-                releasedataout['audioformat'] = "MP3"
-            elif track.format == "MPEG Audio" and track.format_profile == "Layer 2":
-                releasedataout['audioformat'] = "MP2"
-
-    if args.parsed.debug:
-        print(f'Mediainfo interpreted data: {releasedataout}')
-
-    return mediainfosall, releasedataout
-
-
 def get_jps_user_id():
     """
     Returns the JPopSuki user id
@@ -1377,69 +1064,6 @@ class HandleCfgOutputDirs:
                 self.file_dir[cfg_key] = Path(Path.home(), cfg_value)
             if not Path(self.file_dir[cfg_key]).is_dir():
                 Path(self.file_dir[cfg_key]).mkdir(parents=True, exist_ok=True)
-
-
-class VideoOptions:
-    """
-    Store Video option constants
-    """
-
-    VideoMedias = ('DVD', 'Blu-Ray', 'VHS', 'VCD', 'TV', 'HDTV', 'WEB')
-    badcontainers = ('ISO', 'VOB', 'MPEG', 'AVI', 'MKV', 'WMV', 'MP4')
-    badcodecs = ('MPEG2', 'h264')
-    badformats = badcontainers + badcodecs
-    resolutions = ('720p', '1080i', '1080p')
-
-
-class Categories:
-    """
-    Store category constants
-    """
-
-    # Store JPS to SM Category translation, defines which JPS Cat gets uploaded to which SM Cat
-    # key: JPS category name
-    # value: SM category ID
-    JPStoSM = {
-        'Album': 0,
-        'EP': 1,  # Does not exist on JPS
-        'Single': 2,
-        'Bluray': 3,  # Does not exist on JPS
-        'DVD': 4,
-        'PV': 5,
-        'Music Performance': 6,  # Does not exist on JPS
-        'TV-Music': 7,  # Music Show
-        'TV-Variety': 8,  # Talk Show
-        'TV-Drama': 9,  # TV Drama
-        'Pictures': 10,
-        'Misc': 11,
-    }
-
-    SM = {
-        'Album': 0,
-        'EP': 1,  # Does not exist on JPS
-        'Single': 2,
-        'Bluray': 3,  # Does not exist on JPS
-        'DVD': 4,
-        'PV': 5,
-        'Music Performance': 6,  # Does not exist on JPS
-        'TV Music': 7,  # TV-Music
-        'TV Variety': 8,  # TV-Variety
-        'TV Drama': 9,  # TV-Drama
-        'Pictures': 10,
-        'Misc': 11,
-    }
-
-    Video = ('Bluray', 'DVD', 'PV', 'TV-Music', 'TV-Variety', 'TV-Drama', 'Music Performance')
-
-    # JPS Categories where release date cannot be entered and therefore need to be processed differently
-    NonDate = ('TV-Music', 'TV-Variety', 'TV-Drama', 'Fansubs', 'Pictures', 'Misc')
-    # JPS Categories where no release data is present and therefore need to be processed differently
-    NonReleaseData = ('Pictures', 'Misc')
-    # Music and Music Video Torrents, for category validation. This must match the cateogry headers in JPS for an artist, hence they are in plural
-    NonTVCategories = ('Albums', 'Singles', 'DVDs', 'PVs')
-    # Categories that should have some of their mediainfo stripped if present, must match indices in Categories.SM
-    SM_StripAllMediainfo = (0, 1, 2, 11)  # Album, EP, Single, Misc - useful to have duration if we have it added to the description
-    SM_StripAllMediainfoExcResolution = 10  # Pictures - useful to have resolution if we have it
 
 
 if __name__ == "__main__":

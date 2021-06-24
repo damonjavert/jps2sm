@@ -16,6 +16,7 @@ def get_valid_filename(s: str) -> AnyStr:
     s = str(s).strip().replace(' ', '_')
     return re.sub(r'(?u)[^-\w.]', '', s)
 
+
 def count_values_dict(dict):
     """
     Count the values in a dictionary.
