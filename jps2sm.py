@@ -673,6 +673,9 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
     return groupid
 
 
+def split_bad_multiple_artists(artists):
+    return re.split(', | x | & ', artists)
+
 class GetGroupData:
     """
     Retrieve group data of the group supplied from args.parsed.urls
@@ -711,16 +714,21 @@ class GetGroupData:
         try:
             artistlinelinktext = str(artistlinelink[0])
             artist_raw = re.findall('<a[^>]+>(.*)<', artistlinelinktext)[0]
-            self.artist = re.split(', | x | & ', artist_raw)
-            print(f'Artist(s): {self.artist}')
+            self.artist = split_bad_multiple_artists(artist_raw)
         except IndexError:  # Cannot find artist
             if self.category == "Pictures":
                 # JPS allows Picture torrents to have no artist set, in this scenario try to infer the artist by examining the text
                 # immediately after the category string up to a YYYY.MM.DD string if available as this should be the magazine title
                 self.artist = re.findall(fr'\[Pictures\] ([A-Za-z ]+) (?:{date_regex2})', text)
+            elif self.category == "Misc":
+                # JPS has some older groups with no artists set, uploaders still used the "Artist - Group name" syntax though
+                artist_raw = re.findall(r'\[Misc\] ([A-Za-z\, ]+) - ', text)[0]
+                self.artist = split_bad_multiple_artists(artist_raw)
             else:
                 print('JPS upload appears to have no artist set and artist cannot be autodetected')
                 raise
+
+        print(f'Artist(s): {self.artist}')
 
         # Extract date without using '[]' as it allows '[]' elsewhere in the title and it works with JPS TV-* categories
         try:
@@ -755,11 +763,13 @@ class GetGroupData:
             if len(titlemerged) == 0:  # Non standard title, fallback on the whole string after the "-"
                 try:
                     self.title = re.findall('<a.*> - (.*)</h2>', text)[0]
-                except IndexError:  # Pictures non-artist upload - for magazines
-                    if self.category == "Pictures":
+                except IndexError:
+                    if self.category == "Pictures":  # Pictures non-artist upload - for magazines
                         # Fallback to all the text after the category, we need to include the date stamp as magazines are often titled
                         # with the same numbers each year - the first magazine each year appears to always be 'No. 1' for example
                         self.title = re.findall(fr'\[Pictures\] (?:[A-Za-z ]+) ({date_regex2}(?:.*))</h2>', text)[0]
+                    elif self.category == "Misc":
+                        self.title = re.findall(r'\[Misc\] (?:[A-Za-z\, ]+) - (.+)</h2>', text)[0]
                     else:
                         print('Cannot find title from the JPS upload')
                         raise
