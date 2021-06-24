@@ -719,7 +719,7 @@ class GetGroupData:
             if self.category == "Pictures":
                 # JPS allows Picture torrents to have no artist set, in this scenario try to infer the artist by examining the text
                 # immediately after the category string up to a YYYY.MM.DD string if available as this should be the magazine title
-                self.artist = re.findall(fr'\[Pictures\] ([A-Za-z ]+) (?:{date_regex2})', text)
+                self.artist = re.findall(fr'\[Pictures\] ([A-Za-z\. ]+) (?:{date_regex2})', text)
             elif self.category == "Misc":
                 # JPS has some older groups with no artists set, uploaders still used the "Artist - Group name" syntax though
                 artist_raw = re.findall(r'\[Misc\] ([A-Za-z\, ]+) - ', text)[0]
@@ -767,7 +767,7 @@ class GetGroupData:
                     if self.category == "Pictures":  # Pictures non-artist upload - for magazines
                         # Fallback to all the text after the category, we need to include the date stamp as magazines are often titled
                         # with the same numbers each year - the first magazine each year appears to always be 'No. 1' for example
-                        self.title = re.findall(fr'\[Pictures\] (?:[A-Za-z ]+) ({date_regex2}(?:.*))</h2>', text)[0]
+                        self.title = re.findall(fr'\[Pictures\] (?:[A-Za-z\. ]+) ({date_regex2}(?:.*))</h2>', text)[0]
                     elif self.category == "Misc":
                         self.title = re.findall(r'\[Misc\] (?:[A-Za-z\, ]+) - (.+)</h2>', text)[0]
                     else:
