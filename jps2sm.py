@@ -24,7 +24,8 @@ import argparse
 import configparser
 import html
 import json
-import traceback
+import logging
+from logging.handlers import RotatingFileHandler
 
 # Third-party packages
 from bs4 import BeautifulSoup
@@ -33,7 +34,7 @@ import humanfriendly
 from pathlib import Path
 
 # jps2sm modules
-from modules.utils import get_valid_filename, count_values_dict
+from modules.utils import get_valid_filename, count_values_dict, fatal_error
 from modules.myloginsession import MyLoginSession
 from modules.constants import Categories, VideoOptions
 from modules.mediainfo import get_mediainfo
@@ -91,8 +92,7 @@ def getbulktorrentids(mode, user, first=1, last=None):
             # There is only 1 page of uploads if the 'Last >>' link cannot be found
             last = 1
 
-    if args.parsed.debug:
-        print(f'Batch user is {user}, batch mode is {mode}, first page is {first}, last page is {last}')
+    logger.debug(f'Batch user is {user}, batch mode is {mode}, first page is {first}, last page is {last}')
 
     useruploads = {}
     useruploads = collections.defaultdict(list)
@@ -102,7 +102,7 @@ def getbulktorrentids(mode, user, first=1, last=None):
     for i in range(first, int(last) + 1):
         useruploadurl = fr"https://jpopsuki.eu/torrents.php?page={i}&order_by=s1&order_way=ASC&type={mode}&userid={user}&disablegrouping=1"
         useruploadpage = s.retrieveContent(useruploadurl)
-        print(useruploadurl)
+        logger.info(useruploadurl)
         # print useruploadpage.text
         soup2 = BeautifulSoup(useruploadpage.text, 'html5lib')
         try:
@@ -111,16 +111,16 @@ def getbulktorrentids(mode, user, first=1, last=None):
             # TODO: Need to add this to every request so it can be handled everywhere, for now it can exist here
             quotaexceeded = re.findall('<title>Browse quota exceeded :: JPopsuki 2.0</title>', useruploadpage.text)
             if quotaexceeded:
-                print('Browse quota exceeded :: JPopsuki 2.0')
-                sys.exit(0)
+                logger.error('Browse quota exceeded :: JPopsuki 2.0')
+                sys.exit(1)
             else:
                 raise
         alltorrentlinksidsonly = re.findall('torrents.php\?id=([0-9]+)\&amp;torrentid=([0-9]+)', torrenttable)
-        print(alltorrentlinksidsonly)
+        logger.info(alltorrentlinksidsonly)
         for groupid, torrentid in alltorrentlinksidsonly:
             useruploads[groupid].append(torrentid)
         time.sleep(5)  # Sleep as otherwise we hit JPS browse quota
-    print(useruploads)
+    logger.debug(useruploads)
     return useruploads
 
 
@@ -199,20 +199,17 @@ def decide_music_performance(artists, multiplefiles, duration):
         return 'TV Music'
     else:  # Single file that is < 25 mins, decide if Music Performance
         if len(artists) > 1:  # Multiple artists
-            if args.parsed.debug:
-                print('Upload is a Music Performance as it has derived multiple artists and is 25 mins or less')
+            logger.debug('Upload is a Music Performance as it has derived multiple artists and is 25 mins or less')
             return 'Music Performance'  # JPS TV Show artists never have multiple artists
         JPSartistpage = s.retrieveContent(f"https://jpopsuki.eu/artist.php?name={artists[0]}")
         soup = BeautifulSoup(JPSartistpage.text, 'html5lib')
         categoriesbox = str(soup.select('#content .thin .main_column .box.center'))
         categories = re.findall(r'\[(.+)\]', categoriesbox)
         if any({*Categories.NonTVCategories} & {*categories}):  # Exclude any TV Shows for being mislabeled as Music Performance
-            if args.parsed.debug:
-                print('Upload is a Music Performance as it is 25 mins or less and not a TV Show')
+            logger.debug('Upload is a Music Performance as it is 25 mins or less and not a TV Show')
             return 'Music Performance'
         else:
-            if args.parsed.debug:
-                print('Upload is not a Music Performance')
+            logger.debug('Upload is not a Music Performance')
             return 'TV Music'
 
 
@@ -232,12 +229,12 @@ def getalternatefansubcategoryid(artist):
     if not any({*Categories.NonTVCategories} & {*categories}) and " ".join(categories).count('TV-') == 1:
         # Artist has no music and only 1 TV Category, artist is a TV show and we can auto detect the category for FanSub releases
         autodetectcategory = re.findall(r'(TV-(?:[^ ]+))', " ".join(categories))[0]
-        if args.parsed.debug:
-            print(f'Autodetected SM category {autodetectcategory} for JPS Fansubs torrent')
+        logger.debug(f'Autodetected SM category {autodetectcategory} for JPS Fansubs torrent')
         return autodetectcategory
     else:  # Cannot autodetect
         AlternateFanSubCategoriesIDs = (5, 6, 7, 8, 9, 11)  # Matches indices in Categories()
-        print(f'Cannot auto-detect correct category for torrent group {torrentgroupdata.title}.\nSelect Category:')
+        logger.warning(f'Cannot auto-detect correct category for torrent group {torrentgroupdata.title}.')
+        print('Select Category:')
         option = 1
         optionlookup = {}
         for alternativefansubcategoryid in AlternateFanSubCategoriesIDs:
@@ -248,9 +245,12 @@ def getalternatefansubcategoryid(artist):
                     option += 1
         alternatecategoryoption = input('Choose alternate category or press ENTER to skip: ')
         if alternatecategoryoption == "":
+            logger.error('No alternate Fansubs category chosen.')
             return "Fansubs"  # Allow upload to fail
         else:
-            return optionlookup[int(alternatecategoryoption)]
+            category = optionlookup[int(alternatecategoryoption)]
+            logger.info(f'Alternate Fansubs category {category} chosen')
+            return category
 
 
 def setorigartist(artist, origartist):
@@ -274,8 +274,7 @@ def setorigartist(artist, origartist):
     }
 
     SMeditartistpage = sm.retrieveContent(f'https://sugoimusic.me/artist.php?artistname={artist}', 'post', data)
-    if args.parsed.debug:
-        print(f'Set artist {artist} original artist to {origartist}')
+    logger.debug(f'Set artist {artist} original artist to {origartist}')
 
 
 def filterlist(string, substr):
@@ -324,8 +323,7 @@ def getreleasedata(torrentids):
         releasedata[torrentid]['slashdata'] = slashlist
         releasedata[torrentid]['uploaddate'] = uploadeddate
 
-    if args.parsed.debug:
-        print(f'Entire group contains: {json.dumps(releasedata, indent=2)}')
+    logger.debug(f'Entire group contains: {json.dumps(releasedata, indent=2)}')
 
     removetorrents = []
     for torrentid, release in releasedata.items():  # Now release is a dict!
@@ -338,12 +336,11 @@ def getreleasedata(torrentids):
         for index, slashreleaseitem in enumerate(release['slashdata']):
             if remaster_freeleech_removed := re.findall(r'(.*) - <strong>Freeleech!<\/strong>', slashreleaseitem):  # Handle Freeleech remastered torrents, issue #43
                 release['slashdata'][index] = f'{remaster_freeleech_removed[0]} - {torrentgroupdata.date[:4]}'  # Use the extracted value and append group JPS release year
-                if args.parsed.debug:
-                    print(f"Torrent {torrentid} is freeleech remastered, validated remasterdata to {release['slashdata'][index]}")
+                logger.debug(f"Torrent {torrentid} is freeleech remastered, validated remasterdata to {release['slashdata'][index]}")
     for torrentid in removetorrents:
         del (releasedata[torrentid])
 
-    print(f'Selected for upload: {releasedata}')
+    logger.info(f'Selected for upload: {releasedata}')
     return releasedata
 
 
@@ -377,13 +374,12 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
     if not args.parsed.dryrun:
         data['auth'] = authkey
 
-    if args.parsed.debug:
-        print(uploaddata)
+    logger.debug(uploaddata)
 
     # TODO Most of this can be in getmediainfo()
     if args.parsed.mediainfo:
         try:
-            data['mediainfo'], releasedatamediainfo = get_mediainfo(torrentpath, uploaddata['media'], media_roots, args.parsed.debug)
+            data['mediainfo'], releasedatamediainfo = get_mediainfo(torrentpath, uploaddata['media'], media_roots)
             data.update(releasedatamediainfo)
             if 'duration' in data.keys() and data['duration'] > 1:
                 duration_friendly_format = humanfriendly.format_timespan(datetime.timedelta(seconds=int(data['duration'] / 1000)))
@@ -396,8 +392,7 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
             if torrentgroupdata.category in Categories.Video:
                 raise
             else:
-                if args.parsed.debug:
-                    print(f'Skipping exception on mediainfo failing as {torrentgroupdata.title} is not a Video category.')
+                logger.debug(f'Skipping exception on mediainfo failing as {torrentgroupdata.title} is not a Video category.')
 
     if torrentgroupdata.category not in Categories.NonReleaseData:
         data['media'] = uploaddata['media']
@@ -496,8 +491,7 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
     if "V.A." in torrentgroupdata.artist:  # At JPS Various Artists torrents have their artists as contrib artists
         del data['contrib_artists[]']  # Error if null as if there is a V.A. torrent group with no contrib artists something is wrong
         data['idols[]'] = contribartistsenglish
-        if args.parsed.debug:
-            print(f'Various Artists torrent, setting main artists to {contribartistsenglish}')
+        logger.debug(f'Various Artists torrent, setting main artists to {contribartistsenglish}')
     else:
         data['idols[]'] = torrentgroupdata.artist  # Set the artist normally
 
@@ -508,7 +502,7 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
     if args.parsed.dryrun or args.parsed.debug:
         dataexcmediainfo = {x: data[x] for x in data if x not in 'mediainfo'}
         dataexcmediainfo['auth'] = '<scrubbed>'
-        print(json.dumps(dataexcmediainfo, indent=2))  # Mediainfo shows too much data
+        logger.info(json.dumps(dataexcmediainfo, indent=2))  # Mediainfo shows too much data
     if not args.parsed.dryrun:
         SMres = sm.retrieveContent(uploadurl, "post", data, postDataFiles)
 
@@ -517,17 +511,20 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
             dupe = re.findall('torrentid=([0-9]+)">The exact same torrent file already exists on the site!</a>$', SMerrorTorrent[0])
             if dupe:
                 dupe_file_name = download_sm_torrent(dupe[0])
-                print(
+                logger.warning(
                     f'This torrent already exists on SugoiMusic - https://sugoimusic.me/torrents.php?torrentid={dupe[0]} '
                     f'The .torrent has been downloaded with name "{Path(output.file_dir["smtorrents"], dupe_file_name)}"'
                 )
-                raise Exception(f'The exact same torrent file already exists on the site! See: https://sugoimusic.me/torrents.php?torrentid={dupe[0]} JPS torrent id: {uploaddata["jpstorrentid"]}')
+                dupe_error_msg = f'The exact same torrent file already exists on the site! See: https://sugoimusic.me/torrents.php?torrentid={dupe[0]} JPS torrent id: {uploaddata["jpstorrentid"]}'
+                logger.error(dupe_error_msg)
+                raise RuntimeError(dupe_error_msg)
             else:
-                raise Exception(SMerrorTorrent[0])
+                logger.error(SMerrorTorrent[0])
+                raise RuntimeError(SMerrorTorrent[0])
 
         SMerrorLogon = re.findall('<p>Invalid (.*)</p>', SMres.text)
         if SMerrorLogon:
-            raise Exception(f'Invalid {SMerrorLogon[0]}')
+            raise RuntimeError(f'Invalid {SMerrorLogon[0]}')
 
         smuploadresultfilename = "SMuploadresult." + Path(torrentpath).stem + ".html"
         smuploadresultpath = Path(output.file_dir['html'], smuploadresultfilename)
@@ -540,16 +537,18 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
             # Find groupid if private torrent warning
             groupid = re.findall(r'Your torrent has been uploaded; however, you must download your torrent from <a href="torrents\.php\?id=([0-9]+)">here</a>', SMres.text)
             if not groupid:
-                raise Exception(f'Cannot find groupid in SM response - there was probably an unknown error. See {smuploadresultfilename} for potential errors')
+                unknown_error_msg = f'Cannot find groupid in SM response - there was probably an unknown error. See {smuploadresultfilename} for potential errors'
+                raise RuntimeError(unknown_error_msg)
 
         if groupid:
-            print(f'OK - groupid {groupid[0]}  See https://sugoimusic.me/torrents.php?id={groupid[0]}')
+            logger.info(f'Torrent uploaded successfully as groupid {groupid[0]}  See https://sugoimusic.me/torrents.php?id={groupid[0]}')
 
     return groupid
 
 
 def split_bad_multiple_artists(artists):
     return re.split(', | x | & ', artists)
+
 
 class GetGroupData:
     """
@@ -560,8 +559,7 @@ class GetGroupData:
 
     def __init__(self, jpsurl):
         self.jpsurl = jpsurl
-        if args.parsed.debug:
-            print('Processing JPS URL: ', jpsurl)
+        logger.debug(f'Processing JPS URL: {jpsurl}')
         self.getdata(jpsurl)
 
     def getdata(self, jpsurl):
@@ -579,12 +577,11 @@ class GetGroupData:
         artistlinelink = soup.select('.thin h2 a')
         originaltitleline = soup.select('.thin h3')
         text = str(artistline[0])
-        if args.parsed.debug:
-            print(artistline[0])
+        logger.debug(artistline[0])
 
         sqbrackets = re.findall('\[(.*?)\]', text)
         self.category = sqbrackets[0]
-        print(self.category)
+        logger.info(f'Category: {self.category}')
 
         try:
             artistlinelinktext = str(artistlinelink[0])
@@ -594,16 +591,24 @@ class GetGroupData:
             if self.category == "Pictures":
                 # JPS allows Picture torrents to have no artist set, in this scenario try to infer the artist by examining the text
                 # immediately after the category string up to a YYYY.MM.DD string if available as this should be the magazine title
-                self.artist = re.findall(fr'\[Pictures\] ([A-Za-z\. ]+) (?:{date_regex2})', text)
+                try:
+                    self.artist = re.findall(fr'\[Pictures\] ([A-Za-z\. ]+) (?:{date_regex2})', text)
+                except IndexError:
+                    logger.exception('Cannot find artist')
+                    raise
             elif self.category == "Misc":
                 # JPS has some older groups with no artists set, uploaders still used the "Artist - Group name" syntax though
-                artist_raw = re.findall(r'\[Misc\] ([A-Za-z\, ]+) - ', text)[0]
+                try:
+                    artist_raw = re.findall(r'\[Misc\] ([A-Za-z\, ]+) - ', text)[0]
+                except IndexError:
+                    logger.exception('Cannot find artist')
+                    raise
                 self.artist = split_bad_multiple_artists(artist_raw)
             else:
-                print('JPS upload appears to have no artist set and artist cannot be autodetected')
+                logger.exception('JPS upload appears to have no artist set and artist cannot be autodetected')
                 raise
 
-        print(f'Artist(s): {self.artist}')
+        logger.info(f'Artist(s): {self.artist}')
 
         # Extract date without using '[]' as it allows '[]' elsewhere in the title and it works with JPS TV-* categories
         try:
@@ -613,18 +618,15 @@ class GetGroupData:
                 self.date = re.findall(r'[^\d]((?:19|20)\d{2})[^\d]', text)[0]
 
             # Handle if cannot find date in the title, use upload date instead from getreleasedata() but error if the category should have it
-            except IndexError as dateexc:
+            except IndexError:
                 if self.category not in Categories.NonDate:
-                    print(f'Group release date not found and not using upload date instead as {self.category} torrents should have it set')
-                    if args.parsed.debug:
-                        print(dateexc)
-                        traceback.print_exc()
-                if args.parsed.debug:
-                    print('Date not found from group data, will use upload date as the release date')
+                    logger.exception(f'Group release date not found and not using upload date instead as {self.category} torrents should have it set')
+                else:
+                    logger.warning('Date not found from group data, will use upload date as the release date')
                 self.date = None
                 pass
 
-        print(f'Release date: {self.date}')
+        logger.info(f'Release date: {self.date}')
 
         if self.category not in Categories.NonDate:
             self.title = re.findall('<a.*> - (.*) \[', text)[0]
@@ -642,21 +644,29 @@ class GetGroupData:
                     if self.category == "Pictures":  # Pictures non-artist upload - for magazines
                         # Fallback to all the text after the category, we need to include the date stamp as magazines are often titled
                         # with the same numbers each year - the first magazine each year appears to always be 'No. 1' for example
-                        self.title = re.findall(fr'\[Pictures\] (?:[A-Za-z\. ]+) ({date_regex2}(?:.*))</h2>', text)[0]
+                        try:
+                            self.title = re.findall(fr'\[Pictures\] (?:[A-Za-z\. ]+) ({date_regex2}(?:.*))</h2>', text)[0]
+                        except IndexError:
+                            logger.exception('Cannot find title from the JPS upload')
+                            raise
                     elif self.category == "Misc":
-                        self.title = re.findall(r'\[Misc\] (?:[A-Za-z\, ]+) - (.+)</h2>', text)[0]
+                        try:
+                            self.title = re.findall(r'\[Misc\] (?:[A-Za-z\, ]+) - (.+)</h2>', text)[0]
+                        except IndexError:
+                            logger.exception('Cannot find title from the JPS upload')
+                            raise
                     else:
-                        print('Cannot find title from the JPS upload')
+                        logger.exception('Cannot find title from the JPS upload')
                         raise
             else:
                 self.title = titlemerged
 
-        print(f'Title: {self.title}')
+        logger.info(f'Title: {self.title}')
         try:
             originalchars = re.findall(r'<a href="artist.php\?id=(?:[0-9]+)">(.+)</a> - (.+)\)</h3>', str(originaltitleline))[0]
             self.originalartist = originalchars[0]
             self.originaltitle = originalchars[1]
-            print(f"Original artist: {self.originalartist} Original title: {self.originaltitle}")
+            logger.info(f"Original artist: {self.originalartist} Original title: {self.originaltitle}")
         except IndexError:  # Do nothing if group has no original artist/title
             pass
 
@@ -672,18 +682,18 @@ class GetGroupData:
         except:
             self.groupdescription = removehtmltags(str(soup.select('#content .thin .main_column .box .body')[0]))
 
-        print(f"Group description:\n{self.groupdescription}")
+        logger.info(f"Group description:\n{self.groupdescription}")
 
         image = str(soup.select('#content .thin .sidebar .box p a'))
         try:
             self.imagelink = "https://jpopsuki.eu/" + re.findall('<a\s+(?:[^>]*?\s+)?href=\"([^\"]*)\"', image)[0]
-            print(self.imagelink)
+            logger.info(f'Image link: {self.imagelink}')
         except IndexError:  # No image for the group
             self.imagelink = None
 
         tagsget = str(soup.select('#content .thin .sidebar .box ul.stats.nobullet li'))
         tags = re.findall('searchtags=([^\"]+)', tagsget)
-        print(tags)
+        logger.info(f'Tags: {tags}')
         self.tagsall = ",".join(tags)
 
         try:
@@ -693,7 +703,7 @@ class GetGroupData:
             for artistpair in contribartistslist:
                 self.contribartists[artistpair[1]] = artistpair[0] # Creates contribartists[artist] = origartist
 
-            print(f'Contributing artists: {self.contribartists}')
+            logger.info(f'Contributing artists: {self.contribartists}')
         except IndexError:  # Do nothing if group has no contrib artists
             pass
 
@@ -826,7 +836,7 @@ def collate(torrentids):
     for torrentid, releasedatafull in getreleasedata(torrentids).items():
 
         torrentcount += 1
-        print(f'Now processing: {torrentid} {releasedatafull}')
+        logger.info(f'Now processing: {torrentid} {releasedatafull}')
 
         releasedata = releasedatafull['slashdata']
         uploaddatestr = releasedatafull['uploaddate']
@@ -874,10 +884,10 @@ def collate(torrentids):
             releasedataout['bitrate'] = validate_jps_bitrate(releasedata[1])
 
             if releasedataout['audioformat'] == args.parsed.excaudioformat:  # Exclude filters
-                print(f'Excluding {releasedata} as exclude audioformat {args.parsed.excaudioformat} is set')
+                logger.info(f'Excluding {releasedata} as exclude audioformat {args.parsed.excaudioformat} is set')
                 continue
             elif releasedataout['media'] == args.parsed.excmedia:
-                print(f'Excluding {releasedata} as exclude  {args.parsed.excmedia} is set')
+                logger.info(f'Excluding {releasedata} as exclude  {args.parsed.excmedia} is set')
                 continue
 
             if len(releasedata) == 4:  # Remastered
@@ -965,8 +975,7 @@ def downloaduploadedtorrents(torrentcount):
 
         with open(torrentpath, "wb") as f:
             f.write(torrentfile.content)
-        if args.parsed.debug:
-            print(f'Downloaded SM torrent as {torrentpath}')
+        logger.debug(f'Downloaded SM torrent as {torrentpath}')
 
 
 def decide_ep(torrentfilename, uploaddata):
@@ -995,18 +1004,14 @@ def decide_ep(torrentfilename, uploaddata):
         if list(filter(file['path'][-1].lower().endswith, music_extensions)) and \
                 not any(substring in file['path'][-1].lower() for substring in off_vocal_phrases):
             #  Count music files which are not an off-vocal or instrumental
-            if args.parsed.debug:
-                # Print each track for consideration
-                print(file['path'][-1])
+            logger.debug(f"Deciding if EP with torrent with these tracks: {file['path'][-1]}")
             track_count += 1
 
     if track_count < 7:
-        if args.parsed.debug:
-            print(f'Upload is an EP as it has {track_count} standard tracks')
+        logger.debug(f'Upload is an EP as it has {track_count} standard tracks')
         return 'EP'
     else:
-        if args.parsed.debug:
-            print(f'Upload is not an EP as it has {track_count} tracks')
+        logger.debug(f'Upload is not an EP as it has {track_count} tracks')
         return 'Album'
 
 
@@ -1066,38 +1071,58 @@ class HandleCfgOutputDirs:
                 Path(self.file_dir[cfg_key]).mkdir(parents=True, exist_ok=True)
 
 
+def get_console_handler():
+    console_handler = logging.StreamHandler(sys.stdout)
+    # console_handler.setFormatter(FORMATTER)
+    return console_handler
+
+
+def get_file_handler():
+    file_handler = RotatingFileHandler(log_file, maxBytes=1048576)
+    file_handler.setFormatter(FORMATTER)
+    return file_handler
+
+
 if __name__ == "__main__":
     args = GetArgs()
     usermode = torrent_password_key = None
+
+    FORMATTER = logging.Formatter("%(asctime)s — %(name)s — %(levelname)s — %(message)s")
+    scriptdir = os.path.dirname(os.path.abspath(sys.argv[0]))
+    log_file = scriptdir + '/jps2sm.log'
+
+    logger = logging.getLogger('main')
+    if args.parsed.debug:
+        logger.setLevel(logging.DEBUG)
+    else:
+        logger.setLevel(logging.INFO)
+    logger.addHandler(get_console_handler())
+    logger.addHandler(get_file_handler())
+    # with this pattern, it's rarely necessary to propagate the error up to parent
+    logger.propagate = False
 
     if not args.parsed.debug:
         sys.tracebacklimit = 0
 
     if args.parsed.urls is None and not (bool(args.parsed.batchuploaded) or bool(args.parsed.batchseeding)):
-        print('Error: Neither any JPS URL(s) (--urls) or batch parameters (--batchuploaded or --batchseeding) have been specified. See --help', file=sys.stderr)
-        sys.exit(1)
+        fatal_error('Error: Neither any JPS URL(s) (--urls) or batch parameters (--batchuploaded or --batchseeding) have been specified. See --help')
     elif args.parsed.urls is not None and (bool(args.parsed.batchuploaded) or bool(args.parsed.batchseeding)):
-        print('Error: Both the JPS URL(s) (--urls) and batch parameters (--batchuploaded or --batchseeding) have been specified, but only one is allowed.', file=sys.stderr)
-        sys.exit(1)
+        fatal_error('Error: Both the JPS URL(s) (--urls) and batch parameters (--batchuploaded or --batchseeding) have been specified, but only one is allowed.')
     elif bool(args.parsed.batchuploaded) or bool(args.parsed.batchseeding):
 
         batchuser = None
         if args.parsed.batchuser:
             if args.parsed.batchuser.isnumeric() is False:
-                print('Error: "--batchuser" or short "-b" should be a JPS profile ID. See --help', file=sys.stderr)
-                sys.exit(1)
+                fatal_error('Error: "--batchuser" or short "-b" should be a JPS profile ID. See --help')
             batchuser = int(args.parsed.batchuser)
 
         if bool(args.parsed.batchstart) ^ bool(args.parsed.batchend):
-            print('Error: You have specified an incomplete page range. See --help', file=sys.stderr)
-            sys.exit(1)
+            fatal_error('Error: You have specified an incomplete page range. See --help')
         elif bool(args.parsed.batchstart) and bool(args.parsed.batchend):
             batchstart = args.parsed.batchstart
             batchend = args.parsed.batchend
         if bool(args.parsed.batchuploaded) and bool(args.parsed.batchseeding):
-            print('Error: Both batch modes of operation specified - only one can be used at the same time. See --help', file=sys.stderr)
-            sys.exit(1)
-
+            fatal_error('Error: Both batch modes of operation specified - only one can be used at the same time. See --help')
         if args.parsed.batchuploaded:
             batchmode = "uploaded"
         elif args.parsed.batchseeding:
@@ -1108,14 +1133,12 @@ if __name__ == "__main__":
         usermode = True
 
     # Get configuration
-    scriptdir = os.path.dirname(os.path.abspath(sys.argv[0]))
     config = configparser.ConfigParser()
     configfile = scriptdir + '/jps2sm.cfg'
     try:
         open(configfile)
     except FileNotFoundError:
-        print('Error: cannot read cfg - enter your JPS/SM credentials in jps2sm.cfg and check jps2sm.cfg.example to see the syntax.', file=sys.stderr)
-        raise
+        fatal_error(f'Error: config file {configfile} not found - enter your JPS/SM credentials in jps2sm.cfg and check jps2sm.cfg.example to see the syntax.')
 
     config.read(configfile)
     jpsuser = config.get('JPopSuki', 'User')
@@ -1142,32 +1165,26 @@ if __name__ == "__main__":
             media_roots = [x.strip() for x in config.get('Media', 'MediaDirectories').split(',')]  # Remove whitespace after comma if any
             for media_dir in media_roots:
                 if not os.path.exists(media_dir):
-                    print(f'Error: Media directory {media_dir} does not exist. Check your configuration in jps2sm.cfg.', file=sys.stderr)
-                    sys.exit(1)
+                    fatal_error(f'Error: Media directory {media_dir} does not exist. Check your configuration in jps2sm.cfg.')
                 if not os.path.isdir(media_dir):
-                    print(f'Error: Media directory {media_dir} is a file and not a directory. Check your configuration in jps2sm.cfg.', file=sys.stderr)
-                    sys.exit(1)
+                    fatal_error(f'Error: Media directory {media_dir} is a file and not a directory. Check your configuration in jps2sm.cfg.')
         except configparser.NoSectionError:
-            print('Error: --mediainfo requires you to configure MediaDirectories in jps2sm.cfg for mediainfo to find your file(s).', file=sys.stderr)
-            sys.exit(1)
+            fatal_error('Error: --mediainfo requires you to configure MediaDirectories in jps2sm.cfg for mediainfo to find your file(s).')
 
-    s = MyLoginSession(loginUrl, loginData, loginTestUrl, successStr, debug=args.parsed.debug)
+    s = MyLoginSession(loginUrl, loginData, loginTestUrl, successStr)
 
     if not args.parsed.dryrun:
-        sm = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr, debug=args.parsed.debug)
+        sm = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr)
         # We only want this run ONCE per instance of the script
         userkeys = get_user_keys()
         authkey = userkeys['authkey']
         torrent_password_key = userkeys['torrent_password_key']
 
     jps_user_id = get_jps_user_id()
-    if args.parsed.debug:
-        print(f"JPopsuki user id is {jps_user_id}")
+    logger.debug(f"JPopsuki user id is {jps_user_id}")
 
     if detect_display_swapped_names(jps_user_id):
-        print("Error: 'Display original Artist/Album titles' is enabled in your JPS user profile. This must be disabled for jps2sm to run.",
-              file=sys.stderr)
-        sys.exit(1)
+        fatal_error("Error: 'Display original Artist/Album titles' is enabled in your JPS user profile. This must be disabled for jps2sm to run.")
 
     if usermode:
         batchuser = args.parsed.batchuser or jps_user_id
@@ -1184,26 +1201,23 @@ if __name__ == "__main__":
 
         user_uploads_found = count_values_dict(useruploads)
         user_uploads_done = 0
-        print(f'Now attempting to upload {user_uploads_found} torrents.')
+        logger.info(f'Now attempting to upload {user_uploads_found} torrents.')
 
         for key, value in useruploads.items():
             groupid = key
             torrentids = value
             try:
-                print('-------------------------')
+                logger.info('-------------------------')
                 torrentgroupdata = GetGroupData("https://jpopsuki.eu/torrents.php?id=%s" % groupid)
                 if torrentgroupdata.category == args.parsed.exccategory:
-                    if args.parsed.debug:
-                        print(f'Excluding groupid {groupid} as it is {torrentgroupdata.category} group and these are being skipped')
+                    logger.debug(f'Excluding groupid {groupid} as it is {torrentgroupdata.category} group and these are being skipped')
                     continue
             except KeyboardInterrupt:  # Allow Ctrl-C to exit without showing the error multiple times and polluting the final error dict
                 break  # Still continue to get error dicts and dupe list so far
-            except Exception as exc:
-                print('Error with retrieving group data for groupid %s trorrentid(s) %s, skipping upload' % (groupid, ",".join(torrentids)))
+            except Exception:
+                # Catch all for any exception
+                logger.exception('Error with retrieving group data for groupid %s trorrentid(s) %s, skipping upload' % (groupid, ",".join(torrentids)))
                 useruploadsgrouperrors[groupid] = torrentids
-                if args.parsed.debug:
-                    print(exc)
-                    traceback.print_exc()
                 continue
 
             try:
@@ -1215,55 +1229,50 @@ if __name__ == "__main__":
                 break  # Still continue to get error dicts and dupe list so far
             except Exception as exc:
                 if str(exc).startswith('The exact same torrent file already exists on the site!'):
-                    print(exc)
                     sm_dupe_torrentid, jps_dupe_torrentid = re.findall(r'The exact same torrent file already exists on the site! See: https://sugoimusic\.me/torrents\.php\?torrentid=([0-9]+) JPS torrent id\: ([0-9]+)', str(exc))[0]
                     user_upload_dupes.append(sm_dupe_torrentid)
                     user_upload_dupes_jps.append(jps_dupe_torrentid)
                 elif str(exc).startswith('Mediainfo error - file/directory not found'):
-                    print(exc)
                     # Need to get filename that was not found
                     missing_file = re.findall(r'Mediainfo error - file/directory not found: (.+) in any of the MediaDirectories', str(exc))
                     user_upload_source_data_not_found.append(missing_file)
                 elif str(exc).startswith('You do not appear to have entered any MediaInfo data for your video upload.'):
-                    print(exc)
                     user_upload_mediainfo_not_submitted += 1
                 else:
-                    print('Error with collating/retrieving release data for groupid %s torrentid(s) %s, skipping upload' % (groupid, ",".join(torrentids)))
+                    # Catch all for any exception
+                    logger.exception(f'Error with collating/retrieving release data for {groupid} torrentid(s) {",".join(torrentids)}, skipping upload')
                     useruploadscollateerrors[groupid] = torrentids
-                    if args.parsed.debug:
-                        print(exc)
-                        traceback.print_exc()
 
                 continue
 
         if useruploadsgrouperrors:
-            print('The following JPS groupid(s) (torrentid(s) shown for reference) had errors in retrieving group data, '
+            logger.error('The following JPS groupid(s) (torrentid(s) shown for reference) had errors in retrieving group data, '
                   'keep this data safe and you can possibly retry with it in a later version:')
-            print(useruploadsgrouperrors)
-            print(f'Total: {count_values_dict(useruploadsgrouperrors)}')
+            logger.error(useruploadsgrouperrors)
+            logger.error(f'Total: {count_values_dict(useruploadsgrouperrors)}')
         if useruploadscollateerrors:
-            print('The following JPS groupid(s) and corresponding torrentid(s) had errors either in collating/retrieving '
+            logger.error('The following JPS groupid(s) and corresponding torrentid(s) had errors either in collating/retrieving '
                   'release data or in performing the actual upload to SM (although group data was retrieved OK), '
                   'keep this data safe and you can possibly retry with it in a later version:')
-            print(useruploadscollateerrors)
-            print(f'Total: {count_values_dict(useruploadscollateerrors)}')
+            logger.error(useruploadscollateerrors)
+            logger.error(f'Total: {count_values_dict(useruploadscollateerrors)}')
         if user_upload_dupes:
-            print('The following SM torrentid(s) have already been uploaded to the site, but the SM torrents were downloaded so you can cross seed:')
-            print(f'SM duplicate torrent ids: {user_upload_dupes}\nJPS duplicate torrent ids: {user_upload_dupes_jps}')
-            print(f'Total: {len(user_upload_dupes)}')
+            logger.warning('The following SM torrentid(s) have already been uploaded to the site, but the SM torrents were downloaded so you can cross seed:')
+            logger.warning(f'SM duplicate torrent ids: {user_upload_dupes}\nJPS duplicate torrent ids: {user_upload_dupes_jps}')
+            logger.warning(f'Total: {len(user_upload_dupes)}')
         if user_upload_source_data_not_found:
-            print('The following file(s)/dir(s) were not found in your MediaDirectories specified in jps2sm.cfg and the upload was skipped:')
-            print(user_upload_source_data_not_found)
-            print(f'Total: {len(user_upload_source_data_not_found)}')
+            logger.error('The following file(s)/dir(s) were not found in your MediaDirectories specified in jps2sm.cfg and the upload was skipped:')
+            logger.error(user_upload_source_data_not_found)
+            logger.error(f'Total: {len(user_upload_source_data_not_found)}')
 
-        print(f'Finished batch upload\n--------------------------------------------------------\nOverall stats:'
-              f'\nTorrents found at JPS: {user_uploads_found}\nGroup data errors: {count_values_dict(useruploadsgrouperrors)}'
-              f'\nRelease data (or any other) errors: {count_values_dict(useruploadscollateerrors)}'
-              f'\nMediaInfo source data missing: {len(user_upload_source_data_not_found)}'
-              f'\nMediaInfo not submitted errors (use \"--mediainfo\" to fix): {user_upload_mediainfo_not_submitted}')
+        logger.info(f'Finished batch upload\n--------------------------------------------------------\nOverall stats:'
+                    f'\nTorrents found at JPS: {user_uploads_found}\nGroup data errors: {count_values_dict(useruploadsgrouperrors)}'
+                    f'\nRelease data (or any other) errors: {count_values_dict(useruploadscollateerrors)}'
+                    f'\nMediaInfo source data missing: {len(user_upload_source_data_not_found)}'
+                    f'\nMediaInfo not submitted errors (use \"--mediainfo\" to fix): {user_upload_mediainfo_not_submitted}')
         if not args.parsed.dryrun:
-            print(f'\nNew uploads successfully created: {user_uploads_done}'
-                  f'\nDuplicates found (torrents downloaded for cross-seeding): {len(user_upload_dupes)}')
+            logger.error(f'\nNew uploads successfully created: {user_uploads_done}'
+                         f'\nDuplicates found (torrents downloaded for cross-seeding): {len(user_upload_dupes)}')
     else:
         # Standard non-batch upload using --urls
         if not args.parsed.urls:

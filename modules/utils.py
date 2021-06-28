@@ -1,5 +1,9 @@
+import logging
 import re
 from typing import AnyStr
+import sys
+
+logger = logging.getLogger('main.' + __name__)
 
 
 def get_valid_filename(s: str) -> AnyStr:
@@ -22,3 +26,16 @@ def count_values_dict(dict):
     Count the values in a dictionary.
     """
     return sum([len(dict[x]) for x in dict])
+
+
+def fatal_error(msg):
+    """
+    Immediately exit and show an error to stderr and not log it
+    Usually used argument, file or other simple errors that should not be logged as otherwise it creates noise
+
+    :param msg: str
+    :return:
+    """
+
+    print(msg, file=sys.stderr)
+    sys.exit(1)

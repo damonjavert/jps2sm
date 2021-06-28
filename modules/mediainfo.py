@@ -1,3 +1,4 @@
+import logging
 import os
 
 # Third-party modules
@@ -7,8 +8,10 @@ from pyunpack import Archive
 from pathlib import Path
 import tempfile
 
+logger = logging.getLogger('main.' + __name__)
 
-def get_mediainfo(torrentfilename, media, media_roots, debug):
+
+def get_mediainfo(torrentfilename, media, media_roots):
     """
     Get filename(s) of video files in the torrent and run mediainfo and capture the output, extract if DVD found (Blurays not yet supported)
     then set the appropriate fields for the upload
@@ -16,7 +19,6 @@ def get_mediainfo(torrentfilename, media, media_roots, debug):
     :param torrentfilename: str filename of torrent to parse from collate()
     :param media: str Validated media from collate()
     :param media_roots: Sanitised MediaDirectories from cfg for use by get_media_location()
-    :param debug: boolean: Log extra info
     :return: mediainfo, releasedataout
 
     mediainfo: Mediainfo text output of the file(s)
@@ -34,9 +36,9 @@ def get_mediainfo(torrentfilename, media, media_roots, debug):
 
     if 'files' in torrentmetadata['info'].keys():  # Multiple files
         directory = torrentname
-        print(f'According to the torrent the dir is {directory}')
+        logger.info(f'According torrent metadata the dir is {directory}')
         file_path = get_media_location(directory, True, media_roots)
-        print(f'dir is {file_path}')
+        logger.info(f'Path to dir: {file_path}')
         for file in torrentmetadata['info']['files']:
             if len(torrentmetadata['info']['files']) == 1:  # This might never happen, it could be just info.name if so
                 filename = os.path.join(*file['path'])
@@ -54,8 +56,7 @@ def get_mediainfo(torrentfilename, media, media_roots, debug):
         releasedataout['multiplefiles'] = False
         filename = torrentname
         file_path = get_media_location(filename, False, media_roots)
-        if debug:
-            print(f'Filename for mediainfo: {file_path}')
+        logger.debug(f'Filename for mediainfo: {file_path}')
         mediainfosall += str(MediaInfo.parse(file_path, text=True))
         releasedataout['duration'] += get_mediainfo_duration(file_path)
         fileforsmfields = file_path
@@ -63,7 +64,7 @@ def get_mediainfo(torrentfilename, media, media_roots, debug):
     if fileforsmfields.suffix == '.iso' and media == 'DVD':
         # If DVD, extract the ISO and run mediainfo against appropriate files, if BR we skip as pyunpack (patool/7z) cannot extract them
         releasedataout['container'] = 'ISO'
-        print(f'Extracting ISO {fileforsmfields} to obtain mediainfo on it...')
+        logger.info(f'Extracting ISO {fileforsmfields} to obtain mediainfo on it...')
         isovideoextensions = ('.vob', '.m2ts')
         tempdir = tempfile.TemporaryDirectory()
         Archive(fileforsmfields).extractall(tempdir.name)
@@ -140,8 +141,7 @@ def get_mediainfo(torrentfilename, media, media_roots, debug):
             elif track.format == "MPEG Audio" and track.format_profile == "Layer 2":
                 releasedataout['audioformat'] = "MP2"
 
-    if debug:
-        print(f'Mediainfo interpreted data: {releasedataout}')
+    logger.debug(f'Mediainfo interpreted data: {releasedataout}')
 
     return mediainfosall, releasedataout
 
@@ -159,7 +159,7 @@ def get_mediainfo_duration(filename):
             if track.duration is None:
                 return 0
             else:
-                print(f'Mediainfo duration: {filename} {track.duration}')
+                logger.info(f'Mediainfo duration: {filename} {track.duration}')
                 return float(track.duration)  # time in ms
 
 
@@ -178,7 +178,7 @@ def get_media_location(media_name, directory, media_roots):
     # Find the file/dir and stop on the first hit, hopefully OS-side disk cache will mean this will not take too long
 
     media_location = None
-    print(f'Searching for {media_name}...')
+    logger.info(f'Searching for {media_name}...')
 
     for media_dir_search in media_roots:
         for dirname, dirnames, filenames in os.walk(media_dir_search):
@@ -194,4 +194,6 @@ def get_media_location(media_name, directory, media_roots):
                         return Path(media_dir_search, media_location)
 
     if media_location is None:
-        raise Exception(f'Mediainfo error - file/directory not found: {media_name} in any of the MediaDirectories specified: {media_roots}')
+        media_not_found_error_msg = f'Mediainfo error - file/directory not found: {media_name} in any of the MediaDirectories specified: {media_roots}'
+        logger.error(media_not_found_error_msg)
+        raise RuntimeError(media_not_found_error_msg)

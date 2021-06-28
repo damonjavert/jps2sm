@@ -1,8 +1,11 @@
+import logging
 import datetime
 import os
 import pickle
 from urllib.parse import urlparse
 import requests
+
+logger = logging.getLogger('main.' + __name__)
 
 
 class MyLoginSession:
@@ -25,7 +28,6 @@ class MyLoginSession:
                  maxSessionTimeSeconds=30 * 60,
                  proxies=None,
                  userAgent='Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1',
-                 debug=False,
                  forceLogin=False,
                  **kwargs):
         """
@@ -48,7 +50,6 @@ class MyLoginSession:
         self.sessionFile = urlData.netloc + sessionFileAppendix
         self.userAgent = userAgent
         self.loginTestString = loginTestString
-        self.debug = debug
 
         self.login(forceLogin, **kwargs)
 
@@ -66,8 +67,7 @@ class MyLoginSession:
         Always updates session cache file.
         """
         wasReadFromCache = False
-        if self.debug:
-            print('loading or generating session...')
+        logger.debug('loading or generating session...')
         if os.path.exists(self.sessionFile) and not forceLogin:
             time = self.modification_date(self.sessionFile)
 
@@ -77,24 +77,19 @@ class MyLoginSession:
                 with open(self.sessionFile, "rb") as f:
                     self.session = pickle.load(f)
                     wasReadFromCache = True
-                    if self.debug:
-                        print("loaded session from cache (last access %ds ago) "
-                              % lastModification)
+                    logger.debug("loaded session from cache (last access %ds ago) " % lastModification)
         if not wasReadFromCache:
             self.session = requests.Session()
             self.session.headers.update({'user-agent': self.userAgent})
             res = self.session.post(self.loginUrl, data=self.loginData,
                                     proxies=self.proxies, **kwargs)
-
-            if self.debug:
-                print('created new session with login')
+            logger.debug('created new session with login')
             self.saveSessionToCache()
 
         # test login
         res = self.session.get(self.loginTestUrl)
         if res.text.lower().find(self.loginTestString.lower()) < 0:
-            if self.debug:
-                print(res.text)
+            logger.debug(res.text)
             raise Exception("could not log into provided site '%s'"
                             " (did not find successful login string)"
                             % self.loginUrl)
@@ -106,8 +101,7 @@ class MyLoginSession:
         # always save (to update timeout)
         with open(self.sessionFile, "wb") as f:
             pickle.dump(self.session, f)
-            if self.debug:
-                print('updated session cache-file %s' % self.sessionFile)
+            logger.debug('updated session cache-file %s' % self.sessionFile)
 
     def retrieveContent(self, url, method="get", postData=None, postDataFiles=None, **kwargs):
         """
