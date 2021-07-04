@@ -898,8 +898,7 @@ def collate(torrentids):
 
             if len(releasedata) == 4:  # Remastered
                 remasterdata = releasedata[3]
-            else:
-                remasterdata = False
+
         elif torrentgroupdata.category in Categories.Video:  # Probably Music in a VC group
             # format / media
             releasedataout['videotorrent'] = False
