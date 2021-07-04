@@ -815,6 +815,21 @@ def validate_jps_bitrate(jps_bitrate):
     return sm_bitrate
 
 
+def decide_exc_filter(audioformat, media, releasedata):
+    """
+    Implement audioformat and media exclusion filters
+    :return: boolean: True or False
+    """
+    if audioformat == args.parsed.excaudioformat:
+        logger.info(f'Excluding {releasedata} as exclude audioformat {args.parsed.excaudioformat} is set')
+        return True
+    elif media == args.parsed.excmedia:
+        logger.info(f'Excluding {releasedata} as exclude media {args.parsed.excmedia} is set')
+        return True
+
+    return False
+
+
 def collate(torrentids):
     """
     Collate and validate data ready for upload to SM
@@ -879,14 +894,9 @@ def collate(torrentids):
 
             releasedataout['media'] = releasedata[2]
             releasedataout['audioformat'] = releasedata[0]
-
             releasedataout['bitrate'] = validate_jps_bitrate(releasedata[1])
 
-            if releasedataout['audioformat'] == args.parsed.excaudioformat:  # Exclude filters
-                logger.info(f'Excluding {releasedata} as exclude audioformat {args.parsed.excaudioformat} is set')
-                continue
-            elif releasedataout['media'] == args.parsed.excmedia:
-                logger.info(f'Excluding {releasedata} as exclude  {args.parsed.excmedia} is set')
+            if decide_exc_filter(releasedataout['audioformat'], releasedataout['media'], releasedata):
                 continue
 
             if len(releasedata) == 4:  # Remastered
