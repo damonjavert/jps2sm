@@ -856,6 +856,7 @@ def collate(torrentids):
         uploaddatestr = releasedatafull['uploaddate']
         releasedataout = {}
         releasedataout['jpstorrentid'] = torrentid  # Not needed for uploadtorrent(), purely for logging purposes
+        remasterdata = False  # Set default
 
         # JPS uses the audioformat field (represented as releasedata[0] here) for containers and codecs in video torrents,
         # and when combined with VideoMedias we can perform VideoTorrent detection.
@@ -870,8 +871,6 @@ def collate(torrentids):
 
             if len(releasedata) == 3:  # Remastered
                 remasterdata = releasedata[2]
-            else:
-                remasterdata = False
 
         elif releasedata[0] in VideoOptions.badformats and releasedata[2] in VideoOptions.VideoMedias:  # Video torrent mistakenly uploaded as an Album/Single
             # container / 'bitrate' / media   Bitrate is meaningless, users usually select Lossless
@@ -884,8 +883,6 @@ def collate(torrentids):
 
             if len(releasedata) == 4:  # Remastered
                 remasterdata = releasedata[3]
-            else:
-                remasterdata = False
 
         elif torrentgroupdata.category in Categories.Music:  # Music torrent
             # format / bitrate / media
@@ -920,7 +917,10 @@ def collate(torrentids):
         elif torrentgroupdata.category in Categories.NonReleaseData:  # Pictures or Misc Category torrents
             releasedataout['videotorrent'] = False
             releasedataout['categorystatus'] = "good"
-            remasterdata = False
+
+        else:  # We should never reach here
+            logger.error('Could not handle release data')
+            raise RuntimeError('Could not handle release data')
 
         if remasterdata:
             try:
