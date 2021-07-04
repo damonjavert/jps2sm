@@ -845,7 +845,7 @@ def collate(torrentids):
     :param torrentids: list of JPS torrentids to be processed
     :param groupdata: dictionary with torrent group data from getgroupdata[]
     """
-    groupid = None
+    release_group_id = None
     torrentcount = 0
     for torrentid, releasedatafull in getreleasedata(torrentids).items():
 
@@ -944,10 +944,16 @@ def collate(torrentids):
         # Upload torrent to SM
         # If groupid was returned from a previous call of uploadtorrent() then use it to allow torrents
         # to be uploaded to the same group, else get the groupid from the first run of uploadtorrent()
-        if groupid is None:
-            groupid = uploadtorrent(torrentpath, **releasedataout)
-        else:
-            uploadtorrent(torrentpath, groupid, **releasedataout)
+        # Update: The bug re torrent merging was fixed a long time ago, so we do not need to nest-together
+        # uploads like this anymore
+        try:
+            if release_group_id is None:
+                release_group_id = uploadtorrent(torrentpath, **releasedataout)
+            else:
+                uploadtorrent(torrentpath, release_group_id, **releasedataout)
+        except Exception:
+            logger.exception('Error in uploadtorrent()')
+            raise RuntimeError('Error in uploadtorrent()')
 
     if not args.parsed.dryrun:
         # Add original artists for contrib artists
