@@ -2,6 +2,10 @@ import logging
 import re
 from typing import AnyStr
 import sys
+import configparser
+
+# Third-party packages
+from pathlib import Path
 
 logger = logging.getLogger('main.' + __name__)
 
@@ -39,3 +43,28 @@ def fatal_error(msg):
 
     print(msg, file=sys.stderr)
     sys.exit(1)
+
+
+class GetConfig:
+    def __init__(self):
+        script_dir = Path(__file__).parent.parent
+
+        # Get configuration
+        config = configparser.ConfigParser()
+        configfile = Path(script_dir, 'jps2sm.cfg')
+        try:
+            open(configfile)
+        except FileNotFoundError:
+            fatal_error(
+                f'Error: config file {configfile} not found - enter your JPS/SM credentials in jps2sm.cfg and check jps2sm.cfg.example to see the syntax.')
+
+        config.read(configfile)
+        self.jps_user = config.get('JPopSuki', 'User')
+        self.jps_pass = config.get('JPopSuki', 'Password')
+        self.sm_user = config.get('SugoiMusic', 'User')
+        self.sm_pass = config.get('SugoiMusic', 'Password')
+        self.media_roots = [x.strip() for x in config.get('Media', 'MediaDirectories').split(',')]  # Remove whitespace after comma if any
+        self.directories = config.items('Directories')
+
+    def __getattr__(self, item):
+        return self.item

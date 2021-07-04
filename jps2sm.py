@@ -34,7 +34,7 @@ import humanfriendly
 from pathlib import Path
 
 # jps2sm modules
-from modules.utils import get_valid_filename, count_values_dict, fatal_error
+from modules.utils import get_valid_filename, count_values_dict, fatal_error, GetConfig
 from modules.myloginsession import MyLoginSession
 from modules.constants import Categories, VideoOptions
 from modules.mediainfo import get_mediainfo
@@ -1089,7 +1089,7 @@ class HandleCfgOutputDirs:
     def __init__(self, config_file_dirs_section):
         self.config_file_dirs_section = config_file_dirs_section
         self.file_dir = {}
-        for (cfg_key, cfg_value) in config_file_dirs_section.items('Directories'):
+        for (cfg_key, cfg_value) in config_file_dirs_section:
             if Path(cfg_value).is_absolute():
                 self.file_dir[cfg_key] = cfg_value
             else:
@@ -1111,6 +1111,7 @@ def get_file_handler():
 
 
 if __name__ == "__main__":
+    config = GetConfig()
     args = GetArgs()
     usermode = torrent_password_key = None
 
@@ -1159,38 +1160,23 @@ if __name__ == "__main__":
 
         usermode = True
 
-    # Get configuration
-    config = configparser.ConfigParser()
-    configfile = scriptdir + '/jps2sm.cfg'
-    try:
-        open(configfile)
-    except FileNotFoundError:
-        fatal_error(f'Error: config file {configfile} not found - enter your JPS/SM credentials in jps2sm.cfg and check jps2sm.cfg.example to see the syntax.')
-
-    config.read(configfile)
-    jpsuser = config.get('JPopSuki', 'User')
-    jpspass = config.get('JPopSuki', 'Password')
-    smuser = config.get('SugoiMusic', 'User')
-    smpass = config.get('SugoiMusic', 'Password')
-
-    output = HandleCfgOutputDirs(config)  # Get config dirs config, handle absolute/relative paths and create if not exist
+    output = HandleCfgOutputDirs(config.directories)  # Get config dirs config, handle absolute/relative paths and create if not exist
 
     # JPS MyLoginSession vars
     loginUrl = "https://jpopsuki.eu/login.php"
     loginTestUrl = "https://jpopsuki.eu"
     successStr = '<div id="extra1"><span></span></div>'
-    loginData = {'username': jpsuser, 'password': jpspass}
+    loginData = {'username': config.jps_user, 'password': config.jps_pass}
 
     # SM MyLoginSession vars
     SMloginUrl = "https://sugoimusic.me/login.php"
     SMloginTestUrl = "https://sugoimusic.me/"
     SMsuccessStr = "Enabled users"
-    SMloginData = {'username': smuser, 'password': smpass}
+    SMloginData = {'username': config.sm_user, 'password': config.sm_pass}
 
     if args.parsed.mediainfo:
         try:
-            media_roots = [x.strip() for x in config.get('Media', 'MediaDirectories').split(',')]  # Remove whitespace after comma if any
-            for media_dir in media_roots:
+            for media_dir in config.media_roots:
                 if not os.path.exists(media_dir):
                     fatal_error(f'Error: Media directory {media_dir} does not exist. Check your configuration in jps2sm.cfg.')
                 if not os.path.isdir(media_dir):
