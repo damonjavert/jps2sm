@@ -440,7 +440,7 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
         for language in languages:  # If we have a language tag, set the language field
             if language.lower() in torrentgroupdata.tagsall:
                 data['lang'] = language
-    elif torrentgroupdata.category not in Categories.NonReleaseData:  # Music Category torrent
+    elif torrentgroupdata.category in Categories.Music:
         data['bitrate'] = uploaddata['bitrate']
 
     if 'remastertitle' in uploaddata.keys():
@@ -887,7 +887,7 @@ def collate(torrentids):
             else:
                 remasterdata = False
 
-        elif torrentgroupdata.category not in Categories.NonReleaseData:  # Music torrent
+        elif torrentgroupdata.category in Categories.Music:  # Music torrent
             # format / bitrate / media
             releasedataout['videotorrent'] = False
             releasedataout['categorystatus'] = "good"
@@ -903,6 +903,19 @@ def collate(torrentids):
                 remasterdata = releasedata[3]
             else:
                 remasterdata = False
+        elif torrentgroupdata.category in Categories.Video:  # Probably Music in a VC group
+            # format / media
+            releasedataout['videotorrent'] = False
+            releasedataout['categorystatus'] = "bad"
+
+            releasedataout['audioformat'] = releasedata[0]
+            releasedataout['media'] = releasedata[1]
+
+            if decide_exc_filter(releasedataout['audioformat'], releasedataout['media'], releasedata):
+                continue
+
+            if len(releasedata) == 3:  # Remastered
+                remasterdata = releasedata[2]
 
         elif torrentgroupdata.category in Categories.NonReleaseData:  # Pictures or Misc Category torrents
             releasedataout['videotorrent'] = False

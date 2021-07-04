@@ -48,7 +48,9 @@ class Categories:
         'Misc': 11,
     }
 
-    Video = ('Bluray', 'DVD', 'PV', 'TV-Music', 'TV-Variety', 'TV-Drama', 'Music Performance')
+    Video = ('Bluray', 'DVD', 'PV', 'TV-Music', 'TV-Variety', 'TV-Drama', 'Music Performance', 'Fansubs')
+
+    Music = ('Album', 'Single')
 
     # JPS Categories where release date cannot be entered and therefore need to be processed differently
     NonDate = ('TV-Music', 'TV-Variety', 'TV-Drama', 'Fansubs', 'Pictures', 'Misc')
