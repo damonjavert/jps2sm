@@ -1,12 +1,12 @@
 loading or generating session...
-loaded session from cache (last access 163s ago) 
+loaded session from cache (last access 297s ago) 
 updated session cache-file jpopsuki.eu_session.dat
 JPopsuki user id is xyz
 updated session cache-file jpopsuki.eu_session.dat
-Processing JPS URL:  https://jpopsuki.eu/torrents.php?id=111284
+Processing JPS URL: https://jpopsuki.eu/torrents.php?id=111284
 updated session cache-file jpopsuki.eu_session.dat
 <h2>[Album] <a href="artist.php?id=360">AKB48</a> - 1830m [2012.08.15]</h2>
-Album
+Category: Album
 Artist(s): ['AKB48']
 Release date: 20120815
 Title: 1830m
@@ -61,8 +61,8 @@ DISC 3 (DVD)
 ・フライングゲット
 ・風は吹いている
 ・上からマリコ
-https://jpopsuki.eu/static/images/torrents/111284.jpg
-['japanese', 'pop', 'rock', 'ballad', 'electro', 'female.vocalist', 'idol']
+Image link: https://jpopsuki.eu/static/images/torrents/111284.jpg
+Tags: ['japanese', 'pop', 'rock', 'ballad', 'electro', 'female.vocalist', 'idol']
 Contributing artists: {'SKE48': '', 'NMB48': '', 'HKT48': '', 'Mariko Shinoda': '篠田麻里子', 'Atsuko Maeda': '前田敦子'}
 Entire group contains: {
   "147830": {
@@ -87,6 +87,15 @@ Entire group contains: {
       "DVD"
     ],
     "uploaddate": "Sep 11 2012, 17:06"
+  },
+  "484250": {
+    "slashdata": [
+      "FLAC",
+      "96-24",
+      "WEB",
+      "Hi-Res - 2020"
+    ],
+    "uploaddate": "Apr 28 2021, 04:32"
   },
   "148289": {
     "slashdata": [
@@ -113,44 +122,44 @@ Entire group contains: {
     "uploaddate": "Aug 11 2012, 08:30"
   }
 }
-Selected for upload: {'147830': {'slashdata': ['MP3', '320', 'CD'], 'uploaddate': 'Aug 11 2012, 17:58'}, '147982': {'slashdata': ['MKV', 'DVD'], 'uploaddate': 'Aug 13 2012, 02:20'}, '151631': {'slashdata': ['ISO', 'Lossless', 'DVD'], 'uploaddate': 'Sep 11 2012, 17:06'}, '148289': {'slashdata': ['FLAC', 'Lossless', 'CD'], 'uploaddate': 'Aug 15 2012, 08:30'}, '266605': {'slashdata': ['ALAC', 'Lossless', 'CD'], 'uploaddate': 'Dec 01 2015, 11:47'}, '147784': {'slashdata': ['AAC', '256', 'CD'], 'uploaddate': 'Aug 11 2012, 08:30'}}
+Selected for upload: {'147830': {'slashdata': ['MP3', '320', 'CD'], 'uploaddate': 'Aug 11 2012, 17:58'}, '147982': {'slashdata': ['MKV', 'DVD'], 'uploaddate': 'Aug 13 2012, 02:20'}, '151631': {'slashdata': ['ISO', 'Lossless', 'DVD'], 'uploaddate': 'Sep 11 2012, 17:06'}, '484250': {'slashdata': ['FLAC', '96-24', 'WEB', 'Hi-Res - 2020'], 'uploaddate': 'Apr 28 2021, 04:32'}, '148289': {'slashdata': ['FLAC', 'Lossless', 'CD'], 'uploaddate': 'Aug 15 2012, 08:30'}, '266605': {'slashdata': ['ALAC', 'Lossless', 'CD'], 'uploaddate': 'Dec 01 2015, 11:47'}, '147784': {'slashdata': ['AAC', '256', 'CD'], 'uploaddate': 'Aug 11 2012, 08:30'}}
 Now processing: 147830 {'slashdata': ['MP3', '320', 'CD'], 'uploaddate': 'Aug 11 2012, 17:58'}
 updated session cache-file jpopsuki.eu_session.dat
-{'videotorrent': False, 'categorystatus': 'good', 'media': 'CD', 'audioformat': 'MP3', 'bitrate': '320', 'uploaddate': '20120811'}
-03 思い出のほとんど.mp3
-16 桜の木になろう.mp3
-15 行ってらっしゃい.mp3
-17 桜の花びらたち　前田敦子ソロ.mp3
-09 Everyday、カチューシャ.mp3
-17 GIVE　ME　FIVE.mp3
-04 家出の夜.mp3
-16 青空よ　寂しくないか_.mp3
-01 ファーストラビット.mp3
-10 さくらんぼと孤独.mp3
-04 上からマリコ.mp3
-13 ユングやフロイトの場合.mp3
-14 やさしさの地図.mp3
-11 大事な時間.mp3
-09 僕たちは　今　話し合うべきなんだ.mp3
-06 ノーカン.mp3
-14 フライングケット.mp3
-05 アンチ.mp3
-02 プラスティックの唇.mp3
-10 走れ!ペンギン.mp3
-13 ぐーぐーおなか.mp3
-07 アボガドじゃねーし・・・.mp3
-06 檸檬の年頃.mp3
-03 ミニスカートの妖精.mp3
-08 直角Sunshine.mp3
-12 いつか見た海の底.mp3
-08 野菜占い.mp3
-02 黄金センター.mp3
-12 蕾たち.mp3
-15 風は吹いている.mp3
-07 恋愛総選挙.mp3
-11 ロマンスかくれんぼ.mp3
-05 スキャンダラスに行こう!.mp3
-01 Hate.mp3
+{'jpstorrentid': '147830', 'videotorrent': False, 'categorystatus': 'good', 'media': 'CD', 'audioformat': 'MP3', 'bitrate': '320', 'uploaddate': '20120811'}
+Deciding if EP with torrent with these tracks: 03 思い出のほとんど.mp3
+Deciding if EP with torrent with these tracks: 16 桜の木になろう.mp3
+Deciding if EP with torrent with these tracks: 15 行ってらっしゃい.mp3
+Deciding if EP with torrent with these tracks: 17 桜の花びらたち　前田敦子ソロ.mp3
+Deciding if EP with torrent with these tracks: 09 Everyday、カチューシャ.mp3
+Deciding if EP with torrent with these tracks: 17 GIVE　ME　FIVE.mp3
+Deciding if EP with torrent with these tracks: 04 家出の夜.mp3
+Deciding if EP with torrent with these tracks: 16 青空よ　寂しくないか_.mp3
+Deciding if EP with torrent with these tracks: 01 ファーストラビット.mp3
+Deciding if EP with torrent with these tracks: 10 さくらんぼと孤独.mp3
+Deciding if EP with torrent with these tracks: 04 上からマリコ.mp3
+Deciding if EP with torrent with these tracks: 13 ユングやフロイトの場合.mp3
+Deciding if EP with torrent with these tracks: 14 やさしさの地図.mp3
+Deciding if EP with torrent with these tracks: 11 大事な時間.mp3
+Deciding if EP with torrent with these tracks: 09 僕たちは　今　話し合うべきなんだ.mp3
+Deciding if EP with torrent with these tracks: 06 ノーカン.mp3
+Deciding if EP with torrent with these tracks: 14 フライングケット.mp3
+Deciding if EP with torrent with these tracks: 05 アンチ.mp3
+Deciding if EP with torrent with these tracks: 02 プラスティックの唇.mp3
+Deciding if EP with torrent with these tracks: 10 走れ!ペンギン.mp3
+Deciding if EP with torrent with these tracks: 13 ぐーぐーおなか.mp3
+Deciding if EP with torrent with these tracks: 07 アボガドじゃねーし・・・.mp3
+Deciding if EP with torrent with these tracks: 06 檸檬の年頃.mp3
+Deciding if EP with torrent with these tracks: 03 ミニスカートの妖精.mp3
+Deciding if EP with torrent with these tracks: 08 直角Sunshine.mp3
+Deciding if EP with torrent with these tracks: 12 いつか見た海の底.mp3
+Deciding if EP with torrent with these tracks: 08 野菜占い.mp3
+Deciding if EP with torrent with these tracks: 02 黄金センター.mp3
+Deciding if EP with torrent with these tracks: 12 蕾たち.mp3
+Deciding if EP with torrent with these tracks: 15 風は吹いている.mp3
+Deciding if EP with torrent with these tracks: 07 恋愛総選挙.mp3
+Deciding if EP with torrent with these tracks: 11 ロマンスかくれんぼ.mp3
+Deciding if EP with torrent with these tracks: 05 スキャンダラスに行こう!.mp3
+Deciding if EP with torrent with these tracks: 01 Hate.mp3
 Upload is not an EP as it has 34 tracks
 {
   "submit": "true",
@@ -176,7 +185,7 @@ Upload is not an EP as it has 34 tracks
 }
 Now processing: 147982 {'slashdata': ['MKV', 'DVD'], 'uploaddate': 'Aug 13 2012, 02:20'}
 updated session cache-file jpopsuki.eu_session.dat
-{'videotorrent': True, 'categorystatus': 'good', 'container': 'MKV', 'codec': 'CHANGEME', 'media': 'DVD', 'audioformat': 'CHANGEME', 'uploaddate': '20120813'}
+{'jpstorrentid': '147982', 'videotorrent': True, 'categorystatus': 'good', 'container': 'MKV', 'codec': 'CHANGEME', 'media': 'DVD', 'audioformat': 'CHANGEME', 'uploaddate': '20120813'}
 {
   "submit": "true",
   "title": "1830m",
@@ -205,7 +214,7 @@ updated session cache-file jpopsuki.eu_session.dat
 }
 Now processing: 151631 {'slashdata': ['ISO', 'Lossless', 'DVD'], 'uploaddate': 'Sep 11 2012, 17:06'}
 updated session cache-file jpopsuki.eu_session.dat
-{'videotorrent': True, 'categorystatus': 'bad', 'container': 'ISO', 'codec': 'CHANGEME', 'media': 'DVD', 'audioformat': 'CHANGEME', 'uploaddate': '20120911'}
+{'jpstorrentid': '151631', 'videotorrent': True, 'categorystatus': 'bad', 'container': 'ISO', 'codec': 'CHANGEME', 'media': 'DVD', 'audioformat': 'CHANGEME', 'uploaddate': '20120911'}
 {
   "submit": "true",
   "title": "1830m",
@@ -232,43 +241,106 @@ updated session cache-file jpopsuki.eu_session.dat
   ],
   "auth": "<scrubbed>"
 }
+Now processing: 484250 {'slashdata': ['FLAC', '96-24', 'WEB', 'Hi-Res - 2020'], 'uploaddate': 'Apr 28 2021, 04:32'}
+updated session cache-file jpopsuki.eu_session.dat
+{'jpstorrentid': '484250', 'videotorrent': False, 'categorystatus': 'good', 'media': 'Web', 'audioformat': 'FLAC', 'bitrate': '96-24', 'remastertitle': 'Hi-Res', 'remasteryear': '2020', 'uploaddate': '20210428'}
+Deciding if EP with torrent with these tracks: 01 ファースト・ラビット.flac
+Deciding if EP with torrent with these tracks: 02 黄金センター(歌-team研究生).flac
+Deciding if EP with torrent with these tracks: 03 ミニスカートの妖精(伊豆田莉奈、サイード横田絵玲奈、平田梨奈).flac
+Deciding if EP with torrent with these tracks: 04 上からマリコ.flac
+Deciding if EP with torrent with these tracks: 05 アンチ(歌-team研究生).flac
+Deciding if EP with torrent with these tracks: 06 檸檬の年頃(小林茉里奈、名取稚菜、佐々木優佳里、武藤十夢).flac
+Deciding if EP with torrent with these tracks: 07 恋愛総選挙(YM7-高城亜樹、河西智美、小森美果、佐藤すみれ、宮崎美穂、竹内美宥、指原莉乃).flac
+Deciding if EP with torrent with these tracks: 08 野菜占い.flac
+Deciding if EP with torrent with these tracks: 09 Everyday、カチューシャ.flac
+Deciding if EP with torrent with these tracks: 10 走れ!ペンギン(歌-team 4).flac
+Deciding if EP with torrent with these tracks: 11 ロマンスかくれんぼ(大森美優).flac
+Deciding if EP with torrent with these tracks: 12 蕾たち(歌-Team 4+研究生).flac
+Deciding if EP with torrent with these tracks: 13 ユングやフロイトの場合(歌-スペシャルガールズC).flac
+Deciding if EP with torrent with these tracks: 14 フライングゲット.flac
+Deciding if EP with torrent with these tracks: 15 風は吹いている.flac
+Deciding if EP with torrent with these tracks: 16 桜の木になろう.flac
+Deciding if EP with torrent with these tracks: 17 GIVE ME FIVE!.flac
+Deciding if EP with torrent with these tracks: 18 Hate(Team A).flac
+Deciding if EP with torrent with these tracks: 19 プラスティックの唇(篠田麻里子).flac
+Deciding if EP with torrent with these tracks: 20 思い出のほとんど(高橋みなみ、前田敦子).flac
+Deciding if EP with torrent with these tracks: 21 家出の夜(Team K).flac
+Deciding if EP with torrent with these tracks: 22 スキャンダラスに行こう! (小嶋陽菜、大島優子).flac
+Deciding if EP with torrent with these tracks: 23 ノーカン(Team B).flac
+Deciding if EP with torrent with these tracks: 24 アボガドじゃね～し…(渡辺麻友、指原莉乃).flac
+Deciding if EP with torrent with these tracks: 25 直角Sunshine(Team 4).flac
+Deciding if EP with torrent with these tracks: 26 僕たちは 今 話し合うべきなんだ(板野友美、柏木由紀).flac
+Deciding if EP with torrent with these tracks: 27 さくらんぼと孤独(研究生).flac
+Deciding if EP with torrent with these tracks: 28 大事な時間(小嶋陽菜、篠田麻里子、高橋みなみ、前田敦子、板野友美、大島優子、柏木由紀、渡辺麻友).flac
+Deciding if EP with torrent with these tracks: 29 いつか見た海の底(Up-and-coming girls).flac
+Deciding if EP with torrent with these tracks: 30 ぐ～ぐ～おなか(岩佐美咲、前田敦子、前田亜美、仁藤萌乃、藤江れいな、石田晴香、小森美果、佐藤亜美菜、佐藤すみれ).flac
+Deciding if EP with torrent with these tracks: 31 やさしさの地図(篠田麻里子、高橋みなみ、横山由依、柏木由紀、入山杏奈、加藤玲奈、島崎遥香、木崎ゆりあ、城 恵理子、児玉 遥).flac
+Deciding if EP with torrent with these tracks: 32 行ってらっしゃい(小嶋陽菜、篠田麻里子、高城亜樹、高橋みなみ、前田敦子、板野友美、大島優子、峯岸みなみ、横山由依、柏木由紀、渡辺麻友、指原莉乃).flac
+Deciding if EP with torrent with these tracks: 33 青空よ 寂しくないか (AKB48+SKE48+NMB48+HKT48).flac
+Deciding if EP with torrent with these tracks: 34 桜の花びら ～前田敦子 solo ver.～.flac
+Upload is not an EP as it has 34 tracks
+{
+  "submit": "true",
+  "title": "1830m",
+  "year": "20120815",
+  "tags": "japanese,pop,rock,ballad,electro,female.vocalist,idol",
+  "album_desc": "1830m is the 4th album released by AKB48. It was released in two versions: a regular 2CD+DVD edition, and a limited 2CD theater edition. The regular 2CD+DVD edition was housed in a special box with a 48-page photobook, one random photo. The theater edition came with 14 alternate covers, a handshake event ticket and a photo of an AKB48/SKE48/NMB48/HKT48 member chosen at random.\n\n\nAKB48\u300c1830m\u300d\u53ce\u9332\u66f2\n\nDISC 1 (CD)\n01. \u30d5\u30a1\u30fc\u30b9\u30c8\u30fb\u30e9\u30d3\u30c3\u30c8 \uff3b\u5c0f\u5d8b\u967d\u83dc\u3001\u7be0\u7530\u9ebb\u91cc\u5b50\u3001\u9ad8\u57ce\u4e9c\u6a39\u3001\u9ad8\u6a4b\u307f\u306a\u307f\u3001\u524d\u7530\u6566\u5b50\u3001\u677f\u91ce\u53cb\u7f8e\u3001\u5927\u5cf6\u512a\u5b50\u3001\u5cef\u5cb8\u307f\u306a\u307f\u3001\u6a2a\u5c71\u7531\u4f9d\u3001\u67cf\u6728\u7531\u7d00\u3001\u5317\u539f\u91cc\u82f1\u3001\u6e21\u8fba\u9ebb\u53cb\u3001\u5927\u5834\u7f8e\u5948\u3001\u5cf6\u5d0e\u9065\u9999\u3001\u5c71\u5185\u9234\u862d\u3001\u6307\u539f\u8389\u4e43\uff3d\n02. \u9ec4\u91d1\u30bb\u30f3\u30bf\u30fc\n03. \u30df\u30cb\u30b9\u30ab\u30fc\u30c8\u306e\u5996\u7cbe \uff3b\u4f0a\u8c46\u7530\u8389\u5948\u3001\u30b5\u30a4\u30fc\u30c9\u6a2a\u7530\u7d75\u73b2\u5948\u3001\u5e73\u7530\u68a8\u5948\uff3d\n04. \u4e0a\u304b\u3089\u30de\u30ea\u30b3\n05. \u30a2\u30f3\u30c1\n06. \u6ab8\u6aac\u306e\u5e74\u9803 \uff3b\u5c0f\u6797\u8309\u91cc\u5948\u3001\u540d\u53d6\u7a1a\u83dc\u3001\u4f50\u3005\u6728\u512a\u4f73\u91cc\u3001\u6b66\u85e4\u5341\u5922\uff3d\n07. \u604b\u611b\u7dcf\u9078\u6319 \uff3bYM7 : \u9ad8\u57ce\u4e9c\u6a39\u3001\u6cb3\u897f\u667a\u7f8e\u3001\u5c0f\u68ee\u7f8e\u679c\u3001\u4f50\u85e4\u3059\u307f\u308c\u3001\u5bae\u5d0e\u7f8e\u7a42\u3001\u7af9\u5185\u7f8e\u5ba5\u3001\u6307\u539f\u8389\u4e43\uff3d\n08. \u91ce\u83dc\u5360\u3044\n09. Everyday\u3001\u30ab\u30c1\u30e5\u30fc\u30b7\u30e3 \n10. \u8d70\u308c\uff01\u30da\u30f3\u30ae\u30f3\n11. \u30ed\u30de\u30f3\u30b9\u304b\u304f\u308c\u3093\u307c \uff3b\u5927\u68ee\u7f8e\u512a\uff3d\n12. \u857e\u305f\u3061\n13. \u30e6\u30f3\u30b0\u3084\u30d5\u30ed\u30a4\u30c8\u306e\u5834\u5408\n14. \u30d5\u30e9\u30a4\u30f3\u30b0\u30b2\u30c3\u30c8\n15. \u98a8\u306f\u5439\u3044\u3066\u3044\u308b\n16. \u685c\u306e\u6728\u306b\u306a\u308d\u3046\n17. GIVE ME FIVE!\n\nDISC 2 (CD)\n01. Hate \uff3b\u30c1\u30fc\u30e0A\uff3d\n02. \u30d7\u30e9\u30b9\u30c6\u30a3\u30c3\u30af\u306e\u5507 \uff3b\u7be0\u7530\u9ebb\u91cc\u5b50\uff3d\n03. \u601d\u3044\u51fa\u306e\u307b\u3068\u3093\u3069 \uff3b\u524d\u7530\u6566\u5b50\u3001\u9ad8\u6a4b\u307f\u306a\u307f\uff3d\n04. \u5bb6\u51fa\u306e\u591c \uff3b\u30c1\u30fc\u30e0K\uff3d\n05. \u30b9\u30ad\u30e3\u30f3\u30c0\u30e9\u30b9\u306b\u884c\u3053\u3046 \uff3b\u5c0f\u5d8b\u967d\u83dc\u3001\u5927\u5cf6\u512a\u5b50\uff3d\n06. \u30ce\u30fc\u30ab\u30f3 \uff3b\u30c1\u30fc\u30e0B\uff3d\n07. \u30a2\u30dc\u30ac\u30c9\u3058\u3083\u306d\uff5e\u3057\u2026 \uff3b\u6e21\u8fba\u9ebb\u53cb\u3001\u6307\u539f\u8389\u4e43\uff3d\n08. \u76f4\u89d2Sunshine \uff3b\u30c1\u30fc\u30e04\uff3d\n09. \u50d5\u305f\u3061\u306f \u4eca \u8a71\u3057\u5408\u3046\u3079\u304d\u306a\u3093\u3060 \uff3b\u677f\u91ce\u53cb\u7f8e\u3001\u67cf\u6728\u7531\u7d00\uff3d\n10. \u3055\u304f\u3089\u3093\u307c\u3068\u5b64\u72ec \uff3b\u7814\u7a76\u751f\uff3d\n11. \u5927\u4e8b\u306a\u6642\u9593 \uff3b\u5c0f\u5d8b\u967d\u83dc\u3001\u7be0\u7530\u9ebb\u91cc\u5b50\u3001\u9ad8\u6a4b\u307f\u306a\u307f\u3001\u524d\u7530\u6566\u5b50\u3001\u677f\u91ce\u53cb\u7f8e\u3001\u5927\u5cf6\u512a\u5b50\u3001\u67cf\u6728\u7531\u7d00\u3001\u6e21\u8fba\u9ebb\u53cb\uff3d\n12. \u3044\u3064\u304b\u898b\u305f\u6d77\u306e\u5e95 \uff3bUp-and-coming girls : \u6e21\u8fba\u9ebb\u53cb\u3001\u5165\u5c71\u674f\u5948\u3001\u52a0\u85e4\u73b2\u5948\u3001\u5ddd\u6804\u674e\u5948\u3001\u5cf6\u5d0e\u9065\u9999\u3001\u5927\u5cf6\u6dbc\u82b1\u3001\u6728\u5d0e\u3086\u308a\u3042\u3001\u677e\u4e95\u73e0\u7406\u5948\u3001\u77e2\u795e\u4e45\u7f8e\u3001\u6728\u672c\u82b1\u97f3\u3001\u5c71\u7530\u83dc\u3005\u3001\u6e21\u8fba\u7f8e\u512a\u7d00\u3001\u57ce\u6075\u7406\u5b50\u3001\u5152\u7389\u9065\u3001\u83c5\u672c\u88d5\u5b50\u3001\u5bae\u8107\u54b2\u826f\uff3d\n13. \u3050\u30fc\u3050\u30fc\u304a\u306a\u304b \uff3b\u5ca9\u4f50\u7f8e\u54b2\u3001\u524d\u7530\u6566\u5b50\u3001\u524d\u7530\u4e9c\u7f8e\u3001\u4ec1\u85e4\u840c\u4e43\u3001\u85e4\u6c5f\u308c\u3044\u306a\u3001\u77f3\u7530\u6674\u9999\u3001\u5c0f\u68ee\u7f8e\u679c\u3001\u4f50\u85e4\u4e9c\u7f8e\u83dc\u3001\u4f50\u85e4\u3059\u307f\u308c\uff3d\n14. \u3084\u3055\u3057\u3055\u306e\u5730\u56f3 \uff3b\u7be0\u7530\u9ebb\u91cc\u5b50\u3001\u9ad8\u6a4b\u307f\u306a\u307f\u3001\u6a2a\u5c71\u7531\u4f9d\u3001\u67cf\u6728\u7531\u7d00\u3001\u5165\u5c71\u674f\u5948\u3001\u52a0\u85e4\u73b2\u5948\u3001\u5cf6\u5d0e\u9065\u9999\u3001\u6728\u5d0e\u3086\u308a\u3042\u3001\u57ce\u6075\u7406\u5b50\u3001\u5152\u7389\u9065\uff3d\n15. \u884c\u3063\u3066\u3089\u3063\u3057\u3083\u3044 \uff3b\u5c0f\u5d8b\u967d\u83dc\u3001\u7be0\u7530\u9ebb\u91cc\u5b50\u3001\u9ad8\u57ce\u4e9c\u6a39\u3001\u9ad8\u6a4b\u307f\u306a\u307f\u3001\u524d\u7530\u6566\u5b50\u3001\u677f\u91ce\u53cb\u7f8e\u3001\u5927\u5cf6\u512a\u5b50\u3001\u5cef\u5cb8\u307f\u306a\u307f\u3001\u6a2a\u5c71\u7531\u4f9d\u3001\u67cf\u6728\u7531\u7d00\u3001\u6e21\u8fba\u9ebb\u53cb\u3001\u6307\u539f\u8389\u4e43\uff3d\n16. \u9752\u7a7a\u3088 \u5bc2\u3057\u304f\u306a\u3044\u304b\uff1f \uff3bAKB48+SKE48+NMB48+HKT48\uff3d\n17. \u685c\u306e\u82b1\u3073\u3089\u305f\u3061 \uff3b\u524d\u7530\u6566\u5b50\uff3d\n\nDISC 3 (DVD)\n\u203b\u632f\u308a\u4ed8\u3051\u6620\u50cf\uff08\u54042:30ver.\uff09\n\u30fbEveryday\u3001\u30ab\u30c1\u30e5\u30fc\u30b7\u30e3\n\u30fb\u30d5\u30e9\u30a4\u30f3\u30b0\u30b2\u30c3\u30c8\n\u30fb\u98a8\u306f\u5439\u3044\u3066\u3044\u308b\n\u30fb\u4e0a\u304b\u3089\u30de\u30ea\u30b3",
+  "audioformat": "FLAC",
+  "image": "https://jpopsuki.eu/static/images/torrents/111284.jpg",
+  "bitrate": "96-24",
+  "remaster": "remaster",
+  "remastertitle": "Hi-Res",
+  "remasteryear": "2020",
+  "type": 0,
+  "contrib_artists[]": [
+    "SKE48",
+    "NMB48",
+    "HKT48",
+    "Mariko Shinoda",
+    "Atsuko Maeda"
+  ],
+  "idols[]": [
+    "AKB48"
+  ],
+  "auth": "<scrubbed>"
+}
 Now processing: 148289 {'slashdata': ['FLAC', 'Lossless', 'CD'], 'uploaddate': 'Aug 15 2012, 08:30'}
 updated session cache-file jpopsuki.eu_session.dat
-{'videotorrent': False, 'categorystatus': 'good', 'media': 'CD', 'audioformat': 'FLAC', 'bitrate': 'Lossless', 'uploaddate': '20120815'}
-03 - ＡＫＢ４８ - 思い出のほとんど.flac
-09 - AKB48 - Everyday、カチューシャ.flac
-17 - AKB48 - GIVE　ME　FIVE.flac
-04 - ＡＫＢ４８ - 家出の夜.flac
-15 - ＡＫＢ４８ - 行ってらしゃい.flac
-16 - AKB48 - 桜の木になろう.flac
-01 - AKB48 - ファースト・ラビット.flac
-04 - AKB48 - 上からマリコ.flac
-16 - ＡＫＢ４８ - 青空よ　寂しくないか？.flac
-14 - ＡＫＢ４８ - やさしさの地図.flac
-06 - ＡＫＢ４８ - ノーカン.flac
-14 - AKB48 - フライングケット.flac
-17 - ＡＫＢ４８ - 桜の花びら～前田敦子solo ver.～.flac
-02 - ＡＫＢ４８ - プラスッティックの唇.flac
-03 - AKB48 - ミニスカートの妖精.flac
-13 - AKB48 - ユングやフロイトの場合.flac
-05 - AKB48 - アンチ.flac
-10 - AKB48 - 走れ!ペンギン.flac
-10 - ＡＫＢ４８ - さくらんぼと孤独.flac
-12 - ＡＫＢ４８ - いつか見た海の底.flac
-08 - ＡＫＢ４８ - 直角Ｓunshine.flac
-07 - ＡＫＢ４８ - アボカドじゃね～し・・・.flac
-09 - ＡＫＢ４８ - 僕たちは　　今　話し合うべきなんだ.flac
-08 - AKB48 - 野菜占い.flac
-15 - AKB48 - 風は吹いている.flac
-07 - AKB48 - 恋愛総選挙.flac
-02 - AKB48 - 黄金センター.flac
-11 - ＡＫＢ４８ - 大事な時間.flac
-12 - AKB48 - 蕾たち.flac
-06 - AKB48 - 檸檬の年頃.flac
-13 - ＡＫＢ４８ - ぐ～ぐ～おなか.flac
-05 - ＡＫＢ４８ - スキャンダラスに行こう！.flac
-01 - ＡＫＢ４８ - Ｈａｔｅ.flac
-11 - AKB48 - ロマンスかくれんぼ.flac
+{'jpstorrentid': '148289', 'videotorrent': False, 'categorystatus': 'good', 'media': 'CD', 'audioformat': 'FLAC', 'bitrate': 'Lossless', 'uploaddate': '20120815'}
+Deciding if EP with torrent with these tracks: 03 - ＡＫＢ４８ - 思い出のほとんど.flac
+Deciding if EP with torrent with these tracks: 09 - AKB48 - Everyday、カチューシャ.flac
+Deciding if EP with torrent with these tracks: 17 - AKB48 - GIVE　ME　FIVE.flac
+Deciding if EP with torrent with these tracks: 04 - ＡＫＢ４８ - 家出の夜.flac
+Deciding if EP with torrent with these tracks: 15 - ＡＫＢ４８ - 行ってらしゃい.flac
+Deciding if EP with torrent with these tracks: 16 - AKB48 - 桜の木になろう.flac
+Deciding if EP with torrent with these tracks: 01 - AKB48 - ファースト・ラビット.flac
+Deciding if EP with torrent with these tracks: 04 - AKB48 - 上からマリコ.flac
+Deciding if EP with torrent with these tracks: 16 - ＡＫＢ４８ - 青空よ　寂しくないか？.flac
+Deciding if EP with torrent with these tracks: 14 - ＡＫＢ４８ - やさしさの地図.flac
+Deciding if EP with torrent with these tracks: 06 - ＡＫＢ４８ - ノーカン.flac
+Deciding if EP with torrent with these tracks: 14 - AKB48 - フライングケット.flac
+Deciding if EP with torrent with these tracks: 17 - ＡＫＢ４８ - 桜の花びら～前田敦子solo ver.～.flac
+Deciding if EP with torrent with these tracks: 02 - ＡＫＢ４８ - プラスッティックの唇.flac
+Deciding if EP with torrent with these tracks: 03 - AKB48 - ミニスカートの妖精.flac
+Deciding if EP with torrent with these tracks: 13 - AKB48 - ユングやフロイトの場合.flac
+Deciding if EP with torrent with these tracks: 05 - AKB48 - アンチ.flac
+Deciding if EP with torrent with these tracks: 10 - AKB48 - 走れ!ペンギン.flac
+Deciding if EP with torrent with these tracks: 10 - ＡＫＢ４８ - さくらんぼと孤独.flac
+Deciding if EP with torrent with these tracks: 12 - ＡＫＢ４８ - いつか見た海の底.flac
+Deciding if EP with torrent with these tracks: 08 - ＡＫＢ４８ - 直角Ｓunshine.flac
+Deciding if EP with torrent with these tracks: 07 - ＡＫＢ４８ - アボカドじゃね～し・・・.flac
+Deciding if EP with torrent with these tracks: 09 - ＡＫＢ４８ - 僕たちは　　今　話し合うべきなんだ.flac
+Deciding if EP with torrent with these tracks: 08 - AKB48 - 野菜占い.flac
+Deciding if EP with torrent with these tracks: 15 - AKB48 - 風は吹いている.flac
+Deciding if EP with torrent with these tracks: 07 - AKB48 - 恋愛総選挙.flac
+Deciding if EP with torrent with these tracks: 02 - AKB48 - 黄金センター.flac
+Deciding if EP with torrent with these tracks: 11 - ＡＫＢ４８ - 大事な時間.flac
+Deciding if EP with torrent with these tracks: 12 - AKB48 - 蕾たち.flac
+Deciding if EP with torrent with these tracks: 06 - AKB48 - 檸檬の年頃.flac
+Deciding if EP with torrent with these tracks: 13 - ＡＫＢ４８ - ぐ～ぐ～おなか.flac
+Deciding if EP with torrent with these tracks: 05 - ＡＫＢ４８ - スキャンダラスに行こう！.flac
+Deciding if EP with torrent with these tracks: 01 - ＡＫＢ４８ - Ｈａｔｅ.flac
+Deciding if EP with torrent with these tracks: 11 - AKB48 - ロマンスかくれんぼ.flac
 Upload is not an EP as it has 34 tracks
 {
   "submit": "true",
@@ -294,41 +366,41 @@ Upload is not an EP as it has 34 tracks
 }
 Now processing: 266605 {'slashdata': ['ALAC', 'Lossless', 'CD'], 'uploaddate': 'Dec 01 2015, 11:47'}
 updated session cache-file jpopsuki.eu_session.dat
-{'videotorrent': False, 'categorystatus': 'good', 'media': 'CD', 'audioformat': 'ALAC', 'bitrate': 'Lossless', 'uploaddate': '20151201'}
-1-03 思い出のほとんど.m4a
-1-09 Everyday、カチューシャ.m4a
-1-15 行ってらっしゃい.m4a
-1-17 GIVE ME FIVE!.m4a
-1-04 家出の夜.m4a
-1-16 桜の木になろう.m4a
-1-01 ファースト・ラビット.m4a
-1-04 上からマリコ.m4a
-1-16 青空よ 寂しくないか_.m4a
-1-14 やさしさの地図.m4a
-1-06 ノーカン.m4a
-1-17 桜の花びらたち ～前田敦子 solo ver.～.m4a
-1-14 フライングゲット.m4a
-1-02 プラスティックの唇.m4a
-1-03 ミニスカートの妖精.m4a
-1-13 ユングやフロイトの場合.m4a
-1-05 アンチ.m4a
-1-10 さくらんぼと孤独.m4a
-1-10 走れ! ペンギン.m4a
-1-12 いつか見た海の底.m4a
-1-08 直角Sunshine.m4a
-1-07 アボガドじゃね～し….m4a
-1-09 僕たちは 今 話し合うべきなんだ.m4a
-1-08 野菜占い.m4a
-1-11 大事な時間.m4a
-1-15 風は吹いている.m4a
-1-07 恋愛総選挙.m4a
-1-02 黄金センター.m4a
-1-12 蕾たち.m4a
-1-06 檸檬の年頃.m4a
-1-13 ぐ～ぐ～おなか.m4a
-1-05 スキャンダラスに行こう!.m4a
-1-01 Hate.m4a
-1-11 ロマンスかくれんぼ.m4a
+{'jpstorrentid': '266605', 'videotorrent': False, 'categorystatus': 'good', 'media': 'CD', 'audioformat': 'ALAC', 'bitrate': 'Lossless', 'uploaddate': '20151201'}
+Deciding if EP with torrent with these tracks: 1-03 思い出のほとんど.m4a
+Deciding if EP with torrent with these tracks: 1-09 Everyday、カチューシャ.m4a
+Deciding if EP with torrent with these tracks: 1-15 行ってらっしゃい.m4a
+Deciding if EP with torrent with these tracks: 1-17 GIVE ME FIVE!.m4a
+Deciding if EP with torrent with these tracks: 1-04 家出の夜.m4a
+Deciding if EP with torrent with these tracks: 1-16 桜の木になろう.m4a
+Deciding if EP with torrent with these tracks: 1-01 ファースト・ラビット.m4a
+Deciding if EP with torrent with these tracks: 1-04 上からマリコ.m4a
+Deciding if EP with torrent with these tracks: 1-16 青空よ 寂しくないか_.m4a
+Deciding if EP with torrent with these tracks: 1-14 やさしさの地図.m4a
+Deciding if EP with torrent with these tracks: 1-06 ノーカン.m4a
+Deciding if EP with torrent with these tracks: 1-17 桜の花びらたち ～前田敦子 solo ver.～.m4a
+Deciding if EP with torrent with these tracks: 1-14 フライングゲット.m4a
+Deciding if EP with torrent with these tracks: 1-02 プラスティックの唇.m4a
+Deciding if EP with torrent with these tracks: 1-03 ミニスカートの妖精.m4a
+Deciding if EP with torrent with these tracks: 1-13 ユングやフロイトの場合.m4a
+Deciding if EP with torrent with these tracks: 1-05 アンチ.m4a
+Deciding if EP with torrent with these tracks: 1-10 さくらんぼと孤独.m4a
+Deciding if EP with torrent with these tracks: 1-10 走れ! ペンギン.m4a
+Deciding if EP with torrent with these tracks: 1-12 いつか見た海の底.m4a
+Deciding if EP with torrent with these tracks: 1-08 直角Sunshine.m4a
+Deciding if EP with torrent with these tracks: 1-07 アボガドじゃね～し….m4a
+Deciding if EP with torrent with these tracks: 1-09 僕たちは 今 話し合うべきなんだ.m4a
+Deciding if EP with torrent with these tracks: 1-08 野菜占い.m4a
+Deciding if EP with torrent with these tracks: 1-11 大事な時間.m4a
+Deciding if EP with torrent with these tracks: 1-15 風は吹いている.m4a
+Deciding if EP with torrent with these tracks: 1-07 恋愛総選挙.m4a
+Deciding if EP with torrent with these tracks: 1-02 黄金センター.m4a
+Deciding if EP with torrent with these tracks: 1-12 蕾たち.m4a
+Deciding if EP with torrent with these tracks: 1-06 檸檬の年頃.m4a
+Deciding if EP with torrent with these tracks: 1-13 ぐ～ぐ～おなか.m4a
+Deciding if EP with torrent with these tracks: 1-05 スキャンダラスに行こう!.m4a
+Deciding if EP with torrent with these tracks: 1-01 Hate.m4a
+Deciding if EP with torrent with these tracks: 1-11 ロマンスかくれんぼ.m4a
 Upload is not an EP as it has 34 tracks
 {
   "submit": "true",
@@ -354,41 +426,41 @@ Upload is not an EP as it has 34 tracks
 }
 Now processing: 147784 {'slashdata': ['AAC', '256', 'CD'], 'uploaddate': 'Aug 11 2012, 08:30'}
 updated session cache-file jpopsuki.eu_session.dat
-{'videotorrent': False, 'categorystatus': 'good', 'media': 'CD', 'audioformat': 'AAC', 'bitrate': '256', 'uploaddate': '20120811'}
-03 思い出のほとんど.m4a
-16 桜の木になろう.m4a
-17 桜の花びらたち　前田敦子ソロ.m4a
-15 行ってらっしゃい.m4a
-09 Everyday、カチューシャ.m4a
-17 GIVE　ME　FIVE.m4a
-16 青空よ　寂しくないか_.m4a
-04 家出の夜.m4a
-01 ファーストラビット.m4a
-04 上からマリコ.m4a
-10 さくらんぼと孤独.m4a
-13 ユングやフロイトの場合.m4a
-14 やさしさの地図.m4a
-11 大事な時間.m4a
-09 僕たちは　今　話し合うべきなんだ.m4a
-06 ノーカン.m4a
-14 フライングケット.m4a
-05 アンチ.m4a
-02 プラスティックの唇.m4a
-13 ぐーぐーおなか.m4a
-10 走れ!ペンギン.m4a
-06 檸檬の年頃.m4a
-07 アボガドじゃねーし・・・.m4a
-03 ミニスカートの妖精.m4a
-12 いつか見た海の底.m4a
-08 直角Sunshine.m4a
-15 風は吹いている.m4a
-08 野菜占い.m4a
-02 黄金センター.m4a
-12 蕾たち.m4a
-07 恋愛総選挙.m4a
-05 スキャンダラスに行こう!.m4a
-11 ロマンスかくれんぼ.m4a
-01 Hate.m4a
+{'jpstorrentid': '147784', 'videotorrent': False, 'categorystatus': 'good', 'media': 'CD', 'audioformat': 'AAC', 'bitrate': '256', 'uploaddate': '20120811'}
+Deciding if EP with torrent with these tracks: 03 思い出のほとんど.m4a
+Deciding if EP with torrent with these tracks: 16 桜の木になろう.m4a
+Deciding if EP with torrent with these tracks: 17 桜の花びらたち　前田敦子ソロ.m4a
+Deciding if EP with torrent with these tracks: 15 行ってらっしゃい.m4a
+Deciding if EP with torrent with these tracks: 09 Everyday、カチューシャ.m4a
+Deciding if EP with torrent with these tracks: 17 GIVE　ME　FIVE.m4a
+Deciding if EP with torrent with these tracks: 16 青空よ　寂しくないか_.m4a
+Deciding if EP with torrent with these tracks: 04 家出の夜.m4a
+Deciding if EP with torrent with these tracks: 01 ファーストラビット.m4a
+Deciding if EP with torrent with these tracks: 04 上からマリコ.m4a
+Deciding if EP with torrent with these tracks: 10 さくらんぼと孤独.m4a
+Deciding if EP with torrent with these tracks: 13 ユングやフロイトの場合.m4a
+Deciding if EP with torrent with these tracks: 14 やさしさの地図.m4a
+Deciding if EP with torrent with these tracks: 11 大事な時間.m4a
+Deciding if EP with torrent with these tracks: 09 僕たちは　今　話し合うべきなんだ.m4a
+Deciding if EP with torrent with these tracks: 06 ノーカン.m4a
+Deciding if EP with torrent with these tracks: 14 フライングケット.m4a
+Deciding if EP with torrent with these tracks: 05 アンチ.m4a
+Deciding if EP with torrent with these tracks: 02 プラスティックの唇.m4a
+Deciding if EP with torrent with these tracks: 13 ぐーぐーおなか.m4a
+Deciding if EP with torrent with these tracks: 10 走れ!ペンギン.m4a
+Deciding if EP with torrent with these tracks: 06 檸檬の年頃.m4a
+Deciding if EP with torrent with these tracks: 07 アボガドじゃねーし・・・.m4a
+Deciding if EP with torrent with these tracks: 03 ミニスカートの妖精.m4a
+Deciding if EP with torrent with these tracks: 12 いつか見た海の底.m4a
+Deciding if EP with torrent with these tracks: 08 直角Sunshine.m4a
+Deciding if EP with torrent with these tracks: 15 風は吹いている.m4a
+Deciding if EP with torrent with these tracks: 08 野菜占い.m4a
+Deciding if EP with torrent with these tracks: 02 黄金センター.m4a
+Deciding if EP with torrent with these tracks: 12 蕾たち.m4a
+Deciding if EP with torrent with these tracks: 07 恋愛総選挙.m4a
+Deciding if EP with torrent with these tracks: 05 スキャンダラスに行こう!.m4a
+Deciding if EP with torrent with these tracks: 11 ロマンスかくれんぼ.m4a
+Deciding if EP with torrent with these tracks: 01 Hate.m4a
 Upload is not an EP as it has 34 tracks
 {
   "submit": "true",

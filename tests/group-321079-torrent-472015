@@ -1,13 +1,12 @@
 loading or generating session...
-created new session with login
-updated session cache-file jpopsuki.eu_session.dat
+loaded session from cache (last access 0s ago) 
 updated session cache-file jpopsuki.eu_session.dat
 JPopsuki user id is xyz
 updated session cache-file jpopsuki.eu_session.dat
-Processing JPS URL:  https://jpopsuki.eu/torrents.php?id=321079&torrentid=472015
+Processing JPS URL: https://jpopsuki.eu/torrents.php?id=321079&torrentid=472015
 updated session cache-file jpopsuki.eu_session.dat
 <h2>[Album] <a href="artist.php?id=429">V.A.</a> - Non-non Biyori Days [2021.01.21]</h2>
-Album
+Category: Album
 Artist(s): ['V.A.']
 Release date: 20210121
 Title: Non-non Biyori Days
@@ -30,8 +29,8 @@ Group description:
 　TVアニメ『のんのんびより』OP主題歌
 08 のんのん日和
 　TVアニメ『のんのんびより』ED主題歌
-https://jpopsuki.eu/static/images/torrents/321079.jpg
-['japanese', 'pop', 'female.vocalist', 'soundtrack', 'compilation', 'anison']
+Image link: https://jpopsuki.eu/static/images/torrents/321079.jpg
+Tags: ['japanese', 'pop', 'female.vocalist', 'soundtrack', 'compilation', 'anison']
 Contributing artists: {'nano.RIPE': '', 'Koiwai Kotori': '小岩井ことり', 'Rie Murakawa': '村川梨衣', 'Ayane Sakura': '佐倉綾音', 'Kana Asumi': '阿澄佳奈'}
 Entire group contains: {
   "472015": {
@@ -46,15 +45,15 @@ Entire group contains: {
 Selected for upload: {'472015': {'slashdata': ['FLAC', 'Hi-Res 96/24', 'WEB'], 'uploaddate': 'Jan 13 2021, 20:33'}}
 Now processing: 472015 {'slashdata': ['FLAC', 'Hi-Res 96/24', 'WEB'], 'uploaddate': 'Jan 13 2021, 20:33'}
 updated session cache-file jpopsuki.eu_session.dat
-{'videotorrent': False, 'categorystatus': 'good', 'media': 'Web', 'audioformat': 'FLAC', 'bitrate': '24bit Lossless 96kHz', 'uploaddate': '20210113'}
-01 つぎはぎもよう.flac
-02 ただいま.flac
-03 あおのらくがき.flac
-04 おもいで.flac
-05 こだまことだま.flac
-06 おかえり.flac
-07 なないろびより.flac
-08 のんのん日和.flac
+{'jpstorrentid': '472015', 'videotorrent': False, 'categorystatus': 'good', 'media': 'Web', 'audioformat': 'FLAC', 'bitrate': '24bit Lossless 96kHz', 'uploaddate': '20210113'}
+Deciding if EP with torrent with these tracks: 01 つぎはぎもよう.flac
+Deciding if EP with torrent with these tracks: 02 ただいま.flac
+Deciding if EP with torrent with these tracks: 03 あおのらくがき.flac
+Deciding if EP with torrent with these tracks: 04 おもいで.flac
+Deciding if EP with torrent with these tracks: 05 こだまことだま.flac
+Deciding if EP with torrent with these tracks: 06 おかえり.flac
+Deciding if EP with torrent with these tracks: 07 なないろびより.flac
+Deciding if EP with torrent with these tracks: 08 のんのん日和.flac
 Upload is not an EP as it has 8 tracks
 Various Artists torrent, setting main artists to ['nano.RIPE', 'Koiwai Kotori', 'Rie Murakawa', 'Ayane Sakura', 'Kana Asumi']
 {

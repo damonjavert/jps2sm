@@ -1,12 +1,12 @@
 loading or generating session...
-loaded session from cache (last access 187s ago) 
+loaded session from cache (last access 1s ago) 
 updated session cache-file jpopsuki.eu_session.dat
 JPopsuki user id is xyz
 updated session cache-file jpopsuki.eu_session.dat
-Processing JPS URL:  https://jpopsuki.eu/torrents.php?id=251299&torrentid=358233
+Processing JPS URL: https://jpopsuki.eu/torrents.php?id=251299&torrentid=358233
 updated session cache-file jpopsuki.eu_session.dat
 <h2>[Album] <a href="artist.php?id=429">V.A.</a> - Mishmash Sunshower EP [2018.02.21]</h2>
-Album
+Category: Album
 Artist(s): ['V.A.']
 Release date: 20180221
 Title: Mishmash Sunshower EP
@@ -22,8 +22,8 @@ Tracklist:
 4. THE FULL TEENZ - Baby (KONCOS cover)
 5. 台風クラブ - 江ノ島
 6. imai - WOOF 2
-https://jpopsuki.eu/static/images/torrents/251299.jpg
-['japanese']
+Image link: https://jpopsuki.eu/static/images/torrents/251299.jpg
+Tags: ['japanese']
 Contributing artists: {'KONCOS': '', 'THE FULL TEENZ': ''}
 Entire group contains: {
   "358233": {
@@ -46,13 +46,13 @@ Entire group contains: {
 Selected for upload: {'358233': {'slashdata': ['MP3', 'V0 (VBR)', 'WEB'], 'uploaddate': 'Apr 06 2018, 19:55'}}
 Now processing: 358233 {'slashdata': ['MP3', 'V0 (VBR)', 'WEB'], 'uploaddate': 'Apr 06 2018, 19:55'}
 updated session cache-file jpopsuki.eu_session.dat
-{'videotorrent': False, 'categorystatus': 'good', 'media': 'Web', 'audioformat': 'MP3', 'bitrate': 'V0 (VBR)', 'uploaddate': '20180406'}
-03 - aaps - Tower.mp3
-02 - KONCOS - Sunshower.mp3
-01 - imai - WOOF 1.mp3
-04 - THE FULL TEENZ - Baby (KONCOS cover).mp3
-05 - 台風クラブ - 江ノ島.mp3
-06 - imai - WOOF 2.mp3
+{'jpstorrentid': '358233', 'videotorrent': False, 'categorystatus': 'good', 'media': 'Web', 'audioformat': 'MP3', 'bitrate': 'V0 (VBR)', 'uploaddate': '20180406'}
+Deciding if EP with torrent with these tracks: 03 - aaps - Tower.mp3
+Deciding if EP with torrent with these tracks: 02 - KONCOS - Sunshower.mp3
+Deciding if EP with torrent with these tracks: 01 - imai - WOOF 1.mp3
+Deciding if EP with torrent with these tracks: 04 - THE FULL TEENZ - Baby (KONCOS cover).mp3
+Deciding if EP with torrent with these tracks: 05 - 台風クラブ - 江ノ島.mp3
+Deciding if EP with torrent with these tracks: 06 - imai - WOOF 2.mp3
 Upload is an EP as it has 6 standard tracks
 Various Artists torrent, setting main artists to ['KONCOS', 'THE FULL TEENZ']
 {
