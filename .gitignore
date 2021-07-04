@@ -5,3 +5,4 @@ jps2sm.cfg
 .idea
 venv
 __pycache__/
+jps2sm.log
