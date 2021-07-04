@@ -1,0 +1,117 @@
+loading or generating session...
+created new session with login
+updated session cache-file jpopsuki.eu_session.dat
+updated session cache-file jpopsuki.eu_session.dat
+JPopsuki user id is xyz
+updated session cache-file jpopsuki.eu_session.dat
+Processing JPS URL: https://jpopsuki.eu/torrents.php?id=280834
+updated session cache-file jpopsuki.eu_session.dat
+<h2>[DVD] <a href="artist.php?id=12127">Airi Suzuki</a> - Suzuki Airi LIVE TOUR 2018 "PARALLEL DATE" [2019.05.22]</h2>
+Category: DVD
+Artist(s): ['Airi Suzuki']
+Release date: 20190522
+Title: Suzuki Airi LIVE TOUR 2018 "PARALLEL DATE"
+Original artist: 鈴木愛理 Original title: 鈴木愛理 LIVE TOUR 2018 “PARALLEL DATE”
+updated session cache-file jpopsuki.eu_session.dat
+Group description:
+Suzuki Airi LIVE TOUR 2018 "PARALLEL DATE" (鈴木愛理 LIVE TOUR 2018 “PARALLEL DATE”) was Suzuki Airi's fall 2018 live tour. It ran from November 3 to December 17, 2018.
+
+The DVD and Blu-ray of the tour were released on May 22, 2019. The Blu-ray includes bonus footage and a live photobooklet.
+Image link: https://jpopsuki.eu/static/images/torrents/280834.jpg
+Tags: ['japanese', 'pop', 'rock', 'female.vocalist', 'live']
+Contributing artists: {}
+Entire group contains: {
+  "405749": {
+    "slashdata": [
+      "MKV",
+      "Blu-Ray"
+    ],
+    "uploaddate": "Jun 03 2019, 00:43"
+  },
+  "405748": {
+    "slashdata": [
+      "ISO",
+      "Blu-Ray",
+      "<strong>Freeleech!</strong>"
+    ],
+    "uploaddate": "Jun 03 2019, 00:42"
+  },
+  "405767": {
+    "slashdata": [
+      "FLAC",
+      "Blu-Ray"
+    ],
+    "uploaddate": "Jun 03 2019, 08:23"
+  }
+}
+Selected for upload: {'405749': {'slashdata': ['MKV', 'Blu-Ray'], 'uploaddate': 'Jun 03 2019, 00:43'}, '405748': {'slashdata': ['ISO', 'Blu-Ray'], 'uploaddate': 'Jun 03 2019, 00:42'}, '405767': {'slashdata': ['FLAC', 'Blu-Ray'], 'uploaddate': 'Jun 03 2019, 08:23'}}
+Now processing: 405749 {'slashdata': ['MKV', 'Blu-Ray'], 'uploaddate': 'Jun 03 2019, 00:43'}
+updated session cache-file jpopsuki.eu_session.dat
+{'jpstorrentid': '405749', 'videotorrent': True, 'categorystatus': 'good', 'container': 'MKV', 'codec': 'CHANGEME', 'media': 'Bluray', 'audioformat': 'CHANGEME', 'uploaddate': '20190603'}
+{
+  "submit": "true",
+  "title": "Suzuki Airi LIVE TOUR 2018 \"PARALLEL DATE\"",
+  "year": "20190522",
+  "tags": "japanese,pop,rock,female.vocalist,live",
+  "album_desc": "Suzuki Airi LIVE TOUR 2018 \"PARALLEL DATE\" (\u9234\u6728\u611b\u7406 LIVE TOUR 2018 \u201cPARALLEL DATE\u201d) was Suzuki Airi's fall 2018 live tour. It ran from November 3 to December 17, 2018.\n\nThe DVD and Blu-ray of the tour were released on May 22, 2019. The Blu-ray includes bonus footage and a live photobooklet.",
+  "audioformat": "CHANGEME",
+  "image": "https://jpopsuki.eu/static/images/torrents/280834.jpg",
+  "type": 3,
+  "codec": "CHANGEME",
+  "ressel": "CHANGEME",
+  "container": "MKV",
+  "sub": "NoSubs",
+  "lang": "Japanese",
+  "artist_jp": "\u9234\u6728\u611b\u7406",
+  "title_jp": "\u9234\u6728\u611b\u7406 LIVE TOUR 2018 \u201cPARALLEL DATE\u201d",
+  "contrib_artists[]": [],
+  "idols[]": [
+    "Airi Suzuki"
+  ],
+  "auth": "<scrubbed>"
+}
+Now processing: 405748 {'slashdata': ['ISO', 'Blu-Ray'], 'uploaddate': 'Jun 03 2019, 00:42'}
+updated session cache-file jpopsuki.eu_session.dat
+{'jpstorrentid': '405748', 'videotorrent': True, 'categorystatus': 'good', 'container': 'ISO', 'codec': 'CHANGEME', 'media': 'Bluray', 'audioformat': 'CHANGEME', 'uploaddate': '20190603'}
+{
+  "submit": "true",
+  "title": "Suzuki Airi LIVE TOUR 2018 \"PARALLEL DATE\"",
+  "year": "20190522",
+  "tags": "japanese,pop,rock,female.vocalist,live",
+  "album_desc": "Suzuki Airi LIVE TOUR 2018 \"PARALLEL DATE\" (\u9234\u6728\u611b\u7406 LIVE TOUR 2018 \u201cPARALLEL DATE\u201d) was Suzuki Airi's fall 2018 live tour. It ran from November 3 to December 17, 2018.\n\nThe DVD and Blu-ray of the tour were released on May 22, 2019. The Blu-ray includes bonus footage and a live photobooklet.",
+  "audioformat": "CHANGEME",
+  "image": "https://jpopsuki.eu/static/images/torrents/280834.jpg",
+  "type": 3,
+  "codec": "CHANGEME",
+  "ressel": "CHANGEME",
+  "container": "ISO",
+  "sub": "NoSubs",
+  "lang": "Japanese",
+  "artist_jp": "\u9234\u6728\u611b\u7406",
+  "title_jp": "\u9234\u6728\u611b\u7406 LIVE TOUR 2018 \u201cPARALLEL DATE\u201d",
+  "contrib_artists[]": [],
+  "idols[]": [
+    "Airi Suzuki"
+  ],
+  "auth": "<scrubbed>"
+}
+Now processing: 405767 {'slashdata': ['FLAC', 'Blu-Ray'], 'uploaddate': 'Jun 03 2019, 08:23'}
+updated session cache-file jpopsuki.eu_session.dat
+{'jpstorrentid': '405767', 'videotorrent': False, 'categorystatus': 'bad', 'audioformat': 'FLAC', 'media': 'Bluray', 'uploaddate': '20190603'}
+{
+  "submit": "true",
+  "title": "Suzuki Airi LIVE TOUR 2018 \"PARALLEL DATE\"",
+  "year": "20190522",
+  "tags": "japanese,pop,rock,female.vocalist,live",
+  "album_desc": "Suzuki Airi LIVE TOUR 2018 \"PARALLEL DATE\" (\u9234\u6728\u611b\u7406 LIVE TOUR 2018 \u201cPARALLEL DATE\u201d) was Suzuki Airi's fall 2018 live tour. It ran from November 3 to December 17, 2018.\n\nThe DVD and Blu-ray of the tour were released on May 22, 2019. The Blu-ray includes bonus footage and a live photobooklet.",
+  "audioformat": "FLAC",
+  "image": "https://jpopsuki.eu/static/images/torrents/280834.jpg",
+  "type": 4,
+  "artist_jp": "\u9234\u6728\u611b\u7406",
+  "title_jp": "\u9234\u6728\u611b\u7406 LIVE TOUR 2018 \u201cPARALLEL DATE\u201d",
+  "contrib_artists[]": [],
+  "idols[]": [
+    "Airi Suzuki"
+  ],
+  "auth": "<scrubbed>"
+}

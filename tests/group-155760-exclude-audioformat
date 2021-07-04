@@ -1,0 +1,167 @@
+loading or generating session...
+loaded session from cache (last access 494s ago) 
+updated session cache-file jpopsuki.eu_session.dat
+JPopsuki user id is xyz
+updated session cache-file jpopsuki.eu_session.dat
+Processing JPS URL: https://jpopsuki.eu/torrents.php?id=155760
+updated session cache-file jpopsuki.eu_session.dat
+<h2>[Album] <a href="artist.php?id=61">4minute</a> - 4minute World [2014.03.16]</h2>
+Category: Album
+Artist(s): ['4minute']
+Release date: 20140316
+Title: 4minute World
+Original artist: 포미닛 Original title: 포미닛월드
+updated session cache-file jpopsuki.eu_session.dat
+Group description:
+4minute World
+
+Tracklist :
+
+1. Wait A Minute
+2. 오늘 뭐해
+3. 알려 줄게
+4. 들어와
+5. 고마워 :)
+
+DVD Tracklist :
+1. What Are You Doing Today (MV)
+2. MV Making Film
+3. Photoshoot Making Film
+Image link: https://jpopsuki.eu/static/images/torrents/155760.jpg
+Tags: ['korean', 'pop', 'female.vocalist']
+Contributing artists: {'Brave Brothers': '용감한형제'}
+Entire group contains: {
+  "216414": {
+    "slashdata": [
+      "VOB",
+      "Lossless",
+      "DVD"
+    ],
+    "uploaddate": "May 23 2014, 18:14"
+  },
+  "211137": {
+    "slashdata": [
+      "MP3",
+      "320",
+      "WEB"
+    ],
+    "uploaddate": "Mar 16 2014, 15:23"
+  },
+  "274819": {
+    "slashdata": [
+      "MP3",
+      "V0 (VBR)",
+      "CD"
+    ],
+    "uploaddate": "Feb 28 2016, 14:38"
+  },
+  "216396": {
+    "slashdata": [
+      "FLAC",
+      "Lossless",
+      "CD"
+    ],
+    "uploaddate": "May 23 2014, 15:50"
+  },
+  "480203": {
+    "slashdata": [
+      "AAC",
+      "256",
+      "WEB",
+      "iTunes EP - 2014"
+    ],
+    "uploaddate": "Mar 25 2021, 05:38"
+  }
+}
+Selected for upload: {'216414': {'slashdata': ['VOB', 'Lossless', 'DVD'], 'uploaddate': 'May 23 2014, 18:14'}, '211137': {'slashdata': ['MP3', '320', 'WEB'], 'uploaddate': 'Mar 16 2014, 15:23'}, '274819': {'slashdata': ['MP3', 'V0 (VBR)', 'CD'], 'uploaddate': 'Feb 28 2016, 14:38'}, '216396': {'slashdata': ['FLAC', 'Lossless', 'CD'], 'uploaddate': 'May 23 2014, 15:50'}, '480203': {'slashdata': ['AAC', '256', 'WEB', 'iTunes EP - 2014'], 'uploaddate': 'Mar 25 2021, 05:38'}}
+Now processing: 216414 {'slashdata': ['VOB', 'Lossless', 'DVD'], 'uploaddate': 'May 23 2014, 18:14'}
+updated session cache-file jpopsuki.eu_session.dat
+{'jpstorrentid': '216414', 'videotorrent': True, 'categorystatus': 'bad', 'container': 'VOB', 'codec': 'CHANGEME', 'media': 'DVD', 'audioformat': 'CHANGEME', 'uploaddate': '20140523'}
+{
+  "submit": "true",
+  "title": "4minute World",
+  "year": "20140316",
+  "tags": "korean,pop,female.vocalist",
+  "album_desc": "4minute World\n\nTracklist :\n\n1. Wait A Minute\n2. \uc624\ub298 \ubb50\ud574\n3. \uc54c\ub824 \uc904\uac8c\n4. \ub4e4\uc5b4\uc640\n5. \uace0\ub9c8\uc6cc :)\n\nDVD Tracklist :\n1. What Are You Doing Today (MV)\n2. MV Making Film\n3. Photoshoot Making Film",
+  "audioformat": "CHANGEME",
+  "image": "https://jpopsuki.eu/static/images/torrents/155760.jpg",
+  "type": 0,
+  "codec": "CHANGEME",
+  "ressel": "CHANGEME",
+  "container": "VOB",
+  "sub": "NoSubs",
+  "lang": "Korean",
+  "artist_jp": "\ud3ec\ubbf8\ub2db",
+  "title_jp": "\ud3ec\ubbf8\ub2db\uc6d4\ub4dc",
+  "contrib_artists[]": [
+    "Brave Brothers"
+  ],
+  "idols[]": [
+    "4minute"
+  ],
+  "auth": "<scrubbed>"
+}
+Now processing: 211137 {'slashdata': ['MP3', '320', 'WEB'], 'uploaddate': 'Mar 16 2014, 15:23'}
+Excluding ['MP3', '320', 'WEB'] as exclude audioformat MP3 is set
+Now processing: 274819 {'slashdata': ['MP3', 'V0 (VBR)', 'CD'], 'uploaddate': 'Feb 28 2016, 14:38'}
+Excluding ['MP3', 'V0 (VBR)', 'CD'] as exclude audioformat MP3 is set
+Now processing: 216396 {'slashdata': ['FLAC', 'Lossless', 'CD'], 'uploaddate': 'May 23 2014, 15:50'}
+updated session cache-file jpopsuki.eu_session.dat
+{'jpstorrentid': '216396', 'videotorrent': False, 'categorystatus': 'good', 'media': 'CD', 'audioformat': 'FLAC', 'bitrate': 'Lossless', 'uploaddate': '20140523'}
+Deciding if EP with torrent with these tracks: 02. What Are You Doing Today.flac
+Deciding if EP with torrent with these tracks: 05. Thank You.flac
+Deciding if EP with torrent with these tracks: 04. Come In.flac
+Deciding if EP with torrent with these tracks: 01. Wait A Minute.flac
+Deciding if EP with torrent with these tracks: 03. I'll Tell You.flac
+Upload is an EP as it has 5 standard tracks
+{
+  "submit": "true",
+  "title": "4minute World",
+  "year": "20140316",
+  "tags": "korean,pop,female.vocalist",
+  "album_desc": "4minute World\n\nTracklist :\n\n1. Wait A Minute\n2. \uc624\ub298 \ubb50\ud574\n3. \uc54c\ub824 \uc904\uac8c\n4. \ub4e4\uc5b4\uc640\n5. \uace0\ub9c8\uc6cc :)\n\nDVD Tracklist :\n1. What Are You Doing Today (MV)\n2. MV Making Film\n3. Photoshoot Making Film",
+  "audioformat": "FLAC",
+  "image": "https://jpopsuki.eu/static/images/torrents/155760.jpg",
+  "bitrate": "Lossless",
+  "type": 1,
+  "artist_jp": "\ud3ec\ubbf8\ub2db",
+  "title_jp": "\ud3ec\ubbf8\ub2db\uc6d4\ub4dc",
+  "contrib_artists[]": [
+    "Brave Brothers"
+  ],
+  "idols[]": [
+    "4minute"
+  ],
+  "auth": "<scrubbed>"
+}
+Now processing: 480203 {'slashdata': ['AAC', '256', 'WEB', 'iTunes EP - 2014'], 'uploaddate': 'Mar 25 2021, 05:38'}
+updated session cache-file jpopsuki.eu_session.dat
+{'jpstorrentid': '480203', 'videotorrent': False, 'categorystatus': 'good', 'media': 'Web', 'audioformat': 'AAC', 'bitrate': '256', 'remastertitle': 'iTunes EP', 'uploaddate': '20210325'}
+Deciding if EP with torrent with these tracks: 4minute - 4minute World - 1.05 Thank You -).m4a
+Deciding if EP with torrent with these tracks: 4minute - 4minute World - 1.04 Come In.m4a
+Deciding if EP with torrent with these tracks: 4minute - 4minute World - 1.02 Whatcha Doin' Today.m4a
+Deciding if EP with torrent with these tracks: 4minute - 4minute World - 1.01 Wait a Minute.m4a
+Deciding if EP with torrent with these tracks: 4minute - 4minute World - 1.03 Let You Know.m4a
+Upload is an EP as it has 5 standard tracks
+{
+  "submit": "true",
+  "title": "4minute World",
+  "year": "20140316",
+  "tags": "korean,pop,female.vocalist",
+  "album_desc": "4minute World\n\nTracklist :\n\n1. Wait A Minute\n2. \uc624\ub298 \ubb50\ud574\n3. \uc54c\ub824 \uc904\uac8c\n4. \ub4e4\uc5b4\uc640\n5. \uace0\ub9c8\uc6cc :)\n\nDVD Tracklist :\n1. What Are You Doing Today (MV)\n2. MV Making Film\n3. Photoshoot Making Film",
+  "audioformat": "AAC",
+  "image": "https://jpopsuki.eu/static/images/torrents/155760.jpg",
+  "bitrate": "256",
+  "remaster": "remaster",
+  "remastertitle": "iTunes EP",
+  "type": 1,
+  "artist_jp": "\ud3ec\ubbf8\ub2db",
+  "title_jp": "\ud3ec\ubbf8\ub2db\uc6d4\ub4dc",
+  "contrib_artists[]": [
+    "Brave Brothers"
+  ],
+  "idols[]": [
+    "4minute"
+  ],
+  "auth": "<scrubbed>"
+}
