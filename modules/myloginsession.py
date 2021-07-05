@@ -5,7 +5,29 @@ import pickle
 from urllib.parse import urlparse
 import requests
 
+from modules.utils import GetConfig
+
 logger = logging.getLogger('main.' + __name__)
+
+
+def jpopsuki(url, test_login=False):
+    """
+    Get content from JPS
+
+    :param url:
+    :param test_login: Disable test login
+    :return: data
+    """
+    config = GetConfig()
+
+    jps_login_url = "https://jpopsuki.eu/login.php"
+    jps_test_url = "https://jpopsuki.eu"
+    jps_success = '<div id="extra1"><span></span></div>'
+    login_data = {'username': config.jps_user, 'password': config.jps_pass}
+
+    jps_session = MyLoginSession(jps_login_url, login_data, jps_test_url, jps_success, test_login)
+
+    return jps_session.retrieveContent(url)
 
 
 class MyLoginSession:
@@ -24,6 +46,7 @@ class MyLoginSession:
                  loginData,
                  loginTestUrl,
                  loginTestString,
+                 test_login=False,
                  sessionFileAppendix='_session.dat',
                  maxSessionTimeSeconds=30 * 60,
                  proxies=None,
@@ -51,7 +74,7 @@ class MyLoginSession:
         self.userAgent = userAgent
         self.loginTestString = loginTestString
 
-        self.login(forceLogin, **kwargs)
+        self.login(forceLogin, test_login, **kwargs)
 
     def modification_date(self, filename):
         """
@@ -60,14 +83,14 @@ class MyLoginSession:
         t = os.path.getmtime(filename)
         return datetime.datetime.fromtimestamp(t)
 
-    def login(self, forceLogin=False, **kwargs):
+    def login(self, forceLogin=False, test_login=False, **kwargs):
         """
         login to a session. Try to read last saved session from cache file. If this fails
         do proper login. If the last cache access was too old, also perform a proper login.
         Always updates session cache file.
         """
         wasReadFromCache = False
-        logger.debug('loading or generating session...')
+        # logger.debug('loading or generating session...')
         if os.path.exists(self.sessionFile) and not forceLogin:
             time = self.modification_date(self.sessionFile)
 
@@ -86,13 +109,14 @@ class MyLoginSession:
             logger.debug('created new session with login')
             self.saveSessionToCache()
 
-        # test login
-        res = self.session.get(self.loginTestUrl)
-        if res.text.lower().find(self.loginTestString.lower()) < 0:
-            logger.debug(res.text)
-            raise Exception("could not log into provided site '%s'"
-                            " (did not find successful login string)"
-                            % self.loginUrl)
+        if test_login:
+            # test login
+            res = self.session.get(self.loginTestUrl)
+            if res.text.lower().find(self.loginTestString.lower()) < 0:
+                logger.debug(res.text)
+                raise Exception("could not log into provided site '%s'"
+                                " (did not find successful login string)"
+                                % self.loginUrl)
 
     def saveSessionToCache(self):
         """

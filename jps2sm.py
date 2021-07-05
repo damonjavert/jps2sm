@@ -35,7 +35,7 @@ from pathlib import Path
 
 # jps2sm modules
 from modules.utils import get_valid_filename, count_values_dict, fatal_error, GetConfig
-from modules.myloginsession import MyLoginSession
+from modules.myloginsession import MyLoginSession, jpopsuki
 from modules.constants import Categories, VideoOptions
 from modules.mediainfo import get_mediainfo
 
@@ -48,7 +48,7 @@ def detect_display_swapped_names(userid):
     :param userid:
     :return: True if enabled (bad) or False if disabled (OK)
     """
-    user_profile_page = s.retrieveContent(f"https://jpopsuki.eu/user.php?action=edit&userid={userid}")
+    user_profile_page = jpopsuki(f"https://jpopsuki.eu/user.php?action=edit&userid={userid}")
     soup = BeautifulSoup(user_profile_page.text, 'html5lib')
     user_form = str(soup.select('#content .thin #userform'))
 
@@ -79,7 +79,7 @@ def getbulktorrentids(mode, user, first=1, last=None):
     :param last: upload page to finish at
     :return: useruploads: dict
     """
-    res = s.retrieveContent(f"https://jpopsuki.eu/torrents.php?type={mode}&userid={user}")
+    res = jpopsuki(f"https://jpopsuki.eu/torrents.php?type={mode}&userid={user}")
     soup = BeautifulSoup(res.text, 'html5lib')
 
     time.sleep(5)  # Sleep as otherwise we hit JPS browse quota
@@ -101,7 +101,7 @@ def getbulktorrentids(mode, user, first=1, last=None):
     # the way that uploadtorrent() works.
     for i in range(first, int(last) + 1):
         useruploadurl = fr"https://jpopsuki.eu/torrents.php?page={i}&order_by=s1&order_way=ASC&type={mode}&userid={user}&disablegrouping=1"
-        useruploadpage = s.retrieveContent(useruploadurl)
+        useruploadpage = jpopsuki(useruploadurl)
         logger.info(useruploadurl)
         # print useruploadpage.text
         soup2 = BeautifulSoup(useruploadpage.text, 'html5lib')
@@ -140,7 +140,7 @@ def get_group_descrption_bbcode(groupid):
     :param: groupid: JPS groupid to get group description with bbcode
     :return: bbcode: group description with bbcode
     """
-    edit_group_page = s.retrieveContent(f"https://jpopsuki.eu/torrents.php?action=editgroup&groupid={groupid}")
+    edit_group_page = jpopsuki(f"https://jpopsuki.eu/torrents.php?action=editgroup&groupid={groupid}")
     soup = BeautifulSoup(edit_group_page.text, 'html5lib')
     bbcode = soup.find("textarea", {"name": "body"}).string
 
@@ -172,7 +172,7 @@ def download_sm_torrent(torrent_id):
     :param torrent_id: SM torrentid to be downloaded
     :return: name: int: filename of torrent downloaded
     """
-    file = s.retrieveContent(
+    file = jpopsuki(
         'https://sugoimusic.me/torrents.php?action='
         f'download&id={torrent_id}&authkey={authkey}&torrent_pass={torrent_password_key}'
     )
@@ -201,7 +201,7 @@ def decide_music_performance(artists, multiplefiles, duration):
         if len(artists) > 1:  # Multiple artists
             logger.debug('Upload is a Music Performance as it has derived multiple artists and is 25 mins or less')
             return 'Music Performance'  # JPS TV Show artists never have multiple artists
-        JPSartistpage = s.retrieveContent(f"https://jpopsuki.eu/artist.php?name={artists[0]}")
+        JPSartistpage = jpopsuki(f"https://jpopsuki.eu/artist.php?name={artists[0]}")
         soup = BeautifulSoup(JPSartistpage.text, 'html5lib')
         categoriesbox = str(soup.select('#content .thin .main_column .box.center'))
         categories = re.findall(r'\[(.+)\]', categoriesbox)
@@ -221,7 +221,7 @@ def getalternatefansubcategoryid(artist):
     :param artist: str artist name
     :return: int alternative category ID based on Categories.SM()
     """
-    JPSartistpage = s.retrieveContent(f"https://jpopsuki.eu/artist.php?name={artist}")
+    JPSartistpage = jpopsuki(f"https://jpopsuki.eu/artist.php?name={artist}")
     soup = BeautifulSoup(JPSartistpage.text, 'html5lib')
     categoriesbox = str(soup.select('#content .thin .main_column .box.center'))
     categories = re.findall(r'\[(.+)\]', categoriesbox)
@@ -567,7 +567,7 @@ class GetGroupData:
         # YYYY.MM.DD OR YYYY format, for Pictures only
         date_regex2 = r'(?:[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])|(?:19|20)\d\d)'
 
-        res = s.retrieveContent(self.jpsurl.split()[0])  # If there are multiple urls only the first url needs to be parsed
+        res = jpopsuki(self.jpsurl.split()[0])  # If there are multiple urls only the first url needs to be parsed
 
         self.groupid = re.findall(r"(?!id=)\d+", self.jpsurl)[0]
 
@@ -945,7 +945,7 @@ def collate(torrentids):
         releasedataout['uploaddate'] = datetime.datetime.strptime(uploaddatestr, '%b %d %Y, %H:%M').strftime('%Y%m%d')
 
         torrentlink = html.unescape(gettorrentlink(torrentid))
-        torrentfile = s.retrieveContent("https://jpopsuki.eu/%s" % torrentlink)  # Download JPS torrent
+        torrentfile = jpopsuki("https://jpopsuki.eu/%s" % torrentlink)  # Download JPS torrent
         torrentfilename = get_valid_filename(
             "JPS %s - %s - %s.torrent" % (torrentgroupdata.artist, torrentgroupdata.title, "-".join(releasedata)))
         torrentpath = Path(output.file_dir['jpstorrents'], torrentfilename)
@@ -1048,7 +1048,7 @@ def get_jps_user_id():
     :return: int: user id
     """
 
-    res = s.retrieveContent("https://jpopsuki.eu/")
+    res = jpopsuki("https://jpopsuki.eu/", True)
     soup = BeautifulSoup(res.text, 'html5lib')
     href = soup.select('.username')[0]['href']
     jps_user_id = re.match(r"user\.php\?id=(\d+)", href).group(1)
@@ -1184,7 +1184,7 @@ if __name__ == "__main__":
         except configparser.NoSectionError:
             fatal_error('Error: --mediainfo requires you to configure MediaDirectories in jps2sm.cfg for mediainfo to find your file(s).')
 
-    s = MyLoginSession(loginUrl, loginData, loginTestUrl, successStr)
+    # s = MyLoginSession(loginUrl, loginData, loginTestUrl, successStr)
 
     if not args.parsed.dryrun:
         sm = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr)
