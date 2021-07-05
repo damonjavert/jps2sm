@@ -1,3 +1,4 @@
+# Standard library packages
 import logging
 import datetime
 import os
@@ -100,7 +101,7 @@ class MyLoginSession:
                 with open(self.sessionFile, "rb") as f:
                     self.session = pickle.load(f)
                     wasReadFromCache = True
-                    logger.debug("loaded session from cache (last access %ds ago) " % lastModification)
+                    # logger.debug("loaded session from cache (last access %ds ago) " % lastModification)
         if not wasReadFromCache:
             self.session = requests.Session()
             self.session.headers.update({'user-agent': self.userAgent})
@@ -111,6 +112,7 @@ class MyLoginSession:
 
         if test_login:
             # test login
+            logger.debug('Loaded session from cache and testing login...')
             res = self.session.get(self.loginTestUrl)
             if res.text.lower().find(self.loginTestString.lower()) < 0:
                 logger.debug(res.text)

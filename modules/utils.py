@@ -1,13 +1,17 @@
+# Standard library packages
 import logging
 import re
 from typing import AnyStr
 import sys
 import configparser
+import argparse
 
 # Third-party packages
 from pathlib import Path
 
 logger = logging.getLogger('main.' + __name__)
+
+__version__ = "1.5.1"
 
 
 def get_valid_filename(s: str) -> AnyStr:
@@ -43,6 +47,25 @@ def fatal_error(msg):
 
     print(msg, file=sys.stderr)
     sys.exit(1)
+
+
+class GetArgs:
+    def __init__(self):
+        parser = argparse.ArgumentParser()
+        parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + __version__)
+        parser.add_argument('-d', '--debug', help='Enable debug mode', action='store_true')
+        parser.add_argument("-u", "--urls", help="JPS URL for a group, or multiple individual releases URLs to be added to the same group", type=str)
+        parser.add_argument("-n", "--dryrun", help="Just parse url and show the output, do not add the torrent to SM", action="store_true")
+        parser.add_argument("-b", "--batchuser", help="User id for batch user operations, default is user id of SM Username specified in jps2sm.cfg")
+        parser.add_argument("-U", "--batchuploaded", help="(Batch mode only) Upload all releases uploaded by you or, if provided, user id specified by --batchuser", action="store_true")
+        parser.add_argument("-S", "--batchseeding", help="(Batch mode only) Upload all releases currently seeding by you or, if provided, user id specified by --batchuser", action="store_true")
+        parser.add_argument("-s", "--batchstart", help="(Batch mode only) Start at this page", type=int)
+        parser.add_argument("-e", "--batchend", help="(Batch mode only) End at this page", type=int)
+        parser.add_argument("-exc", "--exccategory", help="(Batch mode only) Exclude a JPS category from upload", type=str)
+        parser.add_argument("-exf", "--excaudioformat", help="(Batch mode only) Exclude an audioformat from upload", type=str)
+        parser.add_argument("-exm", "--excmedia", help="(Batch mode only) Exclude a media from upload", type=str)
+        parser.add_argument("-m", "--mediainfo", help="Search and get mediainfo data from the source file(s) in the directories specified by MediaDirectories. Extract data to set codec, resolution, audio format and container fields as well as the mediainfo field itself.", action="store_true")
+        self.parsed = parser.parse_args()
 
 
 class GetConfig:
