@@ -32,11 +32,11 @@ import humanfriendly
 from pathlib import Path
 
 # jps2sm modules
-from modules.utils import get_valid_filename, count_values_dict, fatal_error, GetConfig, GetArgs
-from modules.myloginsession import MyLoginSession, jpopsuki, sugoimusic
-from modules.constants import Categories, VideoOptions
-from modules.mediainfo import get_mediainfo
-from modules.validation import decide_music_performance, get_alternate_fansub_category_id, validate_jps_video_data, validate_jps_bitrate, decide_exc_filter, decide_ep
+from jps2sm.utils import get_valid_filename, count_values_dict, fatal_error, GetConfig, GetArgs
+from jps2sm.myloginsession import MyLoginSession, jpopsuki, sugoimusic
+from jps2sm.constants import Categories, VideoOptions
+from jps2sm.mediainfo import get_mediainfo
+from jps2sm.validation import decide_music_performance, get_alternate_fansub_category_id, validate_jps_video_data, validate_jps_bitrate, decide_exc_filter, decide_ep
 
 
 def detect_display_swapped_names(userid):

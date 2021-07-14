@@ -2,9 +2,9 @@
 import logging
 import re
 
-from modules.myloginsession import jpopsuki
-from modules.constants import Categories, VideoOptions
-from modules.utils import GetArgs
+from jps2sm.myloginsession import jpopsuki
+from jps2sm.constants import Categories, VideoOptions
+from jps2sm.utils import GetArgs
 
 # Third-party packages
 from bs4 import BeautifulSoup

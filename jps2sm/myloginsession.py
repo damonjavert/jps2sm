@@ -6,7 +6,7 @@ import pickle
 from urllib.parse import urlparse
 import requests
 
-from modules.utils import GetConfig
+from jps2sm.utils import GetConfig
 
 logger = logging.getLogger('main.' + __name__)
 
