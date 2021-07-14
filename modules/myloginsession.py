@@ -31,6 +31,30 @@ def jpopsuki(url, test_login=False):
     return jps_session.retrieveContent(url)
 
 
+def sugoimusic(url, method="get", post_data=None, post_data_files=None, test_login=False):
+    """
+    Get/Post content to SM
+
+    :param post_data_files: Files to send in POST
+    :param post_data: Parameters to send in POST
+    :param method: HTML method
+    :param url: URL to parse
+    :param test_login: Disable test login
+    :return: data
+    """
+
+    config = GetConfig()
+
+    sm_login_url = "https://sugoimusic.me/login.php"
+    sm_test_url = "https://sugoimusic.me/"
+    sm_success = "Enabled users"
+    login_data = {'username': config.sm_user, 'password': config.sm_pass}
+
+    sm_session = MyLoginSession(sm_login_url, login_data, sm_test_url, sm_success, test_login)
+
+    return sm_session.retrieveContent(url, method, post_data, post_data_files)
+
+
 class MyLoginSession:
     """
     Taken from: https://stackoverflow.com/a/37118451/2115140

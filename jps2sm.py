@@ -33,7 +33,7 @@ from pathlib import Path
 
 # jps2sm modules
 from modules.utils import get_valid_filename, count_values_dict, fatal_error, GetConfig, GetArgs
-from modules.myloginsession import MyLoginSession, jpopsuki
+from modules.myloginsession import MyLoginSession, jpopsuki, sugoimusic
 from modules.constants import Categories, VideoOptions
 from modules.mediainfo import get_mediainfo
 from modules.validation import decide_music_performance, get_alternate_fansub_category_id, validate_jps_video_data, validate_jps_bitrate, decide_exc_filter, decide_ep
@@ -151,7 +151,7 @@ def get_user_keys():
     Get SM session authkey and torrent_password_key for use by uploadtorrent()|download_sm_torrent() data dict.
     Uses SM login data
     """
-    smpage = sm.retrieveContent("https://sugoimusic.me/torrents.php?id=118")  # Arbitrary page on JPS that has authkey
+    smpage = sugoimusic("https://sugoimusic.me/torrents.php?id=118", test_login=True)  # Arbitrary page on JPS that has authkey
     soup = BeautifulSoup(smpage.text, 'html5lib')
     rel2 = str(soup.select_one('#torrent_details .group_torrent > td > span > .tooltip'))
 
@@ -183,12 +183,6 @@ def download_sm_torrent(torrent_id):
     return name
 
 
-
-
-
-
-
-
 def setorigartist(artist, origartist):
     """
     Set an artist's original artist with the string origartist, currently used for contrib artists
@@ -197,7 +191,7 @@ def setorigartist(artist, origartist):
     :param artist: string: String of the artist that needs it's original artist set
     :param origartist: string: Original artist
     """
-    SMartistpage = sm.retrieveContent(f"https://sugoimusic.me/artist.php?artistname={artist}")
+    SMartistpage = sugoimusic(f"https://sugoimusic.me/artist.php?artistname={artist}")
     soup = BeautifulSoup(SMartistpage.text, 'html5lib')
     linkbox = str(soup.select('#content .thin .header .linkbox'))
     artistid = re.findall(r'href="artist\.php\?action=edit&amp;artistid=([0-9]+)"', linkbox)[0]
@@ -209,7 +203,7 @@ def setorigartist(artist, origartist):
         'name_jp': origartist
     }
 
-    SMeditartistpage = sm.retrieveContent(f'https://sugoimusic.me/artist.php?artistname={artist}', 'post', data)
+    SMeditartistpage = sugoimusic(f'https://sugoimusic.me/artist.php?artistname={artist}', 'post', data)
     logger.debug(f'Set artist {artist} original artist to {origartist}')
 
 
@@ -440,7 +434,7 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
         dataexcmediainfo['auth'] = '<scrubbed>'
         logger.info(json.dumps(dataexcmediainfo, indent=2))  # Mediainfo shows too much data
     if not args.parsed.dryrun:
-        SMres = sm.retrieveContent(uploadurl, "post", data, postDataFiles)
+        SMres = sugoimusic(uploadurl, "post", data, postDataFiles)
 
         SMerrorTorrent = re.findall('red; text-align: center;">(.*)</p>', SMres.text)
         if SMerrorTorrent:
@@ -835,7 +829,7 @@ def downloaduploadedtorrents(torrentcount):
     if torrentcount == 0:
         return
 
-    user_recents = sm.retrieveContent(f"https://sugoimusic.me/ajax.php?action=user_recents&limit={torrentcount}")
+    user_recents = sugoimusic(f"https://sugoimusic.me/ajax.php?action=user_recents&limit={torrentcount}")
     user_recents_json = json.loads(user_recents.text)
 
     smtorrentlinks = {}
@@ -843,7 +837,7 @@ def downloaduploadedtorrents(torrentcount):
         smtorrentlinks[torrentdata['torrentid']] = torrentdata['torrentdl']
 
     for torrentid, torrentlink in smtorrentlinks.items():
-        torrentfile = sm.retrieveContent(torrentlink)
+        torrentfile = sugoimusic(torrentlink)
         torrentfilename = get_valid_filename(f'SM {torrentgroupdata.artist} - {torrentgroupdata.title} - {torrentid}.torrent')
         torrentpath = Path(output.file_dir['smtorrents'], torrentfilename)
 
@@ -959,18 +953,6 @@ if __name__ == "__main__":
 
     output = HandleCfgOutputDirs(config.directories)  # Get config dirs config, handle absolute/relative paths and create if not exist
 
-    # JPS MyLoginSession vars
-    loginUrl = "https://jpopsuki.eu/login.php"
-    loginTestUrl = "https://jpopsuki.eu"
-    successStr = '<div id="extra1"><span></span></div>'
-    loginData = {'username': config.jps_user, 'password': config.jps_pass}
-
-    # SM MyLoginSession vars
-    SMloginUrl = "https://sugoimusic.me/login.php"
-    SMloginTestUrl = "https://sugoimusic.me/"
-    SMsuccessStr = "Enabled users"
-    SMloginData = {'username': config.sm_user, 'password': config.sm_pass}
-
     if args.parsed.mediainfo:
         try:
             for media_dir in config.media_roots:
@@ -984,7 +966,6 @@ if __name__ == "__main__":
     # s = MyLoginSession(loginUrl, loginData, loginTestUrl, successStr)
 
     if not args.parsed.dryrun:
-        sm = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr)
         # We only want this run ONCE per instance of the script
         userkeys = get_user_keys()
         authkey = userkeys['authkey']
