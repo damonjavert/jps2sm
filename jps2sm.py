@@ -11,6 +11,7 @@ print(walrus := "", end='')  # jps2sm requires python3.8, a SyntaxError here mea
 
 # Standard version check that for now it pretty useless
 import sys
+
 if sys.version_info < (3, 8):
     print("Error: jps2sm requires python 3.8 to run.", file=sys.stderr)
     exit(1)
@@ -38,7 +39,8 @@ from jps2sm.utils import get_valid_filename, count_values_dict, fatal_error, Get
 from jps2sm.myloginsession import MyLoginSession, jpopsuki, sugoimusic
 from jps2sm.constants import Categories, VideoOptions
 from jps2sm.mediainfo import get_mediainfo
-from jps2sm.validation import decide_music_performance, get_alternate_fansub_category_id, validate_jps_video_data, validate_jps_bitrate, decide_exc_filter, decide_ep
+from jps2sm.validation import decide_music_performance, get_alternate_fansub_category_id, validate_jps_video_data, validate_jps_bitrate, \
+    decide_exc_filter, decide_ep
 
 
 def detect_display_swapped_names(userid):
@@ -86,7 +88,9 @@ def getbulktorrentids(mode, user, first=1, last=None):
     linkbox = str(soup.select('#content #ajax_torrents .linkbox')[0])
     if not last:
         try:
-            last = re.findall(fr'page=([0-9]*)&amp;order_by=s3&amp;order_way=DESC&amp;type={mode}&amp;userid=(?:[0-9]*)&amp;disablegrouping=1(?:\'\);|&amp;action=advanced)"><strong> Last &gt;&gt;</strong>', linkbox)[0]
+            last = re.findall(
+                fr'page=([0-9]*)&amp;order_by=s3&amp;order_way=DESC&amp;type={mode}&amp;userid=(?:[0-9]*)&amp;disablegrouping=1(?:\'\);|&amp;action=advanced)"><strong> Last &gt;&gt;</strong>',
+                linkbox)[0]
         except:
             # There is only 1 page of uploads if the 'Last >>' link cannot be found
             last = 1
@@ -123,7 +127,7 @@ def getbulktorrentids(mode, user, first=1, last=None):
     return useruploads
 
 
-def download_sm_torrent(torrent_id):
+def download_sm_torrent(torrent_id, artist, title):
     """
     Downloads the SM torrent if it is a dupe, in this scenario we cannot use downloaduploadedtorrents() as the user
     has not actually uploaded it.
@@ -136,7 +140,7 @@ def download_sm_torrent(torrent_id):
         f'download&id={torrent_id}&authkey={authkey}&torrent_pass={torrent_password_key}'
     )
     name = get_valid_filename(
-        "SM %s - %s - %s.torrent" % (torrentgroupdata.artist, torrentgroupdata.title, torrent_id)
+        "SM %s - %s - %s.torrent" % (artist, title, torrent_id)
     )
     path = Path(output.file_dir['smtorrents'], name)
     with open(path, "wb") as f:
@@ -169,7 +173,7 @@ def setorigartist(artist, origartist):
     logger.debug(f'Set artist {artist} original artist to {origartist}')
 
 
-def uploadtorrent(torrentpath, groupid=None, **uploaddata):
+def uploadtorrent(torrentpath, torrentgroupdata, groupid=None, **uploaddata):
     """
     Prepare POST data for the SM upload, performs additional validation, reports errors and performs the actual upload to
     SM whilst saving the html result to investigate any errors if they are not reported correctly.
@@ -335,7 +339,7 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
         if SMerrorTorrent:
             dupe = re.findall('torrentid=([0-9]+)">The exact same torrent file already exists on the site!</a>$', SMerrorTorrent[0])
             if dupe:
-                dupe_file_name = download_sm_torrent(dupe[0])
+                dupe_file_name = download_sm_torrent(dupe[0], torrentgroupdata.artist, torrentgroupdata.title)
                 logger.warning(
                     f'This torrent already exists on SugoiMusic - https://sugoimusic.me/torrents.php?torrentid={dupe[0]} '
                     f'The .torrent has been downloaded with name "{Path(output.file_dir["smtorrents"], dupe_file_name)}"'
@@ -360,7 +364,9 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
         groupid = re.findall('<input type="hidden" name="groupid" value="([0-9]+)" />', SMres.text)
         if not groupid:
             # Find groupid if private torrent warning
-            groupid = re.findall(r'Your torrent has been uploaded; however, you must download your torrent from <a href="torrents\.php\?id=([0-9]+)">here</a>', SMres.text)
+            groupid = re.findall(
+                r'Your torrent has been uploaded; however, you must download your torrent from <a href="torrents\.php\?id=([0-9]+)">here</a>',
+                SMres.text)
             if not groupid:
                 unknown_error_msg = f'Cannot find groupid in SM response - there was probably an unknown error. See {smuploadresultfilename} for potential errors'
                 raise RuntimeError(unknown_error_msg)
@@ -371,15 +377,7 @@ def uploadtorrent(torrentpath, groupid=None, **uploaddata):
     return groupid
 
 
-
-
-
-
-
-
-
-
-def collate(torrentids):
+def collate(torrentids, torrentgroupdata):
     """
     Collate and validate data ready for upload to SM
 
@@ -409,7 +407,8 @@ def collate(torrentids):
 
         # JPS uses the audioformat field (represented as releasedata[0] here) for containers and codecs in video torrents,
         # and when combined with VideoMedias we can perform VideoTorrent detection.
-        if releasedata[0] in VideoOptions.badformats and releasedata[1] in VideoOptions.VideoMedias:  # VideoCategory torrent, this also detects VideoCategories in a non-VC group
+        if releasedata[0] in VideoOptions.badformats and releasedata[
+            1] in VideoOptions.VideoMedias:  # VideoCategory torrent, this also detects VideoCategories in a non-VC group
             # container / media
             releasedataout['videotorrent'] = True  # For processing by uploadtorrent()
             releasedataout['categorystatus'] = "good"
@@ -421,7 +420,8 @@ def collate(torrentids):
             if len(releasedata) == 3:  # Remastered
                 remasterdata = releasedata[2]
 
-        elif releasedata[0] in VideoOptions.badformats and releasedata[2] in VideoOptions.VideoMedias:  # Video torrent mistakenly uploaded as an Album/Single
+        elif releasedata[0] in VideoOptions.badformats and releasedata[
+            2] in VideoOptions.VideoMedias:  # Video torrent mistakenly uploaded as an Album/Single
             # container / 'bitrate' / media   Bitrate is meaningless, users usually select Lossless
             releasedataout['videotorrent'] = True  # For processing by uploadtorrent()
             releasedataout['categorystatus'] = "bad"
@@ -509,9 +509,9 @@ def collate(torrentids):
         # uploads like this anymore
         try:
             if release_group_id is None:
-                release_group_id = uploadtorrent(torrentpath, **releasedataout)
+                release_group_id = uploadtorrent(torrentpath, torrentgroupdata, **releasedataout)
             else:
-                uploadtorrent(torrentpath, release_group_id, **releasedataout)
+                uploadtorrent(torrentpath, torrentgroupdata, release_group_id, **releasedataout)
         except Exception:
             logger.exception('Error in uploadtorrent()')
             raise RuntimeError('Error in uploadtorrent()')
@@ -526,7 +526,7 @@ def collate(torrentids):
     return torrentcount  # For use by downloaduploadedtorrents()
 
 
-def downloaduploadedtorrents(torrentcount):
+def downloaduploadedtorrents(torrentcount, artist, title):
     """
     Get last torrentcount torrent DL links that user uploaded using SM API and download them
 
@@ -546,7 +546,7 @@ def downloaduploadedtorrents(torrentcount):
 
     for torrentid, torrentlink in smtorrentlinks.items():
         torrentfile = sugoimusic(torrentlink)
-        torrentfilename = get_valid_filename(f'SM {torrentgroupdata.artist} - {torrentgroupdata.title} - {torrentid}.torrent')
+        torrentfilename = get_valid_filename(f'SM {artist} - {title} - {torrentid}.torrent')
         torrentpath = Path(output.file_dir['smtorrents'], torrentfilename)
 
         with open(torrentpath, "wb") as f:
@@ -566,33 +566,22 @@ def get_file_handler():
     return file_handler
 
 
-if __name__ == "__main__":
+def main():
+    """
+    This code was formally in if __name__ == "__main__" and was moved to eventually find and remove all globals
 
-    config = GetConfig()
-    args = GetArgs()
-    usermode = torrent_password_key = None
+    TODO: Split up this def into separate defs
 
-    FORMATTER = logging.Formatter("%(asctime)s — %(name)s — %(levelname)s — %(message)s")
-    scriptdir = os.path.dirname(os.path.abspath(sys.argv[0]))
-    log_file = scriptdir + '/jps2sm.log'
+    :return:
+    """
 
-    logger = logging.getLogger('main')
-    if args.parsed.debug:
-        logger.setLevel(logging.DEBUG)
-    else:
-        logger.setLevel(logging.INFO)
-    logger.addHandler(get_console_handler())
-    logger.addHandler(get_file_handler())
-    # with this pattern, it's rarely necessary to propagate the error up to parent
-    logger.propagate = False
-
-    if not args.parsed.debug:
-        sys.tracebacklimit = 0
+    usermode = None
 
     if args.parsed.urls is None and not (bool(args.parsed.batchuploaded) or bool(args.parsed.batchseeding)):
         fatal_error('Error: Neither any JPS URL(s) (--urls) or batch parameters (--batchuploaded or --batchseeding) have been specified. See --help')
     elif args.parsed.urls is not None and (bool(args.parsed.batchuploaded) or bool(args.parsed.batchseeding)):
-        fatal_error('Error: Both the JPS URL(s) (--urls) and batch parameters (--batchuploaded or --batchseeding) have been specified, but only one is allowed.')
+        fatal_error(
+            'Error: Both the JPS URL(s) (--urls) and batch parameters (--batchuploaded or --batchseeding) have been specified, but only one is allowed.')
     elif bool(args.parsed.batchuploaded) or bool(args.parsed.batchseeding):
 
         batchuser = None
@@ -617,8 +606,6 @@ if __name__ == "__main__":
 
         usermode = True
 
-    output = HandleCfgOutputDirs(config.directories)  # Get config dirs config, handle absolute/relative paths and create if not exist
-
     if args.parsed.mediainfo:
         try:
             for media_dir in config.media_roots:
@@ -628,14 +615,6 @@ if __name__ == "__main__":
                     fatal_error(f'Error: Media directory {media_dir} is a file and not a directory. Check your configuration in jps2sm.cfg.')
         except configparser.NoSectionError:
             fatal_error('Error: --mediainfo requires you to configure MediaDirectories in jps2sm.cfg for mediainfo to find your file(s).')
-
-    # s = MyLoginSession(loginUrl, loginData, loginTestUrl, successStr)
-
-    if not args.parsed.dryrun:
-        # We only want this run ONCE per instance of the script
-        userkeys = get_user_keys()
-        authkey = userkeys['authkey']
-        torrent_password_key = userkeys['torrent_password_key']
 
     jps_user_id = get_jps_user_id()
     logger.debug(f"JPopsuki user id is {jps_user_id}")
@@ -673,20 +652,23 @@ if __name__ == "__main__":
                 break  # Still continue to get error dicts and dupe list so far
             except Exception:
                 # Catch all for any exception
-                logger.exception('Error with retrieving group data for groupid %s trorrentid(s) %s, skipping upload' % (groupid, ",".join(torrentids)))
+                logger.exception(
+                    'Error with retrieving group data for groupid %s trorrentid(s) %s, skipping upload' % (groupid, ",".join(torrentids)))
                 useruploadsgrouperrors[groupid] = torrentids
                 continue
 
             try:
-                torrentcount = collate(torrentids)
+                torrentcount = collate(torrentids, torrentgroupdata)
                 if not args.parsed.dryrun:
-                    downloaduploadedtorrents(torrentcount)
+                    downloaduploadedtorrents(torrentcount, torrentgroupdata.artist, torrentgroupdata.title)
                     user_uploads_done += torrentcount
             except KeyboardInterrupt:  # Allow Ctrl-C to exit without showing the error multiple times and polluting the final error dict
                 break  # Still continue to get error dicts and dupe list so far
             except Exception as exc:
                 if str(exc).startswith('The exact same torrent file already exists on the site!'):
-                    sm_dupe_torrentid, jps_dupe_torrentid = re.findall(r'The exact same torrent file already exists on the site! See: https://sugoimusic\.me/torrents\.php\?torrentid=([0-9]+) JPS torrent id\: ([0-9]+)', str(exc))[0]
+                    sm_dupe_torrentid, jps_dupe_torrentid = re.findall(
+                        r'The exact same torrent file already exists on the site! See: https://sugoimusic\.me/torrents\.php\?torrentid=([0-9]+) JPS torrent id\: ([0-9]+)',
+                        str(exc))[0]
                     user_upload_dupes.append(sm_dupe_torrentid)
                     user_upload_dupes_jps.append(jps_dupe_torrentid)
                 elif str(exc).startswith('Mediainfo error - file/directory not found'):
@@ -697,24 +679,26 @@ if __name__ == "__main__":
                     user_upload_mediainfo_not_submitted += 1
                 else:
                     # Catch all for any exception
-                    logger.exception(f'Error with collating/retrieving release data for {groupid} torrentid(s) {",".join(torrentids)}, skipping upload')
+                    logger.exception(
+                        f'Error with collating/retrieving release data for {groupid} torrentid(s) {",".join(torrentids)}, skipping upload')
                     useruploadscollateerrors[groupid] = torrentids
 
                 continue
 
         if useruploadsgrouperrors:
             logger.error('The following JPS groupid(s) (torrentid(s) shown for reference) had errors in retrieving group data, '
-                  'keep this data safe and you can possibly retry with it in a later version:')
+                         'keep this data safe and you can possibly retry with it in a later version:')
             logger.error(useruploadsgrouperrors)
             logger.error(f'Total: {count_values_dict(useruploadsgrouperrors)}')
         if useruploadscollateerrors:
             logger.error('The following JPS groupid(s) and corresponding torrentid(s) had errors either in collating/retrieving '
-                  'release data or in performing the actual upload to SM (although group data was retrieved OK), '
-                  'keep this data safe and you can possibly retry with it in a later version:')
+                         'release data or in performing the actual upload to SM (although group data was retrieved OK), '
+                         'keep this data safe and you can possibly retry with it in a later version:')
             logger.error(useruploadscollateerrors)
             logger.error(f'Total: {count_values_dict(useruploadscollateerrors)}')
         if user_upload_dupes:
-            logger.warning('The following SM torrentid(s) have already been uploaded to the site, but the SM torrents were downloaded so you can cross seed:')
+            logger.warning(
+                'The following SM torrentid(s) have already been uploaded to the site, but the SM torrents were downloaded so you can cross seed:')
             logger.warning(f'SM duplicate torrent ids: {user_upload_dupes}\nJPS duplicate torrent ids: {user_upload_dupes_jps}')
             logger.warning(f'Total: {len(user_upload_dupes)}')
         if user_upload_source_data_not_found:
@@ -736,6 +720,38 @@ if __name__ == "__main__":
             raise RuntimeError("Expected some JPS urls to be set")
         torrentgroupdata = GetGroupData(args.parsed.urls)
         torrentids = re.findall('torrentid=([0-9]+)', args.parsed.urls)
-        torrentcount = collate(torrentids)
+        torrentcount = collate(torrentids, torrentgroupdata)
         if not args.parsed.dryrun:
-            downloaduploadedtorrents(torrentcount)
+            downloaduploadedtorrents(torrentcount, torrentgroupdata.artist, torrentgroupdata.title)
+
+
+if __name__ == "__main__":
+    args = GetArgs()
+    config = GetConfig()
+    output = HandleCfgOutputDirs(config.directories)  # Get config dirs config, handle absolute/relative paths and create if not exist
+
+    FORMATTER = logging.Formatter("%(asctime)s — %(name)s — %(levelname)s — %(message)s")
+    scriptdir = os.path.dirname(os.path.abspath(sys.argv[0]))
+    log_file = scriptdir + '/jps2sm.log'
+
+    logger = logging.getLogger('main')
+    if args.parsed.debug:
+        logger.setLevel(logging.DEBUG)
+    else:
+        logger.setLevel(logging.INFO)
+    logger.addHandler(get_console_handler())
+    logger.addHandler(get_file_handler())
+    # with this pattern, it's rarely necessary to propagate the error up to parent
+    logger.propagate = False
+
+    if not args.parsed.dryrun:
+        # We only want this run ONCE per instance of the script
+        # TODO Move to a class
+        userkeys = get_user_keys()
+        authkey = userkeys['authkey']
+        torrent_password_key = userkeys['torrent_password_key']
+
+    if not args.parsed.debug:
+        sys.tracebacklimit = 0
+
+    main()
