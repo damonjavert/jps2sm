@@ -25,6 +25,19 @@ class GetGroupData:
     def __init__(self, jpsurl):
         self.jpsurl = jpsurl
         logger.debug(f'Processing JPS URL: {jpsurl}')
+        self.groupid: int = int()
+        self.category: str = str()
+        self.artist: str = str()
+        self.date: str = str()
+        self.title: str = str()
+        self.originalartist: str = str()
+        self.originaltitle: str = str()
+        self.rel2: str = str()
+        self.groupdescription: str = str()
+        self.imagelink: str = str()
+        self.tagsall: str = str()
+        self.contribartists: str = str()
+
         self.getdata(jpsurl)
 
     def getdata(self, jpsurl):
@@ -44,13 +57,11 @@ class GetGroupData:
         text = str(artistline[0])
         logger.debug(artistline[0])
 
-        sqbrackets = re.findall('\[(.*?)\]', text)
-        self.category = sqbrackets[0]
+        self.category = re.findall(r'\[(.*?)\]', text)[0]
         logger.info(f'Category: {self.category}')
 
         try:
-            artistlinelinktext = str(artistlinelink[0])
-            artist_raw = re.findall('<a[^>]+>(.*)<', artistlinelinktext)[0]
+            artist_raw = re.findall(r'<a[^>]+>(.*)<', str(artistlinelink[0]))[0]
             self.artist = split_bad_multiple_artists(artist_raw)
         except IndexError:  # Cannot find artist
             if self.category == "Pictures":
@@ -94,17 +105,17 @@ class GetGroupData:
         logger.info(f'Release date: {self.date}')
 
         if self.category not in Categories.NonDate:
-            self.title = re.findall('<a.*> - (.*) \[', text)[0]
+            self.title = re.findall(r'<a.*> - (.*) \[', text)[0]
         else:
             # Using two sets of findall() as I cannot get the OR regex operator "|" to work
-            title1 = re.findall('<a.*> - (?:[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])) - (.*)</h2>', text)
-            title2 = re.findall('<a.*> - (.*) \((.*) (?:[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01]))', text)
+            title1 = re.findall(r'<a.*> - (?:[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])) - (.*)</h2>', text)
+            title2 = re.findall(r'<a.*> - (.*) \((.*) (?:[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01]))', text)
             # title1 has 1 matching group, title2 has 2
             titlemergedpre = [title1, " ".join(itertools.chain(*title2))]
             titlemerged = "".join(itertools.chain(*titlemergedpre))
             if len(titlemerged) == 0:  # Non standard title, fallback on the whole string after the "-"
                 try:
-                    self.title = re.findall('<a.*> - (.*)</h2>', text)[0]
+                    self.title = re.findall(r'<a.*> - (.*)</h2>', text)[0]
                 except IndexError:
                     if self.category == "Pictures":  # Pictures non-artist upload - for magazines
                         # Fallback to all the text after the category, we need to include the date stamp as magazines are often titled
@@ -137,10 +148,6 @@ class GetGroupData:
 
         self.rel2 = str(soup.select('#content .thin .main_column .torrent_table tbody')[0])
 
-        # print rel2
-        # fakeurl = 'https://jpopsuki.eu/torrents.php?id=181558&torrentid=251763'
-        # fakeurl = 'blah'
-
         # Get description with BB Code if user has group edit permissions on JPS, if not just use stripped html text.
         try:
             self.groupdescription = get_group_descrption_bbcode(self.groupid)  # Requires PU+ at JPS
@@ -172,35 +179,11 @@ class GetGroupData:
         except IndexError:  # Do nothing if group has no contrib artists
             pass
 
-    def category(self):
-        return self.category()
-
-    def date(self):
-        return self.date()
-
-    def artist(self):
-        return self.artist()
-
-    def title(self):
-        return self.title()
-
     def originalchars(self):
         return self.originalartist, self.originaltitle
 
-    def rel2(self):
-        return self.rel2()
-
-    def groupdescription(self):
-        return self.groupdescription()
-
-    def imagelink(self):
-        return self.imagelink()
-
-    def tagsall(self):
-        return self.tagsall()
-
-    def contribartists(self):
-        return self.contribartists
+    def __getattr__(self, item):
+        return self.item
 
 
 def split_bad_multiple_artists(artists):
