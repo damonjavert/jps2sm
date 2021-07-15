@@ -1,7 +1,7 @@
 # bulkinvite.py
 # SM bulkinviter
 
-from jps2sm import MyLoginSession
+from jps2sm.myloginsession import MyLoginSession
 #from jps2sm import getauthkey
 # TODO fix getauthkey() so it can be imported
 
