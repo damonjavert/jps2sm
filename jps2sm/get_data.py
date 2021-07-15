@@ -38,9 +38,9 @@ class GetGroupData:
         self.tagsall: str = str()
         self.contribartists: str = str()
 
-        self.getdata(jpsurl)
+        self.getdata()
 
-    def getdata(self, jpsurl):
+    def getdata(self):
         date_regex = r'[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])'  # YYYY.MM.DD format
         # YYYY.MM.DD OR YYYY format, for Pictures only
         date_regex2 = r'(?:[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])|(?:19|20)\d\d)'
@@ -50,14 +50,12 @@ class GetGroupData:
         self.groupid = re.findall(r"(?!id=)\d+", self.jpsurl)[0]
 
         soup = BeautifulSoup(res.text, 'html5lib')
-
-        artistline = soup.select('.thin h2')
         artistlinelink = soup.select('.thin h2 a')
         originaltitleline = soup.select('.thin h3')
-        text = str(artistline[0])
-        logger.debug(artistline[0])
 
-        self.category = re.findall(r'\[(.*?)\]', text)[0]
+        logger.debug(torrent_description_page_h2_line := str(soup.select('.thin h2')[0]))
+
+        self.category = re.findall(r'\[(.*?)\]', torrent_description_page_h2_line)[0]
         logger.info(f'Category: {self.category}')
 
         try:
@@ -68,14 +66,14 @@ class GetGroupData:
                 # JPS allows Picture torrents to have no artist set, in this scenario try to infer the artist by examining the text
                 # immediately after the category string up to a YYYY.MM.DD string if available as this should be the magazine title
                 try:
-                    self.artist = re.findall(fr'\[Pictures\] ([A-Za-z\. ]+) (?:{date_regex2})', text)
+                    self.artist = re.findall(fr'\[Pictures\] ([A-Za-z\. ]+) (?:{date_regex2})', torrent_description_page_h2_line)
                 except IndexError:
                     logger.exception('Cannot find artist')
                     raise
             elif self.category == "Misc":
                 # JPS has some older groups with no artists set, uploaders still used the "Artist - Group name" syntax though
                 try:
-                    artist_raw = re.findall(r'\[Misc\] ([A-Za-z\, ]+) - ', text)[0]
+                    artist_raw = re.findall(r'\[Misc\] ([A-Za-z\, ]+) - ', torrent_description_page_h2_line)[0]
                 except IndexError:
                     logger.exception('Cannot find artist')
                     raise
@@ -88,10 +86,10 @@ class GetGroupData:
 
         # Extract date without using '[]' as it allows '[]' elsewhere in the title and it works with JPS TV-* categories
         try:
-            self.date = re.findall(date_regex, text)[0].replace(".", "")
+            self.date = re.findall(date_regex, torrent_description_page_h2_line)[0].replace(".", "")
         except IndexError:  # Handle YYYY dates, creating extra regex as I cannot get it working without causing issue #33
             try:
-                self.date = re.findall(r'[^\d]((?:19|20)\d{2})[^\d]', text)[0]
+                self.date = re.findall(r'[^\d]((?:19|20)\d{2})[^\d]', torrent_description_page_h2_line)[0]
 
             # Handle if cannot find date in the title, use upload date instead from getreleasedata() but error if the category should have it
             except IndexError:
@@ -105,29 +103,29 @@ class GetGroupData:
         logger.info(f'Release date: {self.date}')
 
         if self.category not in Categories.NonDate:
-            self.title = re.findall(r'<a.*> - (.*) \[', text)[0]
+            self.title = re.findall(r'<a.*> - (.*) \[', torrent_description_page_h2_line)[0]
         else:
             # Using two sets of findall() as I cannot get the OR regex operator "|" to work
-            title1 = re.findall(r'<a.*> - (?:[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])) - (.*)</h2>', text)
-            title2 = re.findall(r'<a.*> - (.*) \((.*) (?:[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01]))', text)
+            title1 = re.findall(r'<a.*> - (?:[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])) - (.*)</h2>', torrent_description_page_h2_line)
+            title2 = re.findall(r'<a.*> - (.*) \((.*) (?:[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01]))', torrent_description_page_h2_line)
             # title1 has 1 matching group, title2 has 2
             titlemergedpre = [title1, " ".join(itertools.chain(*title2))]
             titlemerged = "".join(itertools.chain(*titlemergedpre))
             if len(titlemerged) == 0:  # Non standard title, fallback on the whole string after the "-"
                 try:
-                    self.title = re.findall(r'<a.*> - (.*)</h2>', text)[0]
+                    self.title = re.findall(r'<a.*> - (.*)</h2>', torrent_description_page_h2_line)[0]
                 except IndexError:
                     if self.category == "Pictures":  # Pictures non-artist upload - for magazines
                         # Fallback to all the text after the category, we need to include the date stamp as magazines are often titled
                         # with the same numbers each year - the first magazine each year appears to always be 'No. 1' for example
                         try:
-                            self.title = re.findall(fr'\[Pictures\] (?:[A-Za-z\. ]+) ({date_regex2}(?:.*))</h2>', text)[0]
+                            self.title = re.findall(fr'\[Pictures\] (?:[A-Za-z\. ]+) ({date_regex2}(?:.*))</h2>', torrent_description_page_h2_line)[0]
                         except IndexError:
                             logger.exception('Cannot find title from the JPS upload')
                             raise
                     elif self.category == "Misc":
                         try:
-                            self.title = re.findall(r'\[Misc\] (?:[A-Za-z\, ]+) - (.+)</h2>', text)[0]
+                            self.title = re.findall(r'\[Misc\] (?:[A-Za-z\, ]+) - (.+)</h2>', torrent_description_page_h2_line)[0]
                         except IndexError:
                             logger.exception('Cannot find title from the JPS upload')
                             raise
@@ -152,6 +150,7 @@ class GetGroupData:
         try:
             self.groupdescription = get_group_descrption_bbcode(self.groupid)  # Requires PU+ at JPS
         except:
+            logger.exception('Could not get group description BBCode. Are you a Power User+ at JPS?')
             self.groupdescription = remove_html_tags(str(soup.select('#content .thin .main_column .box .body')[0]))
 
         logger.info(f"Group description:\n{self.groupdescription}")
@@ -232,7 +231,6 @@ def get_release_data(torrentids, release_data, date):
 
     logger.info(f'Selected for upload: {releasedata}')
     return releasedata
-
 
 
 def get_group_descrption_bbcode(groupid):
