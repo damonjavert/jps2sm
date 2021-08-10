@@ -157,6 +157,32 @@ def validate_jps_bitrate(jps_bitrate):
     return sm_bitrate
 
 
+def decide_category(jps_category, artist, title, torrentpath, uploaddata, mediainfo_enabled, multiplefiles, duration):
+    """
+    Decide the SM category for the upload.
+
+    :return: int category ID based on Categories.SM()
+    """
+    if jps_category == "Fansubs":
+        return get_alternate_fansub_category_id(artist, title)  # Title just for user output
+    if jps_category == "Album":  # Ascertain if upload is EP
+        return Categories.JPStoSM[decide_ep(torrentpath, uploaddata)]
+
+    if uploaddata['videotorrent']:
+        if jps_category == "DVD" and uploaddata['media'] == 'Bluray':
+            return Categories.JPStoSM['Bluray']  # JPS has no Bluray category
+        if uploaddata['categorystatus'] == 'bad':  # Need to set a correct category
+            if uploaddata['media'] == 'Bluray':
+                return Categories.JPStoSM['Bluray']
+            else:  # Still need to change the category to something, if not a Bluray then even if it is not a DVD the most sensible category is DVD in a music torrent group
+                return Categories.JPStoSM['DVD']
+        if jps_category == "TV-Music" and mediainfo_enabled:
+            return Categories.SM[decide_music_performance(artist, multiplefiles, duration)]
+
+    # If we reach here then set the default value
+    return Categories.JPStoSM[jps_category]
+
+
 def decide_exc_filter(audioformat, media, releasedata):
     """
     Implement audioformat and media exclusion filters

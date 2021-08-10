@@ -40,7 +40,7 @@ from jps2sm.myloginsession import MyLoginSession, jpopsuki, sugoimusic
 from jps2sm.constants import Categories, VideoOptions
 from jps2sm.mediainfo import get_mediainfo
 from jps2sm.validation import decide_music_performance, get_alternate_fansub_category_id, validate_jps_video_data, validate_jps_bitrate, \
-    decide_exc_filter, decide_ep
+    decide_exc_filter, decide_ep, decide_category
 
 
 def detect_display_swapped_names(userid):
@@ -206,6 +206,7 @@ def uploadtorrent(torrentpath, torrentgroupdata, groupid=None, **uploaddata):
     logger.debug(uploaddata)
 
     # TODO Most of this can be in getmediainfo()
+    data['multiplefiles'] = data['duration'] = None
     if args.parsed.mediainfo:
         try:
             data['mediainfo'], releasedatamediainfo = get_mediainfo(torrentpath, uploaddata['media'], config.media_roots)
@@ -232,16 +233,6 @@ def uploadtorrent(torrentpath, torrentgroupdata, groupid=None, **uploaddata):
         data['image'] = torrentgroupdata.imagelink
 
     if uploaddata['videotorrent']:
-        if torrentgroupdata.category == "DVD" and uploaddata['media'] == 'Bluray':
-            data['type'] = Categories.JPStoSM['Bluray']  # JPS has no Bluray category
-        if uploaddata['categorystatus'] == 'bad':  # Need to set a correct category
-            if uploaddata['media'] == 'Bluray':
-                data['type'] = Categories.JPStoSM['Bluray']
-            else:  # Still need to change the category to something, if not a Bluray then even if it is not a DVD the most sensible category is DVD in a music torrent group
-                data['type'] = Categories.JPStoSM['DVD']
-        if torrentgroupdata.category == "TV-Music" and args.parsed.mediainfo:
-            data['type'] = Categories.SM[decide_music_performance(torrentgroupdata.artist, data['multiplefiles'], data['duration'])]
-
         # If not supplied by getmediainfo() use codec found by collate()
         if 'codec' not in data.keys():
             data['codec'] = uploaddata['codec']
@@ -279,17 +270,11 @@ def uploadtorrent(torrentpath, torrentgroupdata, groupid=None, **uploaddata):
         data['remaster'] = 'remaster'
         data['remasteryear'] = uploaddata['remasteryear']
 
-    # Non-BR/DVD/TV-* category validation
-    # TODO Move this to a def
     if torrentgroupdata.category == "Fansubs":
-        data['type'] = get_alternate_fansub_category_id(torrentgroupdata.artist, torrentgroupdata.title)  # Title just for user
         data['sub'] = 'Hardsubs'  # We have subtitles! Subs in JPS FanSubs are usually Hardsubs so guess as this
         # TODO: Use torrent library to look for sub/srt files
-    elif torrentgroupdata.category == "Album":  # Ascertain if upload is EP
-        data['type'] = Categories.JPStoSM[decide_ep(torrentpath, uploaddata)]
 
-    if 'type' not in data.keys():  # Set default value after all validation has been done
-        data['type'] = Categories.JPStoSM[torrentgroupdata.category]
+    data['type'] = decide_category(torrentgroupdata.category, torrentgroupdata.artist, torrentgroupdata.title, torrentpath, uploaddata, args.parsed.mediainfo, data['multiplefiles'], data['duration'])
 
     # Now that all Category validation is complete decide if we should strip some mediainfo data
     mediainfo_non_resolution = ('container', 'mediainfo')
