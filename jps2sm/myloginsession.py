@@ -139,6 +139,7 @@ class MyLoginSession:
             logger.debug('Loaded session from cache and testing login...')
             res = self.session.get(self.loginTestUrl)
             if res.text.lower().find(self.loginTestString.lower()) < 0:
+                os.remove(self.sessionFile) # delete the session file if login fails
                 logger.debug(res.text)
                 raise Exception("could not log into provided site '%s'"
                                 " (did not find successful login string)"
