@@ -193,15 +193,27 @@ def decide_ep(torrentfilename, uploaddata):
     music_extensions = ['.flac', '.mp3', '.ogg', '.alac', '.m4a', '.wav', '.wma', '.ra']
     off_vocal_phrases = ['off-vocal', 'offvocal', 'off vocal', 'inst.', 'instrumental', 'english ver', 'japanese ver', 'korean ver']
     track_count = 0
+    has_cue = False
+    track_extensions = set()
     for file in torrent_metadata['info']['files']:
-        if file['path'][-1].lower().endswith('.iso'):
+        file_path = file['path'][-1].lower()
+
+        if file_path.endswith('.iso'):
             return 'Album'
 
-        if list(filter(file['path'][-1].lower().endswith, music_extensions)) and \
-                not any(substring in file['path'][-1].lower() for substring in off_vocal_phrases):
+        if file_path.endswith('.cue'):
+            has_cue = True
+
+        if list(filter(file_path.endswith, music_extensions)) and \
+                not any(substring in file_path for substring in off_vocal_phrases):
             #  Count music files which are not an off-vocal or instrumental
             logger.debug(f"Deciding if EP with torrent with these tracks: {file['path'][-1]}")
             track_count += 1
+            track_extensions.add(file_path.split('.')[-1])
+
+    if has_cue and track_extensions == {'flac'}:
+        logger.debug(f'Upload is not an EP as it has a .cue file and only .flac files')
+        return 'Album'
 
     if track_count < 7:
         logger.debug(f'Upload is an EP as it has {track_count} standard tracks')
