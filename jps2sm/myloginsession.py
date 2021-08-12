@@ -131,6 +131,12 @@ class MyLoginSession:
             self.session.headers.update({'user-agent': self.userAgent})
             res = self.session.post(self.loginUrl, data=self.loginData,
                                     proxies=self.proxies, **kwargs)
+
+            if 'Your username or password was incorrect.' in res.text: # check if login was sucessful
+                raise Exception("could not log into provided site '%s'"
+                                " (username or password was incorrect)"
+                                % self.loginUrl)
+
             logger.debug('created new session with login')
             self.saveSessionToCache()
 
@@ -139,6 +145,7 @@ class MyLoginSession:
             logger.debug('Loaded session from cache and testing login...')
             res = self.session.get(self.loginTestUrl)
             if res.text.lower().find(self.loginTestString.lower()) < 0:
+                os.remove(self.sessionFile) # delete the session file if login fails
                 logger.debug(res.text)
                 raise Exception("could not log into provided site '%s'"
                                 " (did not find successful login string)"
