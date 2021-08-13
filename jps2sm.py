@@ -74,12 +74,28 @@ def getbulktorrentids(mode, user, first=1, last=None):
     together so that they are uplaoded to the same group by uploadtorrent() even if they were not uploaded to JPS
     at the same time. - uploadtorrent() requires torrents uplaoded to the same group by uploaded together.
 
-    :param mode: Area to get bulk torrent ids from, either 'uploaded' for a user's uploads or 'seeding' for torrents currently seeding
+    :param mode: Area to get bulk torrent ids from, 'uploaded' for a user's uploads, 'seeding' for torrents currently seeding and 'snatched' for a user's snatched torrents
     :param user: JPS userid
     :param first: upload page number to start at
     :param last: upload page to finish at
     :return: useruploads: dict
     """
+
+    sort_by = {
+        'name': 's1',
+        'year': 's2',
+        'time': 's3', # snatched time for snatched, seeding time for seeding, added for uploaded
+        'size': 's4',
+        'snatches': 's5',
+        'seeders':  's6',
+        'leechers': 's7'
+    }
+
+    if mode == 'snatched' or mode == 'uploaded':
+        sort_mode = sort_by['time']
+    elif mode == 'seeding':
+        sort_mode = sort_by['name']
+
     res = jpopsuki(f"https://jpopsuki.eu/torrents.php?type={mode}&userid={user}")
     soup = BeautifulSoup(res.text, 'html5lib')
 
@@ -103,7 +119,7 @@ def getbulktorrentids(mode, user, first=1, last=None):
     # Parse every torrent page and add to dict, to group together releases into the same group so that they work with
     # the way that uploadtorrent() works.
     for i in range(first, int(last) + 1):
-        useruploadurl = fr"https://jpopsuki.eu/torrents.php?page={i}&order_by=s1&order_way=ASC&type={mode}&userid={user}&disablegrouping=1"
+        useruploadurl = fr"https://jpopsuki.eu/torrents.php?page={i}&order_by={sort_mode}&order_way=ASC&type={mode}&userid={user}&disablegrouping=1"
         useruploadpage = jpopsuki(useruploadurl)
         logger.info(useruploadurl)
         # print useruploadpage.text
@@ -577,12 +593,12 @@ def main():
 
     usermode = None
 
-    if args.parsed.urls is None and not (bool(args.parsed.batchuploaded) or bool(args.parsed.batchseeding)):
-        fatal_error('Error: Neither any JPS URL(s) (--urls) or batch parameters (--batchuploaded or --batchseeding) have been specified. See --help')
-    elif args.parsed.urls is not None and (bool(args.parsed.batchuploaded) or bool(args.parsed.batchseeding)):
+    if args.parsed.urls is None and not (bool(args.parsed.batchuploaded) or bool(args.parsed.batchseeding) or bool(args.parsed.batchsnatched)):
+        fatal_error('Error: Neither any JPS URL(s) (--urls) or batch parameters (--batchsnatched, --batchuploaded or --batchseeding) have been specified. See --help')
+    elif args.parsed.urls is not None and (bool(args.parsed.batchuploaded) or bool(args.parsed.batchseeding) or bool(args.parsed.batchsnatched)):
         fatal_error(
-            'Error: Both the JPS URL(s) (--urls) and batch parameters (--batchuploaded or --batchseeding) have been specified, but only one is allowed.')
-    elif bool(args.parsed.batchuploaded) or bool(args.parsed.batchseeding):
+            'Error: Both the JPS URL(s) (--urls) and batch parameters (--batchsnatched,--batchuploaded or --batchseeding) have been specified, but only one is allowed.')
+    elif bool(args.parsed.batchuploaded) or bool(args.parsed.batchseeding) or bool(args.parsed.batchsnatched):
 
         batchuser = None
         if args.parsed.batchuser:
@@ -595,12 +611,15 @@ def main():
         elif bool(args.parsed.batchstart) and bool(args.parsed.batchend):
             batchstart = args.parsed.batchstart
             batchend = args.parsed.batchend
-        if bool(args.parsed.batchuploaded) and bool(args.parsed.batchseeding):
-            fatal_error('Error: Both batch modes of operation specified - only one can be used at the same time. See --help')
+        if bool(args.parsed.batchuploaded) and (bool(args.parsed.batchseeding) or bool(args.parsed.batchsnatched)) or \
+           (bool(args.parsed.batchseeding) and bool(args.parsed.batchsnatched)): # https://stackoverflow.com/a/3076081
+            fatal_error('Error: Multiple batch modes of operation specified - only one can be used at the same time. See --help')
         if args.parsed.batchuploaded:
             batchmode = "uploaded"
         elif args.parsed.batchseeding:
             batchmode = "seeding"
+        elif args.parsed.batchsnatched:
+            batchmode = "snatched"
         else:
             raise RuntimeError("Expected some batch mode to be set")
 
