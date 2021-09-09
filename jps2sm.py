@@ -532,13 +532,6 @@ def collate(torrentids, torrentgroupdata):
             logger.exception('Error in uploadtorrent()')
             raise RuntimeError('Error in uploadtorrent()')
 
-    if not args.parsed.dryrun:
-        # Add original artists for contrib artists
-        if torrentgroupdata.contribartists:
-            for artist, origartist in torrentgroupdata.contribartists.items():
-                # For every artist, go to its artist page to get artist ID, then use this to go to artist.php?action=edit with the orig artist
-                setorigartist(artist, origartist)
-
     return torrentcount  # For use by downloaduploadedtorrents()
 
 
@@ -676,33 +669,44 @@ def main():
                 useruploadsgrouperrors[groupid] = torrentids
                 continue
 
-            try:
-                torrentcount = collate(torrentids, torrentgroupdata)
-                if not args.parsed.dryrun:
-                    downloaduploadedtorrents(torrentcount, torrentgroupdata.artist, torrentgroupdata.title)
-                    user_uploads_done += torrentcount
-            except KeyboardInterrupt:  # Allow Ctrl-C to exit without showing the error multiple times and polluting the final error dict
-                break  # Still continue to get error dicts and dupe list so far
-            except Exception as exc:
-                if str(exc).startswith('The exact same torrent file already exists on the site!'):
-                    sm_dupe_torrentid, jps_dupe_torrentid = re.findall(
-                        r'The exact same torrent file already exists on the site! See: https://sugoimusic\.me/torrents\.php\?torrentid=([0-9]+) JPS torrent id\: ([0-9]+)',
-                        str(exc))[0]
-                    user_upload_dupes.append(sm_dupe_torrentid)
-                    user_upload_dupes_jps.append(jps_dupe_torrentid)
-                elif str(exc).startswith('Mediainfo error - file/directory not found'):
-                    # Need to get filename that was not found
-                    missing_file = re.findall(r'Mediainfo error - file/directory not found: (.+) in any of the MediaDirectories', str(exc))
-                    user_upload_source_data_not_found.append(missing_file)
-                elif str(exc).startswith('You do not appear to have entered any MediaInfo data for your video upload.'):
-                    user_upload_mediainfo_not_submitted += 1
-                else:
-                    # Catch all for any exception
-                    logger.exception(
-                        f'Error with collating/retrieving release data for {groupid} torrentid(s) {",".join(torrentids)}, skipping upload')
-                    useruploadscollateerrors[groupid] = torrentids
+            group_torrents_count = 0
 
-                continue
+            for jps_torrent_id in torrentids:
+                try:
+                    group_torrents_count += collate([jps_torrent_id], torrentgroupdata)
+                except KeyboardInterrupt:  # Allow Ctrl-C to exit without showing the error multiple times and polluting the final error dict
+                    break  # Still continue to get error dicts and dupe list so far
+                except Exception as exc:
+                    if str(exc).startswith('The exact same torrent file already exists on the site!'):
+                        sm_dupe_torrentid, jps_dupe_torrentid = re.findall(
+                            r'The exact same torrent file already exists on the site! See: https://sugoimusic\.me/torrents\.php\?torrentid=([0-9]+) JPS torrent id\: ([0-9]+)',
+                            str(exc))[0]
+                        user_upload_dupes.append(sm_dupe_torrentid)
+                        user_upload_dupes_jps.append(jps_dupe_torrentid)
+                    elif str(exc).startswith('Mediainfo error - file/directory not found'):
+                        # Need to get filename that was not found
+                        missing_file = re.findall(r'Mediainfo error - file/directory not found: (.+) in any of the MediaDirectories', str(exc))
+                        user_upload_source_data_not_found.append(missing_file)
+                    elif str(exc).startswith('You do not appear to have entered any MediaInfo data for your video upload.'):
+                        user_upload_mediainfo_not_submitted += 1
+                    else:
+                        # Catch all for any exception
+                        logger.exception(
+                            f'Error with collating/retrieving release data for {groupid} torrentid(s) {",".join(torrentids)}, skipping upload')
+                        useruploadscollateerrors[groupid] = torrentids
+
+                    continue
+
+            if not args.parsed.dryrun:
+                downloaduploadedtorrents(group_torrents_count, torrentgroupdata.artist, torrentgroupdata.title)
+                user_uploads_done += group_torrents_count
+
+                # Add original artists for contrib artists
+                if torrentgroupdata.contribartists:
+                    for artist, origartist in torrentgroupdata.contribartists.items():
+                        # For every artist, go to its artist page to get artist ID, then use this to go to
+                        # artist.php?action=edit with the orig artist
+                        setorigartist(artist, origartist)
 
         if useruploadsgrouperrors:
             logger.error('The following JPS groupid(s) (torrentid(s) shown for reference) had errors in retrieving group data, '
