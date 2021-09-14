@@ -741,11 +741,19 @@ def main():
         # Standard non-batch upload using --urls
         if not args.parsed.urls:
             raise RuntimeError("Expected some JPS urls to be set")
+
         torrentgroupdata = GetGroupData(args.parsed.urls)
         torrentids = re.findall('torrentid=([0-9]+)', args.parsed.urls)
         torrentcount = collate(torrentids, torrentgroupdata)
+
         if not args.parsed.dryrun:
             downloaduploadedtorrents(torrentcount, torrentgroupdata.artist, torrentgroupdata.title)
+
+            if torrentgroupdata.contribartists:
+                for artist, origartist in torrentgroupdata.contribartists.items():
+                    # For every artist, go to its artist page to get artist ID, then use this to go to
+                    # artist.php?action=edit with the orig artist
+                    setorigartist(artist, origartist)
 
 
 if __name__ == "__main__":
