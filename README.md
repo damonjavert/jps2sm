@@ -152,6 +152,8 @@ Help for optional arguments for batch processing:
                     Exclude an audioformat from upload
   -exm EXCMEDIA, --excmedia EXCMEDIA
                     Exclude a media from upload
+  -bfa ARTIST, --batchfilterartist ARTIST
+                    (Experimental )Limits batch job to specified artist name. Due to JPS search limitations special characeters are replaced.
 
 
 Help for optional arguments:

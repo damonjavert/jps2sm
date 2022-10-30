@@ -7,7 +7,7 @@ import sys
 
 from jps2sm.get_data import GetGroupData
 from jps2sm.myloginsession import jpopsuki
-from jps2sm.utils import fatal_error
+from jps2sm.utils import fatal_error, remove_special_chars
 from jps2sm.constants import JPSTorrentView
 
 # Third-party packages
@@ -16,7 +16,7 @@ from bs4 import BeautifulSoup
 logger = logging.getLogger('main.' + __name__)
 
 
-def get_batch_jps_group_torrent_ids(mode, user, first=1, last=None, sort=None, order=None):
+def get_batch_jps_group_torrent_ids(mode, user, first=1, last=None, sort=None, order=None, artist_filter=None):
     """
     Iterates through pages of uploads on JPS and gathers the jps_group_ids and corresponding jps_torrent_id and returns
     a dict in the format of jps_group_id: [jps_torrent_id]
@@ -73,12 +73,16 @@ def get_batch_jps_group_torrent_ids(mode, user, first=1, last=None, sort=None, o
     if not last and mode != 'recent':
         # Ascertain last page if not provided for seeding and snatched modes
 
-        res = jpopsuki(f"https://jpopsuki.eu/torrents.php?type={mode}&userid={user}")
+        if artist_filter:
+            artist_filter = remove_special_chars(artist_filter).replace(' ','+')
+            res = jpopsuki(f"https://jpopsuki.eu/torrents.php?type={mode}&userid={user}&action=advanced&artistname={artist_filter}")
+        else:
+            res = jpopsuki(f"https://jpopsuki.eu/torrents.php?type={mode}&userid={user}")
         soup = BeautifulSoup(res.text, 'html5lib')
         linkbox = str(soup.select('#content #ajax_torrents .linkbox')[0])
         try:
             last = re.findall(
-                fr'page=([0-9]*)&amp;order_by=s3&amp;order_way=DESC&amp;type={mode}&amp;userid=(?:[0-9]*)&amp;disablegrouping=1(?:\'\);|&amp;action=advanced)"><strong> Last &gt;&gt;</strong>',
+                fr'page=([0-9]*)&amp;order_by=s3&amp;order_way=DESC&amp;type={mode}&amp;userid=(?:[0-9]*)&amp;disablegrouping=1(?:&amp;action=advanced&amp;artistname=\S*)?(?:\'\);|&amp;action=advanced)"><strong> Last &gt;&gt;</strong>',
                 linkbox)[0]
         except IndexError:
             # There is only 1 page of uploads if the 'Last >>' link cannot be found
@@ -95,6 +99,7 @@ def get_batch_jps_group_torrent_ids(mode, user, first=1, last=None, sort=None, o
                  f'sort is {sort}, JPS sort column is {sort_mode} - {jps_sort_name}, '
                  f'order by is {order_way} '
                  f'first page is {first}, last page is {last}')
+    time.sleep(1) #reduce risk of hitting JPS browse quota with the next requests
 
     batch_uploads = collections.defaultdict(list)
 
@@ -106,6 +111,9 @@ def get_batch_jps_group_torrent_ids(mode, user, first=1, last=None, sort=None, o
             batch_upload_url = f"https://jpopsuki.eu/torrents.php?page={i}&order_by={sort_mode}&order_way={order_way}&disablegrouping=1"
         else:
             raise RuntimeError("Unknown batch mode set")
+
+        if artist_filter:
+            batch_upload_url+=f"&action=advanced&artistname={artist_filter}"
 
         batch_upload_page = jpopsuki(batch_upload_url)
         logger.info(batch_upload_url)

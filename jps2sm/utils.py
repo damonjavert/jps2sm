@@ -77,6 +77,7 @@ class GetArgs:
         parser.add_argument("-exf", "--excaudioformat", help="(Batch mode only) Exclude an audioformat from upload", type=str)
         parser.add_argument("-exm", "--excmedia", help="(Batch mode only) Exclude a media from upload", type=str)
         parser.add_argument("-m", "--mediainfo", help="Search and get mediainfo data from the source file(s) in the directories specified by MediaDirectories. Extract data to set codec, resolution, audio format and container fields as well as the mediainfo field itself.", action="store_true")
+        parser.add_argument("-bfa", "--batchfilterartist", help="(Batch mode only) Limit batch mode to specified artist name", type=str, default=None)
         self.parsed = parser.parse_args()
 
         # Handle bag args
@@ -184,7 +185,6 @@ def remove_html_tags(text):
     clean = re.compile('<.*?>')
     return re.sub(clean, '', text)
 
-
 def decide_duplicate(jps_torrent_object):
     from jps2sm.myloginsession import sugoimusic
     """
@@ -227,4 +227,9 @@ def decide_duplicate(jps_torrent_object):
     else:
         raise Exception('Bad response from SugoiMusic hashcheck')
 
-
+def remove_special_chars(text):
+    """
+    Strip text of special characters
+    """
+    text = re.sub('[^A-Za-z0-9 ]+',' ',text)
+    return re.sub(' {2,}', ' ', text)

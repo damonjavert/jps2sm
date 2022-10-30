@@ -13,6 +13,7 @@ from jps2sm.constants import Categories
 from jps2sm.utils import remove_html_tags
 
 # Third-party packages
+from html2phpbbcode.parser import HTML2PHPBBCode
 from bs4 import BeautifulSoup
 
 logger = logging.getLogger('main.' + __name__)
@@ -271,7 +272,7 @@ def split_bad_multiple_artists(artists):
     return re.split(', | x | & ', artists)
 
 
-def get_release_data(torrentids, release_data, date):
+def get_release_data(torrentids, release_data, date, jps_user_id=None):
     """
     Retrieve all torrent id and release data (slash separated data and upload date) whilst coping with 'noise' from FL torrents,
     and either return all data if using a group URL or only return the relevant releases if release url(s) were used
@@ -282,8 +283,16 @@ def get_release_data(torrentids, release_data, date):
 
     # print(release_data)
     freeleechtext = '<strong>Freeleech!</strong>'
-    releasedatapre = re.findall(r"swapTorrent\('([0-9]+)'\);\">» (.+?(?=</a>))</a>(?:\s*)</td>(?:\s*)<td class=\"nobr\">(\d*(?:\.)?(?:\d{0,2})?) (\w{2})</td>(?:\s*)<td>([0-9,]{1,6})</td>(?:\s*)<td>([0-9,]{1,6})</td>(?:\s*)<td>([0-9,]{1,6})</td>.*?<blockquote>(?:\s*)Uploaded by <a href=\"user.php\?id=(?:[0-9]+)\">(?:[\S]+)</a>  on <span title=\"(?:[^\"]+)\">([^<]+)</span>", release_data, re.DOTALL)
+    releasedatapre = re.findall(r"swapTorrent\('([0-9]+)'\);\">» (.+?(?=</a>))</a>(?:\s*)</td>(?:\s*)<td class=\"nobr\">(\d*(?:\.)?(?:\d{0,2})?) (\w{2})</td>(?:\s*)<td>([0-9,]{1,6})</td>(?:\s*)<td>([0-9,]{1,6})</td>(?:\s*)<td>([0-9,]{1,6})</td>.*?<blockquote>(?:\s*)Uploaded by <a href=\"user.php\?id=([0-9]+)\">(?:[\S]+)</a>  on <span title=\"(?:[^\"]+)\">([^<]+)</span>.*?<blockquote>(.*?)</blockquote>", release_data, re.DOTALL)
     # logger.debug(f'Pre-processed releasedata: {json.dumps(releasedatapre, indent=2)}')
+
+
+    #soup = BeautifulSoup(release_data,'html5lib')
+    #raw_release_desc = soup.find_all("blockquote")[-1].decode_contents()
+    #logging.debug(f"Raw release desc: {raw_release_desc}")
+    parser = HTML2PHPBBCode()
+    #release_desc = parser.feed(raw_release_desc)
+    #logging.debug(f"BBCode parsed output for release desc: {release_desc}")
 
     releasedata = {}
 
@@ -301,7 +310,7 @@ def get_release_data(torrentids, release_data, date):
         completed = release[4]
         seeders = release[5]
         leechers = release[6]
-        uploadeddate = release[7]
+        uploadeddate = release[8]
         releasedata[torrentid] = {}
         releasedata[torrentid]['slashdata'] = slashlist
         releasedata[torrentid]['uploaddate'] = uploadeddate
@@ -310,6 +319,19 @@ def get_release_data(torrentids, release_data, date):
         releasedata[torrentid]['completed'] = completed
         releasedata[torrentid]['seeders'] = seeders
         releasedata[torrentid]['leechers'] = leechers
+        orig_uploader_id=int(release[7])
+        release_desc = parser.feed(release[9])
+        logger.debug(f"Release description:{release_desc}")
+        if release_desc.startswith(' New ratio after downloading'):
+            release_desc = ''
+        logger.debug(f"Checking if own upload. Own id: {jps_user_id}. Original uploader id: {orig_uploader_id}")
+        if orig_uploader_id == jps_user_id:
+            releasedata[torrentid]['release_desc'] = release_desc
+        else:
+            releasedata[torrentid]['release_desc'] = f'Migrated using jps2sm. Thanks to the original uploader.'
+            if not release_desc == '':
+                releasedata[torrentid]['release_desc']+=f"\n\n[spoiler=Original description]{release_desc}[/spoiler]"
+
 
     logger.debug(f'Entire group contains: {json.dumps(releasedata, indent=2)}')
 

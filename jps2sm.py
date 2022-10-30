@@ -65,7 +65,6 @@ def detect_display_swapped_names(userid):
         # Not OK!
         return True
 
-
 def download_sm_torrent(torrent_id, artist, title):
     """
     Downloads the SM torrent if it is a dupe, in this scenario we cannot use downloaduploadedtorrents() as the user
@@ -143,7 +142,7 @@ def uploadtorrent(jps_torrent_object, torrentgroupdata, **uploaddata):
         'year': date,
         'tags': torrentgroupdata.tagsall,
         'album_desc': torrentgroupdata.groupdescription,
-        # 'release_desc': releasedescription
+        'release_desc': uploaddata['release_desc']
     }
 
     if not args.parsed.dryrun:
@@ -344,8 +343,8 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
     jps_torrent_downloaded_count = sm_torrent_uploaded_count = skipped_max_size = skipped_low_seeders = skipped_exc_filter = skipped_dupe = 0
     dupe_jps_ids = []
     dupe_sm_ids = []
-
-    for torrentid, releasedatafull in get_release_data(torrentids, torrentgroupdata.rel2, torrentgroupdata.date).items():
+ 
+    for torrentid, releasedatafull in get_release_data(torrentids, torrentgroupdata.rel2, torrentgroupdata.date, jps_user_id).items():
 
         logger.info(f'Now processing: {torrentid} {releasedatafull}')
 
@@ -459,6 +458,10 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
         # uploadtorrent() will use the upload date as release date if the torrent has no release date, usually for
         # Picture Category torrents and some TV-Variety.
         releasedataout['uploaddate'] = datetime.datetime.strptime(uploaddatestr, '%b %d %Y, %H:%M').strftime('%Y%m%d')
+
+        #Add release description
+        if 'release_desc' in releasedatafull:
+            releasedataout['release_desc'] = releasedatafull['release_desc']
 
         torrentlink = html.unescape(get_torrent_link(torrentid, torrentgroupdata.rel2))
         jps_torrent_file = jpopsuki("https://jpopsuki.eu/%s" % torrentlink)  # Download JPS torrent
@@ -611,9 +614,9 @@ def batch_mode(jps_user_id=None):
     batchuser = args.parsed.batchuser or jps_user_id
     if args.parsed.batchstart and args.parsed.batchend:
         batch_uploads = get_batch_jps_group_torrent_ids(mode=args.batch_mode, user=batchuser, first=args.parsed.batchstart, last=args.parsed.batchend,
-                                                        sort=args.parsed.batchsort, order=args.parsed.batchsortorder)
+                                                        sort=args.parsed.batchsort, order=args.parsed.batchsortorder,artist_filter=args.parsed.batchfilterartist)
     else:
-        batch_uploads = get_batch_jps_group_torrent_ids(mode=args.batch_mode, user=batchuser, sort=args.parsed.batchsort, order=args.parsed.batchsortorder)
+        batch_uploads = get_batch_jps_group_torrent_ids(mode=args.batch_mode, user=batchuser, sort=args.parsed.batchsort, order=args.parsed.batchsortorder,artist_filter=args.parsed.batchfilterartist)
 
     #batch_uploads = { '362613': ['535927'], '354969': ['535926'], '362612': ['535925'], '362611': ['535924'], '181901': ['535923'], '181902': ['535922'] }
 
@@ -783,6 +786,8 @@ def main():
                     fatal_error(f'Error: Media directory {media_dir} is a file and not a directory. Check your configuration in jps2sm.cfg.')
         except configparser.NoSectionError:
             fatal_error('Error: --mediainfo requires you to configure MediaDirectories in jps2sm.cfg for mediainfo to find your file(s).')
+
+    global jps_user_id
 
     jps_user_id = get_jps_user_id()
     logger.debug(f"JPopsuki user id is {jps_user_id}")
