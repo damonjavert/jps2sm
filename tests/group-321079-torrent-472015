@@ -1,5 +1,4 @@
-loading or generating session...
-loaded session from cache (last access 0s ago) 
+Loaded session from cache and testing login...
 updated session cache-file jpopsuki.eu_session.dat
 JPopsuki user id is xyz
 updated session cache-file jpopsuki.eu_session.dat
@@ -39,11 +38,13 @@ Entire group contains: {
       "Hi-Res 96/24",
       "WEB"
     ],
-    "uploaddate": "Jan 13 2021, 20:33"
+    "uploaddate": "Jan 13 2021, 20:33",
+    "size_no_units": "1.28",
+    "size_units": "GB"
   }
 }
-Selected for upload: {'472015': {'slashdata': ['FLAC', 'Hi-Res 96/24', 'WEB'], 'uploaddate': 'Jan 13 2021, 20:33'}}
-Now processing: 472015 {'slashdata': ['FLAC', 'Hi-Res 96/24', 'WEB'], 'uploaddate': 'Jan 13 2021, 20:33'}
+Selected for upload: {'472015': {'slashdata': ['FLAC', 'Hi-Res 96/24', 'WEB'], 'uploaddate': 'Jan 13 2021, 20:33', 'size_no_units': '1.28', 'size_units': 'GB'}}
+Now processing: 472015 {'slashdata': ['FLAC', 'Hi-Res 96/24', 'WEB'], 'uploaddate': 'Jan 13 2021, 20:33', 'size_no_units': '1.28', 'size_units': 'GB'}
 updated session cache-file jpopsuki.eu_session.dat
 {'jpstorrentid': '472015', 'videotorrent': False, 'categorystatus': 'good', 'media': 'Web', 'audioformat': 'FLAC', 'bitrate': '24bit Lossless 96kHz', 'uploaddate': '20210113'}
 Deciding if EP with torrent with these tracks: 01 つぎはぎもよう.flac

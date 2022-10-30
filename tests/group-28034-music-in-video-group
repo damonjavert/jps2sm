@@ -1,6 +1,4 @@
-loading or generating session...
-created new session with login
-updated session cache-file jpopsuki.eu_session.dat
+Loaded session from cache and testing login...
 updated session cache-file jpopsuki.eu_session.dat
 JPopsuki user id is xyz
 updated session cache-file jpopsuki.eu_session.dat
@@ -26,7 +24,9 @@ Entire group contains: {
       "MKV",
       "Blu-Ray"
     ],
-    "uploaddate": "Jun 03 2019, 00:43"
+    "uploaddate": "Jun 03 2019, 00:43",
+    "size_no_units": "7.45",
+    "size_units": "GB"
   },
   "405748": {
     "slashdata": [
@@ -34,18 +34,22 @@ Entire group contains: {
       "Blu-Ray",
       "<strong>Freeleech!</strong>"
     ],
-    "uploaddate": "Jun 03 2019, 00:42"
+    "uploaddate": "Jun 03 2019, 00:42",
+    "size_no_units": "45.77",
+    "size_units": "GB"
   },
   "405767": {
     "slashdata": [
       "FLAC",
       "Blu-Ray"
     ],
-    "uploaddate": "Jun 03 2019, 08:23"
+    "uploaddate": "Jun 03 2019, 08:23",
+    "size_no_units": "1.53",
+    "size_units": "GB"
   }
 }
-Selected for upload: {'405749': {'slashdata': ['MKV', 'Blu-Ray'], 'uploaddate': 'Jun 03 2019, 00:43'}, '405748': {'slashdata': ['ISO', 'Blu-Ray'], 'uploaddate': 'Jun 03 2019, 00:42'}, '405767': {'slashdata': ['FLAC', 'Blu-Ray'], 'uploaddate': 'Jun 03 2019, 08:23'}}
-Now processing: 405749 {'slashdata': ['MKV', 'Blu-Ray'], 'uploaddate': 'Jun 03 2019, 00:43'}
+Selected for upload: {'405749': {'slashdata': ['MKV', 'Blu-Ray'], 'uploaddate': 'Jun 03 2019, 00:43', 'size_no_units': '7.45', 'size_units': 'GB'}, '405748': {'slashdata': ['ISO', 'Blu-Ray'], 'uploaddate': 'Jun 03 2019, 00:42', 'size_no_units': '45.77', 'size_units': 'GB'}, '405767': {'slashdata': ['FLAC', 'Blu-Ray'], 'uploaddate': 'Jun 03 2019, 08:23', 'size_no_units': '1.53', 'size_units': 'GB'}}
+Now processing: 405749 {'slashdata': ['MKV', 'Blu-Ray'], 'uploaddate': 'Jun 03 2019, 00:43', 'size_no_units': '7.45', 'size_units': 'GB'}
 updated session cache-file jpopsuki.eu_session.dat
 {'jpstorrentid': '405749', 'videotorrent': True, 'categorystatus': 'good', 'container': 'MKV', 'codec': 'CHANGEME', 'media': 'Bluray', 'audioformat': 'CHANGEME', 'uploaddate': '20190603'}
 {
@@ -70,7 +74,7 @@ updated session cache-file jpopsuki.eu_session.dat
   ],
   "auth": "<scrubbed>"
 }
-Now processing: 405748 {'slashdata': ['ISO', 'Blu-Ray'], 'uploaddate': 'Jun 03 2019, 00:42'}
+Now processing: 405748 {'slashdata': ['ISO', 'Blu-Ray'], 'uploaddate': 'Jun 03 2019, 00:42', 'size_no_units': '45.77', 'size_units': 'GB'}
 updated session cache-file jpopsuki.eu_session.dat
 {'jpstorrentid': '405748', 'videotorrent': True, 'categorystatus': 'good', 'container': 'ISO', 'codec': 'CHANGEME', 'media': 'Bluray', 'audioformat': 'CHANGEME', 'uploaddate': '20190603'}
 {
@@ -95,7 +99,7 @@ updated session cache-file jpopsuki.eu_session.dat
   ],
   "auth": "<scrubbed>"
 }
-Now processing: 405767 {'slashdata': ['FLAC', 'Blu-Ray'], 'uploaddate': 'Jun 03 2019, 08:23'}
+Now processing: 405767 {'slashdata': ['FLAC', 'Blu-Ray'], 'uploaddate': 'Jun 03 2019, 08:23', 'size_no_units': '1.53', 'size_units': 'GB'}
 updated session cache-file jpopsuki.eu_session.dat
 {'jpstorrentid': '405767', 'videotorrent': False, 'categorystatus': 'bad', 'audioformat': 'FLAC', 'media': 'Bluray', 'uploaddate': '20190603'}
 {

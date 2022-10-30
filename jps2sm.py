@@ -84,7 +84,7 @@ def getbulktorrentids(mode, user, first=1, last=None):
     sort_by = {
         'name': 's1',
         'year': 's2',
-        'time': 's3', # snatched time for snatched, seeding time for seeding, added for uploaded
+        'time': 's3', # snatched time for snatched, seeding time for seeding, added for uploaded and recent
         'size': 's4',
         'snatches': 's5',
         'seeders':  's6',
@@ -95,14 +95,17 @@ def getbulktorrentids(mode, user, first=1, last=None):
         sort_mode = sort_by['time']
     elif mode == 'seeding':
         sort_mode = sort_by['name']
+    elif mode == 'recent':
+        sort_mode = sort_by['time']
 
-    res = jpopsuki(f"https://jpopsuki.eu/torrents.php?type={mode}&userid={user}")
-    soup = BeautifulSoup(res.text, 'html5lib')
+    if not last and sort_mode != 'recent':
+        # Ascertain last page if not provided for seeding and snatched modes
+        # We do not need to ascertain the last page for recent mode as we never use this - we are not trying to jps2sm
+        # *every* torrent!
 
-    time.sleep(5)  # Sleep as otherwise we hit JPS browse quota
-
-    linkbox = str(soup.select('#content #ajax_torrents .linkbox')[0])
-    if not last:
+        res = jpopsuki(f"https://jpopsuki.eu/torrents.php?type={mode}&userid={user}")
+        soup = BeautifulSoup(res.text, 'html5lib')
+        linkbox = str(soup.select('#content #ajax_torrents .linkbox')[0])
         try:
             last = re.findall(
                 fr'page=([0-9]*)&amp;order_by=s3&amp;order_way=DESC&amp;type={mode}&amp;userid=(?:[0-9]*)&amp;disablegrouping=1(?:\'\);|&amp;action=advanced)"><strong> Last &gt;&gt;</strong>',
@@ -110,6 +113,8 @@ def getbulktorrentids(mode, user, first=1, last=None):
         except:
             # There is only 1 page of uploads if the 'Last >>' link cannot be found
             last = 1
+    elif not last and sort_mode == 'recent':
+        last = 1
 
     logger.debug(f'Batch user is {user}, batch mode is {mode}, first page is {first}, last page is {last}')
 
@@ -119,15 +124,20 @@ def getbulktorrentids(mode, user, first=1, last=None):
     # Parse every torrent page and add to dict, to group together releases into the same group so that they work with
     # the way that uploadtorrent() works.
     for i in range(first, int(last) + 1):
-        useruploadurl = fr"https://jpopsuki.eu/torrents.php?page={i}&order_by={sort_mode}&order_way=ASC&type={mode}&userid={user}&disablegrouping=1"
-        useruploadpage = jpopsuki(useruploadurl)
-        logger.info(useruploadurl)
+        if mode == 'snatched' or mode == 'uploaded' or mode == 'seeding':
+            batch_upload_url = f"https://jpopsuki.eu/torrents.php?page={i}&order_by={sort_mode}&order_way=ASC&type={mode}&userid={user}&disablegrouping=1"
+        elif mode == 'recent':
+            batch_upload_url = f"https://jpopsuki.eu/torrents.php?page={i}&order_by={sort_mode}&order_way=DESC&disablegrouping=1"
+        else:
+            raise RuntimeError("Unknown batch mode set")
+
+        useruploadpage = jpopsuki(batch_upload_url)
+        logger.info(batch_upload_url)
         # print useruploadpage.text
         soup2 = BeautifulSoup(useruploadpage.text, 'html5lib')
         try:
             torrenttable = str(soup2.select('#content #ajax_torrents .torrent_table tbody')[0])
         except IndexError:
-            # TODO: Need to add this to every request so it can be handled everywhere, for now it can exist here
             quotaexceeded = re.findall('<title>Browse quota exceeded :: JPopsuki 2.0</title>', useruploadpage.text)
             if quotaexceeded:
                 logger.error('Browse quota exceeded :: JPopsuki 2.0')
@@ -393,7 +403,7 @@ def uploadtorrent(torrentpath, torrentgroupdata, groupid=None, **uploaddata):
     return groupid
 
 
-def collate(torrentids, torrentgroupdata):
+def collate(torrentids, torrentgroupdata, max_size=None):
     """
     Collate and validate data ready for upload to SM
 
@@ -401,12 +411,13 @@ def collate(torrentids, torrentgroupdata):
     all available data from JPS
     Perform validation on some fields
     Download JPS torrent
-    Apply filters
+    Apply filters via decide_exc_filter()
     Send data to uploadtorrent()
     Send data to setorigartists()
 
     :param torrentids: list of JPS torrentids to be processed
     :param groupdata: dictionary with torrent group data from getgroupdata[]
+    :param max_size: bool: Only upload torrents < 1Gb if True
     """
     release_group_id = None
     torrentcount = 0
@@ -417,9 +428,18 @@ def collate(torrentids, torrentgroupdata):
 
         releasedata = releasedatafull['slashdata']
         uploaddatestr = releasedatafull['uploaddate']
+        # size_no_units = releasedatafull['size_no_units']  # TODO Use this
+        size_units = releasedatafull['size_units']
         releasedataout = {}
         releasedataout['jpstorrentid'] = torrentid  # Not needed for uploadtorrent(), purely for logging purposes
         remasterdata = False  # Set default
+
+        if max_size and size_units == "GB":
+            # Currently only a max_size of 1Gb is supported.
+            # Very simple way of just using the units, if we do not see 'GB' then it is < 1 Gb
+            # TODO Add option to specify the file size
+            logger.debug("Skipping as torrent is >=1Gb")
+            continue
 
         # JPS uses the audioformat field (represented as releasedata[0] here) for containers and codecs in video torrents,
         # and when combined with VideoMedias we can perform VideoTorrent detection.
@@ -591,16 +611,16 @@ def main():
     :return:
     """
 
-    usermode = None
+    batch_status = None
 
-    if args.parsed.urls is None and not (bool(args.parsed.batchuploaded) or bool(args.parsed.batchseeding) or bool(args.parsed.batchsnatched)):
-        fatal_error('Error: Neither any JPS URL(s) (--urls) or batch parameters (--batchsnatched, --batchuploaded or --batchseeding) have been specified. See --help')
-    elif args.parsed.urls is not None and (bool(args.parsed.batchuploaded) or bool(args.parsed.batchseeding) or bool(args.parsed.batchsnatched)):
+    if args.parsed.urls is None and not (bool(args.parsed.batchuploaded) or bool(args.parsed.batchseeding) or bool(args.parsed.batchsnatched) or bool(args.parsed.batchrecent)):
+        fatal_error('Error: Neither any JPS URL(s) (--urls) or batch parameters (--batchsnatched, --batchuploaded, --batchseeding or --batchrecent) have been specified. See --help')
+    elif args.parsed.urls is not None and (bool(args.parsed.batchuploaded) or bool(args.parsed.batchseeding) or bool(args.parsed.batchsnatched) or bool(args.parsed.batchrecent)):
         fatal_error(
-            'Error: Both the JPS URL(s) (--urls) and batch parameters (--batchsnatched,--batchuploaded or --batchseeding) have been specified, but only one is allowed.')
-    elif bool(args.parsed.batchuploaded) or bool(args.parsed.batchseeding) or bool(args.parsed.batchsnatched):
+            'Error: Both the JPS URL(s) (--urls) and batch parameters (--batchsnatched,--batchuploaded, --batchseeding or --batchrecent) have been specified, but only one is allowed.')
+    elif bool(args.parsed.batchuploaded) or bool(args.parsed.batchseeding) or bool(args.parsed.batchsnatched) or bool(args.parsed.batchrecent):
 
-        batchuser = None
+        batchuser = max_size = None
         if args.parsed.batchuser:
             if args.parsed.batchuser.isnumeric() is False:
                 fatal_error('Error: "--batchuser" or short "-b" should be a JPS profile ID. See --help')
@@ -615,15 +635,18 @@ def main():
            (bool(args.parsed.batchseeding) and bool(args.parsed.batchsnatched)): # https://stackoverflow.com/a/3076081
             fatal_error('Error: Multiple batch modes of operation specified - only one can be used at the same time. See --help')
         if args.parsed.batchuploaded:
-            batchmode = "uploaded"
+            batch_mode = "uploaded"
         elif args.parsed.batchseeding:
-            batchmode = "seeding"
+            batch_mode = "seeding"
         elif args.parsed.batchsnatched:
-            batchmode = "snatched"
+            batch_mode = "snatched"
+        elif args.parsed.batchrecent:
+            batch_mode = "recent"
+            max_size = True
         else:
             raise RuntimeError("Expected some batch mode to be set")
 
-        usermode = True
+        batch_status = True
 
     if args.parsed.mediainfo:
         try:
@@ -641,12 +664,12 @@ def main():
     if detect_display_swapped_names(jps_user_id):
         fatal_error("Error: 'Display original Artist/Album titles' is enabled in your JPS user profile. This must be disabled for jps2sm to run.")
 
-    if usermode:
+    if batch_status:
         batchuser = args.parsed.batchuser or jps_user_id
         if args.parsed.batchstart and args.parsed.batchend:
-            useruploads = getbulktorrentids(batchmode, batchuser, args.parsed.batchstart, args.parsed.batchend)
+            useruploads = getbulktorrentids(batch_mode, batchuser, args.parsed.batchstart, args.parsed.batchend)
         else:
-            useruploads = getbulktorrentids(batchmode, batchuser)
+            useruploads = getbulktorrentids(batch_mode, batchuser)
         useruploadsgrouperrors = collections.defaultdict(list)
         useruploadscollateerrors = collections.defaultdict(list)
         user_upload_dupes = []
@@ -677,7 +700,7 @@ def main():
                 continue
 
             try:
-                torrentcount = collate(torrentids, torrentgroupdata)
+                torrentcount = collate(torrentids, torrentgroupdata, max_size)
                 if not args.parsed.dryrun:
                     downloaduploadedtorrents(torrentcount, torrentgroupdata.artist, torrentgroupdata.title)
                     user_uploads_done += torrentcount

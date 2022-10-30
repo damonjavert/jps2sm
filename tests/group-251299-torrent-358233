@@ -1,5 +1,4 @@
-loading or generating session...
-loaded session from cache (last access 1s ago) 
+Loaded session from cache and testing login...
 updated session cache-file jpopsuki.eu_session.dat
 JPopsuki user id is xyz
 updated session cache-file jpopsuki.eu_session.dat
@@ -32,7 +31,9 @@ Entire group contains: {
       "V0 (VBR)",
       "WEB"
     ],
-    "uploaddate": "Apr 06 2018, 19:55"
+    "uploaddate": "Apr 06 2018, 19:55",
+    "size_no_units": "31.90",
+    "size_units": "MB"
   },
   "358232": {
     "slashdata": [
@@ -40,11 +41,13 @@ Entire group contains: {
       "Lossless",
       "WEB"
     ],
-    "uploaddate": "Apr 06 2018, 19:54"
+    "uploaddate": "Apr 06 2018, 19:54",
+    "size_no_units": "121.22",
+    "size_units": "MB"
   }
 }
-Selected for upload: {'358233': {'slashdata': ['MP3', 'V0 (VBR)', 'WEB'], 'uploaddate': 'Apr 06 2018, 19:55'}}
-Now processing: 358233 {'slashdata': ['MP3', 'V0 (VBR)', 'WEB'], 'uploaddate': 'Apr 06 2018, 19:55'}
+Selected for upload: {'358233': {'slashdata': ['MP3', 'V0 (VBR)', 'WEB'], 'uploaddate': 'Apr 06 2018, 19:55', 'size_no_units': '31.90', 'size_units': 'MB'}}
+Now processing: 358233 {'slashdata': ['MP3', 'V0 (VBR)', 'WEB'], 'uploaddate': 'Apr 06 2018, 19:55', 'size_no_units': '31.90', 'size_units': 'MB'}
 updated session cache-file jpopsuki.eu_session.dat
 {'jpstorrentid': '358233', 'videotorrent': False, 'categorystatus': 'good', 'media': 'Web', 'audioformat': 'MP3', 'bitrate': 'V0 (VBR)', 'uploaddate': '20180406'}
 Deciding if EP with torrent with these tracks: 03 - aaps - Tower.mp3

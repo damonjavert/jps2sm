@@ -198,19 +198,24 @@ def get_release_data(torrentids, release_data, date):
     :return: releasedata: 2d dict of release data in the format of torrentid: { "slashdata" : [ slashdatalist ] , "uploaddate": uploaddate } .
     """
 
+    # print(release_data)
     freeleechtext = '<strong>Freeleech!</strong>'
-    releasedatapre = re.findall(r"swapTorrent\('([0-9]+)'\);\">» (.*?)</a>.*?<blockquote>(?:\s*)Uploaded by <a href=\"user.php\?id=(?:[0-9]+)\">(?:[\S]+)</a>  on <span title=\"(?:[^\"]+)\">([^<]+)</span>", release_data, re.DOTALL)
-    # if args.parsed.debug:
-    #     print(f'Pre-processed releasedata: {json.dumps(releasedatapre, indent=2)}')
+    # swapTorrent\('([0-9]+)'\);\">» (.*?)</a>.*?(?:\s*)</td>.*?(?:\s*)<td\sclass=\"nobr\">(\d*(\.)?(\d{0,2})?)
+    releasedatapre = re.findall(r"swapTorrent\('([0-9]+)'\);\">» (.*?)</a>(?:\s*)</td>(?:\s*)<td class=\"nobr\">(\d*(?:\.)?(?:\d{0,2})?) (\w{2}).*?<blockquote>(?:\s*)Uploaded by <a href=\"user.php\?id=(?:[0-9]+)\">(?:[\S]+)</a>  on <span title=\"(?:[^\"]+)\">([^<]+)</span>", release_data, re.DOTALL)
+    # logger.debug(f'Pre-processed releasedata: {json.dumps(releasedatapre, indent=2)}')
 
     releasedata = {}
     for release in releasedatapre:
         torrentid = release[0]
         slashlist = ([i.split(' / ') for i in [release[1]]])[0]
-        uploadeddate = release[2]
+        size_no_units = release[2]
+        size_units = release[3]
+        uploadeddate = release[4]
         releasedata[torrentid] = {}
         releasedata[torrentid]['slashdata'] = slashlist
         releasedata[torrentid]['uploaddate'] = uploadeddate
+        releasedata[torrentid]['size_no_units'] = size_no_units
+        releasedata[torrentid]['size_units'] = size_units
 
     logger.debug(f'Entire group contains: {json.dumps(releasedata, indent=2)}')
 

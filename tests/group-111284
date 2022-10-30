@@ -1,5 +1,4 @@
-loading or generating session...
-loaded session from cache (last access 297s ago) 
+Loaded session from cache and testing login...
 updated session cache-file jpopsuki.eu_session.dat
 JPopsuki user id is xyz
 updated session cache-file jpopsuki.eu_session.dat
@@ -71,14 +70,18 @@ Entire group contains: {
       "320",
       "CD"
     ],
-    "uploaddate": "Aug 11 2012, 17:58"
+    "uploaddate": "Aug 11 2012, 17:58",
+    "size_no_units": "340.05",
+    "size_units": "MB"
   },
   "147982": {
     "slashdata": [
       "MKV",
       "DVD"
     ],
-    "uploaddate": "Aug 13 2012, 02:20"
+    "uploaddate": "Aug 13 2012, 02:20",
+    "size_no_units": "2.28",
+    "size_units": "GB"
   },
   "151631": {
     "slashdata": [
@@ -86,7 +89,9 @@ Entire group contains: {
       "Lossless",
       "DVD"
     ],
-    "uploaddate": "Sep 11 2012, 17:06"
+    "uploaddate": "Sep 11 2012, 17:06",
+    "size_no_units": "6.65",
+    "size_units": "GB"
   },
   "484250": {
     "slashdata": [
@@ -95,7 +100,9 @@ Entire group contains: {
       "WEB",
       "Hi-Res - 2020"
     ],
-    "uploaddate": "Apr 28 2021, 04:32"
+    "uploaddate": "Apr 28 2021, 04:32",
+    "size_no_units": "4.81",
+    "size_units": "GB"
   },
   "148289": {
     "slashdata": [
@@ -103,7 +110,9 @@ Entire group contains: {
       "Lossless",
       "CD"
     ],
-    "uploaddate": "Aug 15 2012, 08:30"
+    "uploaddate": "Aug 15 2012, 08:30",
+    "size_no_units": "1.08",
+    "size_units": "GB"
   },
   "266605": {
     "slashdata": [
@@ -111,7 +120,9 @@ Entire group contains: {
       "Lossless",
       "CD"
     ],
-    "uploaddate": "Dec 01 2015, 11:47"
+    "uploaddate": "Dec 01 2015, 11:47",
+    "size_no_units": "1.14",
+    "size_units": "GB"
   },
   "147784": {
     "slashdata": [
@@ -119,11 +130,13 @@ Entire group contains: {
       "256",
       "CD"
     ],
-    "uploaddate": "Aug 11 2012, 08:30"
+    "uploaddate": "Aug 11 2012, 08:30",
+    "size_no_units": "280.39",
+    "size_units": "MB"
   }
 }
-Selected for upload: {'147830': {'slashdata': ['MP3', '320', 'CD'], 'uploaddate': 'Aug 11 2012, 17:58'}, '147982': {'slashdata': ['MKV', 'DVD'], 'uploaddate': 'Aug 13 2012, 02:20'}, '151631': {'slashdata': ['ISO', 'Lossless', 'DVD'], 'uploaddate': 'Sep 11 2012, 17:06'}, '484250': {'slashdata': ['FLAC', '96-24', 'WEB', 'Hi-Res - 2020'], 'uploaddate': 'Apr 28 2021, 04:32'}, '148289': {'slashdata': ['FLAC', 'Lossless', 'CD'], 'uploaddate': 'Aug 15 2012, 08:30'}, '266605': {'slashdata': ['ALAC', 'Lossless', 'CD'], 'uploaddate': 'Dec 01 2015, 11:47'}, '147784': {'slashdata': ['AAC', '256', 'CD'], 'uploaddate': 'Aug 11 2012, 08:30'}}
-Now processing: 147830 {'slashdata': ['MP3', '320', 'CD'], 'uploaddate': 'Aug 11 2012, 17:58'}
+Selected for upload: {'147830': {'slashdata': ['MP3', '320', 'CD'], 'uploaddate': 'Aug 11 2012, 17:58', 'size_no_units': '340.05', 'size_units': 'MB'}, '147982': {'slashdata': ['MKV', 'DVD'], 'uploaddate': 'Aug 13 2012, 02:20', 'size_no_units': '2.28', 'size_units': 'GB'}, '151631': {'slashdata': ['ISO', 'Lossless', 'DVD'], 'uploaddate': 'Sep 11 2012, 17:06', 'size_no_units': '6.65', 'size_units': 'GB'}, '484250': {'slashdata': ['FLAC', '96-24', 'WEB', 'Hi-Res - 2020'], 'uploaddate': 'Apr 28 2021, 04:32', 'size_no_units': '4.81', 'size_units': 'GB'}, '148289': {'slashdata': ['FLAC', 'Lossless', 'CD'], 'uploaddate': 'Aug 15 2012, 08:30', 'size_no_units': '1.08', 'size_units': 'GB'}, '266605': {'slashdata': ['ALAC', 'Lossless', 'CD'], 'uploaddate': 'Dec 01 2015, 11:47', 'size_no_units': '1.14', 'size_units': 'GB'}, '147784': {'slashdata': ['AAC', '256', 'CD'], 'uploaddate': 'Aug 11 2012, 08:30', 'size_no_units': '280.39', 'size_units': 'MB'}}
+Now processing: 147830 {'slashdata': ['MP3', '320', 'CD'], 'uploaddate': 'Aug 11 2012, 17:58', 'size_no_units': '340.05', 'size_units': 'MB'}
 updated session cache-file jpopsuki.eu_session.dat
 {'jpstorrentid': '147830', 'videotorrent': False, 'categorystatus': 'good', 'media': 'CD', 'audioformat': 'MP3', 'bitrate': '320', 'uploaddate': '20120811'}
 Deciding if EP with torrent with these tracks: 03 思い出のほとんど.mp3
@@ -171,6 +184,8 @@ Upload is not an EP as it has 34 tracks
   "image": "https://jpopsuki.eu/static/images/torrents/111284.jpg",
   "bitrate": "320",
   "type": 0,
+  "artist_jp": "",
+  "title_jp": "",
   "contrib_artists[]": [
     "SKE48",
     "NMB48",
@@ -183,7 +198,7 @@ Upload is not an EP as it has 34 tracks
   ],
   "auth": "<scrubbed>"
 }
-Now processing: 147982 {'slashdata': ['MKV', 'DVD'], 'uploaddate': 'Aug 13 2012, 02:20'}
+Now processing: 147982 {'slashdata': ['MKV', 'DVD'], 'uploaddate': 'Aug 13 2012, 02:20', 'size_no_units': '2.28', 'size_units': 'GB'}
 updated session cache-file jpopsuki.eu_session.dat
 {'jpstorrentid': '147982', 'videotorrent': True, 'categorystatus': 'good', 'container': 'MKV', 'codec': 'CHANGEME', 'media': 'DVD', 'audioformat': 'CHANGEME', 'uploaddate': '20120813'}
 {
@@ -200,6 +215,8 @@ updated session cache-file jpopsuki.eu_session.dat
   "sub": "NoSubs",
   "lang": "Japanese",
   "type": 0,
+  "artist_jp": "",
+  "title_jp": "",
   "contrib_artists[]": [
     "SKE48",
     "NMB48",
@@ -212,7 +229,7 @@ updated session cache-file jpopsuki.eu_session.dat
   ],
   "auth": "<scrubbed>"
 }
-Now processing: 151631 {'slashdata': ['ISO', 'Lossless', 'DVD'], 'uploaddate': 'Sep 11 2012, 17:06'}
+Now processing: 151631 {'slashdata': ['ISO', 'Lossless', 'DVD'], 'uploaddate': 'Sep 11 2012, 17:06', 'size_no_units': '6.65', 'size_units': 'GB'}
 updated session cache-file jpopsuki.eu_session.dat
 {'jpstorrentid': '151631', 'videotorrent': True, 'categorystatus': 'bad', 'container': 'ISO', 'codec': 'CHANGEME', 'media': 'DVD', 'audioformat': 'CHANGEME', 'uploaddate': '20120911'}
 {
@@ -229,6 +246,8 @@ updated session cache-file jpopsuki.eu_session.dat
   "container": "ISO",
   "sub": "NoSubs",
   "lang": "Japanese",
+  "artist_jp": "",
+  "title_jp": "",
   "contrib_artists[]": [
     "SKE48",
     "NMB48",
@@ -241,7 +260,7 @@ updated session cache-file jpopsuki.eu_session.dat
   ],
   "auth": "<scrubbed>"
 }
-Now processing: 484250 {'slashdata': ['FLAC', '96-24', 'WEB', 'Hi-Res - 2020'], 'uploaddate': 'Apr 28 2021, 04:32'}
+Now processing: 484250 {'slashdata': ['FLAC', '96-24', 'WEB', 'Hi-Res - 2020'], 'uploaddate': 'Apr 28 2021, 04:32', 'size_no_units': '4.81', 'size_units': 'GB'}
 updated session cache-file jpopsuki.eu_session.dat
 {'jpstorrentid': '484250', 'videotorrent': False, 'categorystatus': 'good', 'media': 'Web', 'audioformat': 'FLAC', 'bitrate': '96-24', 'remastertitle': 'Hi-Res', 'remasteryear': '2020', 'uploaddate': '20210428'}
 Deciding if EP with torrent with these tracks: 01 ファースト・ラビット.flac
@@ -292,6 +311,8 @@ Upload is not an EP as it has 34 tracks
   "remastertitle": "Hi-Res",
   "remasteryear": "2020",
   "type": 0,
+  "artist_jp": "",
+  "title_jp": "",
   "contrib_artists[]": [
     "SKE48",
     "NMB48",
@@ -304,7 +325,7 @@ Upload is not an EP as it has 34 tracks
   ],
   "auth": "<scrubbed>"
 }
-Now processing: 148289 {'slashdata': ['FLAC', 'Lossless', 'CD'], 'uploaddate': 'Aug 15 2012, 08:30'}
+Now processing: 148289 {'slashdata': ['FLAC', 'Lossless', 'CD'], 'uploaddate': 'Aug 15 2012, 08:30', 'size_no_units': '1.08', 'size_units': 'GB'}
 updated session cache-file jpopsuki.eu_session.dat
 {'jpstorrentid': '148289', 'videotorrent': False, 'categorystatus': 'good', 'media': 'CD', 'audioformat': 'FLAC', 'bitrate': 'Lossless', 'uploaddate': '20120815'}
 Deciding if EP with torrent with these tracks: 03 - ＡＫＢ４８ - 思い出のほとんど.flac
@@ -352,6 +373,8 @@ Upload is not an EP as it has 34 tracks
   "image": "https://jpopsuki.eu/static/images/torrents/111284.jpg",
   "bitrate": "Lossless",
   "type": 0,
+  "artist_jp": "",
+  "title_jp": "",
   "contrib_artists[]": [
     "SKE48",
     "NMB48",
@@ -364,7 +387,7 @@ Upload is not an EP as it has 34 tracks
   ],
   "auth": "<scrubbed>"
 }
-Now processing: 266605 {'slashdata': ['ALAC', 'Lossless', 'CD'], 'uploaddate': 'Dec 01 2015, 11:47'}
+Now processing: 266605 {'slashdata': ['ALAC', 'Lossless', 'CD'], 'uploaddate': 'Dec 01 2015, 11:47', 'size_no_units': '1.14', 'size_units': 'GB'}
 updated session cache-file jpopsuki.eu_session.dat
 {'jpstorrentid': '266605', 'videotorrent': False, 'categorystatus': 'good', 'media': 'CD', 'audioformat': 'ALAC', 'bitrate': 'Lossless', 'uploaddate': '20151201'}
 Deciding if EP with torrent with these tracks: 1-03 思い出のほとんど.m4a
@@ -412,6 +435,8 @@ Upload is not an EP as it has 34 tracks
   "image": "https://jpopsuki.eu/static/images/torrents/111284.jpg",
   "bitrate": "Lossless",
   "type": 0,
+  "artist_jp": "",
+  "title_jp": "",
   "contrib_artists[]": [
     "SKE48",
     "NMB48",
@@ -424,7 +449,7 @@ Upload is not an EP as it has 34 tracks
   ],
   "auth": "<scrubbed>"
 }
-Now processing: 147784 {'slashdata': ['AAC', '256', 'CD'], 'uploaddate': 'Aug 11 2012, 08:30'}
+Now processing: 147784 {'slashdata': ['AAC', '256', 'CD'], 'uploaddate': 'Aug 11 2012, 08:30', 'size_no_units': '280.39', 'size_units': 'MB'}
 updated session cache-file jpopsuki.eu_session.dat
 {'jpstorrentid': '147784', 'videotorrent': False, 'categorystatus': 'good', 'media': 'CD', 'audioformat': 'AAC', 'bitrate': '256', 'uploaddate': '20120811'}
 Deciding if EP with torrent with these tracks: 03 思い出のほとんど.m4a
@@ -472,6 +497,8 @@ Upload is not an EP as it has 34 tracks
   "image": "https://jpopsuki.eu/static/images/torrents/111284.jpg",
   "bitrate": "256",
   "type": 0,
+  "artist_jp": "",
+  "title_jp": "",
   "contrib_artists[]": [
     "SKE48",
     "NMB48",
