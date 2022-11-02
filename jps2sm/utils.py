@@ -5,6 +5,10 @@ from typing import AnyStr
 import sys
 import configparser
 import argparse
+import torrent_parser as tp
+import tempfile
+import bencoding, hashlib
+import json
 
 # Third-party packages
 from pathlib import Path
@@ -123,3 +127,45 @@ def remove_html_tags(text):
     """
     clean = re.compile('<.*?>')
     return re.sub(clean, '', text)
+
+
+def decide_duplicate(torrent_path):
+    from jps2sm.myloginsession import sugoimusic
+    """
+    Detect if a torrent is a duplicate by crafting the torrent hash and then sending this to SM.
+
+    This is useful for mediainfo (-m) uploads as it avoids the need to search for the file(s) and
+    the mediainfo data before doing the upload, only having to find that it is a duplicate anyway.
+
+    torrent_path: str:  Path to the JPS torrent file
+    """
+
+    torrent_hashcheckdata = tp.parse_torrent_file(torrent_path)
+    torrent_hashcheckdata["info"]["source"] = 'SugoiMusic'
+
+    #temp_torrent_file = tempfile.TemporaryFile()
+    temp_torrent_file = tempfile.mkstemp()
+    tp.create_torrent_file(temp_torrent_file[1], torrent_hashcheckdata)
+
+    with open(temp_torrent_file[1], "rb") as f:
+        data = bencoding.bdecode(f.read())
+        info = data[b'info']
+        hashed_info = hashlib.sha1(bencoding.bencode(info)).hexdigest()
+
+    logger.debug(hashed_info)
+
+    hashcheckjson = sugoimusic('https://sugoimusic.me/ajax.php?action=torrent&hash=' + hashed_info)
+
+    if hashcheckjson.text == '{"status":"failure","error":"bad hash parameter"}':
+        logger.debug('Duplicate not detected via torrent hash')
+        return False, None
+    elif str(hashcheckjson.text).startswith('{"status":"success"'):
+        logger.debug('Duplicate detected via torrent hash')
+        dupe_jps_torrent_json = json.loads(hashcheckjson.text)
+        dupe_jps_torrent_id = dupe_jps_torrent_json['response']['torrent']['id']
+        logger.debug(f'Dupe torrent: {dupe_jps_torrent_id}')
+        return True, dupe_jps_torrent_id
+    else:
+        raise Exception('Bad response from SugoiMusic hashcheck')
+
+

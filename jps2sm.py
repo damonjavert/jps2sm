@@ -35,7 +35,7 @@ from pathlib import Path
 
 # jps2sm modules
 from jps2sm.get_data import GetGroupData, get_user_keys, get_jps_user_id, get_torrent_link, get_release_data
-from jps2sm.utils import get_valid_filename, count_values_dict, fatal_error, GetConfig, GetArgs, HandleCfgOutputDirs
+from jps2sm.utils import get_valid_filename, count_values_dict, fatal_error, GetConfig, GetArgs, HandleCfgOutputDirs, decide_duplicate
 from jps2sm.myloginsession import MyLoginSession, jpopsuki, sugoimusic
 from jps2sm.constants import Categories, VideoOptions
 from jps2sm.mediainfo import get_mediainfo
@@ -537,6 +537,18 @@ def collate(torrentids, torrentgroupdata, max_size=None):
 
         with open(torrentpath, "wb") as f:
             f.write(torrentfile.content)
+
+        if args.parsed.mediainfo and not args.parsed.dryrun:
+            dupe, sugoimusic_torrent_id = decide_duplicate(torrentpath)
+            if dupe:
+                dupe_file_name = download_sm_torrent(sugoimusic_torrent_id, torrentgroupdata.artist, torrentgroupdata.title)
+                logger.warning(
+                    f'This torrent already exists on SugoiMusic - https://sugoimusic.me/torrents.php?torrentid={sugoimusic_torrent_id} '
+                    f'The .torrent has been downloaded with name "{Path(output.file_dir["smtorrents"], dupe_file_name)}"'
+                )
+                dupe_error_msg = f'The exact same torrent file already exists on the site! See: https://sugoimusic.me/torrents.php?torrentid={sugoimusic_torrent_id} JPS torrent id: {torrentid}'
+                logger.error(dupe_error_msg)
+                raise RuntimeError(dupe_error_msg)
 
         # Upload torrent to SM
         # If groupid was returned from a previous call of uploadtorrent() then use it to allow torrents
