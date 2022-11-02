@@ -372,14 +372,14 @@ def uploadtorrent(torrentpath, torrentgroupdata, groupid=None, **uploaddata):
                 )
                 dupe_error_msg = f'The exact same torrent file already exists on the site! See: https://sugoimusic.me/torrents.php?torrentid={dupe[0]} JPS torrent id: {uploaddata["jpstorrentid"]}'
                 logger.error(dupe_error_msg)
-                raise RuntimeError(dupe_error_msg)
+                raise Exception(dupe_error_msg)
             else:
                 logger.error(SMerrorTorrent[0])
-                raise RuntimeError(SMerrorTorrent[0])
+                raise Exception(SMerrorTorrent[0])
 
         SMerrorLogon = re.findall('<p>Invalid (.*)</p>', SMres.text)
         if SMerrorLogon:
-            raise RuntimeError(f'Invalid {SMerrorLogon[0]}')
+            raise Exception(f'Invalid {SMerrorLogon[0]}')
 
         smuploadresultfilename = "SMuploadresult." + Path(torrentpath).stem + ".html"
         smuploadresultpath = Path(output.file_dir['html'], smuploadresultfilename)
@@ -543,14 +543,11 @@ def collate(torrentids, torrentgroupdata, max_size=None):
         # to be uploaded to the same group, else get the groupid from the first run of uploadtorrent()
         # Update: The bug re torrent merging was fixed a long time ago, so we do not need to nest-together
         # uploads like this anymore
-        try:
-            if release_group_id is None:
-                release_group_id = uploadtorrent(torrentpath, torrentgroupdata, **releasedataout)
-            else:
-                uploadtorrent(torrentpath, torrentgroupdata, release_group_id, **releasedataout)
-        except Exception:
-            logger.exception('Error in uploadtorrent()')
-            raise RuntimeError('Error in uploadtorrent()')
+
+        if release_group_id is None:
+            release_group_id = uploadtorrent(torrentpath, torrentgroupdata, **releasedataout)
+        else:
+            uploadtorrent(torrentpath, torrentgroupdata, release_group_id, **releasedataout)
 
     if not args.parsed.dryrun:
         # Add original artists for contrib artists
@@ -724,7 +721,6 @@ def main():
                     logger.exception(
                         f'Error with collating/retrieving release data for {groupid} torrentid(s) {",".join(torrentids)}, skipping upload')
                     useruploadscollateerrors[groupid] = torrentids
-
                 continue
 
         if useruploadsgrouperrors:
