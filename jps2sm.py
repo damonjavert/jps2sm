@@ -545,7 +545,7 @@ def collate(torrentids, torrentgroupdata, max_size=None):
                 )
                 dupe_error_msg = f'The exact same torrent file already exists on the site! See: https://sugoimusic.me/torrents.php?torrentid={sugoimusic_torrent_id} JPS torrent id: {torrentid}'
                 logger.error(dupe_error_msg)
-                raise RuntimeError(dupe_error_msg)
+                raise Exception(dupe_error_msg)
 
         # Upload torrent to SM
         uploadtorrent(torrentpath, torrentgroupdata, **releasedataout)
