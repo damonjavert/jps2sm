@@ -397,8 +397,6 @@ def uploadtorrent(torrentpath, torrentgroupdata, **uploaddata):
         if groupid:
             logger.info(f'Torrent uploaded successfully as groupid {groupid[0]}  See https://sugoimusic.me/torrents.php?id={groupid[0]}')
 
-    return groupid
-
 
 def collate(torrentids, torrentgroupdata, max_size=None):
     """
