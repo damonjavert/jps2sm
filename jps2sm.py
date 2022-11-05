@@ -67,14 +67,14 @@ def detect_display_swapped_names(userid):
 
 def getbulktorrentids(mode, user, first=1, last=None):
     """
-    Iterates through a users' uploads on JPS and gathers the groupids and corresponding torrentids and returns
+    Iterates through pages of uploads on JPS and gathers the groupids and corresponding torrentids and returns
     a dict in the format of groupid: [torrentd1, torrentid2, ... ]
 
-    As we add a unique group id as the key this means that all uploads from a user to the same groupid are correlated
-    together so that they are uplaoded to the same group by uploadtorrent() even if they were not uploaded to JPS
-    at the same time. - uploadtorrent() requires torrents uplaoded to the same group by uploaded together.
-
-    :param mode: Area to get bulk torrent ids from, 'uploaded' for a user's uploads, 'seeding' for torrents currently seeding and 'snatched' for a user's snatched torrents
+    :param mode: Area to get bulk torrent ids from:
+        'uploaded' for a user's uploads,
+        'seeding' for torrents currently seeding,
+        'snatched' for a user's snatched torrents and
+        'recent' for uploads recently uploaded to JPS,
     :param user: JPS userid
     :param first: upload page number to start at
     :param last: upload page to finish at
@@ -84,7 +84,7 @@ def getbulktorrentids(mode, user, first=1, last=None):
     sort_by = {
         'name': 's1',
         'year': 's2',
-        'time': 's3', # snatched time for snatched, seeding time for seeding, added for uploaded and recent
+        'time': 's3',  # snatched time for snatched, seeding time for seeding, added for uploaded and recent
         'size': 's4',
         'snatches': 's5',
         'seeders':  's6',
@@ -100,8 +100,6 @@ def getbulktorrentids(mode, user, first=1, last=None):
 
     if not last and sort_mode != 'recent':
         # Ascertain last page if not provided for seeding and snatched modes
-        # We do not need to ascertain the last page for recent mode as we never use this - we are not trying to jps2sm
-        # *every* torrent!
 
         res = jpopsuki(f"https://jpopsuki.eu/torrents.php?type={mode}&userid={user}")
         soup = BeautifulSoup(res.text, 'html5lib')
@@ -114,6 +112,8 @@ def getbulktorrentids(mode, user, first=1, last=None):
             # There is only 1 page of uploads if the 'Last >>' link cannot be found
             last = 1
     elif not last and sort_mode == 'recent':
+        # We do not need to ascertain the last page for recent mode as we never use this - we are not trying to jps2sm
+        # *every* torrent!
         last = 1
 
     logger.debug(f'Batch user is {user}, batch mode is {mode}, first page is {first}, last page is {last}')
@@ -121,8 +121,7 @@ def getbulktorrentids(mode, user, first=1, last=None):
     useruploads = {}
     useruploads = collections.defaultdict(list)
 
-    # Parse every torrent page and add to dict, to group together releases into the same group so that they work with
-    # the way that uploadtorrent() works.
+    # Parse every torrent page and add to dict
     for i in range(first, int(last) + 1):
         if mode == 'snatched' or mode == 'uploaded' or mode == 'seeding':
             batch_upload_url = f"https://jpopsuki.eu/torrents.php?page={i}&order_by={sort_mode}&order_way=ASC&type={mode}&userid={user}&disablegrouping=1"
@@ -149,6 +148,7 @@ def getbulktorrentids(mode, user, first=1, last=None):
         for groupid, torrentid in alltorrentlinksidsonly:
             useruploads[groupid].append(torrentid)
         time.sleep(5)  # Sleep as otherwise we hit JPS browse quota
+
     logger.debug(useruploads)
     return useruploads
 
@@ -199,7 +199,7 @@ def setorigartist(artist, origartist):
     logger.debug(f'Set artist {artist} original artist to {origartist}')
 
 
-def uploadtorrent(torrentpath, torrentgroupdata, groupid=None, **uploaddata):
+def uploadtorrent(torrentpath, torrentgroupdata, **uploaddata):
     """
     Prepare POST data for the SM upload, performs additional validation, reports errors and performs the actual upload to
     SM whilst saving the html result to investigate any errors if they are not reported correctly.
@@ -326,9 +326,6 @@ def uploadtorrent(torrentpath, torrentgroupdata, groupid=None, **uploaddata):
     elif args.parsed.mediainfo and data['type'] == Categories.SM_StripAllMediainfoExcResolution:
         for field in mediainfo_non_resolution:
             data.pop(field, None)
-
-    if groupid:
-        data['groupid'] = groupid  # Upload torrents into the same group
 
     try:
         data['artist_jp'], data['title_jp'] = torrentgroupdata.originalchars()
@@ -551,15 +548,7 @@ def collate(torrentids, torrentgroupdata, max_size=None):
                 raise RuntimeError(dupe_error_msg)
 
         # Upload torrent to SM
-        # If groupid was returned from a previous call of uploadtorrent() then use it to allow torrents
-        # to be uploaded to the same group, else get the groupid from the first run of uploadtorrent()
-        # Update: The bug re torrent merging was fixed a long time ago, so we do not need to nest-together
-        # uploads like this anymore
-
-        if release_group_id is None:
-            release_group_id = uploadtorrent(torrentpath, torrentgroupdata, **releasedataout)
-        else:
-            uploadtorrent(torrentpath, torrentgroupdata, release_group_id, **releasedataout)
+        uploadtorrent(torrentpath, torrentgroupdata, **releasedataout)
 
     if not args.parsed.dryrun:
         # Add original artists for contrib artists
