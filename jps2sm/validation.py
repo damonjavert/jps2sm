@@ -174,14 +174,14 @@ def decide_exc_filter(audioformat, media, releasedata):
     return False
 
 
-def decide_ep(torrentfilename, uploaddata):
+def decide_ep(jps_torrent_object, uploaddata):
     """
     Return if Album upload should be an EP or not.
     EPs are considered to have < 7 tracks, excluding off-vocals and uploaded to JPS as an Album
 
     We assume we are being called only if Cat = Album
 
-    :param torrentfilename:
+    :param jps_torrent_object: bytes: BytesIO object of the JPS torrent
     :param uploaddata:
     :return: str: 'EP' or 'Album'
     """
@@ -189,7 +189,7 @@ def decide_ep(torrentfilename, uploaddata):
     if uploaddata['media'].lower() == 'bluray' or uploaddata['media'].lower() == 'dvd':
         return 'Album'
 
-    torrent_metadata = tp.parse_torrent_file(torrentfilename)
+    torrent_metadata = tp.TorrentFileParser(jps_torrent_object).parse()
     music_extensions = ['.flac', '.mp3', '.ogg', '.alac', '.m4a', '.wav', '.wma', '.ra']
     off_vocal_phrases = ['off-vocal', 'offvocal', 'off vocal', 'inst.', 'instrumental', 'english ver', 'japanese ver', 'korean ver']
     track_count = 0

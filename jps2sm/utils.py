@@ -129,7 +129,7 @@ def remove_html_tags(text):
     return re.sub(clean, '', text)
 
 
-def decide_duplicate(torrent_path):
+def decide_duplicate(jps_torrent_object):
     from jps2sm.myloginsession import sugoimusic
     """
     Detect if a torrent is a duplicate by crafting the torrent hash and then sending this to SM.
@@ -137,13 +137,11 @@ def decide_duplicate(torrent_path):
     This is useful for mediainfo (-m) uploads as it avoids the need to search for the file(s) and
     the mediainfo data before doing the upload, only having to find that it is a duplicate anyway.
 
-    torrent_path: str:  Path to the JPS torrent file
+    jps_torrent_object: bytes: BytesIO object of the JPS torrent
     """
 
-    torrent_hashcheckdata = tp.parse_torrent_file(torrent_path)
+    torrent_hashcheckdata = tp.TorrentFileParser(jps_torrent_object).parse()
     torrent_hashcheckdata["info"]["source"] = 'SugoiMusic'
-
-    #temp_torrent_file = tempfile.TemporaryFile()
     temp_torrent_file = tempfile.mkstemp()
     tp.create_torrent_file(temp_torrent_file[1], torrent_hashcheckdata)
 

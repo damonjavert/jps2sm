@@ -11,12 +11,12 @@ import tempfile
 logger = logging.getLogger('main.' + __name__)
 
 
-def get_mediainfo(torrentfilename, media, media_roots):
+def get_mediainfo(jps_torrent_object, media, media_roots):
     """
     Get filename(s) of video files in the torrent and run mediainfo and capture the output, extract if DVD found (Blurays not yet supported)
     then set the appropriate fields for the upload
 
-    :param torrentfilename: str filename of torrent to parse from collate()
+    :param jps_torrent_object: bytes: BytesIO object of the JPS torrent
     :param media: str Validated media from collate()
     :param media_roots: Sanitised MediaDirectories from cfg for use by get_media_location()
     :return: mediainfo, releasedataout
@@ -25,7 +25,7 @@ def get_mediainfo(torrentfilename, media, media_roots):
     releaseadtaout: Fields gathered from mediainfo for SM upload
     """
 
-    torrentmetadata = tp.parse_torrent_file(torrentfilename)
+    torrentmetadata = tp.TorrentFileParser(jps_torrent_object).parse()
     torrentname = torrentmetadata['info']['name']  # Directory if >1 file, otherwise it is filename
     # print(torrentmetadata)
     mediainfosall = ""

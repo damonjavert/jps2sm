@@ -27,6 +27,7 @@ import html
 import json
 import logging
 from logging.handlers import RotatingFileHandler
+import io
 
 # Third-party packages
 from bs4 import BeautifulSoup
@@ -199,15 +200,14 @@ def setorigartist(artist, origartist):
     logger.debug(f'Set artist {artist} original artist to {origartist}')
 
 
-def uploadtorrent(torrentpath, torrentgroupdata, **uploaddata):
+def uploadtorrent(jps_torrent_object, torrentgroupdata, **uploaddata):
     """
     Prepare POST data for the SM upload, performs additional validation, reports errors and performs the actual upload to
     SM whilst saving the html result to investigate any errors if they are not reported correctly.
 
-    :param torrentpath: filename of the JPS torrent to be uploaded, also used as save path for SM upload result html page
+    :param jps_torrent_object: bytes: BytesIO object of the JPS torrent
     :param groupid: groupid to upload to - allows to upload torrents to the same group
     :param uploaddata: dict of collated / validated release data from collate()
-    :return: groupid: groupid used in the upload, used by collate() in case of uploading several torrents to the same group
     """
     uploadurl = 'https://sugoimusic.me/upload.php'
     languages = ('Japanese', 'English', 'Korean', 'Chinese', 'Vietnamese')
@@ -234,7 +234,7 @@ def uploadtorrent(torrentpath, torrentgroupdata, **uploaddata):
     # TODO Most of this can be in getmediainfo()
     if args.parsed.mediainfo:
         try:
-            data['mediainfo'], releasedatamediainfo = get_mediainfo(torrentpath, uploaddata['media'], config.media_roots)
+            data['mediainfo'], releasedatamediainfo = get_mediainfo(jps_torrent_object, uploaddata['media'], config.media_roots)
             data.update(releasedatamediainfo)
             if 'duration' in data.keys() and data['duration'] > 1:
                 duration_friendly_format = humanfriendly.format_timespan(datetime.timedelta(seconds=int(data['duration'] / 1000)))
@@ -312,7 +312,7 @@ def uploadtorrent(torrentpath, torrentgroupdata, **uploaddata):
         data['sub'] = 'Hardsubs'  # We have subtitles! Subs in JPS FanSubs are usually Hardsubs so guess as this
         # TODO: Use torrent library to look for sub/srt files
     elif torrentgroupdata.category == "Album":  # Ascertain if upload is EP
-        data['type'] = Categories.JPStoSM[decide_ep(torrentpath, uploaddata)]
+        data['type'] = Categories.JPStoSM[decide_ep(jps_torrent_object, uploaddata)]
 
     if 'type' not in data.keys():  # Set default value after all validation has been done
         data['type'] = Categories.JPStoSM[torrentgroupdata.category]
@@ -347,8 +347,11 @@ def uploadtorrent(torrentpath, torrentgroupdata, **uploaddata):
     else:
         data['idols[]'] = torrentgroupdata.artist  # Set the artist normally
 
+    jps_torrent_object.seek(0)
+
     postDataFiles = {
-        'file_input': open(torrentpath, 'rb')
+        # We need to specify a filename  now we are using BytesIO and SM will validate files without a .torrent extension
+        'file_input': ('blah.torrent', jps_torrent_object)
     }
 
     if args.parsed.dryrun or args.parsed.debug:
@@ -378,10 +381,10 @@ def uploadtorrent(torrentpath, torrentgroupdata, **uploaddata):
         if SMerrorLogon:
             raise Exception(f'Invalid {SMerrorLogon[0]}')
 
-        smuploadresultfilename = "SMuploadresult." + Path(torrentpath).stem + ".html"
-        smuploadresultpath = Path(output.file_dir['html'], smuploadresultfilename)
+        html_debug_output_filename = f"SMuploadresult.{torrentgroupdata.artist}.{torrentgroupdata.title}.{torrentgroupdata.date}.JPS_ID{uploaddata['jpstorrentid']}.html"
+        html_debug_output_path = Path(output.file_dir['html'], html_debug_output_filename)
 
-        with open(smuploadresultpath, "w") as f:
+        with open(html_debug_output_path, "w") as f:
             f.write(str(SMres.content))
 
         groupid = re.findall('<input type="hidden" name="groupid" value="([0-9]+)" />', SMres.text)
@@ -391,7 +394,7 @@ def uploadtorrent(torrentpath, torrentgroupdata, **uploaddata):
                 r'Your torrent has been uploaded; however, you must download your torrent from <a href="torrents\.php\?id=([0-9]+)">here</a>',
                 SMres.text)
             if not groupid:
-                unknown_error_msg = f'Cannot find groupid in SM response - there was probably an unknown error. See {smuploadresultfilename} for potential errors'
+                unknown_error_msg = f'Cannot find groupid in SM response - there was probably an unknown error. See {html_debug_output_path} for potential errors'
                 raise RuntimeError(unknown_error_msg)
 
         if groupid:
@@ -525,16 +528,18 @@ def collate(torrentids, torrentgroupdata, max_size=None):
         releasedataout['uploaddate'] = datetime.datetime.strptime(uploaddatestr, '%b %d %Y, %H:%M').strftime('%Y%m%d')
 
         torrentlink = html.unescape(get_torrent_link(torrentid, torrentgroupdata.rel2))
-        torrentfile = jpopsuki("https://jpopsuki.eu/%s" % torrentlink)  # Download JPS torrent
-        torrentfilename = get_valid_filename(
+        jps_torrent_file = jpopsuki("https://jpopsuki.eu/%s" % torrentlink)  # Download JPS torrent
+        jps_torrent_filename = get_valid_filename(
             "JPS %s - %s - %s.torrent" % (torrentgroupdata.artist, torrentgroupdata.title, "-".join(releasedata)))
-        torrentpath = Path(output.file_dir['jpstorrents'], torrentfilename)
+        jps_torrent_path = Path(output.file_dir['jpstorrents'], jps_torrent_filename)
 
-        with open(torrentpath, "wb") as f:
-            f.write(torrentfile.content)
+        with open(jps_torrent_path, "wb") as f:
+            f.write(jps_torrent_file.content)
+
+        jps_torrent_object = io.BytesIO(jps_torrent_file.content)  # Keep file in memory as it could be processed and deleted by a torrent client
 
         if args.parsed.mediainfo and not args.parsed.dryrun:
-            dupe, sugoimusic_torrent_id = decide_duplicate(torrentpath)
+            dupe, sugoimusic_torrent_id = decide_duplicate(jps_torrent_object)
             if dupe:
                 dupe_file_name = download_sm_torrent(sugoimusic_torrent_id, torrentgroupdata.artist, torrentgroupdata.title)
                 logger.warning(
@@ -546,7 +551,7 @@ def collate(torrentids, torrentgroupdata, max_size=None):
                 raise Exception(dupe_error_msg)
 
         # Upload torrent to SM
-        uploadtorrent(torrentpath, torrentgroupdata, **releasedataout)
+        uploadtorrent(jps_torrent_object, torrentgroupdata, **releasedataout)
 
     if not args.parsed.dryrun:
         # Add original artists for contrib artists
