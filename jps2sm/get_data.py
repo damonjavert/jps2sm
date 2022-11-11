@@ -4,6 +4,9 @@ import re
 import itertools
 import time
 import json
+from dataclasses import dataclass
+from typing import Optional
+import collections
 
 from jps2sm.myloginsession import jpopsuki, sugoimusic
 from jps2sm.constants import Categories
@@ -13,6 +16,23 @@ from jps2sm.utils import remove_html_tags
 from bs4 import BeautifulSoup
 
 logger = logging.getLogger('main.' + __name__)
+
+
+@dataclass
+class JPSGroup:
+    groupid: int
+    category: str
+    artist: str
+    date: str
+    title: str
+    originalartist: str
+    originaltitle: str
+    rel2: str
+    groupdescription: str
+    imagelink: str
+    tagsall: str
+    contribartists: str
+    originalchars: Optional[list]
 
 
 class GetGroupData:
@@ -180,6 +200,23 @@ class GetGroupData:
 
     def originalchars(self):
         return self.originalartist, self.originaltitle
+
+    def all(self):
+        return {
+            'groupid': self.groupid,
+            'category': self.category,
+            'artist': self.artist,
+            'date': self.date,
+            'title': self.title,
+            'originalartist': self.originalartist,
+            'originaltitle': self.originaltitle,
+            'rel2': self.rel2,
+            'groupdescription': self.groupdescription,
+            'imagelink': self.imagelink,
+            'tagsall': self.tagsall,
+            'contribartists': self.contribartists,
+            'originalchars': self.originalchars()
+        }
 
     def __getattr__(self, item):
         return self.item

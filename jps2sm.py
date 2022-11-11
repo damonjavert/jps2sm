@@ -35,7 +35,8 @@ import humanfriendly
 from pathlib import Path
 
 # jps2sm modules
-from jps2sm.get_data import GetGroupData, get_user_keys, get_jps_user_id, get_torrent_link, get_release_data
+from jps2sm.get_data import JPSGroup, GetGroupData, get_user_keys, get_jps_user_id, get_torrent_link, get_release_data
+from jps2sm.batch import get_batch_group_data
 from jps2sm.utils import get_valid_filename, count_values_dict, fatal_error, GetConfig, GetArgs, HandleCfgOutputDirs, decide_duplicate
 from jps2sm.myloginsession import MyLoginSession, jpopsuki, sugoimusic
 from jps2sm.constants import Categories, VideoOptions
@@ -145,12 +146,12 @@ def getbulktorrentids(mode, user, first=1, last=None):
             else:
                 raise
         alltorrentlinksidsonly = re.findall('torrents.php\?id=([0-9]+)\&amp;torrentid=([0-9]+)', torrenttable)
-        logger.info(alltorrentlinksidsonly)
+        logger.info(f'Groupids and torrentids found on page: {alltorrentlinksidsonly}')
         for groupid, torrentid in alltorrentlinksidsonly:
             useruploads[groupid].append(torrentid)
         time.sleep(5)  # Sleep as otherwise we hit JPS browse quota
 
-    logger.debug(useruploads)
+    logger.debug(f'Groupids and torrentids found on all pages: {useruploads}')
     return useruploads
 
 
@@ -328,7 +329,7 @@ def uploadtorrent(jps_torrent_object, torrentgroupdata, **uploaddata):
             data.pop(field, None)
 
     try:
-        data['artist_jp'], data['title_jp'] = torrentgroupdata.originalchars()
+        data['artist_jp'], data['title_jp'] = torrentgroupdata.originalchars
     except AttributeError:  # If no originalchars do nothing
         pass
 
@@ -381,7 +382,7 @@ def uploadtorrent(jps_torrent_object, torrentgroupdata, **uploaddata):
         if SMerrorLogon:
             raise Exception(f'Invalid {SMerrorLogon[0]}')
 
-        html_debug_output_filename = f"SMuploadresult.{torrentgroupdata.artist}.{torrentgroupdata.title}.{torrentgroupdata.date}.JPS_ID{uploaddata['jpstorrentid']}.html"
+        html_debug_output_filename = f"SMuploadresult.{torrentgroupdata.artist[0]}.{torrentgroupdata.title}.{torrentgroupdata.date}.JPS_ID{uploaddata['jpstorrentid']}.html"
         html_debug_output_path = Path(output.file_dir['html'], html_debug_output_filename)
 
         with open(html_debug_output_path, "w") as f:
@@ -401,7 +402,7 @@ def uploadtorrent(jps_torrent_object, torrentgroupdata, **uploaddata):
             logger.info(f'Torrent uploaded successfully as groupid {groupid[0]}  See https://sugoimusic.me/torrents.php?id={groupid[0]}')
 
 
-def collate(torrentids, torrentgroupdata, max_size=None):
+def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
     """
     Collate and validate data ready for upload to SM
 
@@ -416,8 +417,8 @@ def collate(torrentids, torrentgroupdata, max_size=None):
     :param torrentids: list of JPS torrentids to be processed
     :param groupdata: dictionary with torrent group data from getgroupdata[]
     :param max_size: bool: Only upload torrents < 1Gb if True
+    :param scrape_only: bool: Only download JPS torrents, do not upload to SM
     """
-    release_group_id = None
     torrentcount = 0
     for torrentid, releasedatafull in get_release_data(torrentids, torrentgroupdata.rel2, torrentgroupdata.date).items():
 
@@ -535,6 +536,9 @@ def collate(torrentids, torrentgroupdata, max_size=None):
 
         with open(jps_torrent_path, "wb") as f:
             f.write(jps_torrent_file.content)
+
+        if scrape_only:
+            continue
 
         jps_torrent_object = io.BytesIO(jps_torrent_file.content)  # Keep file in memory as it could be processed and deleted by a torrent client
 
@@ -668,37 +672,46 @@ def main():
     if batch_status:
         batchuser = args.parsed.batchuser or jps_user_id
         if args.parsed.batchstart and args.parsed.batchend:
-            useruploads = getbulktorrentids(batch_mode, batchuser, args.parsed.batchstart, args.parsed.batchend)
+            batch_uploads = getbulktorrentids(batch_mode, batchuser, args.parsed.batchstart, args.parsed.batchend)
         else:
-            useruploads = getbulktorrentids(batch_mode, batchuser)
-        useruploadsgrouperrors = collections.defaultdict(list)
+            batch_uploads = getbulktorrentids(batch_mode, batchuser)
         useruploadscollateerrors = collections.defaultdict(list)
         user_upload_dupes = []
         user_upload_dupes_jps = []
         user_upload_source_data_not_found = []
         user_upload_mediainfo_not_submitted = 0
 
-        user_uploads_found = count_values_dict(useruploads)
+        user_uploads_found = count_values_dict(batch_uploads)
         user_uploads_done = 0
+
         logger.info(f'Now attempting to upload {user_uploads_found} torrents.')
 
-        for key, value in useruploads.items():
+        batch_group_data, batch_uploads_group_errors, batch_groups_excluded = get_batch_group_data(batch_uploads, args.parsed.exccategory)
+        # print(json.dumps(batch_group_data, indent=2))
+
+        for key, value in batch_uploads.items():
             groupid = key
             torrentids = value
-            try:
-                logger.info('-------------------------')
-                torrentgroupdata = GetGroupData("https://jpopsuki.eu/torrents.php?id=%s" % groupid)
-                if torrentgroupdata.category == args.parsed.exccategory:
-                    logger.debug(f'Excluding groupid {groupid} as it is {torrentgroupdata.category} group and these are being skipped')
-                    continue
-            except KeyboardInterrupt:  # Allow Ctrl-C to exit without showing the error multiple times and polluting the final error dict
-                break  # Still continue to get error dicts and dupe list so far
-            except Exception:
-                # Catch all for any exception
-                logger.exception(
-                    'Error with retrieving group data for groupid %s trorrentid(s) %s, skipping upload' % (groupid, ",".join(torrentids)))
-                useruploadsgrouperrors[groupid] = torrentids
+
+            if groupid in batch_uploads_group_errors or groupid in batch_groups_excluded:
+                # Skip group if GetGroupData() failed or the group is being excluded by the '-exc' parameter
                 continue
+
+            torrentgroupdata = JPSGroup(
+                groupid=batch_group_data[groupid]['groupid'],
+                category=batch_group_data[groupid]['category'],
+                artist=batch_group_data[groupid]['artist'],
+                date=batch_group_data[groupid]['date'],
+                title=batch_group_data[groupid]['title'],
+                originalartist=batch_group_data[groupid]['originalartist'],
+                originaltitle=batch_group_data[groupid]['originaltitle'],
+                rel2=batch_group_data[groupid]['rel2'],
+                groupdescription=batch_group_data[groupid]['groupdescription'],
+                imagelink=batch_group_data[groupid]['imagelink'],
+                tagsall=batch_group_data[groupid]['tagsall'],
+                contribartists=batch_group_data[groupid]['contribartists'],
+                originalchars=batch_group_data[groupid]['originalchars']
+            )
 
             try:
                 torrentcount = collate(torrentids, torrentgroupdata, max_size)
@@ -727,11 +740,11 @@ def main():
                     useruploadscollateerrors[groupid] = torrentids
                 continue
 
-        if useruploadsgrouperrors:
+        if batch_uploads_group_errors:
             logger.error('The following JPS groupid(s) (torrentid(s) shown for reference) had errors in retrieving group data, '
                          'keep this data safe and you can possibly retry with it in a later version:')
-            logger.error(useruploadsgrouperrors)
-            logger.error(f'Total: {count_values_dict(useruploadsgrouperrors)}')
+            logger.error(batch_uploads_group_errors)
+            logger.error(f'Total: {count_values_dict(batch_uploads_group_errors)}')
         if useruploadscollateerrors:
             logger.error('The following JPS groupid(s) and corresponding torrentid(s) had errors either in collating/retrieving '
                          'release data or in performing the actual upload to SM (although group data was retrieved OK), '
@@ -749,7 +762,7 @@ def main():
             logger.error(f'Total: {len(user_upload_source_data_not_found)}')
 
         logger.info(f'Finished batch upload\n--------------------------------------------------------\nOverall stats:'
-                    f'\nTorrents found at JPS: {user_uploads_found}\nGroup data errors: {count_values_dict(useruploadsgrouperrors)}'
+                    f'\nTorrents found at JPS: {user_uploads_found}\nGroup data errors: {count_values_dict(batch_uploads_group_errors)}'
                     f'\nRelease data (or any other) errors: {count_values_dict(useruploadscollateerrors)}'
                     f'\nMediaInfo source data missing: {len(user_upload_source_data_not_found)}'
                     f'\nMediaInfo not submitted errors (use \"--mediainfo\" to fix): {user_upload_mediainfo_not_submitted}')
