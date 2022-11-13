@@ -11,10 +11,11 @@ def get_batch_group_data(batch_uploads, excluded_category):
     """
     Iterate through batch_uploads and run GetGroupData on each group and store the data in batch_group_data{}
 
-    :param: batch_uploads: dict: Contains jps_group_id: jps_torrent_id of all uploads
-    :param: excluded_category: str: String of JPS Category name to be excluded
-    :return: batch_group_data: dict: multi dimensional dict contain group data of all uploads
-    :return: batch_group_errors: list: All JPS jps_group_ids where GetGroupData failed
+    :param batch_uploads: dict, Contains jps_group_id: jps_torrent_id of all uploads
+    :param excluded_category: str, JPS Category name to be excluded
+    :return batch_group_data: dict, multi dimensional dict contain group data of all uploads
+    :return batch_group_errors: list, All JPS jps_group_ids where GetGroupData failed
+    :return batch_groups_excluded: list, All jps_group_ids that were excluded by the user, currently --exccategory
     """
 
     batch_group_errors = collections.defaultdict(list)
