@@ -67,20 +67,20 @@ def detect_display_swapped_names(userid):
         return True
 
 
-def getbulktorrentids(mode, user, first=1, last=None):
+def get_batch_jps_group_torrent_ids(mode, user, first=1, last=None):
     """
-    Iterates through pages of uploads on JPS and gathers the groupids and corresponding torrentids and returns
-    a dict in the format of groupid: [torrentd1, torrentid2, ... ]
+    Iterates through pages of uploads on JPS and gathers the jps_group_ids and corresponding jps_torrent_id and returns
+    a dict in the format of jps_group_id: [jps_torrent_id]
 
-    :param mode: Area to get bulk torrent ids from:
+    :param mode: Area to get batch torrent ids from:
         'uploaded' for a user's uploads,
-        'seeding' for torrents currently seeding,
+        'seeding' for the user's currently seeding torrents,
         'snatched' for a user's snatched torrents and
-        'recent' for uploads recently uploaded to JPS,
-    :param user: JPS userid
+        'recent' for uploads recently uploaded to JPS from ANY user,
+    :param user: JPS userid, defined by --batchuser or the SM user specified in jps2sm.cfg
     :param first: upload page number to start at
     :param last: upload page to finish at
-    :return: useruploads: dict
+    :return: batch_uploads: dict
     """
 
     sort_by = {
@@ -100,7 +100,7 @@ def getbulktorrentids(mode, user, first=1, last=None):
     elif mode == 'recent':
         sort_mode = sort_by['time']
 
-    if not last and sort_mode != 'recent':
+    if not last and mode != 'recent':
         # Ascertain last page if not provided for seeding and snatched modes
 
         res = jpopsuki(f"https://jpopsuki.eu/torrents.php?type={mode}&userid={user}")
@@ -110,18 +110,17 @@ def getbulktorrentids(mode, user, first=1, last=None):
             last = re.findall(
                 fr'page=([0-9]*)&amp;order_by=s3&amp;order_way=DESC&amp;type={mode}&amp;userid=(?:[0-9]*)&amp;disablegrouping=1(?:\'\);|&amp;action=advanced)"><strong> Last &gt;&gt;</strong>',
                 linkbox)[0]
-        except:
+        except IndexError:
             # There is only 1 page of uploads if the 'Last >>' link cannot be found
             last = 1
-    elif not last and sort_mode == 'recent':
+    elif not last and mode == 'recent':
         # We do not need to ascertain the last page for recent mode as we never use this - we are not trying to jps2sm
         # *every* torrent!
         last = 1
 
     logger.debug(f'Batch user is {user}, batch mode is {mode}, first page is {first}, last page is {last}')
 
-    useruploads = {}
-    useruploads = collections.defaultdict(list)
+    batch_uploads = collections.defaultdict(list)
 
     # Parse every torrent page and add to dict
     for i in range(first, int(last) + 1):
@@ -132,27 +131,29 @@ def getbulktorrentids(mode, user, first=1, last=None):
         else:
             raise RuntimeError("Unknown batch mode set")
 
-        useruploadpage = jpopsuki(batch_upload_url)
+        batch_upload_page = jpopsuki(batch_upload_url)
         logger.info(batch_upload_url)
-        # print useruploadpage.text
-        soup2 = BeautifulSoup(useruploadpage.text, 'html5lib')
+        # print batch_upload_page.text
+        soup2 = BeautifulSoup(batch_upload_page.text, 'html5lib')
         try:
-            torrenttable = str(soup2.select('#content #ajax_torrents .torrent_table tbody')[0])
+            torrent_table = str(soup2.select('#content #ajax_torrents .torrent_table tbody')[0])
         except IndexError:
-            quotaexceeded = re.findall('<title>Browse quota exceeded :: JPopsuki 2.0</title>', useruploadpage.text)
-            if quotaexceeded:
+            quota_exceeded = re.findall('<title>Browse quota exceeded :: JPopsuki 2.0</title>', batch_upload_page.text)
+            if quota_exceeded:
                 logger.error('Browse quota exceeded :: JPopsuki 2.0')
                 sys.exit(1)
             else:
                 raise
-        alltorrentlinksidsonly = re.findall('torrents.php\?id=([0-9]+)\&amp;torrentid=([0-9]+)', torrenttable)
-        logger.info(f'Groupids and torrentids found on page: {alltorrentlinksidsonly}')
-        for groupid, torrentid in alltorrentlinksidsonly:
-            useruploads[groupid].append(torrentid)
+        # Find all JPS groupid/torrentid pairs and returns a list of tuples
+        all_jps_group_ids_and_torrent_ids = re.findall('torrents.php\?id=([0-9]+)&amp;torrentid=([0-9]+)', torrent_table)
+        logger.info(f'jps_group_ids and jps_torrent_ids found on page: {all_jps_group_ids_and_torrent_ids}')
+
+        for jps_group_id, jps_torrent_id in all_jps_group_ids_and_torrent_ids:
+            batch_uploads[jps_group_id].append(jps_torrent_id)
         time.sleep(5)  # Sleep as otherwise we hit JPS browse quota
 
-    logger.debug(f'Groupids and torrentids found on all pages: {useruploads}')
-    return useruploads
+    logger.debug(f'jps_group_ids and jps_torrent_ids found on all pages: {batch_uploads}')
+    return batch_uploads
 
 
 def download_sm_torrent(torrent_id, artist, title):
@@ -672,9 +673,9 @@ def main():
     if batch_status:
         batchuser = args.parsed.batchuser or jps_user_id
         if args.parsed.batchstart and args.parsed.batchend:
-            batch_uploads = getbulktorrentids(batch_mode, batchuser, args.parsed.batchstart, args.parsed.batchend)
+            batch_uploads = get_batch_jps_group_torrent_ids(batch_mode, batchuser, args.parsed.batchstart, args.parsed.batchend)
         else:
-            batch_uploads = getbulktorrentids(batch_mode, batchuser)
+            batch_uploads = get_batch_jps_group_torrent_ids(batch_mode, batchuser)
         useruploadscollateerrors = collections.defaultdict(list)
         user_upload_dupes = []
         user_upload_dupes_jps = []
