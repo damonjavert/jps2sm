@@ -240,7 +240,8 @@ def uploadtorrent(jps_torrent_object, torrentgroupdata, **uploaddata):
             data.pop(field, None)
 
     try:
-        data['artist_jp'], data['title_jp'] = torrentgroupdata.originalchars
+        data['artist_jp'] = torrentgroupdata.originalartist
+        data['title_jp'] = torrentgroupdata.originaltitle
     except AttributeError:  # If no originalchars do nothing
         pass
 

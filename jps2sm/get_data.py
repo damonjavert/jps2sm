@@ -58,8 +58,7 @@ def get_jps_group_data_class(batch_group_data, jps_group_id):
         groupdescription=batch_group_data[jps_group_id]['groupdescription'],
         imagelink=batch_group_data[jps_group_id]['imagelink'],
         tagsall=batch_group_data[jps_group_id]['tagsall'],
-        contribartists=batch_group_data[jps_group_id]['contribartists'],
-        originalchars=batch_group_data[jps_group_id]['originalchars']
+        contribartists=batch_group_data[jps_group_id]['contribartists']
     )
 
     return torrent_group_data
