@@ -35,6 +35,36 @@ class JPSGroup:
     originalchars: Optional[list]
 
 
+def get_jps_group_data_class(batch_group_data, jps_group_id):
+    """
+    Extract a JPS group's data from batch_group_data{} and present it as a JPSGroup dataclass.
+    In the future this can potentially be used to provide validation, or collate() and uploadtorrent() may
+    be refactored to just use a dict.
+
+    :param batch_group_data: dict
+    :param jps_group_id: int
+    :returns: torrent_group_data: class
+    """
+
+    torrent_group_data = JPSGroup(
+        groupid=batch_group_data[jps_group_id]['groupid'],
+        category=batch_group_data[jps_group_id]['category'],
+        artist=batch_group_data[jps_group_id]['artist'],
+        date=batch_group_data[jps_group_id]['date'],
+        title=batch_group_data[jps_group_id]['title'],
+        originalartist=batch_group_data[jps_group_id]['originalartist'],
+        originaltitle=batch_group_data[jps_group_id]['originaltitle'],
+        rel2=batch_group_data[jps_group_id]['rel2'],
+        groupdescription=batch_group_data[jps_group_id]['groupdescription'],
+        imagelink=batch_group_data[jps_group_id]['imagelink'],
+        tagsall=batch_group_data[jps_group_id]['tagsall'],
+        contribartists=batch_group_data[jps_group_id]['contribartists'],
+        originalchars=batch_group_data[jps_group_id]['originalchars']
+    )
+
+    return torrent_group_data
+
+
 class GetGroupData:
     """
     Retrieve group data of the group supplied from args.parsed.urls

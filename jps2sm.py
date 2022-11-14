@@ -34,7 +34,7 @@ import humanfriendly
 from pathlib import Path
 
 # jps2sm modules
-from jps2sm.get_data import JPSGroup, GetGroupData, get_user_keys, get_jps_user_id, get_torrent_link, get_release_data
+from jps2sm.get_data import GetGroupData, get_jps_group_data_class, get_user_keys, get_jps_user_id, get_torrent_link, get_release_data
 from jps2sm.batch import get_batch_jps_group_torrent_ids, get_batch_group_data
 from jps2sm.utils import get_valid_filename, count_values_dict, fatal_error, GetConfig, GetArgs, HandleCfgOutputDirs, decide_duplicate
 from jps2sm.myloginsession import jpopsuki, sugoimusic
@@ -326,7 +326,7 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
     Send data to setorigartists()
 
     :param torrentids: list of JPS torrentids to be processed
-    :param groupdata: dictionary with torrent group data from getgroupdata[]
+    :param torrentgroupdata: dictionary with torrent group data from getgroupdata[]
     :param max_size: bool: Only upload torrents < 1Gb if True
     :param scrape_only: bool: Only download JPS torrents, do not upload to SM
     """
@@ -600,35 +600,40 @@ def main():
         batch_group_data, batch_uploads_group_errors, batch_groups_excluded = get_batch_group_data(batch_uploads, args.parsed.exccategory)
         # print(json.dumps(batch_group_data, indent=2))
 
-        for key, value in batch_uploads.items():
-            groupid = key
-            torrentids = value
+        if batch_mode == "recent":
+            # Do an initial run of collate() to grab the JPS torrents only so data can be downloaded first
+            # TODO Extract release data logic so that collate() does not need to be called twice.
 
-            if groupid in batch_uploads_group_errors or groupid in batch_groups_excluded:
+            for jps_group_id, jps_torrent_ids in batch_uploads.items():
+                if jps_group_id in batch_uploads_group_errors or jps_group_id in batch_groups_excluded:
+                    # Skip group if GetGroupData() failed or the group is being excluded by the '-exc' parameter
+                    continue
+
+                jps_group_data = get_jps_group_data_class(batch_group_data, jps_group_id)
+
+                scrape_only = True
+                try:
+                    collate(jps_torrent_ids, jps_group_data, max_size, scrape_only)
+                except Exception as exc:
+                    logger.exception(f'Exception  - {exc} - in collate() on initial run with recent batch mode, however these are skipped'
+                                     'as they will be handled in the next run.')
+                    continue
+
+            print('JPS torrents that match any filters have now been downloaded.')
+            input('When these files have been downloaded press enter to continue...')
+
+        for jps_group_id, jps_torrent_ids in batch_uploads.items():
+            if jps_group_id in batch_uploads_group_errors or jps_group_id in batch_groups_excluded:
                 # Skip group if GetGroupData() failed or the group is being excluded by the '-exc' parameter
                 continue
 
-            torrentgroupdata = JPSGroup(
-                groupid=batch_group_data[groupid]['groupid'],
-                category=batch_group_data[groupid]['category'],
-                artist=batch_group_data[groupid]['artist'],
-                date=batch_group_data[groupid]['date'],
-                title=batch_group_data[groupid]['title'],
-                originalartist=batch_group_data[groupid]['originalartist'],
-                originaltitle=batch_group_data[groupid]['originaltitle'],
-                rel2=batch_group_data[groupid]['rel2'],
-                groupdescription=batch_group_data[groupid]['groupdescription'],
-                imagelink=batch_group_data[groupid]['imagelink'],
-                tagsall=batch_group_data[groupid]['tagsall'],
-                contribartists=batch_group_data[groupid]['contribartists'],
-                originalchars=batch_group_data[groupid]['originalchars']
-            )
+            jps_group_data = get_jps_group_data_class(batch_group_data, jps_group_id)
 
             try:
-                torrentcount = collate(torrentids, torrentgroupdata, max_size)
+                torrent_count = collate(jps_torrent_ids, jps_group_data, max_size)
                 if not args.parsed.dryrun:
-                    downloaduploadedtorrents(torrentcount, torrentgroupdata.artist, torrentgroupdata.title)
-                    user_uploads_done += torrentcount
+                    downloaduploadedtorrents(torrent_count, jps_group_data.artist, jps_group_data.title)
+                    user_uploads_done += torrent_count
             except KeyboardInterrupt:  # Allow Ctrl-C to exit without showing the error multiple times and polluting the final error dict
                 break  # Still continue to get error dicts and dupe list so far
             except Exception as exc:
@@ -647,8 +652,8 @@ def main():
                 else:
                     # Catch all for any exception
                     logger.exception(
-                        f'Error with collating/retrieving release data for {groupid} torrentid(s) {",".join(torrentids)}, skipping upload')
-                    useruploadscollateerrors[groupid] = torrentids
+                        f'Error with collating/retrieving release data for {jps_group_id} torrentid(s) {",".join(jps_torrent_ids)}, skipping upload')
+                    useruploadscollateerrors[jps_group_id] = jps_torrent_ids
                 continue
 
         if batch_uploads_group_errors:
@@ -684,11 +689,11 @@ def main():
         # Standard non-batch upload using --urls
         if not args.parsed.urls:
             raise RuntimeError("Expected some JPS urls to be set")
-        torrentgroupdata = GetGroupData(args.parsed.urls)
-        torrentids = re.findall('torrentid=([0-9]+)', args.parsed.urls)
-        torrentcount = collate(torrentids, torrentgroupdata)
+        jps_group_data = GetGroupData(args.parsed.urls)
+        jps_torrent_ids = re.findall('torrentid=([0-9]+)', args.parsed.urls)
+        torrent_count = collate(jps_torrent_ids, jps_group_data)
         if not args.parsed.dryrun:
-            downloaduploadedtorrents(torrentcount, torrentgroupdata.artist, torrentgroupdata.title)
+            downloaduploadedtorrents(torrent_count, jps_group_data.artist, jps_group_data.title)
 
 
 if __name__ == "__main__":
