@@ -327,30 +327,37 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
     Send data to setorigartists()
 
     :param torrentids: list of JPS torrentids to be processed
+            Always a single torrentid unless specifying a group url in --url mode
     :param torrentgroupdata: dictionary with torrent group data from getgroupdata[]
     :param max_size: bool: Only upload torrents < 1Gb if True
     :param scrape_only: bool: Only download JPS torrents, do not upload to SM
     """
-    torrentcount = 0
+    jps_torrent_downloaded_count = sm_torrent_uploaded_count = skipped_max_size = skipped_low_seeders  = skipped_exc_filter= 0
+
     for torrentid, releasedatafull in get_release_data(torrentids, torrentgroupdata.rel2, torrentgroupdata.date).items():
 
-        torrentcount += 1
         logger.info(f'Now processing: {torrentid} {releasedatafull}')
+
+        if max_size and releasedatafull['size_units'] == "GB":
+            # Currently only a max_size of 1Gb is supported.
+            # Very simple way of just using the units, if we do not see 'GB' then it is < 1 Gb
+            # TODO Add option to specify the file size
+            skipped_max_size += 1
+            logger.debug("Skipping as torrent is >=1Gb")
+            continue
+
+        if int(releasedatafull['seeders']) < 1:
+            logger.debug('Skipping as torrent has no seeders')
+            skipped_low_seeders += 1
+            continue
 
         releasedata = releasedatafull['slashdata']
         uploaddatestr = releasedatafull['uploaddate']
         # size_no_units = releasedatafull['size_no_units']  # TODO Use this
-        size_units = releasedatafull['size_units']
+        # size_units = releasedatafull['size_units']
         releasedataout = {}
         releasedataout['jpstorrentid'] = torrentid  # Not needed for uploadtorrent(), purely for logging purposes
         remasterdata = False  # Set default
-
-        if max_size and size_units == "GB":
-            # Currently only a max_size of 1Gb is supported.
-            # Very simple way of just using the units, if we do not see 'GB' then it is < 1 Gb
-            # TODO Add option to specify the file size
-            logger.debug("Skipping as torrent is >=1Gb")
-            continue
 
         # JPS uses the audioformat field (represented as releasedata[0] here) for containers and codecs in video torrents,
         # and when combined with VideoMedias we can perform VideoTorrent detection.
@@ -390,6 +397,7 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
             releasedataout['bitrate'] = validate_jps_bitrate(releasedata[1])
 
             if decide_exc_filter(releasedataout['audioformat'], releasedataout['media'], releasedata):
+                skipped_exc_filter += 1
                 continue
 
             if len(releasedata) == 4:  # Remastered
@@ -404,6 +412,7 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
             releasedataout['media'] = releasedata[1]
 
             if decide_exc_filter(releasedataout['audioformat'], releasedataout['media'], releasedata):
+                skipped_exc_filter += 1
                 continue
 
             if len(releasedata) == 3:  # Remastered
@@ -449,6 +458,8 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
         with open(jps_torrent_path, "wb") as f:
             f.write(jps_torrent_file.content)
 
+        jps_torrent_downloaded_count += 1
+
         if scrape_only:
             continue
 
@@ -458,6 +469,7 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
             dupe, sugoimusic_torrent_id = decide_duplicate(jps_torrent_object)
             if dupe:
                 dupe_file_name = download_sm_torrent(sugoimusic_torrent_id, torrentgroupdata.artist, torrentgroupdata.title)
+                # torrentgroupdata.artist and torrentgroupdata.title is just to generate a pretty filename
                 logger.warning(
                     f'This torrent already exists on SugoiMusic - https://sugoimusic.me/torrents.php?torrentid={sugoimusic_torrent_id} '
                     f'The .torrent has been downloaded with name "{Path(output.file_dir["smtorrents"], dupe_file_name)}"'
@@ -469,6 +481,8 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
         # Upload torrent to SM
         uploadtorrent(jps_torrent_object, torrentgroupdata, **releasedataout)
 
+        sm_torrent_uploaded_count += 1
+
     if not args.parsed.dryrun:
         # Add original artists for contrib artists
         if torrentgroupdata.contribartists:
@@ -476,7 +490,18 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
                 # For every artist, go to its artist page to get artist ID, then use this to go to artist.php?action=edit with the orig artist
                 setorigartist(artist, origartist)
 
-    return torrentcount  # For use by downloaduploadedtorrents()
+    collate_torrent_counts = {
+        'jps_torrents_downloaded_count': jps_torrent_downloaded_count,
+        'sm_torrents_uploaded_count': sm_torrent_uploaded_count,  # For use by downloaduploadedtorrents() or statisics when in a batch_mode
+        'skipped_torrents_max_size': skipped_max_size,
+        'skipped_torrents_low_seeders': skipped_low_seeders,
+        'skipped_torrents_exc_filter': skipped_exc_filter
+    }
+
+    # logger.debug(collate_torrent_counts)
+
+    return collate_torrent_counts
+
 
 
 def downloaduploadedtorrents(torrentcount, artist, title):
@@ -529,6 +554,38 @@ def main():
     """
 
     batch_status = None
+
+    def batch_stats(final_stats):
+        """
+        Return statistics from a batch upload.
+        If using --recent mode it returns initial statistics after JPS torrents have been scraped, followed by final_stats after the
+        SM upload.
+
+        TODO: Needs some cleaning up, but this is better than the stats being completely duplicated as it was before
+        """
+        if final_stats:
+            print('Finished batch upload')
+        print(f'--------------------------------------------------------\nOverall stats:'
+              f'\nTorrents found at JPS: {user_uploads_found}'
+              f'\nJPS Group data errors: {count_values_dict(batch_uploads_group_errors)}')
+
+        if final_stats:
+            print(f'Release data errors: {count_values_dict(useruploadscollateerrors)}')
+        else:
+            print(f'Release data errors: Not yet analysed')
+
+        print(f'Torrents skipped due to max_size filter: {batch_uploads_skipped_torrents_max_size}'
+              f'\nTorrents skipped due to low seeders: {batch_uploads_skipped_torrents_low_seeders}'
+              f'\nJPS Torrents downloaded: {batch_uploads_jps_torrents_downloaded_count}'
+              )
+        if final_stats:
+            if args.parsed.mediainfo:
+                print(f'MediaInfo source data missing: {len(user_upload_source_data_not_found)}')
+            if not args.parsed.dryrun:
+                logger.info(f'MediaInfo not submitted errors (use \"--mediainfo\" to fix): {user_upload_mediainfo_not_submitted}'
+                            f'\n\nNew uploads successfully created: {user_uploads_done}'
+                            f'\nDuplicates found (torrents downloaded for cross-seeding): {len(user_upload_dupes)}')
+
 
     if args.parsed.urls is None and not (bool(args.parsed.batchuploaded) or bool(args.parsed.batchseeding) or bool(args.parsed.batchsnatched) or bool(args.parsed.batchrecent)):
         fatal_error('Error: Neither any JPS URL(s) (--urls) or batch parameters (--batchsnatched, --batchuploaded, --batchseeding or --batchrecent) have been specified. See --help')
@@ -596,6 +653,9 @@ def main():
         user_uploads_found = count_values_dict(batch_uploads)
         user_uploads_done = 0
 
+        batch_uploads_skipped_torrents_max_size = batch_uploads_skipped_torrents_low_seeders = batch_uploads_jps_torrents_downloaded_count = 0
+        batch_uploads_skipped_torrents_exc_filter = 0
+
         logger.info(f'Now attempting to upload {user_uploads_found} torrents.')
 
         batch_group_data, batch_uploads_group_errors, batch_groups_excluded = get_batch_group_data(batch_uploads, args.parsed.exccategory)
@@ -604,6 +664,7 @@ def main():
         if batch_mode == "recent":
             # Do an initial run of collate() to grab the JPS torrents only so data can be downloaded first
             # TODO Extract release data logic so that collate() does not need to be called twice.
+            batch_uploads_jps_torrents_downloaded_count = 0
 
             for jps_group_id, jps_torrent_ids in batch_uploads.items():
                 if jps_group_id in batch_uploads_group_errors or jps_group_id in batch_groups_excluded:
@@ -613,15 +674,25 @@ def main():
                 jps_group_data = get_jps_group_data_class(batch_group_data, jps_group_id)
 
                 scrape_only = True
+
                 try:
-                    collate(jps_torrent_ids, jps_group_data, max_size, scrape_only)
+                    torrent_counts = collate(jps_torrent_ids, jps_group_data, max_size, scrape_only)
+                    batch_uploads_jps_torrents_downloaded_count += torrent_counts["jps_torrents_downloaded_count"]
+                    batch_uploads_skipped_torrents_max_size += torrent_counts['skipped_torrents_max_size']
+                    batch_uploads_skipped_torrents_low_seeders += torrent_counts['skipped_torrents_low_seeders']
+                    batch_uploads_skipped_torrents_exc_filter += torrent_counts['skipped_torrents_exc_filter']
+
                 except Exception as exc:
                     logger.exception(f'Exception  - {exc} - in collate() on initial run with recent batch mode, however these are skipped'
                                      'as they will be handled in the next run.')
                     continue
 
-            print('JPS torrents that match any filters have now been downloaded.')
+            batch_stats(final_stats=False)
+
             input('When these files have been downloaded press enter to continue...')
+
+        batch_uploads_skipped_torrents_max_size = batch_uploads_skipped_torrents_low_seeders = batch_uploads_jps_torrents_downloaded_count = 0
+        batch_uploads_skipped_torrents_exc_filter = 0
 
         for jps_group_id, jps_torrent_ids in batch_uploads.items():
             if jps_group_id in batch_uploads_group_errors or jps_group_id in batch_groups_excluded:
@@ -631,10 +702,14 @@ def main():
             jps_group_data = get_jps_group_data_class(batch_group_data, jps_group_id)
 
             try:
-                torrent_count = collate(jps_torrent_ids, jps_group_data, max_size)
+                torrent_counts = collate(jps_torrent_ids, jps_group_data, max_size)
+                batch_uploads_jps_torrents_downloaded_count += torrent_counts["jps_torrents_downloaded_count"]
+                batch_uploads_skipped_torrents_max_size += torrent_counts['skipped_torrents_max_size']
+                batch_uploads_skipped_torrents_low_seeders += torrent_counts['skipped_torrents_low_seeders']
+                batch_uploads_skipped_torrents_exc_filter += torrent_counts['skipped_torrents_exc_filter']
                 if not args.parsed.dryrun:
-                    downloaduploadedtorrents(torrent_count, jps_group_data.artist, jps_group_data.title)
-                    user_uploads_done += torrent_count
+                    downloaduploadedtorrents(torrent_counts['sm_torrents_uploaded_count'], jps_group_data.artist, jps_group_data.title)
+                    user_uploads_done += torrent_counts['sm_torrents_uploaded_count'] #  This will always be same as '+=1'
             except KeyboardInterrupt:  # Allow Ctrl-C to exit without showing the error multiple times and polluting the final error dict
                 break  # Still continue to get error dicts and dupe list so far
             except Exception as exc:
@@ -678,23 +753,17 @@ def main():
             logger.error(user_upload_source_data_not_found)
             logger.error(f'Total: {len(user_upload_source_data_not_found)}')
 
-        logger.info(f'Finished batch upload\n--------------------------------------------------------\nOverall stats:'
-                    f'\nTorrents found at JPS: {user_uploads_found}\nGroup data errors: {count_values_dict(batch_uploads_group_errors)}'
-                    f'\nRelease data (or any other) errors: {count_values_dict(useruploadscollateerrors)}'
-                    f'\nMediaInfo source data missing: {len(user_upload_source_data_not_found)}'
-                    f'\nMediaInfo not submitted errors (use \"--mediainfo\" to fix): {user_upload_mediainfo_not_submitted}')
-        if not args.parsed.dryrun:
-            logger.error(f'\nNew uploads successfully created: {user_uploads_done}'
-                         f'\nDuplicates found (torrents downloaded for cross-seeding): {len(user_upload_dupes)}')
+        batch_stats(final_stats=True)
+
     else:
         # Standard non-batch upload using --urls
         if not args.parsed.urls:
             raise RuntimeError("Expected some JPS urls to be set")
         jps_group_data = GetGroupData(args.parsed.urls)
         jps_torrent_ids = re.findall('torrentid=([0-9]+)', args.parsed.urls)
-        torrent_count = collate(jps_torrent_ids, jps_group_data)
+        torrent_counts = collate(jps_torrent_ids, jps_group_data)
         if not args.parsed.dryrun:
-            downloaduploadedtorrents(torrent_count, jps_group_data.artist, jps_group_data.title)
+            downloaduploadedtorrents(torrent_counts['sm_torrents_uploaded_count'], jps_group_data.artist, jps_group_data.title)
 
 
 if __name__ == "__main__":

@@ -52,7 +52,6 @@ def fatal_error(msg):
     print(msg, file=sys.stderr)
     sys.exit(1)
 
-
 class GetArgs:
     def __init__(self):
         parser = argparse.ArgumentParser()
