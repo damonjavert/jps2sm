@@ -32,7 +32,6 @@ class JPSGroup:
     imagelink: str
     tagsall: str
     contribartists: str
-    originalchars: Optional[list]
 
 
 def get_jps_group_data_class(batch_group_data, jps_group_id):
