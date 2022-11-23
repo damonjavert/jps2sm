@@ -106,6 +106,10 @@ class GetConfig:
         self.sm_pass = config.get('SugoiMusic', 'Password')
         self.media_roots = [x.strip() for x in config.get('Media', 'MediaDirectories').split(',')]  # Remove whitespace after comma if any
         self.directories = config.items('Directories')
+        try:
+            self.skip_dupes = config.getboolean('SugoiMusic', 'SkipDuplicates')
+        except configparser.NoOptionError:
+            self.skip_dupes = False
 
     def __getattr__(self, item):
         return self.item

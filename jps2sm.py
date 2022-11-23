@@ -278,13 +278,14 @@ def uploadtorrent(jps_torrent_object, torrentgroupdata, **uploaddata):
         if SMerrorTorrent:
             dupe = re.findall('torrentid=([0-9]+)">The exact same torrent file already exists on the site!</a>$', SMerrorTorrent[0])
             if dupe:
-                dupe_file_name = download_sm_torrent(dupe[0], torrentgroupdata.artist, torrentgroupdata.title)
-                logger.warning(
-                    f'This torrent already exists on SugoiMusic - https://sugoimusic.me/torrents.php?torrentid={dupe[0]} '
-                    f'The .torrent has been downloaded with name "{Path(output.file_dir["smtorrents"], dupe_file_name)}"'
-                )
+                if not config.skip_dupes:
+                    dupe_file_name = download_sm_torrent(dupe[0], torrentgroupdata.artist, torrentgroupdata.title)
+                    logger.warning(
+                        f'This torrent already exists on SugoiMusic - https://sugoimusic.me/torrents.php?torrentid={dupe[0]} '
+                        f'The .torrent has been downloaded with name "{Path(output.file_dir["smtorrents"], dupe_file_name)}"'
+                    )
                 dupe_error_msg = f'The exact same torrent file already exists on the site! See: https://sugoimusic.me/torrents.php?torrentid={dupe[0]} JPS torrent id: {uploaddata["jpstorrentid"]}'
-                logger.error(dupe_error_msg)
+                logger.info(dupe_error_msg)
                 raise Exception(dupe_error_msg)
             else:
                 logger.error(SMerrorTorrent[0])
@@ -468,14 +469,15 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
         if args.parsed.mediainfo and not args.parsed.dryrun:
             dupe, sugoimusic_torrent_id = decide_duplicate(jps_torrent_object)
             if dupe:
-                dupe_file_name = download_sm_torrent(sugoimusic_torrent_id, torrentgroupdata.artist, torrentgroupdata.title)
-                # torrentgroupdata.artist and torrentgroupdata.title is just to generate a pretty filename
-                logger.warning(
-                    f'This torrent already exists on SugoiMusic - https://sugoimusic.me/torrents.php?torrentid={sugoimusic_torrent_id} '
-                    f'The .torrent has been downloaded with name "{Path(output.file_dir["smtorrents"], dupe_file_name)}"'
-                )
+                if not config.skip_dupes:
+                    dupe_file_name = download_sm_torrent(sugoimusic_torrent_id, torrentgroupdata.artist, torrentgroupdata.title)
+                    # torrentgroupdata.artist and torrentgroupdata.title is just to generate a pretty filename
+                    logger.warning(
+                        f'This torrent already exists on SugoiMusic - https://sugoimusic.me/torrents.php?torrentid={sugoimusic_torrent_id} '
+                        f'The .torrent has been downloaded with name "{Path(output.file_dir["smtorrents"], dupe_file_name)}"'
+                    )
                 dupe_error_msg = f'The exact same torrent file already exists on the site! See: https://sugoimusic.me/torrents.php?torrentid={sugoimusic_torrent_id} JPS torrent id: {torrentid}'
-                logger.error(dupe_error_msg)
+                logger.warning(dupe_error_msg)
                 raise Exception(dupe_error_msg)
 
         # Upload torrent to SM
