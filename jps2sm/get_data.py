@@ -334,7 +334,6 @@ def get_jps_user_id():
     soup = BeautifulSoup(res.text, 'html5lib')
     href = soup.select('.username')[0]['href']
     jps_user_id = re.match(r"user\.php\?id=(\d+)", href).group(1)
-    time.sleep(5)  # Sleep as otherwise we hit JPS browse quota
 
     return int(str(jps_user_id))
 
