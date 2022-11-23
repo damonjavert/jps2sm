@@ -641,9 +641,10 @@ def main():
     if batch_status:
         batchuser = args.parsed.batchuser or jps_user_id
         if args.parsed.batchstart and args.parsed.batchend:
-            batch_uploads = get_batch_jps_group_torrent_ids(batch_mode, batchuser, args.parsed.batchstart, args.parsed.batchend)
+            batch_uploads = get_batch_jps_group_torrent_ids(mode=batch_mode, user=batchuser, first=args.parsed.batchstart, last=args.parsed.batchend,
+                                                            sort=args.parsed.batchsort, order=args.parsed.batchsortorder)
         else:
-            batch_uploads = get_batch_jps_group_torrent_ids(batch_mode, batchuser)
+            batch_uploads = get_batch_jps_group_torrent_ids(mode=batch_mode, user=batchuser, sort=args.parsed.batchsort, order=args.parsed.batchsortorder)
         useruploadscollateerrors = collections.defaultdict(list)
         user_upload_dupes = []
         user_upload_dupes_jps = []

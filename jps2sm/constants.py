@@ -61,3 +61,19 @@ class Categories:
     # Categories that should have some of their mediainfo stripped if present, must match indices in Categories.SM
     SM_StripAllMediainfo = (0, 1, 2, 11)  # Album, EP, Single, Misc - useful to have duration if we have it added to the description
     SM_StripAllMediainfoExcResolution = 10  # Pictures - useful to have resolution if we have it
+
+
+class JPSTorrentView:
+    """
+    Store the JPS logic of sorting torrents - used by get_batch_jps_group_torrent_ids()
+    """
+
+    sort_by = {
+        'name': 's1',
+        'year': 's2',
+        'time': 's3',  # snatched time for snatched, seeding time for seeding, added for uploaded and recent
+        'size': 's4',
+        'snatches': 's5',
+        'seeders':  's6',
+        'leechers': 's7'
+    }

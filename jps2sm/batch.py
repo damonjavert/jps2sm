@@ -7,6 +7,8 @@ import sys
 
 from jps2sm.get_data import GetGroupData
 from jps2sm.myloginsession import jpopsuki
+from jps2sm.utils import fatal_error
+from jps2sm.constants import JPSTorrentView
 
 # Third-party packages
 from bs4 import BeautifulSoup
@@ -14,7 +16,7 @@ from bs4 import BeautifulSoup
 logger = logging.getLogger('main.' + __name__)
 
 
-def get_batch_jps_group_torrent_ids(mode, user, first=1, last=None):
+def get_batch_jps_group_torrent_ids(mode, user, first=1, last=None, sort=None, order=None):
     """
     Iterates through pages of uploads on JPS and gathers the jps_group_ids and corresponding jps_torrent_id and returns
     a dict in the format of jps_group_id: [jps_torrent_id]
@@ -27,25 +29,46 @@ def get_batch_jps_group_torrent_ids(mode, user, first=1, last=None):
     :param user: JPS userid, defined by --batchuser or the SM user specified in jps2sm.cfg
     :param first: upload page number to start at
     :param last: upload page to finish at
+    :param sort: Sort the JPS torrents page by a specific column, one of: {",".join(JPSTorrentView.sort_by.keys())}
+    :param order: Order by ASC or DESC
     :return: batch_uploads: dict
     """
 
-    sort_by = {
-        'name': 's1',
-        'year': 's2',
-        'time': 's3',  # snatched time for snatched, seeding time for seeding, added for uploaded and recent
-        'size': 's4',
-        'snatches': 's5',
-        'seeders':  's6',
-        'leechers': 's7'
-    }
+    # sort_by = {
+    #    'name': 's1',
+    #    'year': 's2',
+    #    'time': 's3',  # snatched time for snatched, seeding time for seeding, added for uploaded and recent
+    #    'size': 's4',
+    #    'snatches': 's5',
+    #    'seeders':  's6',
+    #    'leechers': 's7'
+    # }
 
-    if mode == 'snatched' or mode == 'uploaded':
-        sort_mode = sort_by['time']
-    elif mode == 'seeding':
-        sort_mode = sort_by['name']
-    elif mode == 'recent':
-        sort_mode = sort_by['time']
+    def get_sort_mode(user_sort):
+        # By default:
+        # uploaded mode: sort by uploaded time ASC
+        # snatched mode: sort by uploaded time ASC
+        # seeding mode: sort by name ASC - it is pointless to sort by seeded time as this random on whenever your torrent client
+        #   last announced to the tracker
+        # recent mode: sort by uploaded DESC - to upload all items recent uploaded to JPS
+
+        default_sort_order_init = "ASC"
+        if user_sort is not None:
+            return JPSTorrentView.sort_by[user_sort], default_sort_order_init
+        if mode == 'snatched' or mode == 'uploaded':
+            return JPSTorrentView.sort_by['time'], default_sort_order_init
+        elif mode == 'seeding':
+            return JPSTorrentView.sort_by['name'], default_sort_order_init
+        elif mode == 'recent':
+            default_sort_order_init = "DESC"
+            return JPSTorrentView.sort_by['time'], default_sort_order_init
+
+    sort_mode, default_sort_order = get_sort_mode(sort)
+
+    if order is not None:
+        order_way = str(order).upper()  # Use --batchsortorder specified by user if present
+    else:
+        order_way = default_sort_order  # Else use sensible default defined in get_sort_mode()
 
     if not last and mode != 'recent':
         # Ascertain last page if not provided for seeding and snatched modes
@@ -65,16 +88,22 @@ def get_batch_jps_group_torrent_ids(mode, user, first=1, last=None):
         # *every* torrent!
         last = 1
 
-    logger.debug(f'Batch user is {user}, batch mode is {mode}, first page is {first}, last page is {last}')
+    # Just for debugging purposes - get the jps_sort_name from the key when specifying the value in JPSTorrentView.sort_by{}
+    jps_sort_name = list(JPSTorrentView.sort_by.keys())[list(JPSTorrentView.sort_by.values()).index(sort_mode)]
+
+    logger.debug(f'Batch user is {user}, batch mode is {mode}, '
+                 f'sort is {sort}, JPS sort column is {sort_mode} - {jps_sort_name}, '
+                 f'order by is {order_way} '
+                 f'first page is {first}, last page is {last}')
 
     batch_uploads = collections.defaultdict(list)
 
     # Parse every torrent page and add to dict
     for i in range(first, int(last) + 1):
         if mode == 'snatched' or mode == 'uploaded' or mode == 'seeding':
-            batch_upload_url = f"https://jpopsuki.eu/torrents.php?page={i}&order_by={sort_mode}&order_way=ASC&type={mode}&userid={user}&disablegrouping=1"
+            batch_upload_url = f"https://jpopsuki.eu/torrents.php?page={i}&order_by={sort_mode}&order_way={order_way}&type={mode}&userid={user}&disablegrouping=1"
         elif mode == 'recent':
-            batch_upload_url = f"https://jpopsuki.eu/torrents.php?page={i}&order_by={sort_mode}&order_way=DESC&disablegrouping=1"
+            batch_upload_url = f"https://jpopsuki.eu/torrents.php?page={i}&order_by={sort_mode}&order_way={order_way}&disablegrouping=1"
         else:
             raise RuntimeError("Unknown batch mode set")
 

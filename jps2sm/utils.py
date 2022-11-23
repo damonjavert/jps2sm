@@ -10,6 +10,8 @@ import tempfile
 import bencoding, hashlib
 import json
 
+from jps2sm.constants import JPSTorrentView
+
 # Third-party packages
 from pathlib import Path
 
@@ -52,18 +54,21 @@ def fatal_error(msg):
     print(msg, file=sys.stderr)
     sys.exit(1)
 
+
 class GetArgs:
     def __init__(self):
         parser = argparse.ArgumentParser()
         parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + __version__)
         parser.add_argument('-d', '--debug', help='Enable debug mode', action='store_true')
-        parser.add_argument("-u", "--urls", help="JPS URL for a group, or multiple individual releases URLs to be added to the same group", type=str)
+        parser.add_argument("-u", "--urls", help="JPS URL for a group, or multiple individual releases URLs from the same group", type=str)
         parser.add_argument("-n", "--dryrun", help="Just parse url and show the output, do not add the torrent to SM", action="store_true")
         parser.add_argument("-b", "--batchuser", help="User id for batch user operations, default is user id of SM Username specified in jps2sm.cfg")
         parser.add_argument("-U", "--batchuploaded", help="(Batch mode only) Upload all releases uploaded by you or, if provided, user id specified by --batchuser", action="store_true")
         parser.add_argument("-S", "--batchseeding", help="(Batch mode only) Upload all releases currently seeding by you or, if provided, user id specified by --batchuser", action="store_true")
         parser.add_argument("-R", "--batchrecent", help="(Batch mode only) Upload recent releases uploaded to JPS that are under 1Gb in size", action="store_true")
-        parser.add_argument("--batchsnatched", help="(Batch mode only) Upload all releases snatched by you or, if provided, user id specified by --batchuser", action="store_true")
+        parser.add_argument("-SN", "--batchsnatched", help="(Batch mode only) Upload all releases snatched by you or, if provided, user id specified by --batchuser", action="store_true")
+        parser.add_argument("-bs", "--batchsort", help=f"(Batch mode only) Sort for batch upload, must be one of: {','.join(JPSTorrentView.sort_by.keys())}")
+        parser.add_argument("-bso", "--batchsortorder", help="(Batch mode only) Sort order for batch upload, either ASC or DESC.")
         parser.add_argument("-s", "--batchstart", help="(Batch mode only) Start at this page", type=int)
         parser.add_argument("-e", "--batchend", help="(Batch mode only) End at this page", type=int)
         parser.add_argument("-exc", "--exccategory", help="(Batch mode only) Exclude a JPS category from upload", type=str)
@@ -71,6 +76,14 @@ class GetArgs:
         parser.add_argument("-exm", "--excmedia", help="(Batch mode only) Exclude a media from upload", type=str)
         parser.add_argument("-m", "--mediainfo", help="Search and get mediainfo data from the source file(s) in the directories specified by MediaDirectories. Extract data to set codec, resolution, audio format and container fields as well as the mediainfo field itself.", action="store_true")
         self.parsed = parser.parse_args()
+
+        # Handle bag args
+        # TODO move all bad arg logic to here
+
+        if self.parsed.batchsort is not None and self.parsed.batchsort not in JPSTorrentView.sort_by.keys():
+            fatal_error(f'Error: Incorrect --batchsort mode specified, sort mode must be one of {",".join(JPSTorrentView.sort_by.keys())}')
+        if self.parsed.batchsortorder is not None and str(self.parsed.batchsortorder).upper() not in ("ASC", "DESC"):
+            fatal_error(f'Error: Incorrect --batchsortorder specified, order must be wither ASC or DESC')
 
 
 class GetConfig:
