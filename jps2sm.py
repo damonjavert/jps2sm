@@ -96,7 +96,15 @@ def setorigartist(artist, origartist):
     :param artist: string: String of the artist that needs it's original artist set
     :param origartist: string: Original artist
     """
+    if origartist == "":  # If there is no origartist at JPS do not bother trying to set it here
+        return
+
     SMartistpage = sugoimusic(f"https://sugoimusic.me/artist.php?artistname={artist}")
+
+    if re.findall("Your search did not match anything", SMartistpage.text):
+        logger.debug(f"Artist {artist} does not yet exist at SM so origartist cannot be set")
+        return
+
     soup = BeautifulSoup(SMartistpage.text, 'html5lib')
     linkbox = str(soup.select('#content .thin .header .linkbox'))
     artistid = re.findall(r'href="artist\.php\?action=edit&amp;artistid=([0-9]+)"', linkbox)[0]
@@ -490,7 +498,11 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
         if torrentgroupdata.contribartists:
             for artist, origartist in torrentgroupdata.contribartists.items():
                 # For every artist, go to its artist page to get artist ID, then use this to go to artist.php?action=edit with the orig artist
-                setorigartist(artist, origartist)
+                try:
+                    setorigartist(artist, origartist)
+                except IndexError:  # Do not let a setorigartist error affect stats
+                    logger.debug(f'Error in setting artist {artist} origartist {origartist}')
+                    pass
 
     collate_torrent_counts = {
         'jps_torrents_downloaded_count': jps_torrent_downloaded_count,
@@ -503,7 +515,6 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
     # logger.debug(collate_torrent_counts)
 
     return collate_torrent_counts
-
 
 
 def downloaduploadedtorrents(torrentcount, artist, title):
