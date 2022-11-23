@@ -269,6 +269,13 @@ def get_release_data(torrentids, release_data, date):
     # logger.debug(f'Pre-processed releasedata: {json.dumps(releasedatapre, indent=2)}')
 
     releasedata = {}
+
+    try:
+        # Create exception if no release data was found, else these get silently skipped in collate() as the response is null.
+        test = releasedatapre[0]
+    except IndexError:
+        raise RuntimeError(f'No release data found for {torrentids}')
+
     for release in releasedatapre:
         torrentid = release[0]
         slashlist = ([i.split(' / ') for i in [release[1]]])[0]
