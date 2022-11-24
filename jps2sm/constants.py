@@ -48,6 +48,10 @@ class Categories:
         'Misc': 11,
     }
 
+    JPS = [
+        'Album', 'Single', 'PV', 'DVD', 'TV-Music', 'TV-Variety', 'TV-Drama', 'Fansubs', 'Pictures', 'Misc'
+    ]
+
     Video = ('Bluray', 'DVD', 'PV', 'TV-Music', 'TV-Variety', 'TV-Drama', 'Music Performance', 'Fansubs')
 
     Music = ('Album', 'Single')

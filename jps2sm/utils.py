@@ -10,7 +10,7 @@ import tempfile
 import bencoding, hashlib
 import json
 
-from jps2sm.constants import JPSTorrentView
+from jps2sm.constants import JPSTorrentView, Categories
 
 # Third-party packages
 from pathlib import Path
@@ -84,6 +84,8 @@ class GetArgs:
             fatal_error(f'Error: Incorrect --batchsort mode specified, sort mode must be one of {",".join(JPSTorrentView.sort_by.keys())}')
         if self.parsed.batchsortorder is not None and str(self.parsed.batchsortorder).upper() not in ("ASC", "DESC"):
             fatal_error(f'Error: Incorrect --batchsortorder specified, order must be wither ASC or DESC')
+        if self.parsed.exccategory is not None and str(self.parsed.exccategory) not in Categories.JPS:
+            fatal_error(f'Error: Incorrect --exccategory specified, it must match a JPS category, these are: {",".join(Categories.JPS)}')
 
 
 class GetConfig:
