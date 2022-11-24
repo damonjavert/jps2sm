@@ -9,6 +9,7 @@ import torrent_parser as tp
 import tempfile
 import bencoding, hashlib
 import json
+import os
 
 from jps2sm.constants import JPSTorrentView, Categories
 
@@ -160,13 +161,18 @@ def decide_duplicate(jps_torrent_object):
 
     torrent_hashcheckdata = tp.TorrentFileParser(jps_torrent_object).parse()
     torrent_hashcheckdata["info"]["source"] = 'SugoiMusic'
-    temp_torrent_file = tempfile.mkstemp()
-    tp.create_torrent_file(temp_torrent_file[1], torrent_hashcheckdata)
+    fd, temp_torrent_file = tempfile.mkstemp()
+    tp.create_torrent_file(temp_torrent_file, torrent_hashcheckdata)
 
-    with open(temp_torrent_file[1], "rb") as f:
+    with open(temp_torrent_file, "rb") as f:
         data = bencoding.bdecode(f.read())
         info = data[b'info']
         hashed_info = hashlib.sha1(bencoding.bencode(info)).hexdigest()
+        f.close()
+    os.close(fd)
+
+    # tempfile is supposed to delete it but with me at least it does not
+    os.remove(temp_torrent_file)
 
     logger.debug(hashed_info)
 
