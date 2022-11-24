@@ -107,10 +107,15 @@ def get_mediainfo(jps_torrent_object, media, media_roots):
                 "AVC": "h264",
                 "HEVC": "h265",
                 "MPEG-4 Visual": "DivX",  # MPEG-4 Part 2 / h263 , usually xvid / divx
+                "VP09": "VP9",
             }
+
             for old, new in validatecodec.items():
                 if track.format == old:
                     releasedataout['codec'] = new
+
+            if track.format == "VP9":
+                releasedataout['codec'] = "VP9"
 
             standardresolutions = {
                 "3840": "1920",
@@ -140,6 +145,8 @@ def get_mediainfo(jps_torrent_object, media, media_roots):
                 releasedataout['audioformat'] = "MP3"
             elif track.format == "MPEG Audio" and track.format_profile == "Layer 2":
                 releasedataout['audioformat'] = "MP2"
+            elif track.format == "Vorbis":
+                releasedataout['audioformat'] = "OGG"
 
     logger.debug(f'Mediainfo interpreted data: {releasedataout}')
 
