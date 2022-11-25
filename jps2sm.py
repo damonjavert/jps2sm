@@ -341,7 +341,7 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
     :param max_size: bool: Only upload torrents < 1Gb if True
     :param scrape_only: bool: Only download JPS torrents, do not upload to SM
     """
-    jps_torrent_downloaded_count = sm_torrent_uploaded_count = skipped_max_size = skipped_low_seeders  = skipped_exc_filter= 0
+    jps_torrent_downloaded_count = sm_torrent_uploaded_count = skipped_max_size = skipped_low_seeders = skipped_exc_filter = skipped_dupe = 0
 
     for torrentid, releasedatafull in get_release_data(torrentids, torrentgroupdata.rel2, torrentgroupdata.date).items():
 
@@ -474,7 +474,7 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
 
         jps_torrent_object = io.BytesIO(jps_torrent_file.content)  # Keep file in memory as it could be processed and deleted by a torrent client
 
-        if args.parsed.mediainfo and not args.parsed.dryrun:
+        if not args.parsed.dryrun:
             dupe, sugoimusic_torrent_id = decide_duplicate(jps_torrent_object)
             if dupe:
                 if not config.skip_dupes:
@@ -486,7 +486,9 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
                     )
                 dupe_error_msg = f'The exact same torrent file already exists on the site! See: https://sugoimusic.me/torrents.php?torrentid={sugoimusic_torrent_id} JPS torrent id: {torrentid}'
                 logger.warning(dupe_error_msg)
-                raise Exception(dupe_error_msg)
+                skipped_dupe += 1
+                continue
+                # raise Exception(dupe_error_msg)
 
         # Upload torrent to SM
         uploadtorrent(jps_torrent_object, torrentgroupdata, **releasedataout)
@@ -509,7 +511,8 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
         'sm_torrents_uploaded_count': sm_torrent_uploaded_count,  # For use by downloaduploadedtorrents() or statisics when in a batch_mode
         'skipped_torrents_max_size': skipped_max_size,
         'skipped_torrents_low_seeders': skipped_low_seeders,
-        'skipped_torrents_exc_filter': skipped_exc_filter
+        'skipped_torrents_exc_filter': skipped_exc_filter,
+        'skipped_torrents_duplicate': skipped_dupe
     }
 
     # logger.debug(collate_torrent_counts)
@@ -597,7 +600,9 @@ def main():
             if not args.parsed.dryrun:
                 logger.info(f'MediaInfo not submitted errors (use \"--mediainfo\" to fix): {user_upload_mediainfo_not_submitted}'
                             f'\n\nNew uploads successfully created: {user_uploads_done}'
-                            f'\nDuplicates found (torrents downloaded for cross-seeding): {len(user_upload_dupes)}')
+                            f'\nDuplicates found on SM (torrents downloaded for cross-seeding): {len(user_upload_dupes)}'
+                            f'\nDuplicates found with torrent hash: {batch_uploads_skipped_dupe}')
+
 
 
     if args.parsed.urls is None and not (bool(args.parsed.batchuploaded) or bool(args.parsed.batchseeding) or bool(args.parsed.batchsnatched) or bool(args.parsed.batchrecent)):
@@ -668,7 +673,7 @@ def main():
         user_uploads_done = 0
 
         batch_uploads_skipped_torrents_max_size = batch_uploads_skipped_torrents_low_seeders = batch_uploads_jps_torrents_downloaded_count = 0
-        batch_uploads_skipped_torrents_exc_filter = 0
+        batch_uploads_skipped_torrents_exc_filter = batch_uploads_skipped_dupe = 0
 
         logger.info(f'Now attempting to upload {user_uploads_found} torrents.')
 
@@ -695,6 +700,7 @@ def main():
                     batch_uploads_skipped_torrents_max_size += torrent_counts['skipped_torrents_max_size']
                     batch_uploads_skipped_torrents_low_seeders += torrent_counts['skipped_torrents_low_seeders']
                     batch_uploads_skipped_torrents_exc_filter += torrent_counts['skipped_torrents_exc_filter']
+                    batch_uploads_skipped_dupe += torrent_counts['skipped_torrents_duplicate']
 
                 except Exception as exc:
                     logger.exception(f'Exception  - {exc} - in collate() on initial run with recent batch mode, however these are skipped'
@@ -707,6 +713,12 @@ def main():
 
         batch_uploads_skipped_torrents_max_size = batch_uploads_skipped_torrents_low_seeders = batch_uploads_jps_torrents_downloaded_count = 0
         batch_uploads_skipped_torrents_exc_filter = 0
+        #batch_count_stats = {
+        #    'batch_uploads_skipped_torrents_max_size': 0,
+        #    'batch_uploads_skipped_torrents_low_seeders': 0,
+        #    'batch_uploads_jps_torrents_downloaded_count': 0,
+        #    'batch_uploads_skipped_torrents_exc_filter': 0
+        #}
 
         for jps_group_id, jps_torrent_ids in batch_uploads.items():
             if jps_group_id in batch_uploads_group_errors or jps_group_id in batch_groups_excluded:
@@ -717,10 +729,17 @@ def main():
 
             try:
                 torrent_counts = collate(jps_torrent_ids, jps_group_data, max_size)
+                #for collate_result_item, value in torrent_counts.items():
+                #    if isinstance(value, int):
+                #        batch_count_stats[collate_result_item] += value
+                #    elif isinstance(value, list):
+                #        batch_count_stats[collate_result_item].append(value)
+
                 batch_uploads_jps_torrents_downloaded_count += torrent_counts["jps_torrents_downloaded_count"]
                 batch_uploads_skipped_torrents_max_size += torrent_counts['skipped_torrents_max_size']
                 batch_uploads_skipped_torrents_low_seeders += torrent_counts['skipped_torrents_low_seeders']
                 batch_uploads_skipped_torrents_exc_filter += torrent_counts['skipped_torrents_exc_filter']
+                batch_uploads_skipped_dupe += torrent_counts['skipped_torrents_duplicate']
                 if not args.parsed.dryrun:
                     downloaduploadedtorrents(torrent_counts['sm_torrents_uploaded_count'], jps_group_data.artist, jps_group_data.title)
                     user_uploads_done += torrent_counts['sm_torrents_uploaded_count'] #  This will always be same as '+=1'
