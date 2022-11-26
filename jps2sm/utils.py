@@ -62,6 +62,7 @@ class GetArgs:
         parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + __version__)
         parser.add_argument('-d', '--debug', help='Enable debug mode', action='store_true')
         parser.add_argument("-u", "--urls", help="JPS URL for a group, or multiple individual releases URLs from the same group", type=str)
+        parser.add_argument("-t", "--torrentid", help="JPS torrent id", type=int)
         parser.add_argument("-n", "--dryrun", help="Just parse url and show the output, do not add the torrent to SM", action="store_true")
         parser.add_argument("-b", "--batchuser", help="User id for batch user operations, default is user id of SM Username specified in jps2sm.cfg")
         parser.add_argument("-U", "--batchuploaded", help="(Batch mode only) Upload all releases uploaded by you or, if provided, user id specified by --batchuser", action="store_true")

@@ -605,9 +605,15 @@ def main():
                             f'\nDuplicates found with torrent hash: {batch_uploads_skipped_dupe}')
 
 
-
-    if args.parsed.urls is None and not (bool(args.parsed.batchuploaded) or bool(args.parsed.batchseeding) or bool(args.parsed.batchsnatched) or bool(args.parsed.batchrecent)):
-        fatal_error('Error: Neither any JPS URL(s) (--urls) or batch parameters (--batchsnatched, --batchuploaded, --batchseeding or --batchrecent) have been specified. See --help')
+    if args.parsed.urls is None and \
+            args.parsed.torrentid is None and \
+            not (bool(args.parsed.batchuploaded) or
+                 bool(args.parsed.batchseeding) or
+                 bool(args.parsed.batchsnatched) or
+                 bool(args.parsed.batchrecent)):
+        fatal_error('Error: Neither any JPS URL(s) (--urls) '
+                    'nor a JPS torrent id (--torrentid) '
+                    'nor any batch parameters (--batchsnatched, --batchuploaded, --batchseeding or --batchrecent) have been specified. See --help')
     elif args.parsed.urls is not None and (bool(args.parsed.batchuploaded) or bool(args.parsed.batchseeding) or bool(args.parsed.batchsnatched) or bool(args.parsed.batchrecent)):
         fatal_error(
             'Error: Both the JPS URL(s) (--urls) and batch parameters (--batchsnatched,--batchuploaded, --batchseeding or --batchrecent) have been specified, but only one is allowed.')
@@ -656,6 +662,10 @@ def main():
 
     if detect_display_swapped_names(jps_user_id):
         fatal_error("Error: 'Display original Artist/Album titles' is enabled in your JPS user profile. This must be disabled for jps2sm to run.")
+
+    if args.parsed.torrentid:
+        non_batch_upload(args.parsed.torrentid, args.parsed.dryrun)
+        return
 
     if batch_status:
         batchuser = args.parsed.batchuser or jps_user_id
@@ -798,6 +808,21 @@ def main():
         torrent_counts = collate(jps_torrent_ids, jps_group_data)
         if not args.parsed.dryrun:
             downloaduploadedtorrents(torrent_counts['sm_torrents_uploaded_count'], jps_group_data.artist, jps_group_data.title)
+
+
+def non_batch_upload(jps_torrent_id, dryrun):
+    """
+    Perform simple non-batch upload to SM with a single jps_torrent_id
+    """
+
+    jps_group_data = GetGroupData(f"https://jpopsuki.eu/torrents.php?torrentid={jps_torrent_id}")
+    # This is a hack to ensure the get_release_data() works as it is designed to only parse a list of strs
+    jps_torrent_id_as_list = [str(jps_torrent_id)]
+
+    torrent_info = collate(jps_torrent_id_as_list, jps_group_data)
+    if not dryrun:
+        downloaduploadedtorrents(torrent_info['sm_torrents_uploaded_count'], jps_group_data.artist, jps_group_data.title)
+
 
 
 if __name__ == "__main__":
