@@ -583,7 +583,8 @@ def main():
             print('Finished batch upload')
         print(f'--------------------------------------------------------\nOverall stats:'
               f'\nTorrents found at JPS: {user_uploads_found}'
-              f'\nJPS Group data errors: {count_values_dict(batch_uploads_group_errors)}')
+              f'\nJPS Group data errors: {count_values_dict(batch_uploads_group_errors)}'
+              f'\nJPS "V.A." Groups with no contributing artists: {len(batch_groups_va_errors)}')
 
         if final_stats:
             print(f'Release data errors: {count_values_dict(useruploadscollateerrors)}')
@@ -677,7 +678,7 @@ def main():
 
         logger.info(f'Now attempting to upload {user_uploads_found} torrents.')
 
-        batch_group_data, batch_uploads_group_errors, batch_groups_excluded = get_batch_group_data(batch_uploads, args.parsed.exccategory)
+        batch_group_data, batch_uploads_group_errors, batch_groups_excluded, batch_groups_va_errors = get_batch_group_data(batch_uploads, args.parsed.exccategory)
         # print(json.dumps(batch_group_data, indent=2))
 
         if batch_mode == "recent":

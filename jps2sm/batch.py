@@ -141,10 +141,12 @@ def get_batch_group_data(batch_uploads, excluded_category):
     :return batch_group_data: dict, multi dimensional dict contain group data of all uploads
     :return batch_group_errors: list, All JPS jps_group_ids where GetGroupData failed
     :return batch_groups_excluded: list, All jps_group_ids that were excluded by the user, currently --exccategory
+    :return batch_groups_va_errors: list, jps_group_ids that were 'V.A.' torrents with no contrib artists set
     """
 
     batch_group_errors = collections.defaultdict(list)
     batch_groups_excluded = []
+    batch_groups_va_errors = []
     batch_group_data = {}
 
     for jps_group_id, jps_torrent_id in batch_uploads.items():
@@ -161,11 +163,16 @@ def get_batch_group_data(batch_uploads, excluded_category):
                 continue
         except KeyboardInterrupt:  # Allow Ctrl-C to exit without showing the error multiple times and polluting the final error dict
             break  # Still continue to get error dicts and dupe list so far
-        except Exception:
+        except Exception as exc:
             # Catch all for any exception
+            va_no_contrib_artists_error = "V.A. torrent with to contrib artists set - torrent has no valid artists so this cannot be uploaded."
+            if str(exc) == va_no_contrib_artists_error:
+                logger.error(va_no_contrib_artists_error)
+                batch_groups_va_errors.append(jps_group_id)
+                continue
             logger.exception(
                 'Error with retrieving group data for jps_group_id %s jps_torrent_id %s, skipping upload' % (jps_group_id, ",".join(jps_torrent_id)))
             batch_group_errors[jps_group_id] = jps_torrent_id
             continue
 
-    return batch_group_data, batch_group_errors, batch_groups_excluded
+    return batch_group_data, batch_group_errors, batch_groups_excluded, batch_groups_va_errors

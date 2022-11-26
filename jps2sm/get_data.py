@@ -215,16 +215,19 @@ class GetGroupData:
         logger.info(f'Tags: {tags}')
         self.tagsall = ",".join(tags)
 
-        try:
-            contribartistsget = str(soup.select('#content .thin .sidebar .box .body ul.stats.nobullet li'))
-            contribartistslist = re.findall(r'<li><a href="artist\.php\?id=(?:[0-9]+?)" title="([^"]*?)">([\w .-]+)</a>', contribartistsget)
-            self.contribartists = {}
-            for artistpair in contribartistslist:
-                self.contribartists[artistpair[1]] = artistpair[0] # Creates contribartists[artist] = origartist
 
-            logger.info(f'Contributing artists: {self.contribartists}')
-        except IndexError:  # Do nothing if group has no contrib artists
-            pass
+        contribartistsget = str(soup.select('#content .thin .sidebar .box .body ul.stats.nobullet li'))
+        contribartistslist = re.findall(r'<li><a href="artist\.php\?id=(?:[0-9]+?)" title="([^"]*?)">([\w .-]+)</a>', contribartistsget)
+        self.contribartists = {}
+        for artistpair in contribartistslist:
+            self.contribartists[artistpair[1]] = artistpair[0]  # Creates contribartists[artist] = origartist
+
+        logger.info(f'Contributing artists: {self.contribartists}')
+        if self.contribartists == {}:
+            # No contrib artists found, we need to error here if it is a V.A. torrent
+            if self.artist == ['V.A.']:
+                raise Exception("V.A. torrent with to contrib artists set - torrent has no valid artists so this cannot be uploaded.")
+
 
     def originalchars(self):
         return self.originalartist, self.originaltitle
