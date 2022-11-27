@@ -108,14 +108,15 @@ def get_mediainfo(jps_torrent_object, media, media_roots):
                 "HEVC": "h265",
                 "MPEG-4 Visual": "DivX",  # MPEG-4 Part 2 / h263 , usually xvid / divx
                 "VP09": "VP9",
+                "VP08": "VP8",
             }
 
             for old, new in validatecodec.items():
                 if track.format == old:
                     releasedataout['codec'] = new
 
-            if track.format == "VP9":
-                releasedataout['codec'] = "VP9"
+            if track.format in ["VP9", "VP8"]:
+                releasedataout['codec'] = track.format
 
             standardresolutions = {
                 "3840": "1920",
