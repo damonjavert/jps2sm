@@ -6,14 +6,16 @@ jps2sm will automatically gather data from JPS from a given group url, release u
 
 ## Features
 * Create upload to SM by automatically retrieving all data on JPS, including english and original titles, group description, release information (format / media / bitrate etc.), group images, contributing artists, original titles, mediainfo data and remaster information if applicable.
-* Upload all torrents in a torrent group or specify 1 or more release urls in a group.
-* Upload all your (or someone elses) personally uploaded or currently seeding torrents at JPS with `--batchuser` mode
+* Upload by specifiyng a JPS group or release `--url`
+* Upload all your (or someone elses) personally uploaded / seeding / snatched torrents with `--batchupload` / `--batchseeding` / `--batchsnatched`
+* Contribute to SM  by uploading ALL non-large recent torrents to SM with `--batchrecent` mode. Note: This mode will prompt you to continue once the JPS data has been downloaded. Torrents over 1Gb are skipped.
 * Search for your media files specified in `MediaDirectories` and run [Mediainfo](https://mediaarea.net/en/MediaInfo) against them and save the output to the 'mediainfo' field and parse the data to populate the codec, container, audioformat and resolution fields. DVD ISOs are automatically extracted and Mediainfo is run against the VOB files, BR ISO images are not currently supported in the pyunpack module.
 * Exclude certain audioformats, medias or categories with `--excaudioformat` , `--excmedia` and `--exccategory`
 * Test your uploads with `--dryrun` mode.
 
 ## How to use
 Windows, Mac and Linux users can use the latest compiled binary on the releases page: https://git.sugoimusic.me/Sugoimusic/jps2sm/releases
+The current compile binaries are out of date, with some features missing, if you can for now, use the python code.
 
 ### Quickstart
 Download the binary release for your platform: https://git.sugoimusic.me/Sugoimusic/jps2sm/releases
@@ -52,6 +54,22 @@ Install modules and run the script, adjusting the exact commands if required by 
 * See Command line usage for batch processing options.
 
 ### Command line usage Examples
+To upload all your current seeding torrents, whilst automatically retrieving mediainfo data:
+
+    python3 jps2sm.py --batchseeding --mediainfo
+
+To upload the latest 50 torrents uploaded to JPS, prompting the user to continue once JPS data has been downloaded:
+
+    python3 jps2sm.py --batchrecent --mediainfo
+
+To upload the most recent 50 torrents you uploaded:
+
+    python3 jps2sm.py --batchuploaded
+
+To upload your 100 most popular uploads, based on snatches:
+
+    python3 jps2sm.py --batchuploaded --batchsort snatches --batchsortorder desc
+
 To upload every release of AKB48 - 1830m:
 
     python3 jps2sm.py --urls "https://jpopsuki.eu/torrents.php?id=111284"
@@ -68,7 +86,7 @@ To *test* upload all your personal uploads:
 
     python3 jps2sm.py --batchuploaded --dryrun
 
-Once everything looks ok, to upload all your personal uploads, `<userid>` is your JPS userid:
+Once everything looks ok, to upload all your personal uploads:
 
     python3 jps2sm.py --batchuploaded
 
@@ -85,23 +103,31 @@ Single group / release mode arguments:
 
 Batch processing mode arguments:
 
-  --batchuser BATCHUSER (--batchuploaded | --batchseeding) [-s BATCHSTART] [-e BATCHEND]
+  --batchuser BATCHUSER (--batchuploaded | --batchseeding | --batchsnatched | --batchrecent) [-s BATCHSTART] [-e BATCHEND]
   [--exccategory EXCCATEGORY] [--excaudioformat EXCAUDIOFORMAT] [--excmedia EXCMEDIA]
 
 
 Help for arguments for group/release uploads:
 
-  -u URLS, --urls URLS  JPS URL for a group, or multiple individual releases URLs, space delimited
-                        in quotes to be added to the same group
+  -u URLS, --urls URLS  JPS URL for a group, or multiple individual releases URLs from the same group, space delimited
+                        in quotes
 
 
-Help for required arguments for batch processing:
+Help for arguments for batch processing:
 
   -b BATCHUSER, --batchuser BATCHUSER
                         User id for batch user operations, default is user id of SM Username specified in jps2sm.cfg
-  -U, --batchuploaded   Upload all releases uploaded by user id specified by --batchuser
+  -U, --batchuploaded   Upload all releases personally uploaded
         **or**
-  -S, --batchseeding    Upload all releases currently seeding by user id specified by --batchuser
+  -S, --batchseeding    Upload all releases currently seeding
+        **or**
+  -SN, --batchsnatched  Upload all releases that have been snatched
+        **or**
+  -R, --batchrecent     Upload ALL recent releases uploaded to JPS that are under 1Gb in size.
+                        This mode will prompt you to continue once the JPS data has been downloaded, by default it parses
+                        the first page at JPS - the last 50 torrents shown on the main page: https://jpopsuki.eu/torrents.php .
+                        This mode is designed to contribute to SM even if you do not have much activity at JPS and/or ensure
+                        that we have the very latest torrents!
 
 
 Help for optional arguments for batch processing:
@@ -110,6 +136,10 @@ Help for optional arguments for batch processing:
                     Start at this page
   -e BATCHEND, --batchend BATCHEND
                     End at this page
+  -bs BATCHSORT, --batchsort BATCHSORT
+                    Sort for batch upload, must be one of: name,year,time,size,snatches,seeders,leechers
+  -bso BATCHSORTORDER, --batchsortorder BATCHSORTORDER
+                    Sort order for batch upload, either ASC or DESC.
   -exc EXCCATEGORY, --exccategory EXCCATEGORY
                     Exclude a JPS category from upload
   -exf EXCAUDIOFORMAT, --excaudioformat EXCAUDIOFORMAT
