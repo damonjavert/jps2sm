@@ -68,7 +68,7 @@ To upload the most recent 50 torrents you uploaded:
 
 To upload your 100 most popular uploads, based on snatches:
 
-    python3 jps2sm.py --batchuploaded --batchsort snatches --batchsortorder desc
+    python3 jps2sm.py --batchuploaded --batchsort snatches --batchsortorder desc --batchstart 1 --batchend 2
 
 To upload every release of AKB48 - 1830m:
 
