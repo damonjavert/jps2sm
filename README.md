@@ -101,6 +101,10 @@ Single group / release mode arguments:
 
   --urls URLS
 
+Single torrent id:
+
+  --torrentid JPSTORRENTID
+
 Batch processing mode arguments:
 
   --batchuser BATCHUSER (--batchuploaded | --batchseeding | --batchsnatched | --batchrecent) [-s BATCHSTART] [-e BATCHEND]
@@ -109,6 +113,8 @@ Batch processing mode arguments:
 
 Help for arguments for group/release uploads:
 
+  -t JPSTORRENTID, --torrentid JPSTORRENTID
+                        Specify a JPS torrent id to upload
   -u URLS, --urls URLS  JPS URL for a group, or multiple individual releases URLs from the same group, space delimited
                         in quotes
 
