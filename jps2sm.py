@@ -791,12 +791,11 @@ def main():
         fatal_error("Error: 'Display original Artist/Album titles' is enabled in your JPS user profile. This must be disabled for jps2sm to run.")
 
     if args.parsed.torrentid:
-        non_batch_upload(jps_torrent_id=args.parsed.torrentid, dryrun=args.parsed.dryrun)
+        non_batch_upload(jps_torrent_id=args.parsed.torrentid, dry_run=args.parsed.dryrun)
         return
 
     if args.parsed.urls:
-        jps_torrent_ids = re.findall('torrentid=([0-9]+)', args.parsed.urls)
-        non_batch_upload(jps_torrent_ids=jps_torrent_ids, dryrun=args.parsed.dryrun)
+        non_batch_upload(jps_urls=args.parsed.urls, dry_run=args.parsed.dryrun)
         return
 
     if args.batch_modes == 1:
@@ -806,26 +805,26 @@ def main():
         raise RuntimeError('Argument handling error')
 
 
-def non_batch_upload(jps_torrent_id=None, jps_torrent_ids=None, dryrun=None):
+def non_batch_upload(jps_torrent_id=None, jps_urls=None, dry_run=None):
     """
-    Perform simple non-batch upload to SM with either a single jps_torrent_id from --torrentid or a list a strings from --urls
+    Perform simple non-batch upload to SM with either a single jps_torrent_id from --torrentid or a string of --urls
     """
 
-    if jps_torrent_id is None and jps_torrent_ids is None:
-        raise RuntimeError('Expected JPS torrentid(s)')
-    if jps_torrent_id and jps_torrent_ids:
-        raise RuntimeError('Expected either jps_torrent_id (int) OR jps_torrent_ids (list of str)')
-
-    jps_group_data = GetGroupData(f"https://jpopsuki.eu/torrents.php?torrentid={jps_torrent_id}")
+    if jps_torrent_id and jps_urls:
+        raise RuntimeError('Expected either jps_torrent_id OR jps_url')
 
     if jps_torrent_id:
+        jps_group_data = GetGroupData(f"https://jpopsuki.eu/torrents.php?torrentid={jps_torrent_id}")
         # This is a hack to ensure the get_release_data() works as it is designed to only parse a list of strs
-        jps_torrent_id_as_list = [str(jps_torrent_id)]
-    if jps_torrent_ids:  # We can use the list of strs as-is
-        jps_torrent_id_as_list = jps_torrent_ids  # just for readability
+        jps_torrent_ids = [str(jps_torrent_id)]
+    elif jps_urls:
+        jps_group_data = GetGroupData(jps_urls)
+        jps_torrent_ids = re.findall('torrentid=([0-9]+)', args.parsed.urls)
+    else:
+        raise RuntimeError('Expected either a jps_torrent_id or a jps_url')
 
-    torrent_info = collate(jps_torrent_id_as_list, jps_group_data)
-    if not dryrun:
+    torrent_info = collate(jps_torrent_ids, jps_group_data)
+    if not dry_run:
         downloaduploadedtorrents(torrent_info['sm_torrents_uploaded_count'], jps_group_data.artist, jps_group_data.title)
 
 
