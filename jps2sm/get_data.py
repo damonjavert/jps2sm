@@ -103,7 +103,21 @@ class GetGroupData:
 
         logger.debug(torrent_description_page_h2_line := str(soup.select('.thin h2')[0]))
 
-        self.category = re.findall(r'\[(.*?)\]', torrent_description_page_h2_line)[0]
+        if torrent_description_page_h2_line == "<h2>Error</h2>":
+            if error := str(soup.select('.thin h3')[0]):  # Try to grab error string
+                if error == "<h3>Torrent not found</h3>":
+                    logger.error('JPS torrent not found')
+                    raise Exception('JPS torrent not found')
+
+            logger.error(f'Error: {error}')
+            raise Exception(f'Error in GetGroupData: {error}')
+
+        try:
+            self.category = re.findall(r'\[(.*?)\]', torrent_description_page_h2_line)[0]
+        except IndexError:
+            logger.error(f'Error: Could not ascertain Category for group {self.groupid}, try adding --debug to see what could be wrong.')
+            raise Exception('JPS Category not found')
+
         logger.info(f'Category: {self.category}')
 
         try:
