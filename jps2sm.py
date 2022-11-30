@@ -629,7 +629,12 @@ def main():
         fatal_error("Error: 'Display original Artist/Album titles' is enabled in your JPS user profile. This must be disabled for jps2sm to run.")
 
     if args.parsed.torrentid:
-        non_batch_upload(args.parsed.torrentid, args.parsed.dryrun)
+        non_batch_upload(jps_torrent_id=args.parsed.torrentid, dryrun=args.parsed.dryrun)
+        return
+
+    if args.parsed.urls:
+        jps_torrent_ids = re.findall('torrentid=([0-9]+)', args.parsed.urls)
+        non_batch_upload(jps_torrent_ids=jps_torrent_ids, dryrun=args.parsed.dryrun)
         return
 
     if args.batch_modes == 1:
@@ -796,25 +801,24 @@ def main():
 
         batch_stats(final_stats=True)
 
-    else:
-        # Standard non-batch upload using --urls
-        if not args.parsed.urls:
-            raise RuntimeError("Expected some JPS urls to be set")
-        jps_group_data = GetGroupData(args.parsed.urls)
-        jps_torrent_ids = re.findall('torrentid=([0-9]+)', args.parsed.urls)
-        collate_torrent_info = collate(jps_torrent_ids, jps_group_data)
-        if not args.parsed.dryrun:
-            downloaduploadedtorrents(collate_torrent_info['sm_torrents_uploaded_count'], jps_group_data.artist, jps_group_data.title)
 
+def non_batch_upload(jps_torrent_id=None, jps_torrent_ids=None, dryrun=None):
+    """
+    Perform simple non-batch upload to SM with either a single jps_torrent_id from --torrentid or a list a strings from --urls
+    """
 
-def non_batch_upload(jps_torrent_id, dryrun):
-    """
-    Perform simple non-batch upload to SM with a single jps_torrent_id
-    """
+    if jps_torrent_id is None and jps_torrent_ids is None:
+        raise RuntimeError('Expected JPS torrentid(s)')
+    if jps_torrent_id and jps_torrent_ids:
+        raise RuntimeError('Expected either jps_torrent_id (int) OR jps_torrent_ids (list of str)')
 
     jps_group_data = GetGroupData(f"https://jpopsuki.eu/torrents.php?torrentid={jps_torrent_id}")
-    # This is a hack to ensure the get_release_data() works as it is designed to only parse a list of strs
-    jps_torrent_id_as_list = [str(jps_torrent_id)]
+
+    if jps_torrent_id:
+        # This is a hack to ensure the get_release_data() works as it is designed to only parse a list of strs
+        jps_torrent_id_as_list = [str(jps_torrent_id)]
+    if jps_torrent_ids:  # We can use the list of strs as-is
+        jps_torrent_id_as_list = jps_torrent_ids  # just for readability
 
     torrent_info = collate(jps_torrent_id_as_list, jps_group_data)
     if not dryrun:
