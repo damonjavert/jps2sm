@@ -80,7 +80,24 @@ class GetArgs:
         self.parsed = parser.parse_args()
 
         # Handle bag args
-        # TODO move all bad arg logic to here
+        self.batch_modes = sum([bool(self.parsed.batchuploaded),
+                                bool(self.parsed.batchseeding),
+                                bool(self.parsed.batchsnatched),
+                                bool(self.parsed.batchrecent)])
+        if self.batch_modes > 1:
+            fatal_error('Error: Multiple batch modes of operation specified - only one can be used at the same time. See --help')
+
+        if self.parsed.urls is not None and self.parsed.torrentid is not None:
+            fatal_error('Error: Both JPS URL(s) (--urls) and a JPS torrent id (--torrentid) have been specified '
+                        '- only one can be used at the same time. See --help')
+        if self.parsed.urls is None and self.parsed.torrentid is None and self.batch_modes == 0:
+            fatal_error('Error: Neither any JPS URL(s) (--urls) '
+                        'nor a JPS torrent id (--torrentid) '
+                        'nor any batch parameters (--batchsnatched, --batchuploaded, --batchseeding or --batchrecent) have been specified. See --help')
+        elif (self.parsed.urls is not None or self.parsed.torrentid is not None) and self.batch_modes == 1:
+            fatal_error(
+                'Error: Both the JPS URL(s) (--urls) or torrent id (--torrentid) and batch parameters '
+                '(--batchsnatched,--batchuploaded, --batchseeding or --batchrecent) have been specified, but only one is allowed.')
 
         if self.parsed.batchsort is not None and self.parsed.batchsort not in JPSTorrentView.sort_by.keys():
             fatal_error(f'Error: Incorrect --batchsort mode specified, sort mode must be one of {",".join(JPSTorrentView.sort_by.keys())}')
@@ -88,6 +105,25 @@ class GetArgs:
             fatal_error(f'Error: Incorrect --batchsortorder specified, order must be wither ASC or DESC')
         if self.parsed.exccategory is not None and str(self.parsed.exccategory) not in Categories.JPS:
             fatal_error(f'Error: Incorrect --exccategory specified, it must match a JPS category, these are: {",".join(Categories.JPS)}')
+
+        if self.batch_modes == 1:  # Handle bad batch args TODO this should be handles as part of proper sub args if possible
+            if self.parsed.batchuser:
+                if self.parsed.batchuser.isnumeric() is False:
+                    fatal_error('Error: "--batchuser" or short "-b" should be a JPS profile ID. See --help')
+
+            if bool(self.parsed.batchstart) ^ bool(self.parsed.batchend):
+                fatal_error('Error: You have specified an incomplete page range. See --help')
+
+            if self.parsed.batchuploaded:
+                self.batch_mode = "uploaded"
+            elif self.parsed.batchseeding:
+                self.batch_mode = "seeding"
+            elif self.parsed.batchsnatched:
+                self.batch_mode = "snatched"
+            elif self.parsed.batchrecent:
+                self.batch_mode = "recent"
+            else:
+                raise RuntimeError("Expected some batch mode to be set")
 
 
 class GetConfig:

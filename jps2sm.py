@@ -573,7 +573,7 @@ def main():
     :return:
     """
 
-    batch_status = None
+    max_size = None
 
     def batch_stats(final_stats):
         """
@@ -612,48 +612,6 @@ def main():
                             f'\nNew uploads successfully created: {batch_torrent_info["sm_torrents_uploaded_count"]}'
                             )
 
-    if args.parsed.urls is None and \
-            args.parsed.torrentid is None and \
-            not (bool(args.parsed.batchuploaded) or
-                 bool(args.parsed.batchseeding) or
-                 bool(args.parsed.batchsnatched) or
-                 bool(args.parsed.batchrecent)):
-        fatal_error('Error: Neither any JPS URL(s) (--urls) '
-                    'nor a JPS torrent id (--torrentid) '
-                    'nor any batch parameters (--batchsnatched, --batchuploaded, --batchseeding or --batchrecent) have been specified. See --help')
-    elif args.parsed.urls is not None and (bool(args.parsed.batchuploaded) or bool(args.parsed.batchseeding) or bool(args.parsed.batchsnatched) or bool(args.parsed.batchrecent)):
-        fatal_error(
-            'Error: Both the JPS URL(s) (--urls) and batch parameters (--batchsnatched,--batchuploaded, --batchseeding or --batchrecent) have been specified, but only one is allowed.')
-    elif bool(args.parsed.batchuploaded) or bool(args.parsed.batchseeding) or bool(args.parsed.batchsnatched) or bool(args.parsed.batchrecent):
-
-        batchuser = max_size = None
-        if args.parsed.batchuser:
-            if args.parsed.batchuser.isnumeric() is False:
-                fatal_error('Error: "--batchuser" or short "-b" should be a JPS profile ID. See --help')
-            batchuser = int(args.parsed.batchuser)
-
-        if bool(args.parsed.batchstart) ^ bool(args.parsed.batchend):
-            fatal_error('Error: You have specified an incomplete page range. See --help')
-        elif bool(args.parsed.batchstart) and bool(args.parsed.batchend):
-            batchstart = args.parsed.batchstart
-            batchend = args.parsed.batchend
-        if bool(args.parsed.batchuploaded) and (bool(args.parsed.batchseeding) or bool(args.parsed.batchsnatched)) or \
-           (bool(args.parsed.batchseeding) and bool(args.parsed.batchsnatched)): # https://stackoverflow.com/a/3076081
-            fatal_error('Error: Multiple batch modes of operation specified - only one can be used at the same time. See --help')
-        if args.parsed.batchuploaded:
-            batch_mode = "uploaded"
-        elif args.parsed.batchseeding:
-            batch_mode = "seeding"
-        elif args.parsed.batchsnatched:
-            batch_mode = "snatched"
-        elif args.parsed.batchrecent:
-            batch_mode = "recent"
-            max_size = True
-        else:
-            raise RuntimeError("Expected some batch mode to be set")
-
-        batch_status = True
-
     if args.parsed.mediainfo:
         try:
             for media_dir in config.media_roots:
@@ -674,13 +632,13 @@ def main():
         non_batch_upload(args.parsed.torrentid, args.parsed.dryrun)
         return
 
-    if batch_status:
+    if args.batch_modes == 1:
         batchuser = args.parsed.batchuser or jps_user_id
         if args.parsed.batchstart and args.parsed.batchend:
-            batch_uploads = get_batch_jps_group_torrent_ids(mode=batch_mode, user=batchuser, first=args.parsed.batchstart, last=args.parsed.batchend,
+            batch_uploads = get_batch_jps_group_torrent_ids(mode=args.batch_mode, user=batchuser, first=args.parsed.batchstart, last=args.parsed.batchend,
                                                             sort=args.parsed.batchsort, order=args.parsed.batchsortorder)
         else:
-            batch_uploads = get_batch_jps_group_torrent_ids(mode=batch_mode, user=batchuser, sort=args.parsed.batchsort, order=args.parsed.batchsortorder)
+            batch_uploads = get_batch_jps_group_torrent_ids(mode=args.batch_mode, user=batchuser, sort=args.parsed.batchsort, order=args.parsed.batchsortorder)
 
         #batch_uploads = { '362613': ['535927'], '354969': ['535926'], '362612': ['535925'], '362611': ['535924'], '181901': ['535923'], '181902': ['535922'] }
 
@@ -708,7 +666,7 @@ def main():
         batch_group_data, batch_uploads_group_errors, batch_groups_excluded, batch_groups_va_errors = get_batch_group_data(batch_uploads, args.parsed.exccategory)
         # print(json.dumps(batch_group_data, indent=2))
 
-        if batch_mode == "recent":
+        if args.batch_mode == "recent":
             # Do an initial run of collate() to grab the JPS torrents only so data can be downloaded first
             # TODO Extract release data logic so that collate() does not need to be called twice.
             batch_releases_jps_torrents_downloaded_count = 0
@@ -723,6 +681,7 @@ def main():
                 jps_group_data = get_jps_group_data_class(batch_group_data, jps_group_id)
 
                 scrape_only = True
+                max_size = True
 
                 try:
                     collate_torrent_info_recent = collate(jps_torrent_ids, jps_group_data, max_size, scrape_only)
