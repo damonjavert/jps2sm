@@ -138,7 +138,7 @@ def get_mediainfo(jps_torrent_object, media, media_roots):
                 releasedataout['resolution'] = str(track.width) + "x" + str(track.height)
 
         if track.track_type == 'Audio' or track.track_type == 'Audio #1':  # Handle multiple audio streams, we just get data from the first for now
-            if track.format in ["AAC", "DTS", "PCM", "AC3"]:
+            if track.format in ["AAC", "DTS", "PCM", "AC3", "Vorbis", "Opus"]:
                 releasedataout['audioformat'] = track.format
             elif track.format == "AC-3":
                 releasedataout['audioformat'] = "AC3"
@@ -146,8 +146,6 @@ def get_mediainfo(jps_torrent_object, media, media_roots):
                 releasedataout['audioformat'] = "MP3"
             elif track.format == "MPEG Audio" and track.format_profile == "Layer 2":
                 releasedataout['audioformat'] = "MP2"
-            elif track.format == "Vorbis":
-                releasedataout['audioformat'] = "OGG"
 
     logger.debug(f'Mediainfo interpreted data: {releasedataout}')
 
