@@ -132,6 +132,7 @@ def validate_jps_bitrate(jps_bitrate):
         "Hi-Res 96/24": "24bit Lossless 96kHz",
         "24bit/48kHz": "24bit Lossless 48kHz",
         "Hi-Res": "24bit Lossless",
+        "24/44.1": "24bit Lossless",
         "Hi-Res 48/24": "24bit Lossless 48kHz",
         "24bit/96kHz": "24bit Lossless 96kHz",
         "24bit/48Khz": "24bit Lossless 48kHz",
