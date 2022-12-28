@@ -286,14 +286,7 @@ def get_release_data(torrentids, release_data, date, jps_user_id=None):
     releasedatapre = re.findall(r"swapTorrent\('([0-9]+)'\);\">» (.+?(?=</a>))</a>(?:\s*)</td>(?:\s*)<td class=\"nobr\">(\d*(?:\.)?(?:\d{0,2})?) (\w{2})</td>(?:\s*)<td>([0-9,]{1,6})</td>(?:\s*)<td>([0-9,]{1,6})</td>(?:\s*)<td>([0-9,]{1,6})</td>.*?<blockquote>(?:\s*)Uploaded by <a href=\"user.php\?id=([0-9]+)\">(?:[\S]+)</a>  on <span title=\"(?:[^\"]+)\">([^<]+)</span>.*?<blockquote>(.*?)</blockquote>", release_data, re.DOTALL)
     # logger.debug(f'Pre-processed releasedata: {json.dumps(releasedatapre, indent=2)}')
 
-
-    #soup = BeautifulSoup(release_data,'html5lib')
-    #raw_release_desc = soup.find_all("blockquote")[-1].decode_contents()
-    #logging.debug(f"Raw release desc: {raw_release_desc}")
     parser = HTML2PHPBBCode()
-    #release_desc = parser.feed(raw_release_desc)
-    #logging.debug(f"BBCode parsed output for release desc: {release_desc}")
-
     releasedata = {}
 
     try:
