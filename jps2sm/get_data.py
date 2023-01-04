@@ -283,8 +283,8 @@ def get_release_data(torrentids, release_data, date, jps_user_id=None):
 
     # print(release_data)
     freeleechtext = '<strong>Freeleech!</strong>'
-    releasedatapre = re.findall(r"swapTorrent\('([0-9]+)'\);\">» (.+?(?=</a>))</a>(?:\s*)</td>(?:\s*)<td class=\"nobr\">(\d*(?:\.)?(?:\d{0,2})?) (\w{2})</td>(?:\s*)<td>([0-9,]{1,6})</td>(?:\s*)<td>([0-9,]{1,6})</td>(?:\s*)<td>([0-9,]{1,6})</td>.*?<blockquote>(?:\s*)Uploaded by <a href=\"user.php\?id=([0-9]+)\">(?:[\S]+)</a>  on <span title=\"(?:[^\"]+)\">([^<]+)</span>.*?<blockquote>(.*?)</blockquote>", release_data, re.DOTALL)
-    # logger.debug(f'Pre-processed releasedata: {json.dumps(releasedatapre, indent=2)}')
+    releasedatapre = re.findall(r"swapTorrent\('([0-9]+)'\);\">» (.+?(?=<\/a>))<\/a>(?:\s*)<\/td>(?:\s*)<td class=\"nobr\">(\d*(?:\.)?(?:\d{0,2})?) (\w{2})<\/td>(?:\s*)<td>([0-9,]{1,6})<\/td>(?:\s*)<td>([0-9,]{1,6})<\/td>(?:\s*)<td>([0-9,]{1,6})<\/td>.*?<blockquote>(?:\s*)Uploaded by <a href=\"user.php\?id=([0-9]+)\">(?:[\S]+)<\/a>  on <span title=\"(?:[^\"]+)\">([^<]+)<\/span>(.*?)(?=<table)", release_data, re.DOTALL)
+    #logger.debug(f'Pre-processed releasedata: {json.dumps(releasedatapre, indent=2)}')
 
     parser = HTML2PHPBBCode()
     releasedata = {}
@@ -313,17 +313,19 @@ def get_release_data(torrentids, release_data, date, jps_user_id=None):
         releasedata[torrentid]['seeders'] = seeders
         releasedata[torrentid]['leechers'] = leechers
         orig_uploader_id=int(release[7])
-        release_desc = parser.feed(release[9])
-        logger.debug(f"Release description:{release_desc}")
-        if release_desc.startswith(' New ratio after downloading'):
-            release_desc = ''
-        logger.debug(f"Checking if own upload. Own id: {jps_user_id}. Original uploader id: {orig_uploader_id}")
-        if orig_uploader_id == jps_user_id:
-            releasedata[torrentid]['release_desc'] = release_desc
+        release_desc_pre = re.findall(r"<blockquote>(.*?)<\/blockquote>",release[9],re.DOTALL)
+        if release_desc_pre:
+            release_desc = parser.feed(release_desc_pre[0])
+            logger.debug(f"Release description:{release_desc}")
+            logger.debug(f"Checking if own upload. Own id: {jps_user_id}. Original uploader id: {orig_uploader_id}")
+            if orig_uploader_id == jps_user_id:
+                releasedata[torrentid]['release_desc'] = release_desc
+            else:
+                releasedata[torrentid]['release_desc'] = f'Migrated using jps2sm. Thanks to the original uploader.'
+                if not release_desc == '':
+                    releasedata[torrentid]['release_desc']+=f"\n\n[spoiler=Original description]{release_desc}[/spoiler]"
         else:
             releasedata[torrentid]['release_desc'] = f'Migrated using jps2sm. Thanks to the original uploader.'
-            if not release_desc == '':
-                releasedata[torrentid]['release_desc']+=f"\n\n[spoiler=Original description]{release_desc}[/spoiler]"
 
 
     logger.debug(f'Entire group contains: {json.dumps(releasedata, indent=2)}')
