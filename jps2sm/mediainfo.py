@@ -25,6 +25,22 @@ def get_mediainfo(jps_torrent_object, media, media_roots):
     releaseadtaout: Fields gathered from mediainfo for SM upload
     """
 
+    def validate_container(file_extension):
+        extensions = {
+            "TP": "TS",
+            "TSV": "TS",
+            "TSA": "TS",
+            "M4V": "MP4",
+            "MPG": "MPEG",
+        }
+
+        validated_extension = file_extension  # Default is to not validate if it is not in the known incorrect list above
+        for old, new in extensions.items():
+            if file_extension.upper() == old:
+                validated_extension = new
+
+        return validated_extension
+
     torrentmetadata = tp.TorrentFileParser(jps_torrent_object).parse()
     torrentname = torrentmetadata['info']['name']  # Directory if >1 file, otherwise it is filename
     # print(torrentmetadata)
@@ -94,7 +110,7 @@ def get_mediainfo(jps_torrent_object, media, media_roots):
         if track.track_type == 'General':
             # releasedataout['language'] = track.audio_language_list  # Will need to check if this is reliable
             if 'container' not in releasedataout:  # Not an ISO, only set container if we do not already know its an ISO
-                releasedataout['container'] = track.file_extension.upper()
+                releasedataout['container'] = validate_container(track.file_extension.upper())
             else:  # We have ISO - get category data based Mediainfo if we have it
                 if track.file_extension.upper() == 'VOB':
                     releasedataout['category'] = 'DVD'
