@@ -1,5 +1,6 @@
 import logging
 import os
+from typing import AnyStr
 
 # Third-party modules
 from pymediainfo import MediaInfo
@@ -24,6 +25,45 @@ def get_mediainfo(jps_torrent_object, media, media_roots):
     mediainfo: Mediainfo text output of the file(s)
     releaseadtaout: Fields gathered from mediainfo for SM upload
     """
+
+    def validate_container(file_extension: str) -> AnyStr:
+        """
+        Map known 'bad' / alternative file extensions of containers to the primary name of the container type.
+        """
+        extensions = {
+            "TP": "TS",
+            "TSV": "TS",
+            "TSA": "TS",
+            "M4V": "MP4",
+            "MPG": "MPEG",
+        }
+
+        validated_extension = file_extension  # Default is to not validate if it is not in the known incorrect list above - let SM catch it.
+        for old, new in extensions.items():
+            if file_extension.upper() == old:
+                validated_extension = new
+
+        return validated_extension
+
+    def validate_codec(codec: str) -> AnyStr:
+        """
+        Map known alternative names for codecs returned by mediainfo to the primary name of the codec
+        """
+        codecs = {
+            "MPEG Video": "MPEG-2",
+            "AVC": "h264",
+            "HEVC": "h265",
+            "MPEG-4 Visual": "DivX",  # MPEG-4 Part 2 / h263 , usually xvid / divx
+            "VP09": "VP9",
+            "VP08": "VP8",
+        }
+
+        validated_codec = codec  # Default is to not validate it if it is not known in the incorrect list above - let SM catch it.
+        for old, new in codecs.items():
+            if codec == old:
+                validated_codec = new
+
+        return validated_codec
 
     torrentmetadata = tp.TorrentFileParser(jps_torrent_object).parse()
     torrentname = torrentmetadata['info']['name']  # Directory if >1 file, otherwise it is filename
@@ -94,7 +134,7 @@ def get_mediainfo(jps_torrent_object, media, media_roots):
         if track.track_type == 'General':
             # releasedataout['language'] = track.audio_language_list  # Will need to check if this is reliable
             if 'container' not in releasedataout:  # Not an ISO, only set container if we do not already know its an ISO
-                releasedataout['container'] = track.file_extension.upper()
+                releasedataout['container'] = validate_container(track.file_extension.upper())
             else:  # We have ISO - get category data based Mediainfo if we have it
                 if track.file_extension.upper() == 'VOB':
                     releasedataout['category'] = 'DVD'
@@ -102,21 +142,7 @@ def get_mediainfo(jps_torrent_object, media, media_roots):
                     releasedataout['category'] = 'Bluray'
 
         if track.track_type == 'Video':
-            validatecodec = {
-                "MPEG Video": "MPEG-2",
-                "AVC": "h264",
-                "HEVC": "h265",
-                "MPEG-4 Visual": "DivX",  # MPEG-4 Part 2 / h263 , usually xvid / divx
-                "VP09": "VP9",
-                "VP08": "VP8",
-            }
-
-            for old, new in validatecodec.items():
-                if track.format == old:
-                    releasedataout['codec'] = new
-
-            if track.format in ["VP9", "VP8"]:
-                releasedataout['codec'] = track.format
+            releasedataout['codec'] = validate_codec(track.format)
 
             standardresolutions = {
                 "3840": "1920",
