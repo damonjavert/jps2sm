@@ -73,6 +73,7 @@ class GetArgs:
         parser.add_argument("-bso", "--batchsortorder", help="(Batch mode only) Sort order for batch upload, either ASC or DESC.")
         parser.add_argument("-s", "--batchstart", help="(Batch mode only) Start at this page", type=int)
         parser.add_argument("-e", "--batchend", help="(Batch mode only) End at this page", type=int)
+        parser.add_argument("-w", "--wait-for-jps-dl", help="Wait for JPS file to be downloaded", action="store_true")
         parser.add_argument("-exc", "--exccategory", help="(Batch mode only) Exclude a JPS category from upload", type=str)
         parser.add_argument("-exf", "--excaudioformat", help="(Batch mode only) Exclude an audioformat from upload", type=str)
         parser.add_argument("-exm", "--excmedia", help="(Batch mode only) Exclude a media from upload", type=str)

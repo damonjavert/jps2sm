@@ -95,7 +95,7 @@ Once everything looks ok, to upload all your personal uploads:
 ## Usage
 
 ```text
-usage: jps2sm.py [--help] [--version] [--debug] [--dryrun] [--mediainfo]
+usage: jps2sm.py [--help] [--version] [--debug] [--dryrun] [--mediainfo] [--wait-for-jps-dl]
 
 Single group / release mode arguments:
 
@@ -163,6 +163,8 @@ Help for optional arguments:
   -m, --mediainfo       Search and get mediainfo data from the source file(s) in the directories
                         specified by MediaDirectories. Extract data to set codec, resolution,
                         audio format and container fields as well as the mediainfo field itself.
+  -w --wait-for-jps-dl  (Non-batch mode only) Show a prompt for the user to continue after scraping JPS torrent data and the
+                        torrent, to allow for the file to be downloaded before adding it to SM
 ```
 
 ## Development

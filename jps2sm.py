@@ -791,11 +791,11 @@ def main():
         fatal_error("Error: 'Display original Artist/Album titles' is enabled in your JPS user profile. This must be disabled for jps2sm to run.")
 
     if args.parsed.torrentid:
-        non_batch_upload(jps_torrent_id=args.parsed.torrentid, dry_run=args.parsed.dryrun)
+        non_batch_upload(jps_torrent_id=args.parsed.torrentid, dry_run=args.parsed.dryrun, wait_for_jps_dl=args.parsed.wait_for_jps_dl)
         return
 
     if args.parsed.urls:
-        non_batch_upload(jps_urls=args.parsed.urls, dry_run=args.parsed.dryrun)
+        non_batch_upload(jps_urls=args.parsed.urls, dry_run=args.parsed.dryrun, wait_for_jps_dl=args.parsed.wait_for_jps_dl)
         return
 
     if args.batch_modes == 1:
@@ -805,7 +805,7 @@ def main():
         raise RuntimeError('Argument handling error')
 
 
-def non_batch_upload(jps_torrent_id=None, jps_urls=None, dry_run=None):
+def non_batch_upload(jps_torrent_id=None, jps_urls=None, dry_run=None, wait_for_jps_dl=False):
     """
     Perform simple non-batch upload to SM with either a single jps_torrent_id from --torrentid or a string of --urls
     """
@@ -822,6 +822,10 @@ def non_batch_upload(jps_torrent_id=None, jps_urls=None, dry_run=None):
         jps_torrent_ids = re.findall('torrentid=([0-9]+)', args.parsed.urls)
     else:
         raise RuntimeError('Expected either a jps_torrent_id or a jps_url')
+
+    if wait_for_jps_dl:
+        pre_torrent_info = collate(torrentids=jps_torrent_ids, torrentgroupdata=jps_group_data, max_size=False, scrape_only=True)
+        input('When these files have been downloaded press enter to continue...')
 
     torrent_info = collate(jps_torrent_ids, jps_group_data)
     if not dry_run:
