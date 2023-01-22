@@ -349,7 +349,7 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
 
         logger.info(f'Now processing: {torrentid} {releasedatafull}')
 
-        if max_size and releasedatafull['size_units'] == "GB" and releasedatafull['size_no_units'] > 25:
+        if max_size and releasedatafull['size_units'] == "GB" and int(releasedatafull['size_no_units']) > 25:
             # Currently only a max_size of 25Gb is supported.
             # Very simple way of skipping based on size, if we Gb and it is >25 we skip, for all MB and KB torrents we do not skip.
             # TODO Add option to specify the file size
