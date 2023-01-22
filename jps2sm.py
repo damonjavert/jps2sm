@@ -349,16 +349,16 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
 
         logger.info(f'Now processing: {torrentid} {releasedatafull}')
 
-        if max_size and releasedatafull['size_units'] == "GB":
-            # Currently only a max_size of 1Gb is supported.
-            # Very simple way of just using the units, if we do not see 'GB' then it is < 1 Gb
+        if max_size and releasedatafull['size_units'] == "GB" and releasedatafull['size_no_units'] > 25:
+            # Currently only a max_size of 25Gb is supported.
+            # Very simple way of skipping based on size, if we Gb and it is >25 we skip, for all MB and KB torrents we do not skip.
             # TODO Add option to specify the file size
             skipped_max_size += 1
             logger.debug("Skipping as torrent is >=1Gb")
             continue
 
-        if int(releasedatafull['seeders']) < 1:
-            logger.debug('Skipping as torrent has no seeders')
+        if int(releasedatafull['seeders']) < 8:
+            logger.debug('Skipping as torrent has low seeders')
             skipped_low_seeders += 1
             continue
 
