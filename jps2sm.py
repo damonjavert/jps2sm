@@ -27,6 +27,7 @@ import json
 import logging
 from logging.handlers import RotatingFileHandler
 import io
+from time import sleep
 
 # Third-party packages
 from bs4 import BeautifulSoup
@@ -689,7 +690,11 @@ def batch_mode(jps_user_id=None):
             'dupe_sm_ids': [],
         }
 
-        input('When these files have been downloaded press enter to continue...')
+        print('Waiting 20 minutes for the files to download, or press Ctrl-C to continue immediately...')
+        try:
+            sleep(1200)
+        except KeyboardInterrupt:
+            pass
 
     for jps_group_id, jps_torrent_ids in batch_uploads.items():
         if jps_group_id in batch_uploads_group_errors or jps_group_id in batch_groups_excluded or jps_group_id in batch_groups_va_errors:
