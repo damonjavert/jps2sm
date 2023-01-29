@@ -34,7 +34,7 @@ import humanfriendly
 from pathlib import Path
 
 # jps2sm modules
-from jps2sm.get_data import GetGroupData, get_jps_group_data_class, get_user_keys, get_jps_user_id, get_torrent_link, get_release_data
+from jps2sm.get_data import GetGroupData, get_jps_group_data_class, get_torrent_link, get_release_data, GetJPSUser, GetSMUser
 from jps2sm.batch import get_batch_jps_group_torrent_ids, get_batch_group_data
 from jps2sm.utils import get_valid_filename, count_values_dict, fatal_error, GetConfig, GetArgs, HandleCfgOutputDirs, decide_duplicate
 from jps2sm.myloginsession import jpopsuki, sugoimusic
@@ -74,9 +74,12 @@ def download_sm_torrent(torrent_id, artist, title):
     :param torrent_id: SM torrentid to be downloaded
     :return: name: int: filename of torrent downloaded
     """
+
+    sm_user = GetSMUser()
+
     file = jpopsuki(
         'https://sugoimusic.me/torrents.php?action='
-        f'download&id={torrent_id}&authkey={authkey}&torrent_pass={torrent_password_key}'
+        f'download&id={torrent_id}&authkey={sm_user.auth_key()}&torrent_pass={sm_user.torrent_password_key()}'
     )
     name = get_valid_filename(
         "SM %s - %s - %s.torrent" % (artist, title, torrent_id)
@@ -109,9 +112,11 @@ def setorigartist(artist, origartist):
     linkbox = str(soup.select('#content .thin .header .linkbox'))
     artistid = re.findall(r'href="artist\.php\?action=edit&amp;artistid=([0-9]+)"', linkbox)[0]
 
+    sm_user = GetSMUser()
+
     data = {
         'action': 'edit',
-        'auth': authkey,
+        'auth': sm_user.auth_key(),
         'artistid': artistid,
         'name_jp': origartist
     }
@@ -146,8 +151,10 @@ def uploadtorrent(jps_torrent_object, torrentgroupdata, **uploaddata):
         # 'release_desc': releasedescription
     }
 
+    sm_user = GetSMUser()
+
     if not args.parsed.dryrun:
-        data['auth'] = authkey
+        data['auth'] = sm_user.auth_key()
 
     logger.debug(uploaddata)
 
@@ -784,7 +791,8 @@ def main():
         except configparser.NoSectionError:
             fatal_error('Error: --mediainfo requires you to configure MediaDirectories in jps2sm.cfg for mediainfo to find your file(s).')
 
-    jps_user_id = get_jps_user_id()
+    jps_user = GetJPSUser()
+    jps_user_id = jps_user.user_id()
     logger.debug(f"JPopsuki user id is {jps_user_id}")
 
     if detect_display_swapped_names(jps_user_id):
@@ -851,14 +859,8 @@ if __name__ == "__main__":
     # with this pattern, it's rarely necessary to propagate the error up to parent
     logger.propagate = False
 
-    if not args.parsed.dryrun:
-        # We only want this run ONCE per instance of the script
-        # TODO Move to a class
-        userkeys = get_user_keys()
-        authkey = userkeys['authkey']
-        torrent_password_key = userkeys['torrent_password_key']
-
     if not args.parsed.debug:
         sys.tracebacklimit = 0
 
     main()
+

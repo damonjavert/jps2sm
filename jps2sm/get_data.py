@@ -5,7 +5,7 @@ import itertools
 import time
 import json
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Dict
 import collections
 
 from jps2sm.myloginsession import jpopsuki, sugoimusic
@@ -348,7 +348,19 @@ def get_group_descrption_bbcode(groupid):
     return bbcode_sanitised
 
 
-def get_jps_user_id():
+class GetJPSUser:
+
+    __jps_user_id = None
+
+    def __init__(self):
+        if GetJPSUser.__jps_user_id is None:
+            GetJPSUser.__jps_user_id = get_jps_user_id()
+
+    def user_id(self):
+        return GetJPSUser.__jps_user_id
+
+
+def get_jps_user_id() -> int:
     """
     Returns the JPopSuki user id
     :return: int: user id
@@ -362,11 +374,30 @@ def get_jps_user_id():
     return int(str(jps_user_id))
 
 
-def get_user_keys():
+class GetSMUser:
+
+    __authkey = None
+    __torrent_password_key = None
+
+    def __init__(self):
+        if GetSMUser.__authkey is None:
+            userkeys = get_user_keys()
+            GetSMUser.__authkey = userkeys['authkey']
+            GetSMUser.__torrent_password_key = userkeys['torrent_password_key']
+
+    def auth_key(self) -> str:
+        return GetSMUser.__authkey
+
+    def torrent_password_key(self) -> str:
+        return GetSMUser.__torrent_password_key
+
+
+def get_user_keys() -> Dict[str]:
     """
     Get SM session authkey and torrent_password_key for use by uploadtorrent()|download_sm_torrent() data dict.
     Uses SM login data
     """
+
     smpage = sugoimusic("https://sugoimusic.me/torrents.php?id=118", test_login=True)  # Arbitrary page on JPS that has authkey
     soup = BeautifulSoup(smpage.text, 'html5lib')
     rel2 = str(soup.select_one('#torrent_details .group_torrent > td > span > .tooltip'))
