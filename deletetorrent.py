@@ -24,7 +24,7 @@ __version__ = "0.3.0"
 
 def getauthkey():
     SMshome = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr)
-    SMreshome = SMshome.retrieveContent("https://sugoimusic.me/torrents.php?id=118")
+    SMreshome = SMshome.retrieve_content("https://sugoimusic.me/torrents.php?id=118")
     soup = BeautifulSoup(SMreshome.text, 'html5lib')
     rel = str(soup.select('#content .thin .main_column .torrent_table tbody'))
     authkey = re.findall('authkey=(.*)&amp;torrent_pass=', rel)
@@ -73,7 +73,7 @@ if __name__ == "__main__":
             }
 
             s = MyLoginSession(SMloginUrl, SMloginData, SMloginTestUrl, SMsuccessStr)
-            res = s.retrieveContent("https://sugoimusic.me/torrents.php", "post", data)
+            res = s.retrieve_content("https://sugoimusic.me/torrents.php", "post", data)
 
             deletesuccess = re.findall('Torrent was successfully (.*)\.', res.text)
             if deletesuccess:
