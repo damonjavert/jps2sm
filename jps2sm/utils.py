@@ -18,7 +18,7 @@ from pathlib import Path
 
 logger = logging.getLogger('main.' + __name__)
 
-__version__ = "1.5.1"
+__version__ = "1.12"
 
 
 def get_valid_filename(s: str) -> AnyStr:
