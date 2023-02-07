@@ -5,7 +5,7 @@ import itertools
 import time
 import json
 from dataclasses import dataclass
-from typing import Optional, Dict
+from typing import Optional, Dict, List, Any, Union, Tuple
 import collections
 
 from jps2sm.myloginsession import jpopsuki, sugoimusic
@@ -34,7 +34,7 @@ class JPSGroup:
     contribartists: str
 
 
-def get_jps_group_data_class(batch_group_data, jps_group_id):
+def get_jps_group_data_class(batch_group_data: dict, jps_group_id: int) -> dataclass(JPSGroup):
     """
     Extract a JPS group's data from batch_group_data{} and present it as a JPSGroup dataclass.
     In the future this can potentially be used to provide validation, or collate() and uploadtorrent() may
@@ -42,7 +42,7 @@ def get_jps_group_data_class(batch_group_data, jps_group_id):
 
     :param batch_group_data: dict
     :param jps_group_id: int
-    :returns: torrent_group_data: class
+    :returns: torrent_group_data: dataclass JPSGroup
     """
 
     torrent_group_data = JPSGroup(
@@ -88,7 +88,7 @@ class GetGroupData:
 
         self.getdata()
 
-    def getdata(self):
+    def getdata(self) -> None:
         date_regex = r'[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])'  # YYYY.MM.DD format
         # YYYY.MM.DD OR YYYY format, for Pictures only
         date_regex2 = r'(?:[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])|(?:19|20)\d\d)'
@@ -242,11 +242,10 @@ class GetGroupData:
             if self.artist == ['V.A.']:
                 raise Exception("V.A. torrent with to contrib artists set - torrent has no valid artists so this cannot be uploaded.")
 
-
-    def originalchars(self):
+    def originalchars(self) -> Tuple[str, str]:
         return self.originalartist, self.originaltitle
 
-    def all(self):
+    def all(self) -> Dict[str, Union[str, Tuple[str, str]]]:
         return {
             'groupid': self.groupid,
             'category': self.category,
@@ -267,22 +266,36 @@ class GetGroupData:
         return self.item
 
 
-def split_bad_multiple_artists(artists):
+def split_bad_multiple_artists(artists: str) -> List[str]:
+    # TODO When upgrading to 3.9+ the type can be changed to list[str] See PEP 585
     return re.split(', | x | & ', artists)
 
 
-def get_release_data(torrentids, release_data, date):
+def get_release_data(torrentids: List[str], torrent_table: str, date: str) -> Dict[str, Dict[str, Union[List[str], str]]]:
+    # TODO When upgrading to 3.9+ the 'List[str]' can be changed to 'list[str]' and  'Union[list, str]' can be 'list | str'. See PEP 585
     """
-    Retrieve all torrent id and release data (slash separated data and upload date) whilst coping with 'noise' from FL torrents,
-    and either return all data if using a group URL or only return the relevant releases if release url(s) were used
+    Retrieve all torrent id and release data (slash separated data, upload date torrent size, snatch count, seeders, leechers)
+    whilst coping with 'noise' from FL torrents, and either return all data if using a group URL or only return the relevant
+    releases if release url(s) were used
 
-    :param torrentids: list of torrentids to be processed, NULL if group is used
-    :return: releasedata: 2d dict of release data in the format of torrentid: { "slashdata" : [ slashdatalist ] , "uploaddate": uploaddate } .
+    :param torrentids: list of torrentids to be processed, empty list if a group URL is being used.
+    :param torrent_table: contents of .torrent_table tbody of the JPS group page
+    :param date: Date for the JPS group in YYYYMMDD format or YYYY
+    :return: releasedata: 2d dict of release data in the format of :
+                torrentid: { "slashdata" : [ slashdatalist ] ,
+                          "uploaddate": uploaddate,
+                          "size_no_units": size_no_units,
+                          "size_units" : size_units,
+                          "completed" : completed,
+                          "seeders" : seeders,
+                         "leechers": leechers, }
+                        ,
+                       ...
     """
 
-    # print(release_data)
+    # print(torrent_table)
     freeleechtext = '<strong>Freeleech!</strong>'
-    releasedatapre = re.findall(r"swapTorrent\('([0-9]+)'\);\">» (.+?(?=</a>))</a>(?:\s*)</td>(?:\s*)<td class=\"nobr\">(\d*(?:\.)?(?:\d{0,2})?) (\w{2})</td>(?:\s*)<td>([0-9,]{1,6})</td>(?:\s*)<td>([0-9,]{1,6})</td>(?:\s*)<td>([0-9,]{1,6})</td>.*?<blockquote>(?:\s*)Uploaded by <a href=\"user.php\?id=(?:[0-9]+)\">(?:[\S]+)</a>  on <span title=\"(?:[^\"]+)\">([^<]+)</span>", release_data, re.DOTALL)
+    releasedatapre = re.findall(r"swapTorrent\('([0-9]+)'\);\">» (.+?(?=</a>))</a>(?:\s*)</td>(?:\s*)<td class=\"nobr\">(\d*(?:\.)?(?:\d{0,2})?) (\w{2})</td>(?:\s*)<td>([0-9,]{1,6})</td>(?:\s*)<td>([0-9,]{1,6})</td>(?:\s*)<td>([0-9,]{1,6})</td>.*?<blockquote>(?:\s*)Uploaded by <a href=\"user.php\?id=(?:[0-9]+)\">(?:[\S]+)</a>  on <span title=\"(?:[^\"]+)\">([^<]+)</span>", torrent_table, re.DOTALL)
     # logger.debug(f'Pre-processed releasedata: {json.dumps(releasedatapre, indent=2)}')
 
     releasedata = {}
@@ -332,7 +345,7 @@ def get_release_data(torrentids, release_data, date):
     return releasedata
 
 
-def get_group_descrption_bbcode(groupid):
+def get_group_descrption_bbcode(groupid: str) -> str:
     """
     Retrieve original bbcode from edit group url and reformat any JPS style bbcode
 
@@ -356,7 +369,7 @@ class GetJPSUser:
         if GetJPSUser.__jps_user_id is None:
             GetJPSUser.__jps_user_id = get_jps_user_id()
 
-    def user_id(self):
+    def user_id(self) -> str:
         return GetJPSUser.__jps_user_id
 
 
@@ -408,12 +421,13 @@ def get_user_keys() -> Dict[str, str]:
     }
 
 
-def get_torrent_link(torrentid, release_data):
+def get_torrent_link(torrentid: str, torrent_table: str) -> str:
     """
     Extract a torrent link for a given torrentid
 
     :param torrentid:
+    :param torrent_table: str of torrent_table in JPS group page
     :return: torrentlink: URI of torrent link
     """
-    torrentlink = re.findall(rf'torrents\.php\?action=download&amp;id={torrentid}&amp;authkey=(?:[^&]+)&amp;torrent_pass=(?:[^"]+)', release_data)[0]
+    torrentlink = re.findall(rf'torrents\.php\?action=download&amp;id={torrentid}&amp;authkey=(?:[^&]+)&amp;torrent_pass=(?:[^"]+)', torrent_table)[0]
     return torrentlink

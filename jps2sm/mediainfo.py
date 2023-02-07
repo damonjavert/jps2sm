@@ -1,6 +1,7 @@
 import logging
 import os
-from typing import AnyStr
+from io import BytesIO
+from typing import AnyStr, List, Tuple, Dict
 
 # Third-party modules
 from pymediainfo import MediaInfo
@@ -12,7 +13,7 @@ import tempfile
 logger = logging.getLogger('main.' + __name__)
 
 
-def get_mediainfo(jps_torrent_object, media, media_roots):
+def get_mediainfo(jps_torrent_object: BytesIO, media: str, media_roots: List[str]) -> Tuple[str, Dict[str, str]]:
     """
     Get filename(s) of video files in the torrent and run mediainfo and capture the output, extract if DVD found (Blurays not yet supported)
     then set the appropriate fields for the upload
@@ -178,7 +179,7 @@ def get_mediainfo(jps_torrent_object, media, media_roots):
     return mediainfosall, releasedataout
 
 
-def get_mediainfo_duration(filename):
+def get_mediainfo_duration(filename: Path) -> float:
     """
     Get duration in mediainfo for filename
 
@@ -195,7 +196,7 @@ def get_mediainfo_duration(filename):
                 return float(track.duration)  # time in ms
 
 
-def get_media_location(media_name, directory, media_roots):
+def get_media_location(media_name: str, directory: bool, media_roots: List[str]) -> Path:
     """
     Find the location of the directory or file of the source data for getmediainfo()
 
