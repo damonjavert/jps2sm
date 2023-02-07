@@ -1,7 +1,7 @@
 import logging
 import os
 from io import BytesIO
-from typing import AnyStr, List, Tuple, Dict
+from typing import AnyStr, List, Tuple, Dict, Union
 
 # Third-party modules
 from pymediainfo import MediaInfo
@@ -90,7 +90,7 @@ def get_mediainfo(jps_torrent_object: BytesIO, media: str, media_roots: List[str
                 filename = os.path.join(*[file_path, *file['path']])  # Each file in the directory of source data for the torrent
 
             mediainfosall += str(MediaInfo.parse(filename, text=True))
-            releasedataout['duration'] += get_mediainfo_duration(filename)
+            releasedataout['duration'] += get_mediainfo_duration(filename)  # TODO should this reference file_path directly?
             # Get biggest file and mediainfo on this to set the fields for the release
             maxfile = max(torrentmetadata['info']['files'], key=lambda x: x['length'])  # returns {'length': int, 'path': [str]} of largest file
             fileforsmfields = Path(*[file_path, *maxfile['path']])  # Assume the largest file is the main file that should populate SM upload fields
@@ -134,7 +134,7 @@ def get_mediainfo(jps_torrent_object: BytesIO, media: str, media_roots: List[str
     mediainfosall = mediainfosall.replace(replacement, '')
 
     if Path(fileforsmfields).suffix == '.iso' and media == 'DVD':
-        tempdir.cleanup()
+        tempdir.cleanup()  # TODO This looks like it can be moved to the if block above
 
     for track in mediainforeleasedata.tracks:
         if track.track_type == 'General':
@@ -184,7 +184,7 @@ def get_mediainfo(jps_torrent_object: BytesIO, media: str, media_roots: List[str
     return mediainfosall, releasedataout
 
 
-def get_mediainfo_duration(filename: Path) -> float:
+def get_mediainfo_duration(filename: Union[str, Path]) -> float:
     """
     Get duration in mediainfo for filename
 
