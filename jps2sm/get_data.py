@@ -392,7 +392,7 @@ class GetSMUser:
         return GetSMUser.__torrent_password_key
 
 
-def get_user_keys() -> Dict[str]:
+def get_user_keys() -> Dict[str, str]:
     """
     Get SM session authkey and torrent_password_key for use by uploadtorrent()|download_sm_torrent() data dict.
     Uses SM login data
