@@ -75,6 +75,8 @@ def get_mediainfo(jps_torrent_object: BytesIO, media: str, media_roots: List[str
 
     # TODO Need to cleanup the logic to create an overall filename list to parse instead of the 3-way duplication we currently have
 
+    fileforsmfields = None
+
     if 'files' in torrentmetadata['info'].keys():  # Multiple files
         directory = torrentname
         logger.info(f'According torrent metadata the dir is {directory}')
@@ -101,6 +103,9 @@ def get_mediainfo(jps_torrent_object: BytesIO, media: str, media_roots: List[str
         mediainfosall += str(MediaInfo.parse(file_path, text=True))
         releasedataout['duration'] += get_mediainfo_duration(file_path)
         fileforsmfields = file_path
+
+    if fileforsmfields is None:
+        raise RuntimeError("Error in parsing torrent meta data to get the filename used for populating the SM media fields.")
 
     if fileforsmfields.suffix == '.iso' and media == 'DVD':
         # If DVD, extract the ISO and run mediainfo against appropriate files, if BR we skip as pyunpack (patool/7z) cannot extract them
