@@ -1,7 +1,7 @@
 import logging
 import os
 from io import BytesIO
-from typing import AnyStr, List, Tuple, Dict, Union
+from typing import List, Tuple, Dict, Union
 
 # Third-party modules
 from pymediainfo import MediaInfo
@@ -22,12 +22,11 @@ def get_mediainfo(jps_torrent_object: BytesIO, media: str, media_roots: List[str
     :param media: str Validated media from collate()
     :param media_roots: Sanitised MediaDirectories from cfg for use by get_media_location()
     :return: mediainfo, releasedataout
-
-    mediainfo: Mediainfo text output of the file(s)
-    releaseadtaout: Fields gathered from mediainfo for SM upload
+            mediainfo: Mediainfo text output of the file(s)
+            releaseadtaout: Fields gathered from mediainfo for SM upload
     """
 
-    def validate_container(file_extension: str) -> AnyStr:
+    def validate_container(file_extension: str) -> str:
         """
         Map known 'bad' / alternative file extensions of containers to the primary name of the container type.
         """
@@ -46,7 +45,7 @@ def get_mediainfo(jps_torrent_object: BytesIO, media: str, media_roots: List[str
 
         return validated_extension
 
-    def validate_codec(codec: str) -> AnyStr:
+    def validate_codec(codec: str) -> str:
         """
         Map known alternative names for codecs returned by mediainfo to the primary name of the codec
         """
