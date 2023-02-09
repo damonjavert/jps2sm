@@ -305,7 +305,10 @@ def uploadtorrent(jps_torrent_object, torrentgroupdata, **uploaddata):
         if SMerrorLogon:
             raise Exception(f'Invalid {SMerrorLogon[0]}')
 
-        html_debug_output_filename = f"SMuploadresult.{torrentgroupdata.artist[0]}.{torrentgroupdata.title}.{torrentgroupdata.date}.JPS_ID{uploaddata['jpstorrentid']}.html"
+        html_debug_output_filename = f"SMuploadresult." + \
+                                     get_valid_filename(f"{torrentgroupdata.artist[0]}.{torrentgroupdata.title}.{torrentgroupdata.date}."
+                                                        f"JPS_ID{uploaddata['jpstorrentid']}") + \
+                                     f".html"
         html_debug_output_path = Path(output.file_dir['html'], html_debug_output_filename)
 
         with open(html_debug_output_path, "w") as f:
