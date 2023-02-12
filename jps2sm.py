@@ -36,6 +36,7 @@ from loguru import logger
 
 # jps2sm modules
 from jps2sm.get_data import GetGroupData, get_jps_group_data_class, get_torrent_link, get_release_data, GetJPSUser, GetSMUser
+from jps2sm.save_data import save_sm_html_debug_output
 from jps2sm.batch import get_batch_jps_group_torrent_ids, get_batch_group_data
 from jps2sm.utils import get_valid_filename, count_values_dict, fatal_error, GetConfig, GetArgs, HandleCfgOutputDirs, decide_duplicate
 from jps2sm.myloginsession import jpopsuki, sugoimusic
@@ -43,6 +44,7 @@ from jps2sm.constants import Categories, VideoOptions
 from jps2sm.mediainfo import get_mediainfo
 from jps2sm.validation import decide_music_performance, get_alternate_fansub_category_id, validate_jps_video_data, validate_jps_bitrate, \
     decide_exc_filter, decide_ep
+
 
 
 def detect_display_swapped_names(userid):
@@ -320,14 +322,7 @@ def uploadtorrent(jps_torrent_object, torrentgroupdata, **uploaddata):
         if SMerrorLogon:
             raise Exception(f'Invalid {SMerrorLogon[0]}')
 
-        html_debug_output_filename = f"SMuploadresult." + \
-                                     get_valid_filename(f"{torrentgroupdata.artist[0]}.{torrentgroupdata.title}.{torrentgroupdata.date}."
-                                                        f"JPS_ID{uploaddata['jpstorrentid']}") + \
-                                     f".html"
-        html_debug_output_path = Path(output.file_dir['html'], html_debug_output_filename)
-
-        with open(html_debug_output_path, "w") as f:
-            f.write(str(SMres.content))
+        html_debug_output_path = save_sm_html_debug_output(SMres.text, torrentgroupdata, uploaddata['jpstorrentid'])
 
         groupid = re.findall('<input type="hidden" name="groupid" value="([0-9]+)" />', SMres.text)
         if not groupid:
