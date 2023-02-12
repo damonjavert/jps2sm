@@ -135,6 +135,7 @@ def uploadtorrent(jps_torrent_object, torrentgroupdata, **uploaddata):
     :param groupid: groupid to upload to - allows to upload torrents to the same group
     :param uploaddata: dict of collated / validated release data from collate()
     """
+    config = GetConfig()
     uploadurl = 'https://sugoimusic.me/upload.php'
     languages = ('Japanese', 'English', 'Korean', 'Chinese', 'Vietnamese')
 
@@ -352,6 +353,8 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
     :param max_size: bool: Only upload torrents < 1Gb if True
     :param scrape_only: bool: Only download JPS torrents, do not upload to SM
     """
+    config = GetConfig()
+
     jps_torrent_downloaded_count = sm_torrent_uploaded_count = skipped_max_size = skipped_low_seeders = skipped_exc_filter = skipped_dupe = 0
     dupe_jps_ids = []
     dupe_sm_ids = []
@@ -785,6 +788,7 @@ def main():
         sys.tracebacklimit = 0
 
     if args.parsed.mediainfo:
+        config = GetConfig()
         try:
             for media_dir in config.media_roots:
                 if not os.path.exists(media_dir):
@@ -845,8 +849,8 @@ def non_batch_upload(jps_torrent_id=None, jps_urls=None, dry_run=None, wait_for_
 
 if __name__ == "__main__":
     args = GetArgs()
-    config = GetConfig()
-    output = HandleCfgOutputDirs(config.directories)  # Get config dirs config, handle absolute/relative paths and create if not exist
+    _config = GetConfig()
+    output = HandleCfgOutputDirs(_config.directories)  # Get config dirs config, handle absolute/relative paths and create if not exist
 
     main()
 

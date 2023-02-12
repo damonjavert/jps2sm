@@ -126,10 +126,14 @@ class GetArgs:
 
 
 class GetConfig:
-    def __init__(self):
-        script_dir = Path(__file__).parent.parent
+    __config_parsed = None
 
-        # Get configuration
+    def __init__(self):
+        if GetConfig.__config_parsed is not None:
+            return
+
+        GetConfig.__config_parsed = True
+        script_dir = Path(__file__).parent.parent
         config = configparser.ConfigParser()
         configfile = Path(script_dir, 'jps2sm.cfg')
         try:
@@ -139,19 +143,19 @@ class GetConfig:
                 f'Error: config file {configfile} not found - enter your JPS/SM credentials in jps2sm.cfg and check jps2sm.cfg.example to see the syntax.')
 
         config.read(configfile)
-        self.jps_user = config.get('JPopSuki', 'User')
-        self.jps_pass = config.get('JPopSuki', 'Password')
-        self.sm_user = config.get('SugoiMusic', 'User')
-        self.sm_pass = config.get('SugoiMusic', 'Password')
-        self.media_roots = [x.strip() for x in config.get('Media', 'MediaDirectories').split(',')]  # Remove whitespace after comma if any
-        self.directories = config.items('Directories')
+        GetConfig.jps_user = config.get('JPopSuki', 'User')
+        GetConfig.jps_pass = config.get('JPopSuki', 'Password')
+        GetConfig.sm_user = config.get('SugoiMusic', 'User')
+        GetConfig.sm_pass = config.get('SugoiMusic', 'Password')
+        GetConfig.media_roots = [x.strip() for x in config.get('Media', 'MediaDirectories').split(',')]  # Remove whitespace after comma if any
+        GetConfig.directories = config.items('Directories')
         try:
-            self.skip_dupes = config.getboolean('SugoiMusic', 'SkipDuplicates')
+            GetConfig.skip_dupes = config.getboolean('SugoiMusic', 'SkipDuplicates')
         except configparser.NoOptionError:
-            self.skip_dupes = False
+            GetConfig.skip_dupes = False
 
     def __getattr__(self, item):
-        return self.item
+        return GetConfig.item
 
 
 class HandleCfgOutputDirs:
