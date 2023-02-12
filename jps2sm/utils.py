@@ -55,7 +55,13 @@ def fatal_error(msg):
 
 
 class GetArgs:
+    __args_parsed = None
+
     def __init__(self):
+        if GetArgs.__args_parsed is not None:
+            return
+
+        GetArgs.__args_parsed = True
         parser = argparse.ArgumentParser()
         parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + __version__)
         parser.add_argument('-d', '--debug', help='Enable debug mode', action='store_true')
@@ -76,51 +82,51 @@ class GetArgs:
         parser.add_argument("-exf", "--excaudioformat", help="(Batch mode only) Exclude an audioformat from upload", type=str)
         parser.add_argument("-exm", "--excmedia", help="(Batch mode only) Exclude a media from upload", type=str)
         parser.add_argument("-m", "--mediainfo", help="Search and get mediainfo data from the source file(s) in the directories specified by MediaDirectories. Extract data to set codec, resolution, audio format and container fields as well as the mediainfo field itself.", action="store_true")
-        self.parsed = parser.parse_args()
+        GetArgs.parsed = parser.parse_args()
 
         # Handle bag args
-        self.batch_modes = sum([bool(self.parsed.batchuploaded),
-                                bool(self.parsed.batchseeding),
-                                bool(self.parsed.batchsnatched),
-                                bool(self.parsed.batchrecent)])
-        if self.batch_modes > 1:
+        GetArgs.batch_modes = sum([bool(GetArgs.parsed.batchuploaded),
+                                   bool(GetArgs.parsed.batchseeding),
+                                   bool(GetArgs.parsed.batchsnatched),
+                                   bool(GetArgs.parsed.batchrecent)])
+        if GetArgs.batch_modes > 1:
             fatal_error('Error: Multiple batch modes of operation specified - only one can be used at the same time. See --help')
 
-        if self.parsed.urls is not None and self.parsed.torrentid is not None:
+        if GetArgs.parsed.urls is not None and GetArgs.parsed.torrentid is not None:
             fatal_error('Error: Both JPS URL(s) (--urls) and a JPS torrent id (--torrentid) have been specified '
                         '- only one can be used at the same time. See --help')
-        if self.parsed.urls is None and self.parsed.torrentid is None and self.batch_modes == 0:
+        if GetArgs.parsed.urls is None and GetArgs.parsed.torrentid is None and GetArgs.batch_modes == 0:
             fatal_error('Error: Neither any JPS URL(s) (--urls) '
                         'nor a JPS torrent id (--torrentid) '
                         'nor any batch parameters (--batchsnatched, --batchuploaded, --batchseeding or --batchrecent) have been specified. See --help')
-        elif (self.parsed.urls is not None or self.parsed.torrentid is not None) and self.batch_modes == 1:
+        elif (GetArgs.parsed.urls is not None or GetArgs.parsed.torrentid is not None) and GetArgs.batch_modes == 1:
             fatal_error(
                 'Error: Both the JPS URL(s) (--urls) or torrent id (--torrentid) and batch parameters '
                 '(--batchsnatched,--batchuploaded, --batchseeding or --batchrecent) have been specified, but only one is allowed.')
 
-        if self.parsed.batchsort is not None and self.parsed.batchsort not in JPSTorrentView.sort_by.keys():
+        if GetArgs.parsed.batchsort is not None and GetArgs.parsed.batchsort not in JPSTorrentView.sort_by.keys():
             fatal_error(f'Error: Incorrect --batchsort mode specified, sort mode must be one of {",".join(JPSTorrentView.sort_by.keys())}')
-        if self.parsed.batchsortorder is not None and str(self.parsed.batchsortorder).upper() not in ("ASC", "DESC"):
+        if GetArgs.parsed.batchsortorder is not None and str(GetArgs.parsed.batchsortorder).upper() not in ("ASC", "DESC"):
             fatal_error(f'Error: Incorrect --batchsortorder specified, order must be wither ASC or DESC')
-        if self.parsed.exccategory is not None and str(self.parsed.exccategory) not in Categories.JPS:
+        if GetArgs.parsed.exccategory is not None and str(GetArgs.parsed.exccategory) not in Categories.JPS:
             fatal_error(f'Error: Incorrect --exccategory specified, it must match a JPS category, these are: {",".join(Categories.JPS)}')
 
-        if self.batch_modes == 1:  # Handle bad batch args TODO this should be handles as part of proper sub args if possible
-            if self.parsed.batchuser:
-                if self.parsed.batchuser.isnumeric() is False:
+        if GetArgs.batch_modes == 1:  # Handle bad batch args TODO this should be handles as part of proper sub args if possible
+            if GetArgs.parsed.batchuser:
+                if GetArgs.parsed.batchuser.isnumeric() is False:
                     fatal_error('Error: "--batchuser" or short "-b" should be a JPS profile ID. See --help')
 
-            if bool(self.parsed.batchstart) ^ bool(self.parsed.batchend):
+            if bool(GetArgs.parsed.batchstart) ^ bool(GetArgs.parsed.batchend):
                 fatal_error('Error: You have specified an incomplete page range. See --help')
 
-            if self.parsed.batchuploaded:
-                self.batch_mode = "uploaded"
-            elif self.parsed.batchseeding:
-                self.batch_mode = "seeding"
-            elif self.parsed.batchsnatched:
-                self.batch_mode = "snatched"
-            elif self.parsed.batchrecent:
-                self.batch_mode = "recent"
+            if GetArgs.parsed.batchuploaded:
+                GetArgs.batch_mode = "uploaded"
+            elif GetArgs.parsed.batchseeding:
+                GetArgs.batch_mode = "seeding"
+            elif GetArgs.parsed.batchsnatched:
+                GetArgs.batch_mode = "snatched"
+            elif GetArgs.parsed.batchrecent:
+                GetArgs.batch_mode = "recent"
             else:
                 raise RuntimeError("Expected some batch mode to be set")
 
