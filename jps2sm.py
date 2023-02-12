@@ -32,6 +32,7 @@ import io
 from bs4 import BeautifulSoup
 import humanfriendly
 from pathlib import Path
+from loguru import logger
 
 # jps2sm modules
 from jps2sm.get_data import GetGroupData, get_jps_group_data_class, get_torrent_link, get_release_data, GetJPSUser, GetSMUser
@@ -562,18 +563,6 @@ def downloaduploadedtorrents(torrentcount, artist, title):
         logger.debug(f'Downloaded SM torrent as {torrentpath}')
 
 
-def get_console_handler():
-    console_handler = logging.StreamHandler(sys.stdout)
-    # console_handler.setFormatter(FORMATTER)
-    return console_handler
-
-
-def get_file_handler():
-    file_handler = RotatingFileHandler(log_file, maxBytes=1048576)
-    file_handler.setFormatter(FORMATTER)
-    return file_handler
-
-
 def batch_mode(jps_user_id=None):
     """
     Operate batch upload mode
@@ -784,6 +773,17 @@ def batch_mode(jps_user_id=None):
 
 def main():
 
+    if args.parsed.debug:
+        stderr_log_level = "DEBUG"
+    else:
+        stderr_log_level = "INFO"
+    logger.remove()
+    logger.add(sys.stderr, format="<lvl>{message}</>", level=stderr_log_level)
+    logger.add("jps2sm.log", level="DEBUG", rotation="1 MB")
+
+    if not args.parsed.debug:
+        sys.tracebacklimit = 0
+
     if args.parsed.mediainfo:
         try:
             for media_dir in config.media_roots:
@@ -847,23 +847,6 @@ if __name__ == "__main__":
     args = GetArgs()
     config = GetConfig()
     output = HandleCfgOutputDirs(config.directories)  # Get config dirs config, handle absolute/relative paths and create if not exist
-
-    FORMATTER = logging.Formatter("%(asctime)s — %(name)s — %(levelname)s — %(message)s")
-    scriptdir = os.path.dirname(os.path.abspath(sys.argv[0]))
-    log_file = scriptdir + '/jps2sm.log'
-
-    logger = logging.getLogger('main')
-    if args.parsed.debug:
-        logger.setLevel(logging.DEBUG)
-    else:
-        logger.setLevel(logging.INFO)
-    logger.addHandler(get_console_handler())
-    logger.addHandler(get_file_handler())
-    # with this pattern, it's rarely necessary to propagate the error up to parent
-    logger.propagate = False
-
-    if not args.parsed.debug:
-        sys.tracebacklimit = 0
 
     main()
 

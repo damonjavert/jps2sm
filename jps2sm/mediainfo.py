@@ -1,4 +1,3 @@
-import logging
 import os
 from io import BytesIO
 from typing import List, Tuple, Dict, Union
@@ -10,7 +9,7 @@ from pyunpack import Archive
 from pathlib import Path
 import tempfile
 
-logger = logging.getLogger('main.' + __name__)
+from loguru import logger
 
 
 def get_mediainfo(jps_torrent_object: BytesIO, media: str, media_roots: List[str]) -> Tuple[str, Dict[str, str]]:

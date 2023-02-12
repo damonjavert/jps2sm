@@ -1,5 +1,4 @@
 # Standard library packages
-import logging
 import re
 
 from jps2sm.myloginsession import jpopsuki
@@ -9,8 +8,7 @@ from jps2sm.utils import GetArgs
 # Third-party packages
 from bs4 import BeautifulSoup
 import torrent_parser as tp
-
-logger = logging.getLogger('main.' + __name__)
+from loguru import logger
 
 
 def decide_music_performance(artists, multiplefiles, duration):

@@ -1,5 +1,4 @@
 # Standard library packages
-import logging
 import re
 from typing import AnyStr
 import sys
@@ -15,8 +14,7 @@ from jps2sm.constants import JPSTorrentView, Categories
 
 # Third-party packages
 from pathlib import Path
-
-logger = logging.getLogger('main.' + __name__)
+from loguru import logger
 
 __version__ = "1.12.1"
 

@@ -18,3 +18,4 @@ pyunpack==0.2.2
 patool==1.12
 bencoding==0.2.6
 requestsloginsession==0.6.1
+loguru==0.6.0

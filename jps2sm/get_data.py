@@ -1,5 +1,4 @@
 # Standard library packages
-import logging
 import re
 import itertools
 import time
@@ -15,7 +14,7 @@ from jps2sm.utils import remove_html_tags
 # Third-party packages
 from bs4 import BeautifulSoup
 
-logger = logging.getLogger('main.' + __name__)
+from loguru import logger
 
 
 @dataclass

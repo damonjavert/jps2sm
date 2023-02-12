@@ -1,12 +1,8 @@
-# Standard library packages
-import logging
+from jps2sm.utils import GetConfig
 
 # External packages
 from requestsloginsession import RequestsLoginSession
-
-from jps2sm.utils import GetConfig
-
-logger = logging.getLogger('main.' + __name__)
+from loguru import logger
 
 
 def jpopsuki(url, test_login=False):
