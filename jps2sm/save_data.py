@@ -29,7 +29,7 @@ def save_sm_html_debug_output(content: str, torrent_group_data: Type[GetGroupDat
     return html_debug_output_path
 
 
-def downloaduploadedtorrents(torrentcount: int, artist: str, title: str) -> None:
+def download_sm_uploaded_torrents(torrentcount: int, artist: str, title: str) -> None:
     """
     Get last torrentcount torrent DL links that user uploaded using SM API and download them
 
@@ -64,7 +64,7 @@ def downloaduploadedtorrents(torrentcount: int, artist: str, title: str) -> None
 
 def download_sm_torrent(torrent_id: str, artist: str, title: str) -> str:
     """
-    Downloads the SM torrent if it is a dupe, in this scenario we cannot use downloaduploadedtorrents() as the user
+    Downloads the SM torrent if it is a dupe, in this scenario we cannot use download_sm_uploaded_torrents() as the user
     has not actually uploaded it.
 
     :param torrent_id: SM torrentid to be downloaded

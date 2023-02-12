@@ -36,7 +36,7 @@ from loguru import logger
 
 # jps2sm modules
 from jps2sm.get_data import GetGroupData, get_jps_group_data_class, get_torrent_link, get_release_data, GetJPSUser, GetSMUser
-from jps2sm.save_data import save_sm_html_debug_output, downloaduploadedtorrents, download_sm_torrent
+from jps2sm.save_data import save_sm_html_debug_output, download_sm_uploaded_torrents, download_sm_torrent
 from jps2sm.batch import get_batch_jps_group_torrent_ids, get_batch_group_data
 from jps2sm.utils import get_valid_filename, count_values_dict, fatal_error, GetConfig, GetArgs, HandleCfgOutputDirs, decide_duplicate
 from jps2sm.myloginsession import jpopsuki, sugoimusic
@@ -500,7 +500,7 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
 
     collate_torrent_info = {
         'jps_torrents_downloaded_count': jps_torrent_downloaded_count,
-        'sm_torrents_uploaded_count': sm_torrent_uploaded_count,  # For use by downloaduploadedtorrents() or statisics when in a batch_mode
+        'sm_torrents_uploaded_count': sm_torrent_uploaded_count,  # For use by download_sm_uploaded_torrents() or statisics when in a batch_mode
         'skipped_torrents_max_size': skipped_max_size,
         'skipped_torrents_low_seeders': skipped_low_seeders,
         'skipped_torrents_exc_filter': skipped_exc_filter,
@@ -656,7 +656,7 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
                     raise RuntimeError('Expected either int or list in collate_torrent_info.items() from collate()')
 
             if not args.parsed.dryrun:
-                downloaduploadedtorrents(collate_torrent_info['sm_torrents_uploaded_count'], jps_group_data.artist, jps_group_data.title)
+                download_sm_uploaded_torrents(collate_torrent_info['sm_torrents_uploaded_count'], jps_group_data.artist, jps_group_data.title)
                 batch_torrent_info['sm_torrents_uploaded_count'] += collate_torrent_info['sm_torrents_uploaded_count'] #  This will always be same as '+=1'
         except KeyboardInterrupt:  # Allow Ctrl-C to exit without showing the error multiple times and polluting the final error dict
             break  # Still continue to get error dicts and dupe list so far
@@ -789,7 +789,7 @@ def non_batch_upload(jps_torrent_id=None, jps_urls=None, dry_run=None, wait_for_
 
     torrent_info = collate(jps_torrent_ids, jps_group_data)
     if not dry_run:
-        downloaduploadedtorrents(torrent_info['sm_torrents_uploaded_count'], jps_group_data.artist, jps_group_data.title)
+        download_sm_uploaded_torrents(torrent_info['sm_torrents_uploaded_count'], jps_group_data.artist, jps_group_data.title)
 
 
 if __name__ == "__main__":
