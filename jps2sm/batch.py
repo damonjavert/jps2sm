@@ -1,5 +1,4 @@
 # Standard library packages
-import logging
 import collections
 import time
 import re
@@ -13,7 +12,7 @@ from jps2sm.constants import JPSTorrentView
 # Third-party packages
 from bs4 import BeautifulSoup
 
-logger = logging.getLogger('main.' + __name__)
+from loguru import logger
 
 
 def get_batch_jps_group_torrent_ids(mode, user, first=1, last=None, sort=None, order=None):
