@@ -62,7 +62,7 @@ def download_sm_uploaded_torrents(torrentcount: int, artist: str, title: str) ->
         logger.debug(f'Downloaded SM torrent as {torrentpath}')
 
 
-def download_sm_torrent(torrent_id: str, artist: str, title: str) -> str:
+def download_sm_torrent(torrent_id: str, artist: str, title: str) -> Path:
     """
     Downloads the SM torrent if it is a dupe, in this scenario we cannot use download_sm_uploaded_torrents() as the user
     has not actually uploaded it.
@@ -87,4 +87,4 @@ def download_sm_torrent(torrent_id: str, artist: str, title: str) -> str:
     with open(path, "wb") as f:
         f.write(file.content)
 
-    return name
+    return Path(output.file_dir["smtorrents"], name)
