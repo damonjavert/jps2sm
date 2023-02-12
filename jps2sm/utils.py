@@ -130,6 +130,9 @@ class GetArgs:
             else:
                 raise RuntimeError("Expected some batch mode to be set")
 
+    def __getattr__(self, item):
+        return GetArgs.item
+
 
 class GetConfig:
     __config_parsed = None
@@ -190,9 +193,6 @@ class HandleCfgOutputDirs:
 
     def __getattr__(self, item):
         return HandleCfgOutputDirs.item
-
-
-
 
 
 def remove_html_tags(text):
