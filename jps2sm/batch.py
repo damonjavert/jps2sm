@@ -89,7 +89,8 @@ def get_batch_jps_group_torrent_ids(mode, user, first=1, last=None, sort=None, o
 
     # Just for debugging purposes - get the jps_sort_name from the key when specifying the value in JPSTorrentView.sort_by{}
     jps_sort_name = list(JPSTorrentView.sort_by.keys())[list(JPSTorrentView.sort_by.values()).index(sort_mode)]
-
+    if not first:
+        first = 1
     logger.debug(f'Batch user is {user}, batch mode is {mode}, '
                  f'sort is {sort}, JPS sort column is {sort_mode} - {jps_sort_name}, '
                  f'order by is {order_way} '

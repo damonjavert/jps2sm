@@ -566,7 +566,7 @@ def downloaduploadedtorrents(torrentcount, artist, title):
         logger.debug(f'Downloaded SM torrent as {torrentpath}')
 
 
-def batch_mode(jps_user_id=None):
+def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
     """
     Operate batch upload mode
     """
@@ -610,12 +610,7 @@ def batch_mode(jps_user_id=None):
                             f'\nNew uploads successfully created: {batch_torrent_info["sm_torrents_uploaded_count"]}'
                             )
 
-    batchuser = args.parsed.batchuser or jps_user_id
-    if args.parsed.batchstart and args.parsed.batchend:
-        batch_uploads = get_batch_jps_group_torrent_ids(mode=args.batch_mode, user=batchuser, first=args.parsed.batchstart, last=args.parsed.batchend,
-                                                        sort=args.parsed.batchsort, order=args.parsed.batchsortorder)
-    else:
-        batch_uploads = get_batch_jps_group_torrent_ids(mode=args.batch_mode, user=batchuser, sort=args.parsed.batchsort, order=args.parsed.batchsortorder)
+    batch_uploads = get_batch_jps_group_torrent_ids(mode=mode, user=user, first=start, last=end, sort=sort, order=order)
 
     #batch_uploads = { '362613': ['535927'], '354969': ['535926'], '362612': ['535925'], '362611': ['535924'], '181901': ['535923'], '181902': ['535922'] }
 
@@ -643,7 +638,7 @@ def batch_mode(jps_user_id=None):
     batch_group_data, batch_uploads_group_errors, batch_groups_excluded, batch_groups_va_errors = get_batch_group_data(batch_uploads, args.parsed.exccategory)
     # print(json.dumps(batch_group_data, indent=2))
 
-    if args.batch_mode == "recent":
+    if mode == "recent":
         # Do an initial run of collate() to grab the JPS torrents only so data can be downloaded first
         # TODO Extract release data logic so that collate() does not need to be called twice.
         batch_releases_jps_torrents_downloaded_count = 0
@@ -814,7 +809,9 @@ def main():
         return
 
     if args.batch_modes == 1:
-        batch_mode(jps_user_id)
+        batch_mode_user = args.parsed.batchuser or jps_user_id
+        batch_mode(mode=args.batch_mode, user=batch_mode_user, start=args.parsed.batchstart,
+                   end=args.parsed.batchend, sort=args.parsed.batchsort, order=args.parsed.batchsortorder)
     else:
         # If we reach here something has gone very wrong with parsing args
         raise RuntimeError('Argument handling error')
