@@ -1,12 +1,14 @@
 import json
+import html
 
-from jps2sm.get_data import GetGroupData, GetSMUser
+from jps2sm.get_data import GetGroupData, GetSMUser, get_torrent_link
 from jps2sm.myloginsession import sugoimusic, jpopsuki
 from jps2sm.utils import get_valid_filename, GetConfig, HandleCfgOutputDirs
-from typing import Type
+from typing import Type, Tuple
 
 from pathlib import Path
 from loguru import logger
+import requests
 
 config = GetConfig()
 output = HandleCfgOutputDirs(config.directories)
@@ -83,8 +85,29 @@ def download_sm_torrent(torrent_id: str, artist: str, title: str) -> Path:
     name = get_valid_filename(
         "SM %s - %s - %s.torrent" % (artist, title, torrent_id)
     )
-    path = Path(output_dir, name)
-    with open(path, "wb") as f:
+    sm_torrent_path = Path(output_dir, name)
+    with open(sm_torrent_path, "wb") as f:
         f.write(file.content)
 
-    return Path(output.file_dir["smtorrents"], name)
+    return sm_torrent_path
+
+
+def download_jps_torrent(jps_torrent_id: str, torrent_group_data: Type[GetGroupData], release_data) -> Tuple[Path, callable(requests.Session())]:
+    """
+    Download a JPS torrent, ascertaining the link from the torrent_table from the JPS Group
+    :param jps_torrent_id: JPS torrent ID
+    :param torrent_group_data: Data from the JPS Group
+    :param release_data:
+    """
+    output_dir = output.file_dir['jpstorrents']
+
+    torrent_link = html.unescape(get_torrent_link(jps_torrent_id, torrent_group_data.rel2))
+    jps_torrent_file = jpopsuki(f"https://jpopsuki.eu/{torrent_link}")  # Download JPS torrent
+    jps_torrent_filename = get_valid_filename(
+        f"JPS {torrent_group_data.artist} - {torrent_group_data.title} - {'-'.join(release_data)}.torrent")
+    jps_torrent_path = Path(output_dir, jps_torrent_filename)
+
+    with open(jps_torrent_path, "wb") as f:
+        f.write(jps_torrent_file.content)
+
+    return jps_torrent_path, jps_torrent_file

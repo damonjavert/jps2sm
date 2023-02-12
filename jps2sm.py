@@ -22,10 +22,7 @@ import os
 import datetime
 import collections
 import configparser
-import html
 import json
-import logging
-from logging.handlers import RotatingFileHandler
 import io
 
 # Third-party packages
@@ -35,16 +32,15 @@ from pathlib import Path
 from loguru import logger
 
 # jps2sm modules
-from jps2sm.get_data import GetGroupData, get_jps_group_data_class, get_torrent_link, get_release_data, GetJPSUser, GetSMUser
-from jps2sm.save_data import save_sm_html_debug_output, download_sm_uploaded_torrents, download_sm_torrent
+from jps2sm.get_data import GetGroupData, get_jps_group_data_class, get_release_data, GetJPSUser, GetSMUser
+from jps2sm.save_data import save_sm_html_debug_output, download_sm_uploaded_torrents, download_sm_torrent, download_jps_torrent
 from jps2sm.batch import get_batch_jps_group_torrent_ids, get_batch_group_data
-from jps2sm.utils import get_valid_filename, count_values_dict, fatal_error, GetConfig, GetArgs, HandleCfgOutputDirs, decide_duplicate
+from jps2sm.utils import count_values_dict, fatal_error, GetConfig, GetArgs, decide_duplicate
 from jps2sm.myloginsession import jpopsuki, sugoimusic
 from jps2sm.constants import Categories, VideoOptions
 from jps2sm.mediainfo import get_mediainfo
 from jps2sm.validation import decide_music_performance, get_alternate_fansub_category_id, validate_jps_video_data, validate_jps_bitrate, \
     decide_exc_filter, decide_ep
-
 
 
 def detect_display_swapped_names(userid):
@@ -326,7 +322,6 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
     """
     config = GetConfig()
     args = GetArgs()
-    output = HandleCfgOutputDirs(config.directories)
 
     jps_torrent_downloaded_count = sm_torrent_uploaded_count = skipped_max_size = skipped_low_seeders = skipped_exc_filter = skipped_dupe = 0
     dupe_jps_ids = []
@@ -447,14 +442,7 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
         # Picture Category torrents and some TV-Variety.
         releasedataout['uploaddate'] = datetime.datetime.strptime(uploaddatestr, '%b %d %Y, %H:%M').strftime('%Y%m%d')
 
-        torrentlink = html.unescape(get_torrent_link(torrentid, torrentgroupdata.rel2))
-        jps_torrent_file = jpopsuki("https://jpopsuki.eu/%s" % torrentlink)  # Download JPS torrent
-        jps_torrent_filename = get_valid_filename(
-            "JPS %s - %s - %s.torrent" % (torrentgroupdata.artist, torrentgroupdata.title, "-".join(releasedata)))
-        jps_torrent_path = Path(output.file_dir['jpstorrents'], jps_torrent_filename)
-
-        with open(jps_torrent_path, "wb") as f:
-            f.write(jps_torrent_file.content)
+        jps_torrent_path, jps_torrent_file = download_jps_torrent(torrentid, torrentgroupdata, releasedata)
 
         jps_torrent_downloaded_count += 1
 
