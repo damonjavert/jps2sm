@@ -36,7 +36,7 @@ from loguru import logger
 
 # jps2sm modules
 from jps2sm.get_data import GetGroupData, get_jps_group_data_class, get_torrent_link, get_release_data, GetJPSUser, GetSMUser
-from jps2sm.save_data import save_sm_html_debug_output
+from jps2sm.save_data import save_sm_html_debug_output, downloaduploadedtorrents, download_sm_torrent
 from jps2sm.batch import get_batch_jps_group_torrent_ids, get_batch_group_data
 from jps2sm.utils import get_valid_filename, count_values_dict, fatal_error, GetConfig, GetArgs, HandleCfgOutputDirs, decide_duplicate
 from jps2sm.myloginsession import jpopsuki, sugoimusic
@@ -67,37 +67,6 @@ def detect_display_swapped_names(userid):
     else:
         # Not OK!
         return True
-
-
-def download_sm_torrent(torrent_id, artist, title):
-    """
-    Downloads the SM torrent if it is a dupe, in this scenario we cannot use downloaduploadedtorrents() as the user
-    has not actually uploaded it.
-
-    :param torrent_id: SM torrentid to be downloaded
-    :param artist: SM Artist name, for naming torrent file only
-    :param title: SM group title, for naming torrent file only
-    :param output_dir: Output directory
-    :return: name: int: filename of torrent downloaded
-    """
-    config = GetConfig()
-    output = HandleCfgOutputDirs(config.directories)
-    output_dir = output.file_dir['smtorrents']
-
-    sm_user = GetSMUser()
-
-    file = jpopsuki(
-        'https://sugoimusic.me/torrents.php?action='
-        f'download&id={torrent_id}&authkey={sm_user.auth_key()}&torrent_pass={sm_user.torrent_password_key()}'
-    )
-    name = get_valid_filename(
-        "SM %s - %s - %s.torrent" % (artist, title, torrent_id)
-    )
-    path = Path(output_dir, name)
-    with open(path, "wb") as f:
-        f.write(file.content)
-
-    return name
 
 
 def setorigartist(artist, origartist):
@@ -541,40 +510,6 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
     }
 
     return collate_torrent_info
-
-
-def downloaduploadedtorrents(torrentcount, artist, title):
-    """
-    Get last torrentcount torrent DL links that user uploaded using SM API and download them
-
-    :param torrentcount: count of recent torrent links to be downloaded
-    :param artist
-    :param title
-    :param output_dir
-    :return:
-    """
-    config = GetConfig()
-    output = HandleCfgOutputDirs(config.directories)
-    output_dir = output.file_dir['smtorrents']
-
-    if torrentcount == 0:
-        return
-
-    user_recents = sugoimusic(f"https://sugoimusic.me/ajax.php?action=user_recents&limit={torrentcount}")
-    user_recents_json = json.loads(user_recents.text)
-
-    smtorrentlinks = {}
-    for torrentdata in user_recents_json['response']['uploads']:  # Get list of SM torrent links
-        smtorrentlinks[torrentdata['torrentid']] = torrentdata['torrentdl']
-
-    for torrentid, torrentlink in smtorrentlinks.items():
-        torrentfile = sugoimusic(torrentlink)
-        torrentfilename = get_valid_filename(f'SM {artist} - {title} - {torrentid}.torrent')
-        torrentpath = Path(output_dir, torrentfilename)
-
-        with open(torrentpath, "wb") as f:
-            f.write(torrentfile.content)
-        logger.debug(f'Downloaded SM torrent as {torrentpath}')
 
 
 def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
