@@ -136,6 +136,7 @@ def uploadtorrent(jps_torrent_object, torrentgroupdata, **uploaddata):
     :param uploaddata: dict of collated / validated release data from collate()
     """
     config = GetConfig()
+    args = GetArgs()
     uploadurl = 'https://sugoimusic.me/upload.php'
     languages = ('Japanese', 'English', 'Korean', 'Chinese', 'Vietnamese')
 
@@ -354,6 +355,7 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
     :param scrape_only: bool: Only download JPS torrents, do not upload to SM
     """
     config = GetConfig()
+    args = GetArgs()
 
     jps_torrent_downloaded_count = sm_torrent_uploaded_count = skipped_max_size = skipped_low_seeders = skipped_exc_filter = skipped_dupe = 0
     dupe_jps_ids = []
@@ -570,10 +572,11 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
     """
     Operate batch upload mode
     """
+    args = GetArgs()
 
     max_size = None
 
-    def batch_stats(final_stats):
+    def batch_stats(final_stats, media_info_mode, dry_run):
         """
         Return statistics from a batch upload.
         If using --recent mode it returns initial statistics after JPS torrents have been scraped, followed by final_stats after the
@@ -601,9 +604,9 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
               f'\nJPS Torrents downloaded: {batch_torrent_info["jps_torrents_downloaded_count"]}'
               )
         if final_stats:
-            if args.parsed.mediainfo:
+            if media_info_mode:
                 print(f'MediaInfo source data missing: {len(batch_upload_source_data_not_found)}')
-            if not args.parsed.dryrun:
+            if not dry_run:
                 logger.info(f'MediaInfo not submitted errors (use \"--mediainfo\" to fix): {batch_upload_mediainfo_not_submitted}'
                             f'\n\nDuplicates found on SM: {len(batch_upload_dupes_at_upload_smids)}'
                             f'\nDuplicates found with torrent hash: {batch_torrent_info["skipped_torrents_duplicate"]}'
@@ -671,7 +674,7 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
                                  'as they will be handled in the next run.')
                 continue
 
-        batch_stats(final_stats=False)
+        batch_stats(final_stats=False, media_info_mode=args.parsed.mediainfo, dry_run=args.parsed.dryrun)
 
         # Reset stats for the second run of collate()
         # TODO Put batch_stats() into non-nested def and then different dicts can then used instead of reassignment
@@ -766,10 +769,11 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
         logger.error(batch_upload_source_data_not_found)
         logger.error(f'Total: {len(batch_upload_source_data_not_found)}')
 
-    batch_stats(final_stats=True)
+    batch_stats(final_stats=True, media_info_mode=args.parsed.mediainfo, dry_run=args.parsed.dryrun)
 
 
 def main():
+    args = GetArgs()
 
     if args.parsed.debug:
         stderr_log_level = "DEBUG"
@@ -845,7 +849,6 @@ def non_batch_upload(jps_torrent_id=None, jps_urls=None, dry_run=None, wait_for_
 
 
 if __name__ == "__main__":
-    args = GetArgs()
     _config = GetConfig()
     output = HandleCfgOutputDirs(_config.directories)  # Get config dirs config, handle absolute/relative paths and create if not exist
 
