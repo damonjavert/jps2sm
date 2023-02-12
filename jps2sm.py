@@ -831,7 +831,7 @@ def non_batch_upload(jps_torrent_id=None, jps_urls=None, dry_run=None, wait_for_
         jps_torrent_ids = [str(jps_torrent_id)]
     elif jps_urls:
         jps_group_data = GetGroupData(jps_urls)
-        jps_torrent_ids = re.findall('torrentid=([0-9]+)', args.parsed.urls)
+        jps_torrent_ids = re.findall('torrentid=([0-9]+)', jps_urls)
     else:
         raise RuntimeError('Expected either a jps_torrent_id or a jps_url')
 
