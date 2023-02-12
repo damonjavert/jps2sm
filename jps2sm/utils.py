@@ -172,17 +172,27 @@ class HandleCfgOutputDirs:
 
     :param config_file_dirs_section: dict: Contents of 'Directories' section in jps2sm.cfg
     """
+    __output_dirs_handled = None
 
     def __init__(self, config_file_dirs_section):
-        self.config_file_dirs_section = config_file_dirs_section
-        self.file_dir = {}
+
+        if HandleCfgOutputDirs.__output_dirs_handled is not None:
+            return
+
+        HandleCfgOutputDirs.file_dir = {}
         for (cfg_key, cfg_value) in config_file_dirs_section:
             if Path(cfg_value).is_absolute():
-                self.file_dir[cfg_key] = cfg_value
+                HandleCfgOutputDirs.file_dir[cfg_key] = cfg_value
             else:
-                self.file_dir[cfg_key] = Path(Path.home(), cfg_value)
-            if not Path(self.file_dir[cfg_key]).is_dir():
-                Path(self.file_dir[cfg_key]).mkdir(parents=True, exist_ok=True)
+                HandleCfgOutputDirs.file_dir[cfg_key] = Path(Path.home(), cfg_value)
+            if not Path(HandleCfgOutputDirs.file_dir[cfg_key]).is_dir():
+                Path(HandleCfgOutputDirs.file_dir[cfg_key]).mkdir(parents=True, exist_ok=True)
+
+    def __getattr__(self, item):
+        return HandleCfgOutputDirs.item
+
+
+
 
 
 def remove_html_tags(text):

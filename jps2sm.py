@@ -73,8 +73,14 @@ def download_sm_torrent(torrent_id, artist, title):
     has not actually uploaded it.
 
     :param torrent_id: SM torrentid to be downloaded
+    :param artist: SM Artist name, for naming torrent file only
+    :param title: SM group title, for naming torrent file only
+    :param output_dir: Output directory
     :return: name: int: filename of torrent downloaded
     """
+    config = GetConfig()
+    output = HandleCfgOutputDirs(config.directories)
+    output_dir = output.file_dir['smtorrents']
 
     sm_user = GetSMUser()
 
@@ -85,7 +91,7 @@ def download_sm_torrent(torrent_id, artist, title):
     name = get_valid_filename(
         "SM %s - %s - %s.torrent" % (artist, title, torrent_id)
     )
-    path = Path(output.file_dir['smtorrents'], name)
+    path = Path(output_dir, name)
     with open(path, "wb") as f:
         f.write(file.content)
 
@@ -137,6 +143,7 @@ def uploadtorrent(jps_torrent_object, torrentgroupdata, **uploaddata):
     """
     config = GetConfig()
     args = GetArgs()
+    output = HandleCfgOutputDirs(config.directories)
     uploadurl = 'https://sugoimusic.me/upload.php'
     languages = ('Japanese', 'English', 'Korean', 'Chinese', 'Vietnamese')
 
@@ -356,6 +363,7 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
     """
     config = GetConfig()
     args = GetArgs()
+    output = HandleCfgOutputDirs(config.directories)
 
     jps_torrent_downloaded_count = sm_torrent_uploaded_count = skipped_max_size = skipped_low_seeders = skipped_exc_filter = skipped_dupe = 0
     dupe_jps_ids = []
@@ -545,8 +553,14 @@ def downloaduploadedtorrents(torrentcount, artist, title):
     Get last torrentcount torrent DL links that user uploaded using SM API and download them
 
     :param torrentcount: count of recent torrent links to be downloaded
+    :param artist
+    :param title
+    :param output_dir
     :return:
     """
+    config = GetConfig()
+    output = HandleCfgOutputDirs(config.directories)
+    output_dir = output.file_dir['smtorrents']
 
     if torrentcount == 0:
         return
@@ -561,7 +575,7 @@ def downloaduploadedtorrents(torrentcount, artist, title):
     for torrentid, torrentlink in smtorrentlinks.items():
         torrentfile = sugoimusic(torrentlink)
         torrentfilename = get_valid_filename(f'SM {artist} - {title} - {torrentid}.torrent')
-        torrentpath = Path(output.file_dir['smtorrents'], torrentfilename)
+        torrentpath = Path(output_dir, torrentfilename)
 
         with open(torrentpath, "wb") as f:
             f.write(torrentfile.content)
@@ -849,8 +863,4 @@ def non_batch_upload(jps_torrent_id=None, jps_urls=None, dry_run=None, wait_for_
 
 
 if __name__ == "__main__":
-    _config = GetConfig()
-    output = HandleCfgOutputDirs(_config.directories)  # Get config dirs config, handle absolute/relative paths and create if not exist
-
     main()
-
