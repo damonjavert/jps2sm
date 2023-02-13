@@ -33,7 +33,7 @@ from loguru import logger
 
 # jps2sm modules
 from jps2sm.get_data import GetGroupData, get_jps_group_data_class, get_release_data, GetJPSUser, GetSMUser
-from jps2sm.save_data import save_sm_html_debug_output, download_sm_uploaded_torrents, download_sm_torrent, download_jps_torrent
+from jps2sm.save_data import save_sm_html_debug_output, download_sm_uploaded_torrents, download_sm_torrent, get_jps_torrent, download_jps_torrent
 from jps2sm.batch import get_batch_jps_group_torrent_ids, get_batch_group_data
 from jps2sm.utils import count_values_dict, fatal_error, GetConfig, GetArgs, decide_duplicate
 from jps2sm.myloginsession import jpopsuki, sugoimusic
@@ -442,32 +442,34 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
         # Picture Category torrents and some TV-Variety.
         releasedataout['uploaddate'] = datetime.datetime.strptime(uploaddatestr, '%b %d %Y, %H:%M').strftime('%Y%m%d')
 
-        jps_torrent_path, jps_torrent_file = download_jps_torrent(torrentid, torrentgroupdata, releasedata)
+        jps_torrent_file = get_jps_torrent(torrentid, torrentgroupdata)
+
+        jps_torrent_object = io.BytesIO(jps_torrent_file.content)  # Keep file in memory as it could be processed and deleted by a torrent client
+
+        dupe_sugoimusic_torrent_id = decide_duplicate(jps_torrent_object)
+        if not dupe_sugoimusic_torrent_id and not config.skip_dupes:
+            download_jps_torrent(jps_torrent_file, torrentgroupdata, releasedata)
 
         jps_torrent_downloaded_count += 1
 
         if scrape_only:
             continue
 
-        jps_torrent_object = io.BytesIO(jps_torrent_file.content)  # Keep file in memory as it could be processed and deleted by a torrent client
-
-        if not args.parsed.dryrun:
-            dupe, sugoimusic_torrent_id = decide_duplicate(jps_torrent_object)
-            if dupe:
-                if not config.skip_dupes:
-                    dupe_file_path = download_sm_torrent(sugoimusic_torrent_id, torrentgroupdata.artist, torrentgroupdata.title)
-                    # torrentgroupdata.artist and torrentgroupdata.title is just to generate a pretty filename
-                    logger.warning(
-                        f'This torrent already exists on SugoiMusic - https://sugoimusic.me/torrents.php?torrentid={sugoimusic_torrent_id} '
-                        f'The .torrent has been downloaded with name "{dupe_file_path}"'
-                    )
-                dupe_error_msg = f'The exact same torrent file already exists on the site! See: https://sugoimusic.me/torrents.php?torrentid={sugoimusic_torrent_id} JPS torrent id: {torrentid}'
-                logger.warning(dupe_error_msg)
-                skipped_dupe += 1
-                dupe_jps_ids.append(int(torrentid))
-                dupe_sm_ids.append(sugoimusic_torrent_id)
-                continue
-                # raise Exception(dupe_error_msg)
+        if not args.parsed.dryrun and dupe_sugoimusic_torrent_id:
+            if not config.skip_dupes:
+                dupe_file_path = download_sm_torrent(dupe_sugoimusic_torrent_id, torrentgroupdata.artist, torrentgroupdata.title)
+                # torrentgroupdata.artist and torrentgroupdata.title is just to generate a pretty filename
+                logger.warning(
+                    f'This torrent already exists on SugoiMusic - https://sugoimusic.me/torrents.php?torrentid={dupe_sugoimusic_torrent_id} '
+                    f'The .torrent has been downloaded with name "{dupe_file_path}"'
+                )
+            dupe_error_msg = f'The exact same torrent file already exists on the site! See: https://sugoimusic.me/torrents.php?torrentid={dupe_sugoimusic_torrent_id} JPS torrent id: {torrentid}'
+            logger.warning(dupe_error_msg)
+            skipped_dupe += 1
+            dupe_jps_ids.append(int(torrentid))
+            dupe_sm_ids.append(dupe_sugoimusic_torrent_id)
+            continue
+            # raise Exception(dupe_error_msg)
 
         # Upload torrent to SM
         uploadtorrent(jps_torrent_object, torrentgroupdata, **releasedataout)

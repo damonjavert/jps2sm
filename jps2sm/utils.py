@@ -236,13 +236,13 @@ def decide_duplicate(jps_torrent_object):
 
     if hashcheckjson.text == '{"status":"failure","error":"bad hash parameter"}':
         logger.debug('Duplicate not detected via torrent hash')
-        return False, None
+        return None
     elif str(hashcheckjson.text).startswith('{"status":"success"'):
         logger.debug('Duplicate detected via torrent hash')
         dupe_jps_torrent_json = json.loads(hashcheckjson.text)
         dupe_jps_torrent_id = dupe_jps_torrent_json['response']['torrent']['id']
         logger.debug(f'Dupe torrent: {dupe_jps_torrent_id}')
-        return True, dupe_jps_torrent_id
+        return dupe_jps_torrent_id
     else:
         raise Exception('Bad response from SugoiMusic hashcheck')
 
