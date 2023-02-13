@@ -446,11 +446,15 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
         jps_torrent_object = io.BytesIO(jps_torrent_file.content)  # Keep file in memory as it could be processed and deleted by a torrent client
 
         dupe_sugoimusic_torrent_id = decide_duplicate(jps_torrent_object)
+        if dupe_sugoimusic_torrent_id:
+            logger.debug(f'dupe outside here {dupe_sugoimusic_torrent_id}')
+
         if dupe_sugoimusic_torrent_id and config.skip_dupes:
             logger.debug(f'Not downloading JPS torrent {torrentid} as it is a duplicate on SM as {dupe_sugoimusic_torrent_id}'
                          f'and SkipDuplicates is true in cfg.')
         else:
             download_jps_torrent(jps_torrent_file, torrentgroupdata, releasedata)
+            logger.debug(f'downloaded jps torrent {torrentid}')
 
         jps_torrent_downloaded_count += 1
 
@@ -723,6 +727,8 @@ def main():
 
     if args.parsed.mediainfo:
         config = GetConfig()
+        if config.skip_dupes:
+            logger.debug('skipping dupes on')
         try:
             for media_dir in config.media_roots:
                 if not os.path.exists(media_dir):
