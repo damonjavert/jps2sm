@@ -443,11 +443,13 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
         releasedataout['uploaddate'] = datetime.datetime.strptime(uploaddatestr, '%b %d %Y, %H:%M').strftime('%Y%m%d')
 
         jps_torrent_file = get_jps_torrent(torrentid, torrentgroupdata)
-
         jps_torrent_object = io.BytesIO(jps_torrent_file.content)  # Keep file in memory as it could be processed and deleted by a torrent client
 
         dupe_sugoimusic_torrent_id = decide_duplicate(jps_torrent_object)
-        if not dupe_sugoimusic_torrent_id and not config.skip_dupes:
+        if dupe_sugoimusic_torrent_id and config.skip_dupes:
+            logger.debug(f'Not downloading JPS torrent {torrentid} as it is a duplicate on SM as {dupe_sugoimusic_torrent_id}'
+                         f'and SkipDuplicates is true in cfg.')
+        else:
             download_jps_torrent(jps_torrent_file, torrentgroupdata, releasedata)
 
         jps_torrent_downloaded_count += 1
