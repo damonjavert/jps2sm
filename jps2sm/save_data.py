@@ -92,7 +92,7 @@ def download_sm_torrent(torrent_id: str, artist: str, title: str) -> Path:
     return sm_torrent_path
 
 
-def download_jps_torrent(jps_torrent_id: str, torrent_group_data: Type[GetGroupData], release_data) -> Tuple[Path, callable(requests.Session())]:
+def download_jps_torrent(jps_torrent_id: str, torrent_group_data: Type[GetGroupData], release_data):
     """
     Download a JPS torrent, ascertaining the link from the torrent_table from the JPS Group
     :param jps_torrent_id: JPS torrent ID
