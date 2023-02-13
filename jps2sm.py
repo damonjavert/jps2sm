@@ -33,7 +33,7 @@ from loguru import logger
 
 # jps2sm modules
 from jps2sm.get_data import GetGroupData, get_jps_group_data_class, get_release_data, GetJPSUser, GetSMUser
-from jps2sm.save_data import save_sm_html_debug_output, download_sm_uploaded_torrents, download_sm_torrent, download_jps_torrent
+from jps2sm.save_data import save_sm_html_debug_output, download_sm_uploaded_torrents, download_sm_torrent, get_jps_torrent, download_jps_torrent
 from jps2sm.batch import get_batch_jps_group_torrent_ids, get_batch_group_data
 from jps2sm.utils import count_values_dict, fatal_error, GetConfig, GetArgs, decide_duplicate
 from jps2sm.myloginsession import jpopsuki, sugoimusic
@@ -323,7 +323,7 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
     config = GetConfig()
     args = GetArgs()
 
-    jps_torrent_downloaded_count = sm_torrent_uploaded_count = skipped_max_size = skipped_low_seeders = skipped_exc_filter = skipped_dupe = 0
+    jps_torrent_downloaded_count = sm_torrent_uploaded_count = skipped_max_size = skipped_low_seeders = skipped_exc_filter = skipped_dupe_torrent_hash = 0
     dupe_jps_ids = []
     dupe_sm_ids = []
 
@@ -442,32 +442,36 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
         # Picture Category torrents and some TV-Variety.
         releasedataout['uploaddate'] = datetime.datetime.strptime(uploaddatestr, '%b %d %Y, %H:%M').strftime('%Y%m%d')
 
-        jps_torrent_path, jps_torrent_file = download_jps_torrent(torrentid, torrentgroupdata, releasedata)
+        jps_torrent_file = get_jps_torrent(torrentid, torrentgroupdata)
+        jps_torrent_object = io.BytesIO(jps_torrent_file.content)  # Keep file in memory as it could be processed and deleted by a torrent client
 
-        jps_torrent_downloaded_count += 1
+        dupe_sugoimusic_torrent_id = decide_duplicate(jps_torrent_object)
+
+        if dupe_sugoimusic_torrent_id and config.skip_dupes:
+            logger.debug(f'Not downloading JPS torrent {torrentid} as it is a duplicate on SM as torrent {dupe_sugoimusic_torrent_id}'
+                         f' and SkipDuplicates is true in cfg.')
+            skipped_dupe_torrent_hash += 1
+        else:
+            download_jps_torrent(jps_torrent_file, torrentgroupdata, releasedata)
+            logger.debug(f'downloaded jps torrent {torrentid}')
+            jps_torrent_downloaded_count += 1
 
         if scrape_only:
             continue
 
-        jps_torrent_object = io.BytesIO(jps_torrent_file.content)  # Keep file in memory as it could be processed and deleted by a torrent client
-
-        if not args.parsed.dryrun:
-            dupe, sugoimusic_torrent_id = decide_duplicate(jps_torrent_object)
-            if dupe:
-                if not config.skip_dupes:
-                    dupe_file_path = download_sm_torrent(sugoimusic_torrent_id, torrentgroupdata.artist, torrentgroupdata.title)
-                    # torrentgroupdata.artist and torrentgroupdata.title is just to generate a pretty filename
-                    logger.warning(
-                        f'This torrent already exists on SugoiMusic - https://sugoimusic.me/torrents.php?torrentid={sugoimusic_torrent_id} '
-                        f'The .torrent has been downloaded with name "{dupe_file_path}"'
-                    )
-                dupe_error_msg = f'The exact same torrent file already exists on the site! See: https://sugoimusic.me/torrents.php?torrentid={sugoimusic_torrent_id} JPS torrent id: {torrentid}'
-                logger.warning(dupe_error_msg)
-                skipped_dupe += 1
-                dupe_jps_ids.append(int(torrentid))
-                dupe_sm_ids.append(sugoimusic_torrent_id)
-                continue
-                # raise Exception(dupe_error_msg)
+        if not args.parsed.dryrun and dupe_sugoimusic_torrent_id:
+            if not config.skip_dupes:
+                dupe_file_path = download_sm_torrent(dupe_sugoimusic_torrent_id, torrentgroupdata.artist, torrentgroupdata.title)
+                # torrentgroupdata.artist and torrentgroupdata.title is just to generate a pretty filename
+                logger.warning(
+                    f'This torrent already exists on SugoiMusic - https://sugoimusic.me/torrents.php?torrentid={dupe_sugoimusic_torrent_id} '
+                    f'The .torrent has been downloaded with name "{dupe_file_path}"'
+                )
+            dupe_error_msg = f'The exact same torrent file already exists on the site! See: https://sugoimusic.me/torrents.php?torrentid={dupe_sugoimusic_torrent_id} JPS torrent id: {torrentid}'
+            logger.warning(dupe_error_msg)
+            dupe_jps_ids.append(int(torrentid))
+            dupe_sm_ids.append(int(dupe_sugoimusic_torrent_id))
+            continue
 
         # Upload torrent to SM
         uploadtorrent(jps_torrent_object, torrentgroupdata, **releasedataout)
@@ -491,7 +495,7 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
         'skipped_torrents_max_size': skipped_max_size,
         'skipped_torrents_low_seeders': skipped_low_seeders,
         'skipped_torrents_exc_filter': skipped_exc_filter,
-        'skipped_torrents_duplicate': skipped_dupe,
+        'skipped_torrents_duplicate': skipped_dupe_torrent_hash,
         'dupe_jps_ids': dupe_jps_ids,
         'dupe_sm_ids': dupe_sm_ids,
     }
@@ -532,6 +536,7 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
         print(f'Torrents skipped due to max_size filter: {batch_torrent_info["skipped_torrents_max_size"]}'
               f'\nTorrents skipped due to low seeders: {batch_torrent_info["skipped_torrents_low_seeders"]}'  
               f'\nTorrents excluded by user: {batch_torrent_info["skipped_torrents_exc_filter"]}'
+              f'\nDuplicates found with torrent hash: {batch_torrent_info["skipped_torrents_duplicate"]}'
               f'\nJPS Torrents downloaded: {batch_torrent_info["jps_torrents_downloaded_count"]}'
               )
         if final_stats:
@@ -540,7 +545,6 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
             if not dry_run:
                 logger.info(f'MediaInfo not submitted errors (use \"--mediainfo\" to fix): {batch_upload_mediainfo_not_submitted}'
                             f'\n\nDuplicates found on SM: {len(batch_upload_dupes_at_upload_smids)}'
-                            f'\nDuplicates found with torrent hash: {batch_torrent_info["skipped_torrents_duplicate"]}'
                             f'\nNew uploads successfully created: {batch_torrent_info["sm_torrents_uploaded_count"]}'
                             )
 
@@ -644,10 +648,10 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
 
             if not args.parsed.dryrun:
                 download_sm_uploaded_torrents(collate_torrent_info['sm_torrents_uploaded_count'], jps_group_data.artist, jps_group_data.title)
-                batch_torrent_info['sm_torrents_uploaded_count'] += collate_torrent_info['sm_torrents_uploaded_count'] #  This will always be same as '+=1'
         except KeyboardInterrupt:  # Allow Ctrl-C to exit without showing the error multiple times and polluting the final error dict
             break  # Still continue to get error dicts and dupe list so far
         except Exception as exc:
+            # TODO These should all be custom exceptions
             if str(exc).startswith('The exact same torrent file already exists on the site!'):
                 sm_dupe_torrentid, jps_dupe_torrentid = re.findall(
                     r'The exact same torrent file already exists on the site! See: https://sugoimusic\.me/torrents\.php\?torrentid=([0-9]+) JPS torrent id\: ([0-9]+)',
