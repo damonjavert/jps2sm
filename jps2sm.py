@@ -446,8 +446,8 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
         jps_torrent_object = io.BytesIO(jps_torrent_file.content)  # Keep file in memory as it could be processed and deleted by a torrent client
 
         #dupe_sugoimusic_torrent_id = decide_duplicate(jps_torrent_object)
-        if dupe_sugoimusic_torrent_id := decide_duplicate(jps_torrent_object):
-            logger.debug(f'dupe outside here {dupe_sugoimusic_torrent_id}')
+        #if dupe_sugoimusic_torrent_id := decide_duplicate(jps_torrent_object):
+        #    logger.debug(f'dupe outside here {dupe_sugoimusic_torrent_id}')
 
         if dupe_sugoimusic_torrent_id := decide_duplicate(jps_torrent_object) and config.skip_dupes:
             logger.debug(f'Not downloading JPS torrent {torrentid} as it is a duplicate on SM as {dupe_sugoimusic_torrent_id}'
@@ -472,7 +472,7 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
             logger.warning(dupe_error_msg)
             skipped_dupe += 1
             dupe_jps_ids.append(int(torrentid))
-            dupe_sm_ids.append(dupe_sugoimusic_torrent_id)
+            dupe_sm_ids.append(int(dupe_sugoimusic_torrent_id))
             continue
             # raise Exception(dupe_error_msg)
 
@@ -651,7 +651,7 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
 
             if not args.parsed.dryrun:
                 download_sm_uploaded_torrents(collate_torrent_info['sm_torrents_uploaded_count'], jps_group_data.artist, jps_group_data.title)
-                batch_torrent_info['sm_torrents_uploaded_count'] += collate_torrent_info['sm_torrents_uploaded_count'] #  This will always be same as '+=1'
+                # batch_torrent_info['sm_torrents_uploaded_count'] += collate_torrent_info['sm_torrents_uploaded_count'] #  This will always be same as '+=1'
         except KeyboardInterrupt:  # Allow Ctrl-C to exit without showing the error multiple times and polluting the final error dict
             break  # Still continue to get error dicts and dupe list so far
         except Exception as exc:
