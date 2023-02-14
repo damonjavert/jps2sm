@@ -449,13 +449,14 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
         #if dupe_sugoimusic_torrent_id := decide_duplicate(jps_torrent_object):
         #    logger.debug(f'dupe outside here {dupe_sugoimusic_torrent_id}')
 
-        if dupe_sugoimusic_torrent_id := decide_duplicate(jps_torrent_object) and config.skip_dupes:
-            logger.debug(f'Not downloading JPS torrent {torrentid} as it is a duplicate on SM as {dupe_sugoimusic_torrent_id}'
-                         f'and SkipDuplicates is true in cfg.')
-        else:
-            download_jps_torrent(jps_torrent_file, torrentgroupdata, releasedata)
-            logger.debug(f'downloaded jps torrent {torrentid}')
-            jps_torrent_downloaded_count += 1
+        if dupe_sugoimusic_torrent_id := decide_duplicate(jps_torrent_object):
+            if config.skip_dupes:
+                logger.debug(f'Not downloading JPS torrent {torrentid} as it is a duplicate on SM as {dupe_sugoimusic_torrent_id}'
+                             f' and SkipDuplicates is true in cfg.')
+            else:
+                download_jps_torrent(jps_torrent_file, torrentgroupdata, releasedata)
+                logger.debug(f'downloaded jps torrent {torrentid}')
+                jps_torrent_downloaded_count += 1
 
         if scrape_only:
             continue
@@ -539,6 +540,7 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
         print(f'Torrents skipped due to max_size filter: {batch_torrent_info["skipped_torrents_max_size"]}'
               f'\nTorrents skipped due to low seeders: {batch_torrent_info["skipped_torrents_low_seeders"]}'  
               f'\nTorrents excluded by user: {batch_torrent_info["skipped_torrents_exc_filter"]}'
+              f'\nDuplicates found with torrent hash: {batch_torrent_info["skipped_torrents_duplicate"]}'
               f'\nJPS Torrents downloaded: {batch_torrent_info["jps_torrents_downloaded_count"]}'
               )
         if final_stats:
@@ -547,7 +549,6 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
             if not dry_run:
                 logger.info(f'MediaInfo not submitted errors (use \"--mediainfo\" to fix): {batch_upload_mediainfo_not_submitted}'
                             f'\n\nDuplicates found on SM: {len(batch_upload_dupes_at_upload_smids)}'
-                            f'\nDuplicates found with torrent hash: {batch_torrent_info["skipped_torrents_duplicate"]}'
                             f'\nNew uploads successfully created: {batch_torrent_info["sm_torrents_uploaded_count"]}'
                             )
 
