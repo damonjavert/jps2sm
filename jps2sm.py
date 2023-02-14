@@ -323,7 +323,7 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
     config = GetConfig()
     args = GetArgs()
 
-    jps_torrent_downloaded_count = sm_torrent_uploaded_count = skipped_max_size = skipped_low_seeders = skipped_exc_filter = skipped_dupe = 0
+    jps_torrent_downloaded_count = sm_torrent_uploaded_count = skipped_max_size = skipped_low_seeders = skipped_exc_filter = skipped_dupe_torrent_hash = 0
     dupe_jps_ids = []
     dupe_sm_ids = []
 
@@ -450,6 +450,7 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
         #    logger.debug(f'dupe outside here {dupe_sugoimusic_torrent_id}')
 
         if dupe_sugoimusic_torrent_id := decide_duplicate(jps_torrent_object):
+            skipped_dupe_torrent_hash += 1
             if config.skip_dupes:
                 logger.debug(f'Not downloading JPS torrent {torrentid} as it is a duplicate on SM as {dupe_sugoimusic_torrent_id}'
                              f' and SkipDuplicates is true in cfg.')
@@ -471,7 +472,6 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
                 )
             dupe_error_msg = f'The exact same torrent file already exists on the site! See: https://sugoimusic.me/torrents.php?torrentid={dupe_sugoimusic_torrent_id} JPS torrent id: {torrentid}'
             logger.warning(dupe_error_msg)
-            skipped_dupe += 1
             dupe_jps_ids.append(int(torrentid))
             dupe_sm_ids.append(int(dupe_sugoimusic_torrent_id))
             continue
@@ -499,7 +499,7 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
         'skipped_torrents_max_size': skipped_max_size,
         'skipped_torrents_low_seeders': skipped_low_seeders,
         'skipped_torrents_exc_filter': skipped_exc_filter,
-        'skipped_torrents_duplicate': skipped_dupe,
+        'skipped_torrents_duplicate': skipped_dupe_torrent_hash,
         'dupe_jps_ids': dupe_jps_ids,
         'dupe_sm_ids': dupe_sm_ids,
     }
