@@ -30,6 +30,7 @@ from bs4 import BeautifulSoup
 import humanfriendly
 from pathlib import Path
 from loguru import logger
+from datasize import DataSize
 
 # jps2sm modules
 from jps2sm.get_data import GetGroupData, get_jps_group_data_class, get_release_data, GetJPSUser, GetSMUser
@@ -317,7 +318,7 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
     :param torrentids: list of JPS torrentids to be processed
             Always a single torrentid unless specifying a group url in --url mode
     :param torrentgroupdata: dictionary with torrent group data from getgroupdata[]
-    :param max_size: bool: Only upload torrents < 1Gb if True
+    :param max_size: str: Maximum size with unit specified, currently only used by recent mode
     :param scrape_only: bool: Only download JPS torrents, do not upload to SM
     """
     config = GetConfig()
@@ -331,13 +332,14 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
 
         logger.info(f'Now processing: {torrentid} {releasedatafull}')
 
-        if max_size and releasedatafull['size_units'] == "GB":
-            # Currently only a max_size of 1Gb is supported.
-            # Very simple way of just using the units, if we do not see 'GB' then it is < 1 Gb
-            # TODO Add option to specify the file size
-            skipped_max_size += 1
-            logger.debug("Skipping as torrent is >=1Gb")
-            continue
+        if max_size:
+            good_jps_format = releasedatafull['size_units'][:1] + "i" + releasedatafull['size_units'][1:] # JPS uses 'GB' when it means 'GiB' etc.
+            jps_torrent_size_in_bytes = DataSize(releasedatafull['size_no_units'] + good_jps_format)
+            cfg_max_size_in_bytes = DataSize(max_size)
+            if jps_torrent_size_in_bytes > cfg_max_size_in_bytes:
+                skipped_max_size += 1
+                logger.debug(f"Skipping as torrent is > {max_size}")
+                continue
 
         if int(releasedatafull['seeders']) < config.jps_min_seeders:
             logger.debug(f'Skipping as torrent has < {config.jps_min_seeders} seeder(s)')
@@ -346,8 +348,6 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
 
         releasedata = releasedatafull['slashdata']
         uploaddatestr = releasedatafull['uploaddate']
-        # size_no_units = releasedatafull['size_no_units']  # TODO Use this
-        # size_units = releasedatafull['size_units']
         releasedataout = {}
         releasedataout['jpstorrentid'] = torrentid  # Not needed for uploadtorrent(), purely for logging purposes
         remasterdata = False  # Set default
@@ -509,8 +509,6 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
     """
     args = GetArgs()
 
-    max_size = None
-
     def batch_stats(final_stats, media_info_mode, dry_run):
         """
         Return statistics from a batch upload.
@@ -550,7 +548,7 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
 
     batch_uploads = get_batch_jps_group_torrent_ids(mode=mode, user=user, first=start, last=end, sort=sort, order=order)
 
-    #batch_uploads = { '362613': ['535927'], '354969': ['535926'], '362612': ['535925'], '362611': ['535924'], '181901': ['535923'], '181902': ['535922'] }
+    # batch_uploads = { '362613': ['535927'], '354969': ['535926'], '362612': ['535925'], '362611': ['535924'], '181901': ['535923'], '181902': ['535922'] }
 
     batch_upload_collate_errors = collections.defaultdict(list)
     batch_upload_dupes_at_upload_smids = []
@@ -576,7 +574,12 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
     batch_group_data, batch_uploads_group_errors, batch_groups_excluded, batch_groups_va_errors = get_batch_group_data(batch_uploads, args.parsed.exccategory)
     # print(json.dumps(batch_group_data, indent=2))
 
+    max_size = None
+
     if mode == "recent":
+        config = GetConfig()
+        max_size = config.max_size_recent_mode
+
         # Do an initial run of collate() to grab the JPS torrents only so data can be downloaded first
         # TODO Extract release data logic so that collate() does not need to be called twice.
         batch_releases_jps_torrents_downloaded_count = 0
@@ -590,11 +593,8 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
 
             jps_group_data = get_jps_group_data_class(batch_group_data, jps_group_id)
 
-            scrape_only = True
-            max_size = True
-
             try:
-                collate_torrent_info_recent = collate(jps_torrent_ids, jps_group_data, max_size, scrape_only)
+                collate_torrent_info_recent = collate(torrentids=jps_torrent_ids, torrentgroupdata=jps_group_data, max_size=max_size, scrape_only=True)
                 for collate_result_item, value in collate_torrent_info_recent.items():
                     if isinstance(value, int):
                         batch_torrent_info[collate_result_item] += value
@@ -636,7 +636,7 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
         jps_group_data = get_jps_group_data_class(batch_group_data, jps_group_id)
 
         try:
-            collate_torrent_info = collate(jps_torrent_ids, jps_group_data, max_size)
+            collate_torrent_info = collate(torrentids=jps_torrent_ids, torrentgroupdata=jps_group_data, max_size=max_size)
             for collate_result_item, value in collate_torrent_info.items():
                 if isinstance(value, int):
                     batch_torrent_info[collate_result_item] += value
@@ -775,10 +775,10 @@ def non_batch_upload(jps_torrent_id=None, jps_urls=None, dry_run=None, wait_for_
         raise RuntimeError('Expected either a jps_torrent_id or a jps_url')
 
     if wait_for_jps_dl:
-        pre_torrent_info = collate(torrentids=jps_torrent_ids, torrentgroupdata=jps_group_data, max_size=False, scrape_only=True)
+        pre_torrent_info = collate(torrentids=jps_torrent_ids, torrentgroupdata=jps_group_data, scrape_only=True)
         input('When these files have been downloaded press enter to continue...')
 
-    torrent_info = collate(jps_torrent_ids, jps_group_data)
+    torrent_info = collate(torrentids=jps_torrent_ids, torrentgroupdata=jps_group_data)
     if not dry_run:
         download_sm_uploaded_torrents(torrent_info['sm_torrents_uploaded_count'], jps_group_data.artist, jps_group_data.title)
 

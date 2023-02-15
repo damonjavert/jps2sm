@@ -151,15 +151,18 @@ class GetConfig:
             fatal_error(
                 f'Error: config file {configfile} not found - enter your JPS/SM credentials in jps2sm.cfg and check jps2sm.cfg.example to see the syntax.')
 
+        jps = 'JPopSuki'
+        sm = 'SugoiMusic'
         config.read(configfile)
-        GetConfig.jps_user = config.get('JPopSuki', 'User')
-        GetConfig.jps_pass = config.get('JPopSuki', 'Password')
-        GetConfig.sm_user = config.get('SugoiMusic', 'User')
-        GetConfig.sm_pass = config.get('SugoiMusic', 'Password')
+        GetConfig.jps_user = config.get(jps, 'User')
+        GetConfig.jps_pass = config.get(jps, 'Password')
+        GetConfig.sm_user = config.get(sm, 'User')
+        GetConfig.sm_pass = config.get(sm, 'Password')
         GetConfig.media_roots = [x.strip() for x in config.get('Media', 'MediaDirectories').split(',')]  # Remove whitespace after comma if any
         GetConfig.directories = config.items('Directories')
-        GetConfig.skip_dupes = config.getboolean('SugoiMusic', 'SkipDuplicates', fallback=False)
-        GetConfig.jps_min_seeders = config.getint('JPopSuki', 'MinSeeders', fallback=1)
+        GetConfig.skip_dupes = config.getboolean(sm, 'SkipDuplicates', fallback=False)
+        GetConfig.jps_min_seeders = config.getint(jps, 'MinSeeders', fallback=1)
+        GetConfig.max_size_recent_mode = config.get(jps, 'MaxSizeRecentMode', fallback=None)
 
     def __getattr__(self, item):
         return GetConfig.item
