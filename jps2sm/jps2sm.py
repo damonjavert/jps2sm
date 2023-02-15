@@ -328,132 +328,131 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
     dupe_jps_ids = []
     dupe_sm_ids = []
 
-    for torrentid, releasedatafull in get_release_data(torrentids, torrentgroupdata.rel2, torrentgroupdata.date).items():
+    for jps_torrent_id, release_data in get_release_data(torrentids, torrentgroupdata.rel2, torrentgroupdata.date).items():
 
-        logger.info(f'Now processing: {torrentid} {releasedatafull}')
+        logger.info(f'Now processing: {jps_torrent_id} {release_data}')
 
         if max_size:
-            good_jps_format = releasedatafull['size_units'][:1] + "i" + releasedatafull['size_units'][1:] # JPS uses 'GB' when it means 'GiB' etc.
-            jps_torrent_size_in_bytes = DataSize(releasedatafull['size_no_units'] + good_jps_format)
+            good_jps_format = release_data['size_units'][:1] + "i" + release_data['size_units'][1:]  # JPS uses 'GB' when it means 'GiB' etc.
+            jps_torrent_size_in_bytes = DataSize(release_data['size_no_units'] + good_jps_format)
             cfg_max_size_in_bytes = DataSize(max_size)
             if jps_torrent_size_in_bytes > cfg_max_size_in_bytes:
                 skipped_max_size += 1
                 logger.debug(f"Skipping as torrent is > {max_size}")
                 continue
 
-        if int(releasedatafull['seeders']) < config.jps_min_seeders:
+        if int(release_data['seeders']) < config.jps_min_seeders:
             logger.debug(f'Skipping as torrent has < {config.jps_min_seeders} seeder(s)')
             skipped_low_seeders += 1
             continue
 
-        releasedata = releasedatafull['slashdata']
-        uploaddatestr = releasedatafull['uploaddate']
-        releasedataout = {}
-        releasedataout['jpstorrentid'] = torrentid  # Not needed for uploadtorrent(), purely for logging purposes
-        remasterdata = False  # Set default
+        slash_data = release_data['slashdata']
+        uploaddatestr = release_data['uploaddate']
+        release_data_collated = {'jpstorrentid': jps_torrent_id}
+        remaster_data = False  # Set default
 
-        # JPS uses the audioformat field (represented as releasedata[0] here) for containers and codecs in video torrents,
+        # JPS uses the audioformat field (represented as slash_data[0] here) for containers and codecs in video torrents,
         # and when combined with VideoMedias we can perform VideoTorrent detection.
-        if releasedata[0] in VideoOptions.badformats and releasedata[
-            1] in VideoOptions.VideoMedias:  # VideoCategory torrent, this also detects VideoCategories in a non-VC group
+        if slash_data[0] in VideoOptions.badformats and slash_data[1] in VideoOptions.VideoMedias:
+            # VideoCategory torrent, this also detects VideoCategories in a non-VC group
             # container / media
-            releasedataout['videotorrent'] = True  # For processing by uploadtorrent()
-            releasedataout['categorystatus'] = "good"
+            release_data_collated['videotorrent'] = True  # For processing by uploadtorrent()
+            release_data_collated['categorystatus'] = "good"
 
-            videoreleasedatavalidated = validate_jps_video_data(releasedata, releasedataout['categorystatus'])
-            for field, data in videoreleasedatavalidated.items():
-                releasedataout[field] = data
+            #videoreleasedatavalidated = validate_jps_video_data(slash_data, release_data_collated['categorystatus'])
+            for field, data in validate_jps_video_data(slash_data, release_data_collated['categorystatus']).items():
+                release_data_collated[field] = data
 
-            if len(releasedata) == 3:  # Remastered
-                remasterdata = releasedata[2]
+            if len(slash_data) == 3:  # Remastered
+                remaster_data = slash_data[2]
 
-        elif releasedata[0] in VideoOptions.badformats and releasedata[
-            2] in VideoOptions.VideoMedias:  # Video torrent mistakenly uploaded as an Album/Single
+        elif slash_data[0] in VideoOptions.badformats and slash_data[2] in VideoOptions.VideoMedias:
+            # Video torrent mistakenly uploaded as an Album/Single
             # container / 'bitrate' / media   Bitrate is meaningless, users usually select Lossless
-            releasedataout['videotorrent'] = True  # For processing by uploadtorrent()
-            releasedataout['categorystatus'] = "bad"
+            release_data_collated['videotorrent'] = True  # For processing by uploadtorrent()
+            release_data_collated['categorystatus'] = "bad"
 
-            videoreleasedatavalidated = validate_jps_video_data(releasedata, releasedataout['categorystatus'])
+            videoreleasedatavalidated = validate_jps_video_data(slash_data, release_data_collated['categorystatus'])
             for field, data in videoreleasedatavalidated.items():
-                releasedataout[field] = data
+                release_data_collated[field] = data
 
-            if len(releasedata) == 4:  # Remastered
-                remasterdata = releasedata[3]
+            if len(slash_data) == 4:  # Remastered
+                remaster_data = slash_data[3]
 
         elif torrentgroupdata.category in Categories.Music:  # Music torrent
             # format / bitrate / media
-            releasedataout['videotorrent'] = False
-            releasedataout['categorystatus'] = "good"
+            release_data_collated['videotorrent'] = False
+            release_data_collated['categorystatus'] = "good"
 
-            releasedataout['media'] = releasedata[2]
-            releasedataout['audioformat'] = releasedata[0]
-            releasedataout['bitrate'] = validate_jps_bitrate(releasedata[1])
+            release_data_collated['media'] = slash_data[2]
+            release_data_collated['audioformat'] = slash_data[0]
+            release_data_collated['bitrate'] = validate_jps_bitrate(slash_data[1])
 
-            if decide_exc_filter(releasedataout['audioformat'], releasedataout['media'], releasedata):
+            if decide_exc_filter(release_data_collated['audioformat'], release_data_collated['media'], slash_data):
                 skipped_exc_filter += 1
                 continue
 
-            if len(releasedata) == 4:  # Remastered
-                remasterdata = releasedata[3]
+            if len(slash_data) == 4:  # Remastered
+                remaster_data = slash_data[3]
 
         elif torrentgroupdata.category in Categories.Video:  # Probably Music in a VC group
             # format / media
-            releasedataout['videotorrent'] = False
-            releasedataout['categorystatus'] = "bad"
+            release_data_collated['videotorrent'] = False
+            release_data_collated['categorystatus'] = "bad"
 
-            releasedataout['audioformat'] = releasedata[0]
-            releasedataout['media'] = releasedata[1]
+            release_data_collated['audioformat'] = slash_data[0]
+            release_data_collated['media'] = slash_data[1]
 
-            if decide_exc_filter(releasedataout['audioformat'], releasedataout['media'], releasedata):
+            if decide_exc_filter(release_data_collated['audioformat'], release_data_collated['media'], slash_data):
                 skipped_exc_filter += 1
                 continue
 
-            if len(releasedata) == 3:  # Remastered
-                remasterdata = releasedata[2]
+            if len(slash_data) == 3:  # Remastered
+                remaster_data = slash_data[2]
 
         elif torrentgroupdata.category in Categories.NonReleaseData:  # Pictures or Misc Category torrents
-            releasedataout['videotorrent'] = False
-            releasedataout['categorystatus'] = "good"
+            release_data_collated['videotorrent'] = False
+            release_data_collated['categorystatus'] = "good"
 
         else:  # We should never reach here
             logger.error('Could not handle release data')
             raise RuntimeError('Could not handle release data')
 
-        if remasterdata:
+        if remaster_data:
             try:
-                remastertext = re.findall('(.*) - (.*)$', remasterdata)[0]
-                releasedataout['remastertitle'] = remastertext[0]
-                remasteryear = remastertext[1]
+                remaster_text = re.findall('(.*) - (.*)$', remaster_data)[0]
+                release_data_collated['remastertitle'] = remaster_text[0]
+                remaster_year = remaster_text[1]
             except IndexError:  # Torrent is remastered and only has year set
-                remasteryear = remasterdata  # The whole string is just the year
+                remaster_year = remaster_data  # The whole string is just the year
 
             # Year is mandatory on JPS so most remastered releases have current year set as year. This looks ugly on SM (and JPS) so if the
             # year is the groupdata['year'] we will not set it.
             year = re.findall('([0-9]{4})(?:.*)', torrentgroupdata.date)[0]
-            if year != remasteryear:
-                releasedataout['remasteryear'] = remasteryear
+            if year != remaster_year:
+                release_data_collated['remasteryear'] = remaster_year
 
-        if 'WEB' in releasedata:  # Media validation
-            releasedataout['media'] = 'Web'
-        elif 'Blu-Ray' in releasedata:
-            releasedataout['media'] = 'Bluray'  # JPS may actually be calling it the correct official name, but modern usage differs.
+        if 'WEB' in slash_data:  # Media validation
+            release_data_collated['media'] = 'Web'
+        elif 'Blu-Ray' in slash_data:
+            release_data_collated['media'] = 'Bluray'  # JPS may actually be calling it the correct official name, but modern usage differs.
 
         # uploadtorrent() will use the upload date as release date if the torrent has no release date, usually for
         # Picture Category torrents and some TV-Variety.
-        releasedataout['uploaddate'] = datetime.datetime.strptime(uploaddatestr, '%b %d %Y, %H:%M').strftime('%Y%m%d')
+        release_data_collated['uploaddate'] = datetime.datetime.strptime(uploaddatestr, '%b %d %Y, %H:%M').strftime('%Y%m%d')
 
-        jps_torrent_file = get_jps_torrent(torrentid, torrentgroupdata)
+        jps_torrent_file = get_jps_torrent(jps_torrent_id, torrentgroupdata)
         jps_torrent_object = io.BytesIO(jps_torrent_file.content)  # Keep file in memory as it could be processed and deleted by a torrent client
 
         dupe_sugoimusic_torrent_id = decide_duplicate(jps_torrent_object)
 
         if dupe_sugoimusic_torrent_id and config.skip_dupes:
-            logger.debug(f'Not downloading JPS torrent {torrentid} as it is a duplicate on SM as torrent {dupe_sugoimusic_torrent_id}'
+            logger.debug(f'Not downloading JPS torrent {jps_torrent_id} as it is a duplicate on SM as torrent {dupe_sugoimusic_torrent_id}'
                          f' and SkipDuplicates is true in cfg.')
             skipped_dupe_torrent_hash += 1
         else:
-            download_jps_torrent(jps_torrent_file, torrentgroupdata, releasedata)
-            logger.debug(f'downloaded jps torrent {torrentid}')
+            download_jps_torrent(jps_torrent_file, torrentgroupdata, slash_data)
+            logger.debug(f'downloaded jps torrent {jps_torrent_id}')
             jps_torrent_downloaded_count += 1
 
         if scrape_only:
@@ -467,14 +466,14 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
                     f'This torrent already exists on SugoiMusic - https://sugoimusic.me/torrents.php?torrentid={dupe_sugoimusic_torrent_id} '
                     f'The .torrent has been downloaded with name "{dupe_file_path}"'
                 )
-            dupe_error_msg = f'The exact same torrent file already exists on the site! See: https://sugoimusic.me/torrents.php?torrentid={dupe_sugoimusic_torrent_id} JPS torrent id: {torrentid}'
+            dupe_error_msg = f'The exact same torrent file already exists on the site! See: https://sugoimusic.me/torrents.php?torrentid={dupe_sugoimusic_torrent_id} JPS torrent id: {jps_torrent_id}'
             logger.warning(dupe_error_msg)
-            dupe_jps_ids.append(int(torrentid))
+            dupe_jps_ids.append(int(jps_torrent_id))
             dupe_sm_ids.append(int(dupe_sugoimusic_torrent_id))
             continue
 
         # Upload torrent to SM
-        uploadtorrent(jps_torrent_object, torrentgroupdata, **releasedataout)
+        uploadtorrent(jps_torrent_object, torrentgroupdata, **release_data_collated)
 
         sm_torrent_uploaded_count += 1
 
