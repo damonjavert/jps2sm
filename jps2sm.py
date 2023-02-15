@@ -339,8 +339,8 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
             logger.debug("Skipping as torrent is >=1Gb")
             continue
 
-        if int(releasedatafull['seeders']) < 1:
-            logger.debug('Skipping as torrent has no seeders')
+        if int(releasedatafull['seeders']) < config.jps_min_seeders:
+            logger.debug(f'Skipping as torrent has < {config.jps_min_seeders} seeder(s)')
             skipped_low_seeders += 1
             continue
 
