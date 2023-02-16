@@ -62,9 +62,9 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
                             f'\nNew uploads successfully created: {batch_torrent_info["sm_torrents_uploaded_count"]}'
                             )
 
-    batch_uploads = get_batch_jps_group_torrent_ids(mode=mode, user=user, first=start, last=end, sort=sort, order=order)
+    # batch_uploads = get_batch_jps_group_torrent_ids(mode=mode, user=user, first=start, last=end, sort=sort, order=order)
 
-    # batch_uploads = { '362613': ['535927'], '354969': ['535926'], '362612': ['535925'], '362611': ['535924'], '181901': ['535923'], '181902': ['535922'] }
+    batch_uploads = { '362613': ['535927'], '354969': ['535926'], '362612': ['535925'], '362611': ['535924'], '181901': ['535923'], '181902': ['535922'] }
 
     batch_upload_collate_errors = collections.defaultdict(list)
     batch_upload_dupes_at_upload_smids = []
@@ -166,14 +166,21 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
                     for item in value:
                         batch_torrent_info[collate_result_item].append(item)
                 elif isinstance(value, dict):
-                    blah_do_nothing = 1
+                    if collate_result_item != "jps_torrent_collated_data":
+                        raise RuntimeError('Expected only a dict with a parent dicts value of jps_torrent_collated_data')
+                    for jps_torrent_id, collate_torrent_info in collate_torrent_info['jps_torrent_collated_data'].items():
+                        batch_collate_torrent_info[jps_torrent_id] = {}
+                        batch_collate_torrent_info[jps_torrent_id]['jps_torrent_object'] = collate_torrent_info['jps_torrent_object']
+                        batch_collate_torrent_info[jps_torrent_id]['torrentgroupdata'] = collate_torrent_info['torrentgroupdata']
+                        batch_collate_torrent_info[jps_torrent_id]['release_data_collated'] = collate_torrent_info['release_data_collated']
+
                 else:
-                    raise RuntimeError('Expected either int or list in collate_torrent_info.items() from collate()')
-            for jps_torrent_id, collate_torrent_info in collate_torrent_info['jps_torrent_collated_data'].items():
-                batch_collate_torrent_info[jps_torrent_id] = {}
-                batch_collate_torrent_info[jps_torrent_id]['jps_torrent_object'] = collate_torrent_info['jps_torrent_object']
-                batch_collate_torrent_info[jps_torrent_id]['torrentgroupdata'] = collate_torrent_info['torrentgroupdata']
-                batch_collate_torrent_info[jps_torrent_id]['release_data_collated'] = collate_torrent_info['release_data_collated']
+                    raise RuntimeError('Expected either int, list or dict in collate_torrent_info.items() from collate()')
+            # for jps_torrent_id, collate_torrent_info in collate_torrent_info['jps_torrent_collated_data'].items():
+            #     batch_collate_torrent_info[jps_torrent_id] = {}
+            #     batch_collate_torrent_info[jps_torrent_id]['jps_torrent_object'] = collate_torrent_info['jps_torrent_object']
+            #     batch_collate_torrent_info[jps_torrent_id]['torrentgroupdata'] = collate_torrent_info['torrentgroupdata']
+            #     batch_collate_torrent_info[jps_torrent_id]['release_data_collated'] = collate_torrent_info['release_data_collated']
 
         except KeyboardInterrupt:  # Allow Ctrl-C to exit without showing the error multiple times and polluting the final error dict
             break  # Still continue to get error dicts and dupe list so far
