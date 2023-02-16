@@ -1,11 +1,12 @@
 # Standard library packages
 import collections
+import json
+import pprint
 import time
 import re
 import sys
 
 from jps2sm.get_data import GetGroupData, get_jps_group_data_class
-from jps2sm.jps2sm import collate
 from jps2sm.myloginsession import jpopsuki
 from jps2sm.save_data import download_sm_uploaded_torrents
 from jps2sm.utils import GetArgs, count_values_dict, GetConfig
@@ -21,6 +22,7 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
     """
     Operate batch upload mode
     """
+    from jps2sm.jps2sm import collate, uploadtorrent
     args = GetArgs()
 
     def batch_stats(final_stats, media_info_mode, dry_run):
@@ -90,6 +92,8 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
 
     max_size = None
 
+    """
+
     if mode == "recent":
         config = GetConfig()
         max_size = config.max_size_recent_mode
@@ -139,8 +143,11 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
         }
 
         input('When these files have been downloaded press enter to continue...')
+    """
 
+    batch_collate_torrent_info = {}
     for jps_group_id, jps_torrent_ids in batch_uploads.items():
+
         if jps_group_id in batch_uploads_group_errors or jps_group_id in batch_groups_excluded or jps_group_id in batch_groups_va_errors:
             # Skip group if GetGroupData() failed or the group is being excluded by the '-exc' parameter, or if it is a 'V.A.' group and
             # no contrib artists were set
@@ -151,17 +158,23 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
 
         try:
             collate_torrent_info = collate(torrentids=jps_torrent_ids, torrentgroupdata=jps_group_data, max_size=max_size)
+            #logger.debug(f'collate_torrent_info: {json.dumps(collate_torrent_info, indent=2)}')
             for collate_result_item, value in collate_torrent_info.items():
                 if isinstance(value, int):
                     batch_torrent_info[collate_result_item] += value
                 elif isinstance(value, list):
                     for item in value:
                         batch_torrent_info[collate_result_item].append(item)
+                elif isinstance(value, dict):
+                    blah_do_nothing = 1
                 else:
                     raise RuntimeError('Expected either int or list in collate_torrent_info.items() from collate()')
+            for jps_torrent_id, collate_torrent_info in collate_torrent_info['jps_torrent_collated_data'].items():
+                batch_collate_torrent_info[jps_torrent_id] = {}
+                batch_collate_torrent_info[jps_torrent_id]['jps_torrent_object'] = collate_torrent_info['jps_torrent_object']
+                batch_collate_torrent_info[jps_torrent_id]['torrentgroupdata'] = collate_torrent_info['torrentgroupdata']
+                batch_collate_torrent_info[jps_torrent_id]['release_data_collated'] = collate_torrent_info['release_data_collated']
 
-            if not args.parsed.dryrun:
-                download_sm_uploaded_torrents(collate_torrent_info['sm_torrents_uploaded_count'], jps_group_data.artist, jps_group_data.title)
         except KeyboardInterrupt:  # Allow Ctrl-C to exit without showing the error multiple times and polluting the final error dict
             break  # Still continue to get error dicts and dupe list so far
         except Exception as exc:
@@ -184,6 +197,16 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
                     f'Error with collating/retrieving release data for {jps_group_id} torrentid(s) {",".join(jps_torrent_ids)}, skipping upload')
                 batch_upload_collate_errors[jps_group_id] = jps_torrent_ids
             continue
+
+    #logger.debug(f'batch_collate_torrent_info: {pprint.pprint(batch_collate_torrent_info, indent=2, compact=True)}')
+
+    if mode == "recent":
+        input('When these files have been downloaded press enter to continue...')
+
+    for jps_torrent_id, collate_torrent_info in batch_collate_torrent_info.items():
+        uploadtorrent(collate_torrent_info['jps_torrent_object'], collate_torrent_info['torrentgroupdata'], **collate_torrent_info['release_data_collated'])
+        if not args.parsed.dryrun:
+            download_sm_uploaded_torrents(collate_torrent_info['sm_torrents_uploaded_count'], collate_torrent_info['torrentgroupdata'].artist, collate_torrent_info['torrentgroupdata'].title)
 
     if batch_uploads_group_errors:
         logger.error('The following JPS groupid(s) (torrentid(s) shown for reference) had errors in retrieving group data, '

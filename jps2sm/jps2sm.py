@@ -327,6 +327,7 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
     jps_torrent_downloaded_count = sm_torrent_uploaded_count = skipped_max_size = skipped_low_seeders = skipped_exc_filter = skipped_dupe_torrent_hash = 0
     dupe_jps_ids = []
     dupe_sm_ids = []
+    jps_torrent_collated_data = {}
 
     for jps_torrent_id, release_data in get_release_data(torrentids, torrentgroupdata.rel2, torrentgroupdata.date).items():
 
@@ -473,7 +474,13 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
             continue
 
         # Upload torrent to SM
-        uploadtorrent(jps_torrent_object, torrentgroupdata, **release_data_collated)
+        #uploadtorrent(jps_torrent_object, torrentgroupdata, **release_data_collated)
+
+        jps_torrent_collated_data[jps_torrent_id] = {}
+        jps_torrent_collated_data[jps_torrent_id]['jps_torrent_object'] = jps_torrent_object
+        jps_torrent_collated_data[jps_torrent_id]['torrentgroupdata'] = torrentgroupdata
+        jps_torrent_collated_data[jps_torrent_id]['release_data_collated'] = release_data_collated
+
 
         sm_torrent_uploaded_count += 1
 
@@ -489,6 +496,7 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
                     pass
 
     collate_torrent_info = {
+        'jps_torrent_collated_data': jps_torrent_collated_data,
         'jps_torrents_downloaded_count': jps_torrent_downloaded_count,
         'sm_torrents_uploaded_count': sm_torrent_uploaded_count,  # For use by download_sm_uploaded_torrents() or statisics when in a batch_mode
         'skipped_torrents_max_size': skipped_max_size,
@@ -569,13 +577,19 @@ def non_batch_upload(jps_torrent_id=None, jps_urls=None, dry_run=None, wait_for_
     else:
         raise RuntimeError('Expected either a jps_torrent_id or a jps_url')
 
+    #if wait_for_jps_dl:
+    #    pre_torrent_info = collate(torrentids=jps_torrent_ids, torrentgroupdata=jps_group_data, scrape_only=True)
+    #    input('When these files have been downloaded press enter to continue...')
+
+    collate_torrent_info = collate(torrentids=jps_torrent_ids, torrentgroupdata=jps_group_data)
+
     if wait_for_jps_dl:
-        pre_torrent_info = collate(torrentids=jps_torrent_ids, torrentgroupdata=jps_group_data, scrape_only=True)
         input('When these files have been downloaded press enter to continue...')
 
-    torrent_info = collate(torrentids=jps_torrent_ids, torrentgroupdata=jps_group_data)
+    for jps_torrent_id, data in collate_torrent_info['jps_torrent_collated_data'].items():
+        uploadtorrent(data['jps_torrent_object'], data['torrentgroupdata'], **data['release_data_collated'])
     if not dry_run:
-        download_sm_uploaded_torrents(torrent_info['sm_torrents_uploaded_count'], jps_group_data.artist, jps_group_data.title)
+        download_sm_uploaded_torrents(collate_torrent_info['sm_torrents_uploaded_count'], jps_group_data.artist, jps_group_data.title)
 
 
 if __name__ == "__main__":
