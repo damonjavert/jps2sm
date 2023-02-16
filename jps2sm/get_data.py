@@ -26,7 +26,7 @@ class JPSGroup:
     title: str
     originalartist: str
     originaltitle: str
-    rel2: str
+    torrent_table: str
     groupdescription: str
     imagelink: str
     tagsall: str
@@ -52,7 +52,7 @@ def get_jps_group_data_class(batch_group_data: dict, jps_group_id: int) -> datac
         title=batch_group_data[jps_group_id]['title'],
         originalartist=batch_group_data[jps_group_id]['originalartist'],
         originaltitle=batch_group_data[jps_group_id]['originaltitle'],
-        rel2=batch_group_data[jps_group_id]['rel2'],
+        torrent_table=batch_group_data[jps_group_id]['torrent_table'],
         groupdescription=batch_group_data[jps_group_id]['groupdescription'],
         imagelink=batch_group_data[jps_group_id]['imagelink'],
         tagsall=batch_group_data[jps_group_id]['tagsall'],
@@ -79,7 +79,7 @@ class GetGroupData:
         self.title: str = str()
         self.originalartist: str = str()
         self.originaltitle: str = str()
-        self.rel2: str = str()
+        self.torrent_table: str = str()
         self.groupdescription: str = str()
         self.imagelink: str = str()
         self.tagsall: str = str()
@@ -205,7 +205,7 @@ class GetGroupData:
         except IndexError:  # Do nothing if group has no original artist/title
             pass
 
-        self.rel2 = str(soup.select('#content .thin .main_column .torrent_table tbody')[0])
+        self.torrent_table = str(soup.select('#content .thin .main_column .torrent_table tbody')[0])
 
         # Get description with BB Code if user has group edit permissions on JPS, if not just use stripped html text.
         try:
@@ -253,7 +253,7 @@ class GetGroupData:
             'title': self.title,
             'originalartist': self.originalartist,
             'originaltitle': self.originaltitle,
-            'rel2': self.rel2,
+            'torrent_table': self.torrent_table,
             'groupdescription': self.groupdescription,
             'imagelink': self.imagelink,
             'tagsall': self.tagsall,
@@ -410,13 +410,13 @@ def get_user_keys() -> Dict[str, str]:
     Uses SM login data
     """
 
-    smpage = sugoimusic("https://sugoimusic.me/torrents.php?id=118", test_login=True)  # Arbitrary page on JPS that has authkey
+    smpage = sugoimusic("https://sugoimusic.me/torrents.php?id=118", test_login=True)  # Arbitrary page on SM that has authkey
     soup = BeautifulSoup(smpage.text, 'html5lib')
-    rel2 = str(soup.select_one('#torrent_details .group_torrent > td > span > .tooltip'))
+    sm_torrent_link = str(soup.select_one('#torrent_details .group_torrent > td > span > .tooltip'))
 
     return {
-        'authkey': re.findall('authkey=(.*)&amp;torrent_pass=', rel2)[0],
-        'torrent_password_key': re.findall(r"torrent_pass=(.+)\" title", rel2)[0]
+        'authkey': re.findall('authkey=(.*)&amp;torrent_pass=', sm_torrent_link)[0],
+        'torrent_password_key': re.findall(r"torrent_pass=(.+)\" title", sm_torrent_link)[0]
     }
 
 
