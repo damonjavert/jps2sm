@@ -33,10 +33,10 @@ from loguru import logger
 from datasize import DataSize
 
 # jps2sm modules
-from jps2sm.get_data import GetGroupData, get_jps_group_data_class, get_release_data, GetJPSUser, GetSMUser
+from jps2sm.get_data import GetGroupData, get_release_data, GetJPSUser, GetSMUser
 from jps2sm.save_data import save_sm_html_debug_output, download_sm_uploaded_torrents, download_sm_torrent, get_jps_torrent, download_jps_torrent
-from jps2sm.batch import get_batch_jps_group_torrent_ids, get_batch_group_data
-from jps2sm.utils import count_values_dict, fatal_error, GetConfig, GetArgs, decide_duplicate
+from jps2sm.batch import batch_mode
+from jps2sm.utils import fatal_error, GetConfig, GetArgs, decide_duplicate
 from jps2sm.myloginsession import jpopsuki, sugoimusic
 from jps2sm.constants import Categories, VideoOptions
 from jps2sm.mediainfo import get_mediainfo
@@ -500,9 +500,6 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
     }
 
     return collate_torrent_info
-
-
-
 
 
 def main():
