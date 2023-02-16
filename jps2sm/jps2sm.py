@@ -251,20 +251,7 @@ def uploadtorrent(jps_torrent_object, torrentgroupdata, **uploaddata):
 
         SMerrorTorrent = re.findall('red; text-align: center;">(.*)</p>', SMres.text)
         if SMerrorTorrent:
-            dupe = re.findall('torrentid=([0-9]+)">The exact same torrent file already exists on the site!</a>$', SMerrorTorrent[0])
-            if dupe:
-                if not config.skip_dupes:
-                    dupe_file_path = download_sm_torrent(dupe[0], torrentgroupdata.artist, torrentgroupdata.title)
-                    logger.warning(
-                        f'This torrent already exists on SugoiMusic - https://sugoimusic.me/torrents.php?torrentid={dupe[0]} '
-                        f'The .torrent has been downloaded with name "{dupe_file_path}"'
-                    )
-                dupe_error_msg = f'The exact same torrent file already exists on the site! See: https://sugoimusic.me/torrents.php?torrentid={dupe[0]} JPS torrent id: {uploaddata["jpstorrentid"]}'
-                logger.info(dupe_error_msg)
-                raise Exception(dupe_error_msg)
-            else:
-                logger.error(SMerrorTorrent[0])
-                raise Exception(SMerrorTorrent[0])
+            raise Exception(SMerrorTorrent[0])
 
         SMerrorLogon = re.findall('<p>Invalid (.*)</p>', SMres.text)
         if SMerrorLogon:
@@ -286,7 +273,7 @@ def uploadtorrent(jps_torrent_object, torrentgroupdata, **uploaddata):
             logger.info(f'Torrent uploaded successfully as groupid {groupid[0]}  See https://sugoimusic.me/torrents.php?id={groupid[0]}')
 
 
-def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
+def collate(torrentids, torrentgroupdata, max_size=None):
     """
     Collate and validate data ready for upload to SM
 
@@ -295,21 +282,20 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
     Perform validation on some fields
     Download JPS torrent
     Apply filters via decide_exc_filter()
-    Send data to uploadtorrent()
     Send data to setorigartists()
 
     :param torrentids: list of JPS torrentids to be processed
             Always a single torrentid unless specifying a group url in --url mode
     :param torrentgroupdata: dictionary with torrent group data from getgroupdata[]
     :param max_size: str: Maximum size with unit specified, currently only used by recent mode
-    :param scrape_only: bool: Only download JPS torrents, do not upload to SM
     """
     config = GetConfig()
     args = GetArgs()
 
-    jps_torrent_downloaded_count = sm_torrent_uploaded_count = skipped_max_size = skipped_low_seeders = skipped_exc_filter = skipped_dupe_torrent_hash = 0
+    jps_torrent_downloaded_count = skipped_max_size = skipped_low_seeders = skipped_exc_filter = skipped_dupe_torrent_hash = 0
     dupe_jps_ids = []
     dupe_sm_ids = []
+    jps_torrent_collated_data = {}
 
     for jps_torrent_id, release_data in get_release_data(torrentids, torrentgroupdata.torrent_table, torrentgroupdata.date).items():
 
@@ -427,19 +413,16 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
         jps_torrent_file = get_jps_torrent(jps_torrent_id, torrentgroupdata)
         jps_torrent_object = io.BytesIO(jps_torrent_file.content)  # Keep file in memory as it could be processed and deleted by a torrent client
 
-        dupe_sugoimusic_torrent_id = decide_duplicate(jps_torrent_object)
+        if dupe_sugoimusic_torrent_id := decide_duplicate(jps_torrent_object):
+            skipped_dupe_torrent_hash += 1
 
         if dupe_sugoimusic_torrent_id and config.skip_dupes:
             logger.debug(f'Not downloading JPS torrent {jps_torrent_id} as it is a duplicate on SM as torrent {dupe_sugoimusic_torrent_id}'
                          f' and SkipDuplicates is true in cfg.')
-            skipped_dupe_torrent_hash += 1
         else:
             download_jps_torrent(jps_torrent_file, torrentgroupdata, slash_data)
             logger.debug(f'downloaded jps torrent {jps_torrent_id}')
             jps_torrent_downloaded_count += 1
-
-        if scrape_only:
-            continue
 
         if not args.parsed.dryrun and dupe_sugoimusic_torrent_id:
             if not config.skip_dupes:
@@ -455,10 +438,10 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
             dupe_sm_ids.append(int(dupe_sugoimusic_torrent_id))
             continue
 
-        # Upload torrent to SM
-        uploadtorrent(jps_torrent_object, torrentgroupdata, **release_data_collated)
-
-        sm_torrent_uploaded_count += 1
+        jps_torrent_collated_data[jps_torrent_id] = {}
+        jps_torrent_collated_data[jps_torrent_id]['jps_torrent_object'] = jps_torrent_object
+        jps_torrent_collated_data[jps_torrent_id]['torrentgroupdata'] = torrentgroupdata
+        jps_torrent_collated_data[jps_torrent_id]['release_data_collated'] = release_data_collated
 
     if not args.parsed.dryrun:
         # Add original artists for contrib artists
@@ -472,8 +455,8 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
                     pass
 
     collate_torrent_info = {
+        'jps_torrent_collated_data': jps_torrent_collated_data,
         'jps_torrents_downloaded_count': jps_torrent_downloaded_count,
-        'sm_torrents_uploaded_count': sm_torrent_uploaded_count,  # For use by download_sm_uploaded_torrents() or statisics when in a batch_mode
         'skipped_torrents_max_size': skipped_max_size,
         'skipped_torrents_low_seeders': skipped_low_seeders,
         'skipped_torrents_exc_filter': skipped_exc_filter,
@@ -552,13 +535,15 @@ def non_batch_upload(jps_torrent_id=None, jps_urls=None, dry_run=None, wait_for_
     else:
         raise RuntimeError('Expected either a jps_torrent_id or a jps_url')
 
+    collate_torrent_info = collate(torrentids=jps_torrent_ids, torrentgroupdata=jps_group_data)
+
     if wait_for_jps_dl:
-        pre_torrent_info = collate(torrentids=jps_torrent_ids, torrentgroupdata=jps_group_data, scrape_only=True)
         input('When these files have been downloaded press enter to continue...')
 
-    torrent_info = collate(torrentids=jps_torrent_ids, torrentgroupdata=jps_group_data)
+    for jps_torrent_id, data in collate_torrent_info['jps_torrent_collated_data'].items():
+        uploadtorrent(data['jps_torrent_object'], data['torrentgroupdata'], **data['release_data_collated'])
     if not dry_run:
-        download_sm_uploaded_torrents(torrent_info['sm_torrents_uploaded_count'], jps_group_data.artist, jps_group_data.title)
+        download_sm_uploaded_torrents(collate_torrent_info['sm_torrents_uploaded_count'], jps_group_data.artist, jps_group_data.title)
 
 
 if __name__ == "__main__":
