@@ -329,7 +329,7 @@ def collate(torrentids, torrentgroupdata, max_size=None, scrape_only=False):
     dupe_sm_ids = []
     jps_torrent_collated_data = {}
 
-    for jps_torrent_id, release_data in get_release_data(torrentids, torrentgroupdata.rel2, torrentgroupdata.date).items():
+    for jps_torrent_id, release_data in get_release_data(torrentids, torrentgroupdata.torrent_table, torrentgroupdata.date).items():
 
         logger.info(f'Now processing: {jps_torrent_id} {release_data}')
 

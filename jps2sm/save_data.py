@@ -100,7 +100,7 @@ def get_jps_torrent(jps_torrent_id: str, torrent_group_data: Type[GetGroupData])
     :param torrent_group_data: Data from the JPS Group
     """
 
-    torrent_link = html.unescape(get_torrent_link(jps_torrent_id, torrent_group_data.rel2))
+    torrent_link = html.unescape(get_torrent_link(jps_torrent_id, torrent_group_data.torrent_table))
     jps_torrent_file = jpopsuki(f"https://jpopsuki.eu/{torrent_link}")  # Download JPS torrent
 
     return jps_torrent_file
