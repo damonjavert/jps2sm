@@ -16,7 +16,7 @@ from jps2sm.constants import JPSTorrentView, Categories
 from pathlib import Path
 from loguru import logger
 
-__version__ = "1.12.1"
+__version__ = "1.15.1"
 
 
 def get_valid_filename(s: str) -> AnyStr:
