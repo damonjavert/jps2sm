@@ -1,103 +1,104 @@
 # jps2sm
 
+![PyPI](https://img.shields.io/pypi/v/jps2sm) ![PyPI - Status](https://img.shields.io/pypi/status/jps2sm) ![GitHub last commit](https://img.shields.io/github/last-commit/damonjavert/jps2sm) ![License](https://img.shields.io/github/license/damonjavert/jps2sm) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+
 ### A project to migrate torrents from JPopSuki to SugoiMusic
 
-jps2sm will automatically gather data from JPS from a given group url, release url(s) or userid's uploaded/seeding torrents and iterate through all the data in and upload them to SM.
+jps2sm will automatically gather and validate data from JPS and transfer it to SM. jps2sm does not download any data using torrents themselves and is not a torrent client.
 
 ## Features
-* Create upload to SM by automatically retrieving all data on JPS, including english and original titles, group description, release information (format / media / bitrate etc.), group images, contributing artists, original titles, mediainfo data and remaster information if applicable.
+* Create upload on SM by automatically retrieving all data on JPS, including english and original titles, group description, release information (format / media / bitrate etc.), group images, contributing artists, original titles, mediainfo data and remaster information if applicable.
 * Upload by specifiyng a JPS group or release `--url`
 * Upload all your (or someone elses) personally uploaded / seeding / snatched torrents with `--batchupload` / `--batchseeding` / `--batchsnatched`
-* Contribute to SM  by uploading ALL non-large recent torrents to SM with `--batchrecent` mode. Note: This mode will prompt you to continue once the JPS data has been downloaded. Torrents over 1Gb are skipped.
+* Contribute to SM  by uploading ALL non-large recent torrents to SM with `--batchrecent` mode. Note: This mode will prompt you to continue once the JPS data has been downloaded. A maximum size can be configured with `MaxSizeRecentMode` in jps2sm.cfg
 * Search for your media files specified in `MediaDirectories` and run [Mediainfo](https://mediaarea.net/en/MediaInfo) against them and save the output to the 'mediainfo' field and parse the data to populate the codec, container, audioformat and resolution fields. DVD ISOs are automatically extracted and Mediainfo is run against the VOB files, BR ISO images are not currently supported in the pyunpack module.
 * Exclude certain audioformats, medias or categories with `--excaudioformat` , `--excmedia` and `--exccategory`
 * Test your uploads with `--dryrun` mode.
 
-## How to use
-Windows, Mac and Linux users can use the latest compiled binary on the releases page: https://git.sugoimusic.me/Sugoimusic/jps2sm/releases
-The current compile binaries are out of date, with some features missing, if you can for now, use the python code.
+## Install
+From PyPi:
+```
+pip install jps2sm
+```
+Or use the latest commit:
+```
+git clone https://github.com/damonjavert/jps2sm.git
+cd jps2sm
+python setup.py install
+```
 
-### Quickstart
-Download the binary release for your platform: https://git.sugoimusic.me/Sugoimusic/jps2sm/releases
+**jps2sm** requires python >=3.8
 
-Extract the contents of the zip, add your JPS & SM login credentials and the directories where your media is stored to **jps2sm.cfg**
-
-    jps2sm --help
-
-See Command line usage below
+## Quickstart
+* Install the latest release of python: https://www.python.org/downloads/
+* Launch your favourite terminal emulator, if you are not familiar with command-line usage or tools, on Windows: Type Win+R and run 'cmd'. On Mac: Go > Utilities > Terminal.
+* Install the package as above `pip install jps2sm` and add your JPS & SM login credentials and the directories where your media is stored to **jps2sm.cfg**, using **jps2sm.cfg.example** as a template.
 
 The SM torrents are automatically downloaded to the $HOME/SMTorrents, or My Documents\SMTorrents if on Windows by default. All video torrents MUST have mediainfo extracted to be uploaded - you must setup `MediaDirectories` as below in order for jps2sm to find your media files:
 
 ```text
-    [Media]
-    MediaDirectories: d:\Music, e:\BR-Rips, .....
+[Media]
+MediaDirectories: d:\Music, e:\BR-Rips, .....
 ```
+MediaInfo will also need to be installed.
 
-or use Linux/Mac OSX ecquivalent paths. The MediaInfo library is bundled with the Windows and Mac OSX releases, if using the Linux release you will need to install MediaInfo, jps2sm/pymediainfo will locate the library. Enjoy!
-
-### Quickstart - for those familiar with python
-**jps2sm** requires python 3.8
-
-The latest Dev release can be used instead by cloning the repo:
-
-    git clone https://git.sugoimusic.me/Sugoimusic/jps2sm
-
-Add your JPS & SM login credentials and the directories where your media is stored to **jps2sm.cfg**, using **jps2sm.cfg.example** as a template.
-
-Install modules and run the script, adjusting the exact commands if required by your environment:
-
-    pip3 install -r requirements.txt
-    python3 jps2sm.py --urls <group-url or release-url(s)>
+To upload an single release or a whole group:
+```
+jps2sm --urls <group-url or release-url(s)>
+```
 
 * A **group-url** looks like https://jpopsuki.eu/torrents.php?id=111284
 * A **release-url** looks like https://jpopsuki.eu/torrents.php?id=111284&torrentid=148289
 * See Command line usage for batch processing options.
 
-### Command line usage Examples
+## Command line usage Examples
 To upload all your current seeding torrents, whilst automatically retrieving mediainfo data:
 
-    python3 jps2sm.py --batchseeding --mediainfo
+    jps2sm --batchseeding --mediainfo    
 
 To upload the latest 50 torrents uploaded to JPS, prompting the user to continue once JPS data has been downloaded:
 
-    python3 jps2sm.py --batchrecent --mediainfo
+    jps2sm --batchrecent --mediainfo
 
-To upload the most recent 50 torrents you uploaded:
+To *test* upload all your JPS uploads:
 
-    python3 jps2sm.py --batchuploaded
+    jps2sm --batchuploaded --dryrun
+
+To upload all your JPS uploads:
+
+    jps2sm --batchuploaded
+
+To upload the most recent 50 torrents you uploaded at JPS:
+
+    jps2sm --batchuploaded --batchsort time --batchsortorder desc --batchstart 1 --batchend 1
 
 To upload your 100 most popular uploads, based on snatches:
 
-    python3 jps2sm.py --batchuploaded --batchsort snatches --batchsortorder desc --batchstart 1 --batchend 2
+    jps2sm --batchuploaded --batchsort snatches --batchsortorder desc --batchstart 1 --batchend 2
 
 To upload every release of AKB48 - 1830m:
 
-    python3 jps2sm.py --urls "https://jpopsuki.eu/torrents.php?id=111284"
+    jps2sm --urls "https://jpopsuki.eu/torrents.php?id=111284"
 
 To upload only the FLAC and MP3 320:
 
-    python3 jps2sm.py --urls "https://jpopsuki.eu/torrents.php?id=111284&torrentid=148289 https://jpopsuki.eu/torrents.php?id=111284&torrentid=147830"
+    jps2sm --urls "https://jpopsuki.eu/torrents.php?id=111284&torrentid=148289 https://jpopsuki.eu/torrents.php?id=111284&torrentid=147830"
 
 To upload every release of AKB48 - 1830m, excluding the ISOs *(in JPS ISO is considered an audio format)*:
 
-    python3 jps2sm.py --urls "https://jpopsuki.eu/torrents.php?id=111284" --excaudioformat ISO
-
-To *test* upload all your personal uploads:
-
-    python3 jps2sm.py --batchuploaded --dryrun
-
-Once everything looks ok, to upload all your personal uploads:
-
-    python3 jps2sm.py --batchuploaded
+    jps2sm --urls "https://jpopsuki.eu/torrents.php?id=111284" --excaudioformat ISO
 
 
 **Please only upload torrents you intend to SEED.** Never-seeded torrents are deleted after 48 hours.
 ## Usage
 
 ```text
-usage: jps2sm.py [--help] [--version] [--debug] [--dryrun] [--mediainfo] [--wait-for-jps-dl]
+usage: jps2sm ( --urls | --torrentid | --batchuploaded | --batchseeding | --batchsnatched | --batchrecent )
+[--batchuser] [--batchsort] [--batchsortorder] [--batchstart --batchend]
+[--exccategory] [--excaudioformat] [--excmedia]
+[--help] [--version] [--debug] [--dryrun] [--mediainfo] [--wait-for-jps-dl]
 
-Single group / release mode arguments:
+Single group / release(s):
 
   --urls URLS
 
@@ -105,9 +106,10 @@ Single torrent id:
 
   --torrentid JPSTORRENTID
 
-Batch processing mode arguments:
+Batch processing mode:
 
-  --batchuser BATCHUSER (--batchuploaded | --batchseeding | --batchsnatched | --batchrecent) [-s BATCHSTART] [-e BATCHEND]
+  --batchuser BATCHUSER (--batchuploaded | --batchseeding | --batchsnatched | --batchrecent)
+  [--batchstart BATCHSTART] [--batchend BATCHEND]
   [--exccategory EXCCATEGORY] [--excaudioformat EXCAUDIOFORMAT] [--excmedia EXCMEDIA]
 
 
@@ -119,7 +121,7 @@ Help for arguments for group/release uploads:
                         in quotes
 
 
-Help for arguments for batch processing:
+Help for arguments for batch mode:
 
   -b BATCHUSER, --batchuser BATCHUSER
                         User id for batch user operations, default is user id of SM Username specified in jps2sm.cfg
@@ -129,14 +131,14 @@ Help for arguments for batch processing:
         **or**
   -SN, --batchsnatched  Upload all releases that have been snatched
         **or**
-  -R, --batchrecent     Upload ALL recent releases uploaded to JPS that are under 1Gb in size.
+  -R, --batchrecent     Upload ALL recent releases uploaded to JPS
                         This mode will prompt you to continue once the JPS data has been downloaded, by default it parses
                         the first page at JPS - the last 50 torrents shown on the main page: https://jpopsuki.eu/torrents.php .
                         This mode is designed to contribute to SM even if you do not have much activity at JPS and/or ensure
                         that we have the very latest torrents!
 
 
-Help for optional arguments for batch processing:
+Help for optional arguments for batch mode:
 
   -s BATCHSTART, --batchstart BATCHSTART
                     Start at this page
@@ -169,10 +171,7 @@ Help for optional arguments:
 
 ## Development
 Pull requests are welcome!
-
-It is strongly recommended to create a python virtual environment for your development.
-
-See https://git.sugoimusic.me/Sugoimusic/jps2sm/issues for areas that you can contribute to.
+See https://github.com/damonjavert/jps2sm/issues for areas that you can contribute to.
 
 ### Windows
 Windows 10 users can setup a Dev environment using [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10). Windows 7 users can install [cygwin](https://cygwin.com/install.html) and then select the python 3.8 packages. Or a python3 MSI installer can be found on the [offical python 3 downloads](https://www.python.org/downloads/windows/) page.
@@ -182,3 +181,10 @@ Install [Homebrew](https://brew.sh) if you do not have it already and then `brew
 
 ### Linux
 Your distro's primary repos may not include packages for python3.8. Using `apt-get install python3` for example may only install python3.6 (or even earlier) and due to the use of the walrus operator jps2sm requires python 3.8. Debian and Fedora based distros can follow this guide: https://docs.python-guide.org/starting/install3/linux/ .
+
+## Legal Disclaimer
+Use of jps2sm is not illegal but piracy probably is in your country. Data transferred using jps2sm should be used to maintain backup copies on JPopSuki and SugoiMusic.
+
+The developers of jps2sm are assuming that you own the original file and hold NO RESPONSIBILITY if further to the use of this software the files are misused in any way and cannot be held responsible for what uploads are created on SugoiMusic as a result.
+
+jps2sm is not a torrent client and only migrates and validates metadata and not the actual data/files themselves.
