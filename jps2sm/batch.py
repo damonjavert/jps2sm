@@ -4,16 +4,16 @@ import time
 import re
 import sys
 
+# Third-party packages
+from bs4 import BeautifulSoup
+from loguru import logger
+
+# jps2sm modules
 from jps2sm.get_data import GetGroupData, get_jps_group_data_class
 from jps2sm.myloginsession import jpopsuki
 from jps2sm.save_data import download_sm_uploaded_torrents
 from jps2sm.utils import GetArgs, count_values_dict, GetConfig
 from jps2sm.constants import JPSTorrentView
-
-# Third-party packages
-from bs4 import BeautifulSoup
-
-from loguru import logger
 
 
 def batch_mode(mode, user, start=1, end=None, sort=None, order=None):

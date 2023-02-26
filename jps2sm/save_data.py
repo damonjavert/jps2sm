@@ -1,14 +1,17 @@
+# Standard library packages
 import json
 import html
+from typing import Type, Tuple
 
+# Third-party packages
+from pathlib import Path
+from loguru import logger
+
+# jps2sm modules
 from jps2sm.get_data import GetGroupData, GetSMUser, get_torrent_link
 from jps2sm.myloginsession import sugoimusic, jpopsuki
 from jps2sm.utils import get_valid_filename, GetConfig, HandleCfgOutputDirs
-from typing import Type, Tuple
 
-from pathlib import Path
-from loguru import logger
-import requests
 
 config = GetConfig()
 output = HandleCfgOutputDirs(config.directories)

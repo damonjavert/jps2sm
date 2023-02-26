@@ -1,21 +1,3 @@
-# jps2sm.py is a python script that will automatically gather data from JPS from a given group url, release url,
-# or a user's uploaded / seeding torrents and iterate through them and upload them to SM.
-
-# Catch python2 being run here to get a relatively graceful error message, rather than a syntax error later on which causes confusion.
-from typing import List, Any
-
-error_x, *error_y = 1, 2, 3, 4  # jps2sm requires requires python3.8, a SyntaxError here means you are running it in python2!
-
-# Catch python < 3.8 being run here to get a relatively graceful error message, rather than a syntax error later on which causes confusion.
-print(walrus := "", end='')  # jps2sm requires python3.8, a SyntaxError here means you are running it in python <= 3.7!
-
-# Standard version check that for now it pretty useless
-import sys
-
-if sys.version_info < (3, 8):
-    print("Error: jps2sm requires python 3.8 to run.", file=sys.stderr)
-    exit(1)
-
 # Standard library packages
 import re
 import os
@@ -24,11 +6,11 @@ import collections
 import configparser
 import json
 import io
+from pathlib import Path
 
 # Third-party packages
 from bs4 import BeautifulSoup
 import humanfriendly
-from pathlib import Path
 from loguru import logger
 from datasize import DataSize
 

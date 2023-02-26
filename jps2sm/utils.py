@@ -4,17 +4,19 @@ from typing import AnyStr
 import sys
 import configparser
 import argparse
-import torrent_parser as tp
 import tempfile
-import bencoding, hashlib
+import hashlib
 import json
 import os
-
-from jps2sm.constants import JPSTorrentView, Categories
 
 # Third-party packages
 from pathlib import Path
 from loguru import logger
+import torrent_parser as tp
+import bencoding
+
+# jps2sm modules
+from jps2sm.constants import JPSTorrentView, Categories
 
 __version__ = "1.15.2"
 

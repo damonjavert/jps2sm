@@ -1,14 +1,14 @@
+# Standard library packages
 import os
 from io import BytesIO
 from typing import List, Tuple, Dict, Union
+from pathlib import Path
+import tempfile
 
 # Third-party modules
 from pymediainfo import MediaInfo
 import torrent_parser as tp
 from pyunpack import Archive
-from pathlib import Path
-import tempfile
-
 from loguru import logger
 
 

@@ -7,15 +7,14 @@ from dataclasses import dataclass
 from typing import Optional, Dict, List, Any, Union, Tuple
 import collections
 
+# Third-party packages
+from bs4 import BeautifulSoup
+from loguru import logger
+
+# jps2sm modules
 from jps2sm.myloginsession import jpopsuki, sugoimusic
 from jps2sm.constants import Categories
 from jps2sm.utils import remove_html_tags
-
-# Third-party packages
-from bs4 import BeautifulSoup
-
-from loguru import logger
-
 
 @dataclass
 class JPSGroup:

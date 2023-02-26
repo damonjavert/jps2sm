@@ -1,14 +1,15 @@
 # Standard library packages
 import re
 
-from jps2sm.myloginsession import jpopsuki
-from jps2sm.constants import Categories, VideoOptions
-from jps2sm.utils import GetArgs
-
 # Third-party packages
 from bs4 import BeautifulSoup
 import torrent_parser as tp
 from loguru import logger
+
+# jps2sm modules
+from jps2sm.myloginsession import jpopsuki
+from jps2sm.constants import Categories, VideoOptions
+from jps2sm.utils import GetArgs
 
 
 def decide_music_performance(artists, multiplefiles, duration):

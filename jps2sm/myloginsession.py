@@ -1,9 +1,8 @@
-from jps2sm.utils import GetConfig
-
-# External packages
+# Third-party packages
 from requestsloginsession import RequestsLoginSession
-from loguru import logger
 
+# jps2sm modules
+from jps2sm.utils import GetConfig
 
 def jpopsuki(url, test_login=False):
     """
