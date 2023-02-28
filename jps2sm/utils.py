@@ -18,7 +18,7 @@ import bencoding
 # jps2sm modules
 from jps2sm.constants import JPSTorrentView, Categories
 
-__version__ = "1.15.2"
+__version__ = "1.15.3"
 
 
 def get_valid_filename(s: str) -> AnyStr:
@@ -144,18 +144,33 @@ class GetConfig:
             return
 
         GetConfig.__config_parsed = True
+        cfg_file_name = 'jps2sm.cfg'
         script_dir = Path(__file__).parent.parent
-        config = configparser.ConfigParser()
-        configfile = Path(script_dir, 'jps2sm.cfg')
-        try:
-            open(configfile)
-        except FileNotFoundError:
-            fatal_error(
-                f'Error: config file {configfile} not found - enter your JPS/SM credentials in jps2sm.cfg and check jps2sm.cfg.example to see the syntax.')
 
+
+        config_file_locations = [ Path(script_dir, cfg_file_name),
+                                  Path(Path.home(), '.config', 'jps2sm', cfg_file_name),
+                                  Path(Path.home(), '.local', 'etc', cfg_file_name),
+                                  Path(Path.home(), cfg_file_name),]
+
+        config_file = None
+        for config_file_location in config_file_locations:
+            try:
+                open(config_file_location)
+            except FileNotFoundError:
+                continue
+            config_file = config_file_location
+            break
+        if config_file is None:
+            config_file_locations_str = list(map(str, config_file_locations))
+            fatal_error(f'Error: configuration file not found. jps2sm searches for the config file following locations: {config_file_locations_str}'
+                        f'\nSee: https://github.com/damonjavert/jps2sm/blob/master/jps2sm.cfg.example for example configuration.')
+
+        open(config_file)
         jps = 'JPopSuki'
         sm = 'SugoiMusic'
-        config.read(configfile)
+        config = configparser.ConfigParser()
+        config.read(config_file)
         GetConfig.jps_user = config.get(jps, 'User')
         GetConfig.jps_pass = config.get(jps, 'Password')
         GetConfig.sm_user = config.get(sm, 'User')
@@ -248,5 +263,4 @@ def decide_duplicate(jps_torrent_object):
         return dupe_jps_torrent_id
     else:
         raise Exception('Bad response from SugoiMusic hashcheck')
-
 
