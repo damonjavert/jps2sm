@@ -19,7 +19,7 @@ from datasize import DataSize
 from jps2sm.get_data import GetGroupData, get_release_data, GetJPSUser, GetSMUser
 from jps2sm.save_data import save_sm_html_debug_output, download_sm_uploaded_torrents, download_sm_torrent, get_jps_torrent, download_jps_torrent
 from jps2sm.batch import batch_mode
-from jps2sm.utils import fatal_error, GetConfig, GetArgs, decide_duplicate
+from jps2sm.utils import fatal_error, GetConfig, GetArgs, decide_duplicate, count_values_dict
 from jps2sm.myloginsession import jpopsuki, sugoimusic
 from jps2sm.constants import Categories, VideoOptions
 from jps2sm.mediainfo import get_mediainfo
@@ -47,6 +47,7 @@ def detect_display_swapped_names(userid):
     else:
         # Not OK!
         return True
+
 
 def set_original_artists(contrib_artists) -> None:
     """
@@ -88,7 +89,7 @@ def set_original_artists(contrib_artists) -> None:
         logger.debug(f'Set artist {artist} original artist to {orig_artist}')
 
     # Add original artists for contrib artists
-    if contrib_artists is None: # Do not do anything if the group has no contrib artists
+    if contrib_artists is None:  # Do not do anything if the group has no contrib artists
         return
     for artist, orig_artist in contrib_artists.items():
         # For every artist, go to its artist page to get artist ID, then use this to go to artist.php?action=edit with the orig artist
@@ -547,9 +548,11 @@ def non_batch_upload(jps_torrent_id=None, jps_urls=None, dry_run=None, wait_for_
 
     for jps_torrent_id, data in collate_torrent_info['jps_torrent_collated_data'].items():
         uploadtorrent(data['jps_torrent_object'], data['torrentgroupdata'], **data['release_data_collated'])
+        if not dry_run:
+            download_sm_uploaded_torrents(torrentcount=1, artist=jps_group_data.artist, title=jps_group_data.title)
+
     if not dry_run:
         set_original_artists(jps_group_data.contribartists)
-        download_sm_uploaded_torrents(collate_torrent_info['sm_torrents_uploaded_count'], jps_group_data.artist, jps_group_data.title)
 
 
 if __name__ == "__main__":
