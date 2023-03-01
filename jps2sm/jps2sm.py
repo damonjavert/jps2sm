@@ -48,39 +48,55 @@ def detect_display_swapped_names(userid):
         # Not OK!
         return True
 
-
-def setorigartist(artist, origartist):
+def set_original_artists(contrib_artists) -> None:
     """
-    Set an artist's original artist with the string origartist, currently used for contrib artists
-    # TODO Consider using this for main orig artist
-
-    :param artist: string: String of the artist that needs it's original artist set
-    :param origartist: string: Original artist
+    Set a batch of original artists from the contrib artists derived from GetGroupData()
+    :param contrib_artists: dict in the form of { artist: orig_artist}
     """
-    if origartist == "":  # If there is no origartist at JPS do not bother trying to set it here
+
+    def set_original_artist(artist, orig_artist) -> None:
+        """
+        Set an artist's original artist with the string orig_artist, currently used for contrib artists
+        # TODO Consider using this for main orig artist
+
+        :param artist: string: String of the artist that needs it's original artist set
+        :param orig_artist: string: Original artist
+        """
+        if orig_artist == "":  # If there is no orig_artist at JPS do not bother trying to set it here
+            return
+
+        SMartistpage = sugoimusic(f"https://sugoimusic.me/artist.php?artistname={artist}")
+
+        if re.findall("Your search did not match anything", SMartistpage.text):
+            logger.debug(f"Artist {artist} does not yet exist at SM so orig_artist cannot be set")
+            return
+
+        soup = BeautifulSoup(SMartistpage.text, 'html5lib')
+        linkbox = str(soup.select('#content .thin .header .linkbox'))
+        artistid = re.findall(r'href="artist\.php\?action=edit&amp;artistid=([0-9]+)"', linkbox)[0]
+
+        sm_user = GetSMUser()
+
+        data = {
+            'action': 'edit',
+            'auth': sm_user.auth_key(),
+            'artistid': artistid,
+            'name_jp': orig_artist
+        }
+
+        sugoimusic(f'https://sugoimusic.me/artist.php?artistname={artist}', 'post', data)
+        logger.debug(f'Set artist {artist} original artist to {orig_artist}')
+
+    # Add original artists for contrib artists
+    if contrib_artists is None: # Do not do anything if the group has no contrib artists
         return
-
-    SMartistpage = sugoimusic(f"https://sugoimusic.me/artist.php?artistname={artist}")
-
-    if re.findall("Your search did not match anything", SMartistpage.text):
-        logger.debug(f"Artist {artist} does not yet exist at SM so origartist cannot be set")
-        return
-
-    soup = BeautifulSoup(SMartistpage.text, 'html5lib')
-    linkbox = str(soup.select('#content .thin .header .linkbox'))
-    artistid = re.findall(r'href="artist\.php\?action=edit&amp;artistid=([0-9]+)"', linkbox)[0]
-
-    sm_user = GetSMUser()
-
-    data = {
-        'action': 'edit',
-        'auth': sm_user.auth_key(),
-        'artistid': artistid,
-        'name_jp': origartist
-    }
-
-    SMeditartistpage = sugoimusic(f'https://sugoimusic.me/artist.php?artistname={artist}', 'post', data)
-    logger.debug(f'Set artist {artist} original artist to {origartist}')
+    for artist, orig_artist in contrib_artists.items():
+        # For every artist, go to its artist page to get artist ID, then use this to go to artist.php?action=edit with the orig artist
+        try:
+            set_original_artist(artist, orig_artist)
+        except IndexError:  # Do not let a set_original_artist error affect stats
+            logger.debug(f'Error in setting artist {artist} orig_artist {orig_artist}')
+            pass
 
 
 def uploadtorrent(jps_torrent_object, torrentgroupdata, **uploaddata):
@@ -443,17 +459,6 @@ def collate(torrentids, torrentgroupdata, max_size=None):
         jps_torrent_collated_data[jps_torrent_id]['torrentgroupdata'] = torrentgroupdata
         jps_torrent_collated_data[jps_torrent_id]['release_data_collated'] = release_data_collated
 
-    if not args.parsed.dryrun:
-        # Add original artists for contrib artists
-        if torrentgroupdata.contribartists:
-            for artist, origartist in torrentgroupdata.contribartists.items():
-                # For every artist, go to its artist page to get artist ID, then use this to go to artist.php?action=edit with the orig artist
-                try:
-                    setorigartist(artist, origartist)
-                except IndexError:  # Do not let a setorigartist error affect stats
-                    logger.debug(f'Error in setting artist {artist} origartist {origartist}')
-                    pass
-
     collate_torrent_info = {
         'jps_torrent_collated_data': jps_torrent_collated_data,
         'jps_torrents_downloaded_count': jps_torrent_downloaded_count,
@@ -543,6 +548,7 @@ def non_batch_upload(jps_torrent_id=None, jps_urls=None, dry_run=None, wait_for_
     for jps_torrent_id, data in collate_torrent_info['jps_torrent_collated_data'].items():
         uploadtorrent(data['jps_torrent_object'], data['torrentgroupdata'], **data['release_data_collated'])
     if not dry_run:
+        set_original_artists(jps_group_data.contribartists)
         download_sm_uploaded_torrents(collate_torrent_info['sm_torrents_uploaded_count'], jps_group_data.artist, jps_group_data.title)
 
 

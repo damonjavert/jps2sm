@@ -20,7 +20,7 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
     """
     Operate batch upload mode
     """
-    from jps2sm.jps2sm import collate, uploadtorrent
+    from jps2sm.jps2sm import collate, uploadtorrent, set_original_artists
     args = GetArgs()
 
     def batch_stats(final_stats, media_info_mode, dry_run):
@@ -148,6 +148,7 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
                 sm_upload_errors += 1
             continue
         if not args.parsed.dryrun:
+            set_original_artists(collate_torrent_info['torrentgroupdata'].contribartists)
             download_sm_uploaded_torrents(torrentcount=1, artist=collate_torrent_info['torrentgroupdata'].artist,
                                           title=collate_torrent_info['torrentgroupdata'].title)
             sm_torrents_uploaded_count += 1
