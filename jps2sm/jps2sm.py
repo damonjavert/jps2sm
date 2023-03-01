@@ -7,7 +7,6 @@ import collections
 import configparser
 import json
 import io
-from pathlib import Path
 
 # Third-party packages
 from bs4 import BeautifulSoup
@@ -100,188 +99,186 @@ def set_original_artists(contrib_artists) -> None:
             pass
 
 
-def uploadtorrent(jps_torrent_object, torrentgroupdata, **uploaddata):
+def uploadtorrent(jps_torrent_object, torrent_group_data, **release_data_collated):
     """
     Prepare POST data for the SM upload, performs additional validation, reports errors and performs the actual upload to
     SM whilst saving the html result to investigate any errors if they are not reported correctly.
 
     :param jps_torrent_object: bytes: BytesIO object of the JPS torrent
-    :param groupid: groupid to upload to - allows to upload torrents to the same group
-    :param uploaddata: dict of collated / validated release data from collate()
+    :param torrent_group_data: JPSGroup data from GetGroupData
+    :param release_data_collated: dict of collated / validated release data from collate()
     """
     config = GetConfig()
     args = GetArgs()
     uploadurl = 'https://sugoimusic.me/upload.php'
     languages = ('Japanese', 'English', 'Korean', 'Chinese', 'Vietnamese')
 
-    if torrentgroupdata.date is None:  # If release date cannot be derived use upload date
-        date = uploaddata['uploaddate']
-    else:
-        date = torrentgroupdata.date
-
-    data = {
+    sugoimusic_upload_data = {
         'submit': 'true',
-        'title': torrentgroupdata.title,
-        'year': date,
-        'tags': torrentgroupdata.tagsall,
-        'album_desc': torrentgroupdata.groupdescription,
+        'title': torrent_group_data.title,
+        'tags': torrent_group_data.tagsall,
+        'album_desc': torrent_group_data.groupdescription,
         # 'release_desc': releasedescription
     }
 
-    sm_user = GetSMUser()
+    if torrent_group_data.date is None:  # If release date cannot be derived use upload date
+        sugoimusic_upload_data['year'] = release_data_collated['uploaddate']
+    else:
+        sugoimusic_upload_data['year'] = torrent_group_data.date
 
     if not args.parsed.dryrun:
-        data['auth'] = sm_user.auth_key()
+        sm_user = GetSMUser()
+        sugoimusic_upload_data['auth'] = sm_user.auth_key()
 
-    logger.debug(uploaddata)
+    logger.debug(release_data_collated)
 
     # TODO Most of this can be in getmediainfo()
     if args.parsed.mediainfo:
         try:
-            data['mediainfo'], releasedatamediainfo = get_mediainfo(jps_torrent_object, uploaddata['media'], config.media_roots)
-            data.update(releasedatamediainfo)
-            if 'duration' in data.keys() and data['duration'] > 1:
-                duration_friendly_format = humanfriendly.format_timespan(datetime.timedelta(seconds=int(data['duration'] / 1000)))
-                data['album_desc'] += f"\n\nDuration: {duration_friendly_format} - {str(data['duration'])}ms"
+            sugoimusic_upload_data['mediainfo'], releasedatamediainfo = get_mediainfo(jps_torrent_object, release_data_collated['media'], config.media_roots)
+            sugoimusic_upload_data.update(releasedatamediainfo)
+            if 'duration' in sugoimusic_upload_data.keys() and sugoimusic_upload_data['duration'] > 1:
+                duration_friendly_format = humanfriendly.format_timespan(datetime.timedelta(seconds=int(sugoimusic_upload_data['duration'] / 1000)))
+                sugoimusic_upload_data['album_desc'] += f"\n\nDuration: {duration_friendly_format} - {str(sugoimusic_upload_data['duration'])}ms"
         except Exception as mediainfo_exc:
             if str(mediainfo_exc).startswith('Mediainfo error - file/directory not found'):
                 pass
             if str(mediainfo_exc).startswith('Mediainfo error - unable to extract what appears to be a Bluray disc:'):
                 pass
-            if torrentgroupdata.category in Categories.Video:
+            if torrent_group_data.category in Categories.Video:
                 raise
             else:
-                logger.debug(f'Skipping exception on mediainfo failing as {torrentgroupdata.title} is not a Video category.')
+                logger.debug(f'Skipping exception on mediainfo failing as {torrent_group_data.title} is not a Video category.')
 
-    if torrentgroupdata.category not in Categories.NonReleaseData:
-        data['media'] = uploaddata['media']
-        if 'audioformat' not in data.keys():  # If not supplied by getmediainfo() use audioformat guessed by collate()
-            data['audioformat'] = uploaddata['audioformat']
+    if torrent_group_data.category not in Categories.NonReleaseData:
+        sugoimusic_upload_data['media'] = release_data_collated['media']
+        if 'audioformat' not in sugoimusic_upload_data.keys():  # If not supplied by getmediainfo() use audioformat guessed by collate()
+            sugoimusic_upload_data['audioformat'] = release_data_collated['audioformat']
 
-    if torrentgroupdata.imagelink is not None:
-        data['image'] = torrentgroupdata.imagelink
+    if torrent_group_data.imagelink is not None:
+        sugoimusic_upload_data['image'] = torrent_group_data.imagelink
 
-    if uploaddata['videotorrent']:
-        if torrentgroupdata.category == "DVD" and uploaddata['media'] == 'Bluray':
-            data['type'] = Categories.JPStoSM['Bluray']  # JPS has no Bluray category
-        if uploaddata['categorystatus'] == 'bad':  # Need to set a correct category
-            if uploaddata['media'] == 'Bluray':
-                data['type'] = Categories.JPStoSM['Bluray']
+    if release_data_collated['videotorrent']:
+        if torrent_group_data.category == "DVD" and release_data_collated['media'] == 'Bluray':
+            sugoimusic_upload_data['type'] = Categories.JPStoSM['Bluray']  # JPS has no Bluray category
+        if release_data_collated['categorystatus'] == 'bad':  # Need to set a correct category
+            if release_data_collated['media'] == 'Bluray':
+                sugoimusic_upload_data['type'] = Categories.JPStoSM['Bluray']
             else:  # Still need to change the category to something, if not a Bluray then even if it is not a DVD the most sensible category is DVD in a music torrent group
-                data['type'] = Categories.JPStoSM['DVD']
-        if torrentgroupdata.category == "TV-Music" and args.parsed.mediainfo:
-            data['type'] = Categories.SM[decide_music_performance(torrentgroupdata.artist, data['multiplefiles'], data['duration'])]
+                sugoimusic_upload_data['type'] = Categories.JPStoSM['DVD']
+        if torrent_group_data.category == "TV-Music" and args.parsed.mediainfo:
+            sugoimusic_upload_data['type'] = Categories.SM[decide_music_performance(torrent_group_data.artist, sugoimusic_upload_data['multiplefiles'], sugoimusic_upload_data['duration'])]
 
         # If not supplied by getmediainfo() use codec found by collate()
-        if 'codec' not in data.keys():
-            data['codec'] = uploaddata['codec']
+        if 'codec' not in sugoimusic_upload_data.keys():
+            sugoimusic_upload_data['codec'] = release_data_collated['codec']
 
         # If not supplied by getmediainfo() try to detect resolution by searching the group description for resolutions
-        if 'ressel' not in data.keys():
-            foundresolutions720 = re.findall('1080 ?x ?720', torrentgroupdata.groupdescription)
-            foundresolutions1080 = re.findall('1920 ?x ?1080', torrentgroupdata.groupdescription)
+        if 'ressel' not in sugoimusic_upload_data.keys():
+            foundresolutions720 = re.findall('1080 ?x ?720', torrent_group_data.groupdescription)
+            foundresolutions1080 = re.findall('1920 ?x ?1080', torrent_group_data.groupdescription)
             if len(foundresolutions720) != 0:
-                data['ressel'] = "720p"
+                sugoimusic_upload_data['ressel'] = "720p"
             elif len(foundresolutions1080) != 0:
-                data['ressel'] = "1080p"
+                sugoimusic_upload_data['ressel'] = "1080p"
             for resolution in VideoOptions.resolutions:  # Now set more specific resolutions if they are present
-                if resolution in torrentgroupdata.groupdescription:  # If we can see the resolution in the group description then set it
-                    data['ressel'] = resolution
+                if resolution in torrent_group_data.groupdescription:  # If we can see the resolution in the group description then set it
+                    sugoimusic_upload_data['ressel'] = resolution
                 else:
-                    data['ressel'] = 'CHANGEME'
+                    sugoimusic_upload_data['ressel'] = 'CHANGEME'
 
         # If not supplied by getmediainfo() use container found by collate()
-        if 'container' not in data.keys():
-            data['container'] = uploaddata['container']
+        if 'container' not in sugoimusic_upload_data.keys():
+            sugoimusic_upload_data['container'] = release_data_collated['container']
 
-        data['sub'] = 'NoSubs'  # assumed default
-        data['lang'] = 'CHANGEME'
+        sugoimusic_upload_data['sub'] = 'NoSubs'  # assumed default
+        sugoimusic_upload_data['lang'] = 'CHANGEME'
         for language in languages:  # If we have a language tag, set the language field
-            if language.lower() in torrentgroupdata.tagsall:
-                data['lang'] = language
-    elif torrentgroupdata.category in Categories.Music:
-        data['bitrate'] = uploaddata['bitrate']
+            if language.lower() in torrent_group_data.tagsall:
+                sugoimusic_upload_data['lang'] = language
+    elif torrent_group_data.category in Categories.Music:
+        sugoimusic_upload_data['bitrate'] = release_data_collated['bitrate']
 
-    if 'remastertitle' in uploaddata.keys():
-        data['remaster'] = 'remaster'
-        data['remastertitle'] = uploaddata['remastertitle']
-    if 'remasteryear' in uploaddata.keys():
-        data['remaster'] = 'remaster'
-        data['remasteryear'] = uploaddata['remasteryear']
+    if 'remastertitle' in release_data_collated.keys():
+        sugoimusic_upload_data['remaster'] = 'remaster'
+        sugoimusic_upload_data['remastertitle'] = release_data_collated['remastertitle']
+    if 'remasteryear' in release_data_collated.keys():
+        sugoimusic_upload_data['remaster'] = 'remaster'
+        sugoimusic_upload_data['remasteryear'] = release_data_collated['remasteryear']
 
     # Non-BR/DVD/TV-* category validation
     # TODO Move this to a def
-    if torrentgroupdata.category == "Fansubs":
-        data['type'] = get_alternate_fansub_category_id(torrentgroupdata.artist, torrentgroupdata.title)  # Title just for user
-        data['sub'] = 'Hardsubs'  # We have subtitles! Subs in JPS FanSubs are usually Hardsubs so guess as this
+    if torrent_group_data.category == "Fansubs":
+        sugoimusic_upload_data['type'] = get_alternate_fansub_category_id(torrent_group_data.artist, torrent_group_data.title)  # Title just for user
+        sugoimusic_upload_data['sub'] = 'Hardsubs'  # We have subtitles! Subs in JPS FanSubs are usually Hardsubs so guess as this
         # TODO: Use torrent library to look for sub/srt files
-    elif torrentgroupdata.category == "Album":  # Ascertain if upload is EP
-        data['type'] = Categories.JPStoSM[decide_ep(jps_torrent_object, uploaddata)]
+    elif torrent_group_data.category == "Album":  # Ascertain if upload is EP
+        sugoimusic_upload_data['type'] = Categories.JPStoSM[decide_ep(jps_torrent_object, release_data_collated)]
 
-    if 'type' not in data.keys():  # Set default value after all validation has been done
-        data['type'] = Categories.JPStoSM[torrentgroupdata.category]
+    if 'type' not in sugoimusic_upload_data.keys():  # Set default value after all validation has been done
+        sugoimusic_upload_data['type'] = Categories.JPStoSM[torrent_group_data.category]
 
     # Now that all Category validation is complete decide if we should strip some mediainfo data
     mediainfo_non_resolution = ('container', 'mediainfo')
     mediainfo_resolution = ('ressel', 'resolution')
-    if args.parsed.mediainfo and data['type'] in Categories.SM_StripAllMediainfo:
+    if args.parsed.mediainfo and sugoimusic_upload_data['type'] in Categories.SM_StripAllMediainfo:
         for field in (mediainfo_non_resolution + mediainfo_resolution):
-            data.pop(field, None)
-    elif args.parsed.mediainfo and data['type'] == Categories.SM_StripAllMediainfoExcResolution:
+            sugoimusic_upload_data.pop(field, None)
+    elif args.parsed.mediainfo and sugoimusic_upload_data['type'] == Categories.SM_StripAllMediainfoExcResolution:
         for field in mediainfo_non_resolution:
-            data.pop(field, None)
+            sugoimusic_upload_data.pop(field, None)
 
     try:
-        data['artist_jp'] = torrentgroupdata.originalartist
-        data['title_jp'] = torrentgroupdata.originaltitle
+        sugoimusic_upload_data['artist_jp'] = torrent_group_data.originalartist
+        sugoimusic_upload_data['title_jp'] = torrent_group_data.originaltitle
     except AttributeError:  # If no originalchars do nothing
         pass
 
     try:
         contribartistsenglish = []
-        for artist, origartist in torrentgroupdata.contribartists.items():
+        for artist, origartist in torrent_group_data.contribartists.items():
             contribartistsenglish.append(artist)
-        data['contrib_artists[]'] = contribartistsenglish
+        sugoimusic_upload_data['contrib_artists[]'] = contribartistsenglish
     except AttributeError:  # If no contrib artists do nothing
         pass
 
-    if "V.A." in torrentgroupdata.artist:  # At JPS Various Artists torrents have their artists as contrib artists
-        del data['contrib_artists[]']  # Error if null as if there is a V.A. torrent group with no contrib artists something is wrong
-        data['idols[]'] = contribartistsenglish
+    if "V.A." in torrent_group_data.artist:  # At JPS Various Artists torrents have their artists as contrib artists
+        del sugoimusic_upload_data['contrib_artists[]']  # Error if null as if there is a V.A. torrent group with no contrib artists something is wrong
+        sugoimusic_upload_data['idols[]'] = contribartistsenglish
         logger.debug(f'Various Artists torrent, setting main artists to {contribartistsenglish}')
     else:
-        data['idols[]'] = torrentgroupdata.artist  # Set the artist normally
+        sugoimusic_upload_data['idols[]'] = torrent_group_data.artist  # Set the artist normally
 
     jps_torrent_object.seek(0)
 
-    postDataFiles = {
+    sugoimusic_upload_files = {
         # We need to specify a filename  now we are using BytesIO and SM will validate files without a .torrent extension
         'file_input': ('blah.torrent', jps_torrent_object)
     }
 
     if args.parsed.dryrun or args.parsed.debug:
-        dataexcmediainfo = {x: data[x] for x in data if x not in 'mediainfo'}
+        dataexcmediainfo = {x: sugoimusic_upload_data[x] for x in sugoimusic_upload_data if x not in 'mediainfo'}
         dataexcmediainfo['auth'] = '<scrubbed>'
         logger.info(json.dumps(dataexcmediainfo, indent=2))  # Mediainfo shows too much data
     if not args.parsed.dryrun:
-        SMres = sugoimusic(uploadurl, "post", data, postDataFiles)
+        sugoimusic_upload_res = sugoimusic(uploadurl, "post", sugoimusic_upload_data, sugoimusic_upload_files)
 
-        SMerrorTorrent = re.findall('red; text-align: center;">(.*)</p>', SMres.text)
-        if SMerrorTorrent:
-            raise Exception(SMerrorTorrent[0])
+        sugoimusic_upload_error = re.findall('red; text-align: center;">(.*)</p>', sugoimusic_upload_res.text)
+        if sugoimusic_upload_error:
+            raise Exception(sugoimusic_upload_error[0])
 
-        SMerrorLogon = re.findall('<p>Invalid (.*)</p>', SMres.text)
-        if SMerrorLogon:
-            raise Exception(f'Invalid {SMerrorLogon[0]}')
+        sugoimusic_data_validation_error = re.findall('<p>Invalid (.*)</p>', sugoimusic_upload_res.text)
+        if sugoimusic_data_validation_error:  # Error when invalid data entered for upload, eg. Invaid bitrate
+            raise Exception(f'Invalid {sugoimusic_data_validation_error[0]}')
 
-        html_debug_output_path = save_sm_html_debug_output(SMres.text, torrentgroupdata, uploaddata['jpstorrentid'])
+        html_debug_output_path = save_sm_html_debug_output(sugoimusic_upload_res.text, torrent_group_data, release_data_collated['jpstorrentid'])
 
-        groupid = re.findall('<input type="hidden" name="groupid" value="([0-9]+)" />', SMres.text)
+        groupid = re.findall('<input type="hidden" name="groupid" value="([0-9]+)" />', sugoimusic_upload_res.text)
         if not groupid:
             # Find groupid if private torrent warning
             groupid = re.findall(
                 r'Your torrent has been uploaded; however, you must download your torrent from <a href="torrents\.php\?id=([0-9]+)">here</a>',
-                SMres.text)
+                sugoimusic_upload_res.text)
             if not groupid:
                 unknown_error_msg = f'Cannot find groupid in SM response - there was probably an unknown error. See {html_debug_output_path} for potential errors'
                 raise RuntimeError(unknown_error_msg)
