@@ -79,44 +79,44 @@ def get_alternate_fansub_category_id(artist, group_name):
             return category
 
 
-def validate_jps_video_data(releasedata, categorystatus):
+def validate_jps_video_data(slash_data, category_status):
     """
-    Validate and process dict supplied by getreleasedata() via collate() to extract all available data
+    Validate and process dict supplied by get_release_data() via collate() to extract all available data
     from JPS for video torrents, whilst handling weird cases where VideoTorrent is uploaded as a Music category
 
-    :param releasedata:
-    :param categorystatus: str: good or bad. good for correct category assigned and bad if this is a Music Torrent
+    :param slash_data: list: 'slash data' from collate()
+    :param category_status: str: good or bad. good for correct category assigned and bad if this is a Music Torrent
     mistakenly uploaded as a non-VC category!
-    :return: releasedataout{} validated container, codec, media, audioformat
+    :return: jps_video_data{} validated container, codec, media, audioformat
     """
-    releasedataout = {}
-    # JPS uses the audioformat field (represented as releasedata[0] here) for containers and codecs in video torrents
+    jps_video_data = {}
+    # JPS uses the audioformat field (represented as slash_data[0] here) for containers and codecs in video torrents
 
     # If a known container is used as audioformat set it as the container on SM
-    if releasedata[0] in VideoOptions.badcontainers:
-        releasedataout['container'] = releasedata[0]
+    if slash_data[0] in VideoOptions.badcontainers:
+        jps_video_data['container'] = slash_data[0]
     else:
-        releasedataout['container'] = 'CHANGEME'
+        jps_video_data['container'] = 'CHANGEME'
     # If a known codec is used as audioformat set it as the codec on SM
-    if releasedata[0] in VideoOptions.badcodecs:
-        if releasedata[0] == "MPEG2":  # JPS uses 'MPEG2' for codec instead of the correct 'MPEG-2'
-            releasedataout['codec'] = "MPEG-2"
+    if slash_data[0] in VideoOptions.badcodecs:
+        if slash_data[0] == "MPEG2":  # JPS uses 'MPEG2' for codec instead of the correct 'MPEG-2'
+            jps_video_data['codec'] = "MPEG-2"
         else:
-            releasedataout['codec'] = releasedata[0]
+            jps_video_data['codec'] = slash_data[0]
     else:
-        releasedataout['codec'] = 'CHANGEME'  # assume default
+        jps_video_data['codec'] = 'CHANGEME'  # assume default
 
-    if categorystatus == "good":
-        releasedataout['media'] = releasedata[1]
+    if category_status == "good":
+        jps_video_data['media'] = slash_data[1]
     else:
-        releasedataout['media'] = releasedata[2]
+        jps_video_data['media'] = slash_data[2]
 
-    if releasedata[0] == 'AAC':  # For video torrents, the only correct audioformat in JPS is AAC
-        releasedataout['audioformat'] = "AAC"
+    if slash_data[0] == 'AAC':  # For video torrents, the only correct audioformat in JPS is AAC
+        jps_video_data['audioformat'] = "AAC"
     else:
-        releasedataout['audioformat'] = "CHANGEME"
+        jps_video_data['audioformat'] = "CHANGEME"
 
-    return releasedataout
+    return jps_video_data
 
 
 def validate_jps_bitrate(jps_bitrate):
