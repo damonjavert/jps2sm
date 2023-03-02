@@ -107,7 +107,7 @@ class GetGroupData:
         self.tagsall: str = str()
         self.contribartists: str = str()
 
-        self.jps_group_id = re.findall(r"(?!id=)\d+", self.jpsurl)[0]
+        self.jps_group_id = re.findall(r"\?id=(\d+)$", self.jpsurl)[0]
 
         jps_group_url = self.jpsurl.split()[0]  # If there are multiple urls only the first url needs to be parsed
         jps_page = get_jps_page(jps_group_url)

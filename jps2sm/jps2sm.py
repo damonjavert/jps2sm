@@ -62,7 +62,7 @@ def main():
 
     if args.parsed.urls:
         try:
-            re.findall(r"(?!id=)\d+", args.parsed.urls)[0]
+            re.findall(r"\?id=(\d+)$", args.parsed.urls)[0]
         except IndexError:
             fatal_error('Error: The URL given does not appear to be a valid JPS group url.')
 
