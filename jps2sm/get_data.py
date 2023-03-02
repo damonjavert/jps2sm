@@ -6,6 +6,7 @@ get_data defs for retrieving data from JPS
 # pylint: disable=fixme
 
 # Standard library packages
+import sys
 import re
 import itertools
 import json
@@ -67,6 +68,22 @@ def get_jps_group_data_class(batch_group_data: dict, jps_group_id: int) -> datac
     return torrent_group_data
 
 
+def get_jps_page(jps_group_url: str) -> str:
+    """
+    Get the JPS page with some error handling
+
+    :return jps_page: str of JPS page
+    """
+
+    jps_page_res = jpopsuki(jps_group_url)
+
+    if jps_page_res.status_code != 200:
+        logger.error(f"JPS returned HTTP error {jps_page_res.status_code} on group url {jps_group_url}")
+        sys.exit(1)
+
+    return jps_page_res.text
+
+
 class GetGroupData:
     """
     Retrieve group data of the group supplied from args.parsed.urls
@@ -77,7 +94,7 @@ class GetGroupData:
     def __init__(self, jpsurl):
         self.jpsurl = jpsurl
         logger.debug(f'Processing JPS URL: {jpsurl}')
-        self.groupid: int = int()
+        self.jps_group_id: int = int()
         self.category: str = str()
         self.artist: str = str()
         self.date: str = str()
@@ -90,20 +107,21 @@ class GetGroupData:
         self.tagsall: str = str()
         self.contribartists: str = str()
 
-        self.getdata()
+        self.jps_group_id = re.findall(r"(?!id=)\d+", self.jpsurl)[0]
 
-    def getdata(self) -> None:
+        jps_group_url = self.jpsurl.split()[0]  # If there are multiple urls only the first url needs to be parsed
+        jps_page = get_jps_page(jps_group_url)
+
+        self.get_data(jps_page)
+
+    def get_data(self, jps_page) -> None:
         date_regex = r'[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])'  # YYYY.MM.DD format
         # YYYY.MM.DD OR YYYY format, for Pictures only
         date_regex2 = r'(?:[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])|(?:19|20)\d\d)'
 
-        res = jpopsuki(self.jpsurl.split()[0])  # If there are multiple urls only the first url needs to be parsed
-
-        self.groupid = re.findall(r"(?!id=)\d+", self.jpsurl)[0]
-
-        soup = BeautifulSoup(res.text, 'html5lib')
-        artistlinelink = soup.select('.thin h2 a')
-        originaltitleline = soup.select('.thin h3')
+        soup = BeautifulSoup(jps_page, 'html5lib')
+        artist_line_link = soup.select('.thin h2 a')
+        original_title_line = soup.select('.thin h3')
 
         logger.debug(torrent_description_page_h2_line := str(soup.select('.thin h2')[0]))
 
@@ -119,13 +137,13 @@ class GetGroupData:
         try:
             self.category = re.findall(r'\[(.*?)\]', torrent_description_page_h2_line)[0]
         except IndexError:
-            logger.error(f'Error: Could not ascertain Category for group {self.groupid}, try adding --debug to see what could be wrong.')
+            logger.error(f'Error: Could not ascertain Category for group {self.jps_group_id}, try adding --debug to see what could be wrong.')
             raise Exception('JPS Category not found')
 
         logger.info(f'Category: {self.category}')
 
         try:
-            artist_raw = re.findall(r'<a[^>]+>(.*)<', str(artistlinelink[0]))[0]
+            artist_raw = re.findall(r'<a[^>]+>(.*)<', str(artist_line_link[0]))[0]
             self.artist = split_bad_multiple_artists(artist_raw)
         except IndexError:  # Cannot find artist
             if self.category == "Pictures":
@@ -203,7 +221,7 @@ class GetGroupData:
 
         logger.info(f'Title: {self.title}')
         try:
-            originalchars = re.findall(r'<a href="artist.php\?id=(?:[0-9]+)">(.+)</a> - (.+)\)</h3>', str(originaltitleline))[0]
+            originalchars = re.findall(r'<a href="artist.php\?id=(?:[0-9]+)">(.+)</a> - (.+)\)</h3>', str(original_title_line))[0]
             self.originalartist = originalchars[0]
             self.originaltitle = originalchars[1]
             logger.info(f"Original artist: {self.originalartist} Original title: {self.originaltitle}")
@@ -214,8 +232,8 @@ class GetGroupData:
 
         # Get description with BB Code if user has group edit permissions on JPS, if not just use stripped html text.
         try:
-            self.groupdescription = get_group_descrption_bbcode(self.groupid)  # Requires PU+ at JPS
-        except:
+            self.groupdescription = get_group_descrption_bbcode(self.jps_group_id)  # Requires PU+ at JPS
+        except IndexError:
             logger.exception('Could not get group description BBCode. Are you a Power User+ at JPS?')
             self.groupdescription = remove_html_tags(str(soup.select('#content .thin .main_column .box .body')[0]))
 
@@ -233,12 +251,11 @@ class GetGroupData:
         logger.info(f'Tags: {tags}')
         self.tagsall = ",".join(tags)
 
-
-        contribartistsget = str(soup.select('#content .thin .sidebar .box .body ul.stats.nobullet li'))
-        contribartistslist = re.findall(r'<li><a href="artist\.php\?id=(?:[0-9]+?)" title="([^"]*?)">([\w .-]+)</a>', contribartistsget)
+        contrib_artists_li = str(soup.select('#content .thin .sidebar .box .body ul.stats.nobullet li'))
+        contrib_artists = re.findall(r'<li><a href="artist\.php\?id=(?:[0-9]+?)" title="([^"]*?)">([\w .-]+)</a>', contrib_artists_li)
         self.contribartists = {}
-        for artistpair in contribartistslist:
-            self.contribartists[artistpair[1]] = artistpair[0]  # Creates contribartists[artist] = origartist
+        for artist_pair in contrib_artists:
+            self.contribartists[artist_pair[1]] = artist_pair[0]  # Creates contribartists[artist] = origartist
 
         logger.info(f'Contributing artists: {self.contribartists}')
         if self.contribartists == {}:
@@ -251,7 +268,7 @@ class GetGroupData:
 
     def all(self) -> Dict[str, Union[str, Tuple[str, str]]]:
         return {
-            'groupid': self.groupid,
+            'groupid': self.jps_group_id,
             'category': self.category,
             'artist': self.artist,
             'date': self.date,
