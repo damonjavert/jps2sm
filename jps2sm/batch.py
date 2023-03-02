@@ -20,7 +20,7 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
     """
     Operate batch upload mode
     """
-    from jps2sm.jps2sm import collate, uploadtorrent, set_original_artists
+    from jps2sm.jps2sm import collate, prepare_torrent, set_original_artists
     args = GetArgs()
 
     def batch_stats(final_stats, media_info_mode, dry_run):
@@ -131,7 +131,7 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
 
     for jps_torrent_id, collate_torrent_info in batch_collate_torrent_info.items():
         try:
-            uploadtorrent(collate_torrent_info['jps_torrent_object'], collate_torrent_info['torrentgroupdata'], **collate_torrent_info['release_data_collated'])
+            prepare_torrent(collate_torrent_info['jps_torrent_object'], collate_torrent_info['torrentgroupdata'], **collate_torrent_info['release_data_collated'])
         except KeyboardInterrupt:  # Allow Ctrl-C to exit without showing the error multiple times and polluting the final error dict
             break  # Still continue to get error dicts and dupe list so far
         except Exception as exc:

@@ -35,7 +35,7 @@ class JPSGroup:
 def get_jps_group_data_class(batch_group_data: dict, jps_group_id: int) -> dataclass(JPSGroup):
     """
     Extract a JPS group's data from batch_group_data{} and present it as a JPSGroup dataclass.
-    In the future this can potentially be used to provide validation, or collate() and uploadtorrent() may
+    In the future this can potentially be used to provide validation, or collate() and prepare_torrent() may
     be refactored to just use a dict.
 
     :param batch_group_data: dict
@@ -407,7 +407,7 @@ class GetSMUser:
 
 def get_user_keys() -> Dict[str, str]:
     """
-    Get SM session authkey and torrent_password_key for use by uploadtorrent()|download_sm_torrent() data dict.
+    Get SM session authkey and torrent_password_key for use by prepare_torrent()|download_sm_torrent() data dict.
     Uses SM login data
     """
 

@@ -17,16 +17,14 @@ config = GetConfig()
 output = HandleCfgOutputDirs(config.directories)
 
 
-def save_sm_html_debug_output(content: str, torrent_group_data: Type[GetGroupData], jps_torrent_id: str) -> Path:
+def save_sm_html_debug_output(content: str, html_debug_output_filename: str) -> Path:
     """
     Save the html output from uploading the torrent to SM, for debug purposes
 
     """
-    html_debug_output_filename = f"SMuploadresult." + \
-                                 get_valid_filename(f"{torrent_group_data.artist[0]}.{torrent_group_data.title}.{torrent_group_data.date}."
-                                                    f"JPS_ID{jps_torrent_id}") + \
-                                 f".html"
-    html_debug_output_path = Path(output.file_dir['html'], html_debug_output_filename)
+    html_debug_output_filename_valid = get_valid_filename(html_debug_output_filename)
+
+    html_debug_output_path = Path(output.file_dir['html'], html_debug_output_filename_valid)
 
     with open(html_debug_output_path, "w") as f:
         f.write(content)

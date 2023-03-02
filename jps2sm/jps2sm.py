@@ -99,7 +99,7 @@ def set_original_artists(contrib_artists) -> None:
             pass
 
 
-def uploadtorrent(jps_torrent_object, torrent_group_data, **release_data_collated):
+def prepare_torrent(jps_torrent_object, torrent_group_data, **release_data_collated):
     """
     Prepare POST data for the SM upload, performs additional validation, reports errors and performs the actual upload to
     SM whilst saving the html result to investigate any errors if they are not reported correctly.
@@ -110,7 +110,6 @@ def uploadtorrent(jps_torrent_object, torrent_group_data, **release_data_collate
     """
     config = GetConfig()
     args = GetArgs()
-    uploadurl = 'https://sugoimusic.me/upload.php'
     languages = ('Japanese', 'English', 'Korean', 'Chinese', 'Vietnamese')
 
     sugoimusic_upload_data = {
@@ -260,31 +259,77 @@ def uploadtorrent(jps_torrent_object, torrent_group_data, **release_data_collate
         dataexcmediainfo = {x: sugoimusic_upload_data[x] for x in sugoimusic_upload_data if x not in 'mediainfo'}
         dataexcmediainfo['auth'] = '<scrubbed>'
         logger.info(json.dumps(dataexcmediainfo, indent=2))  # Mediainfo shows too much data
+
+    sugoimusic_upload_data['jps_torrent_id'] = release_data_collated['jpstorrentid']
+
     if not args.parsed.dryrun:
-        sugoimusic_upload_res = sugoimusic(uploadurl, "post", sugoimusic_upload_data, sugoimusic_upload_files)
+        upload_torrent(sugoimusic_upload_data, sugoimusic_upload_files)
 
-        sugoimusic_upload_error = re.findall('red; text-align: center;">(.*)</p>', sugoimusic_upload_res.text)
-        if sugoimusic_upload_error:
-            raise Exception(sugoimusic_upload_error[0])
 
-        sugoimusic_data_validation_error = re.findall('<p>Invalid (.*)</p>', sugoimusic_upload_res.text)
-        if sugoimusic_data_validation_error:  # Error when invalid data entered for upload, eg. Invaid bitrate
-            raise Exception(f'Invalid {sugoimusic_data_validation_error[0]}')
+def upload_torrent(sugoimusic_upload_data, sugoimusic_upload_files):
+    """
+    Perform upload to SugoiMusic and do error handling
 
-        html_debug_output_path = save_sm_html_debug_output(sugoimusic_upload_res.text, torrent_group_data, release_data_collated['jpstorrentid'])
+    :param sugoimusic_upload_data: dict of all required items in the format of:
 
-        groupid = re.findall('<input type="hidden" name="groupid" value="([0-9]+)" />', sugoimusic_upload_res.text)
-        if not groupid:
-            # Find groupid if private torrent warning
-            groupid = re.findall(
-                r'Your torrent has been uploaded; however, you must download your torrent from <a href="torrents\.php\?id=([0-9]+)">here</a>',
-                sugoimusic_upload_res.text)
-            if not groupid:
-                unknown_error_msg = f'Cannot find groupid in SM response - there was probably an unknown error. See {html_debug_output_path} for potential errors'
-                raise RuntimeError(unknown_error_msg)
+    {
+      "submit": "true", # Always must be 'true'
+      "title": "torrent group title",
+      "year": "YYYYMMDD",
+      "tags": "tag1,tag2,tag3",
+      "album_desc": "torrent group description",
+      "auth": user_auth_key,
+      "audioformat": "FLAC",
+      "image": "full-url-of-group-image",
+      "bitrate": "Lossless",
+      "type": 0, # SM category ID, see Categories.SM
+      "artist_jp": "\u7a32\u8449\u66c7",
+      "title_jp": "\u30a2\u30f3\u30c1\u30b5\u30a4\u30af\u30ed\u30f3",
+      "contrib_artists[]": [
+        "contribartist1",
+        "contribartist2"
+      ],
+      "idols[]": [
+        "artist1",
+        "artist2"
+      ],
+      "jps_torrent_id": jps_torrent_id  # optional
+    }
 
-        if groupid:
-            logger.info(f'Torrent uploaded successfully as groupid {groupid[0]}  See https://sugoimusic.me/torrents.php?id={groupid[0]}')
+    :param sugoimusic_upload_files: dict with the torrent to upload in the format of: {'file_input': ('filename.torrent', torrent_object: bytesIO) }
+    """
+    upload_url = 'https://sugoimusic.me/upload.php'
+
+    sugoimusic_upload_res = sugoimusic(upload_url, "post", sugoimusic_upload_data, sugoimusic_upload_files)
+
+    sugoimusic_upload_error = re.findall('red; text-align: center;">(.*)</p>', sugoimusic_upload_res.text)
+    if sugoimusic_upload_error:
+        raise Exception(sugoimusic_upload_error[0])
+
+    sugoimusic_data_validation_error = re.findall('<p>Invalid (.*)</p>', sugoimusic_upload_res.text)
+    if sugoimusic_data_validation_error:  # Error when invalid data entered for upload, eg. Invaid bitrate
+        raise Exception(f'Invalid {sugoimusic_data_validation_error[0]}')
+
+    html_debug_output_path_filename = f"sm_upload_output_{sugoimusic_upload_data['idols[]'][0]}_" \
+                                      f"{sugoimusic_upload_data['title']}_" \
+                                      f"{sugoimusic_upload_data['year']}_" \
+                                      f"{sugoimusic_upload_data['jps_torrent_id']}.html"
+    html_debug_output_path = save_sm_html_debug_output(sugoimusic_upload_res.text, html_debug_output_path_filename)
+
+    sugoimusic_group_id = re.findall('<input type="hidden" name="groupid" value="([0-9]+)" />', sugoimusic_upload_res.text)
+    if not sugoimusic_group_id:
+        # Find sugoimusic_group_id if private torrent warning
+        sugoimusic_group_id = re.findall(
+            r'Your torrent has been uploaded; however, you must download your torrent from <a href="torrents\.php\?id=([0-9]+)">here</a>',
+            sugoimusic_upload_res.text)
+        if not sugoimusic_group_id:
+            unknown_error_msg = f'Cannot find groupid in SM response - there was probably an unknown error. ' \
+                                f'See {html_debug_output_path} for potential errors'
+            raise RuntimeError(unknown_error_msg)
+
+    if sugoimusic_group_id:
+        logger.info(f'Torrent uploaded successfully as sugoimusic_group_id {sugoimusic_group_id[0]}  '
+                    f'See https://sugoimusic.me/torrents.php?id={sugoimusic_group_id[0]}')
 
 
 def collate(torrentids, torrentgroupdata, max_size=None):
@@ -339,7 +384,7 @@ def collate(torrentids, torrentgroupdata, max_size=None):
         if slash_data[0] in VideoOptions.badformats and slash_data[1] in VideoOptions.VideoMedias:
             # VideoCategory torrent, this also detects VideoCategories in a non-VC group
             # container / media
-            release_data_collated['videotorrent'] = True  # For processing by uploadtorrent()
+            release_data_collated['videotorrent'] = True  # For processing by prepare_torrent()
             release_data_collated['categorystatus'] = "good"
 
             #videoreleasedatavalidated = validate_jps_video_data(slash_data, release_data_collated['categorystatus'])
@@ -352,7 +397,7 @@ def collate(torrentids, torrentgroupdata, max_size=None):
         elif slash_data[0] in VideoOptions.badformats and slash_data[2] in VideoOptions.VideoMedias:
             # Video torrent mistakenly uploaded as an Album/Single
             # container / 'bitrate' / media   Bitrate is meaningless, users usually select Lossless
-            release_data_collated['videotorrent'] = True  # For processing by uploadtorrent()
+            release_data_collated['videotorrent'] = True  # For processing by prepare_torrent()
             release_data_collated['categorystatus'] = "bad"
 
             videoreleasedatavalidated = validate_jps_video_data(slash_data, release_data_collated['categorystatus'])
@@ -420,7 +465,7 @@ def collate(torrentids, torrentgroupdata, max_size=None):
         elif 'Blu-Ray' in slash_data:
             release_data_collated['media'] = 'Bluray'  # JPS may actually be calling it the correct official name, but modern usage differs.
 
-        # uploadtorrent() will use the upload date as release date if the torrent has no release date, usually for
+        # prepare_torrent() will use the upload date as release date if the torrent has no release date, usually for
         # Picture Category torrents and some TV-Variety.
         release_data_collated['uploaddate'] = datetime.datetime.strptime(uploaddatestr, '%b %d %Y, %H:%M').strftime('%Y%m%d')
 
@@ -544,7 +589,7 @@ def non_batch_upload(jps_torrent_id=None, jps_urls=None, dry_run=None, wait_for_
         input('When these files have been downloaded press enter to continue...')
 
     for jps_torrent_id, data in collate_torrent_info['jps_torrent_collated_data'].items():
-        uploadtorrent(data['jps_torrent_object'], data['torrentgroupdata'], **data['release_data_collated'])
+        prepare_torrent(data['jps_torrent_object'], data['torrentgroupdata'], **data['release_data_collated'])
         if not dry_run:
             download_sm_uploaded_torrents(torrentcount=1, artist=jps_group_data.artist, title=jps_group_data.title)
 
