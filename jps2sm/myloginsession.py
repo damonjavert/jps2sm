@@ -1,3 +1,9 @@
+"""
+Handle login sessions for JPS and SM
+"""
+# pylint: disable=no-name-in-module,import-error
+# pylint appears to have a bug where it cannot import despite python itself being able to
+
 # Third-party packages
 from requestsloginsession import RequestsLoginSession
 
@@ -47,4 +53,3 @@ def sugoimusic(url, method="get", post_data=None, post_data_files=None, test_log
     sm_session = RequestsLoginSession(sm_login_url, login_data, sm_test_url, sm_success, test_login)
 
     return sm_session.retrieve_content(url, method, post_data, post_data_files)
-

@@ -1,3 +1,9 @@
+"""
+Perform validation of JPS data
+"""
+# pylint: disable=no-name-in-module,import-error
+# pylint appears to have a bug where it cannot import despite python itself being able to
+
 # Standard library packages
 import re
 
@@ -12,7 +18,7 @@ from jps2sm.constants import Categories, VideoOptions
 from jps2sm.utils import GetArgs
 
 
-def decide_music_performance(artists, multiplefiles, duration):
+def decide_music_performance(artists, multiple_files, duration):
     """
     Return if upload should be a Music Performance or not
     A music performance is a cut from a Music TV show and is 25 mins or less long and therefore also not a TV Show artist
@@ -21,7 +27,7 @@ def decide_music_performance(artists, multiplefiles, duration):
 
     :return:  str: 'Music Performance' or 'TV Music'
     """
-    if multiplefiles is True or duration > 1500000:  # 1 500 000 ms = 25 mins
+    if multiple_files is True or duration > 1500000:  # 1 500 000 ms = 25 mins
         return 'TV Music'
     else:  # Single file that is < 25 mins, decide if Music Performance
         if len(artists) > 1:  # Multiple artists
@@ -45,6 +51,7 @@ def get_alternate_fansub_category_id(artist, group_name):
     If it is a TV show, this TV show category type is detected and returned, else query the user from a list of potential categories.
 
     :param artist: str artist name
+    :param group_name: str JPS group name
     :return: int alternative category ID based on Categories.SM()
     """
     JPSartistpage = jpopsuki(f"https://jpopsuki.eu/artist.php?name={artist}")
@@ -63,18 +70,18 @@ def get_alternate_fansub_category_id(artist, group_name):
         print('Select Category:')
         option = 1
         optionlookup = {}
-        for alternativefansubcategoryid in AlternateFanSubCategoriesIDs:
+        for alternative_fansub_category_id in AlternateFanSubCategoriesIDs:
             for cat, catid in Categories.SM.items():
-                if alternativefansubcategoryid == catid:
+                if alternative_fansub_category_id == catid:
                     print(f'({option}) {cat}')
-                    optionlookup[option] = alternativefansubcategoryid
+                    optionlookup[option] = alternative_fansub_category_id
                     option += 1
-        alternatecategoryoption = input('Choose alternate category or press ENTER to skip: ')
-        if alternatecategoryoption == "":
+        alternate_category_option = input('Choose alternate category or press ENTER to skip: ')
+        if alternate_category_option == "":
             logger.error('No alternate Fansubs category chosen.')
             return "Fansubs"  # Allow upload to fail
         else:
-            category = optionlookup[int(alternatecategoryoption)]
+            category = optionlookup[int(alternate_category_option)]
             logger.info(f'Alternate Fansubs category {category} chosen')
             return category
 

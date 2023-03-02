@@ -1,3 +1,9 @@
+"""
+jps2sm constants
+"""
+# pylint: disable=too-few-public-methods
+# These are being used just to store constants
+
 class VideoOptions:
     """
     Store Video option constants

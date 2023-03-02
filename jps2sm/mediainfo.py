@@ -1,3 +1,10 @@
+"""
+mediainfo processing
+"""
+# pylint: disable=no-name-in-module,import-error
+# pylint appears to have a bug where it cannot import despite python itself being able to
+# pylint: disable=fixme
+
 # Standard library packages
 import os
 from io import BytesIO

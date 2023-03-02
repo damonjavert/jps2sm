@@ -1,3 +1,9 @@
+"""
+jps2sm main defs
+"""
+# pylint: disable=no-name-in-module,import-error
+# pylint appears to have a bug where it cannot import despite python itself being able to
+
 # Standard library packages
 import sys
 import re

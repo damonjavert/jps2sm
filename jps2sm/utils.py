@@ -1,3 +1,9 @@
+"""
+Util functions
+"""
+# pylint: disable=no-name-in-module,import-error
+# pylint appears to have a bug where it cannot import despite python itself being able to
+
 # Standard library packages
 import re
 from typing import AnyStr
@@ -60,6 +66,10 @@ class GetArgs:
     __args_parsed = None
 
     def __init__(self):
+        # pylint: disable=line-too-long
+        # It is actually easier to read the arguments without wrapping the lines and using lots of vars for the help texts
+        # would unnecessary extra code.
+
         if GetArgs.__args_parsed is not None:
             return
 
