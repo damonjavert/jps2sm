@@ -41,9 +41,9 @@ def detect_display_swapped_names(userid):
     if (good_setting != -1) and (bad_setting == -1):
         # OK!
         return False
-    else:
-        # Not OK!
-        return True
+
+    # Not OK!
+    return True
 
 
 def main():

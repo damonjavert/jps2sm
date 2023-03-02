@@ -29,20 +29,23 @@ def decide_music_performance(artists, multiple_files, duration):
     """
     if multiple_files is True or duration > 1500000:  # 1 500 000 ms = 25 mins
         return 'TV Music'
-    else:  # Single file that is < 25 mins, decide if Music Performance
-        if len(artists) > 1:  # Multiple artists
-            logger.debug('Upload is a Music Performance as it has derived multiple artists and is 25 mins or less')
-            return 'Music Performance'  # JPS TV Show artists never have multiple artists
-        JPSartistpage = jpopsuki(f"https://jpopsuki.eu/artist.php?name={artists[0]}")
-        soup = BeautifulSoup(JPSartistpage.text, 'html5lib')
-        categoriesbox = str(soup.select('#content .thin .main_column .box.center'))
-        categories = re.findall(r'\[(.+)\]', categoriesbox)
-        if any({*Categories.NonTVCategories} & {*categories}):  # Exclude any TV Shows for being mislabeled as Music Performance
-            logger.debug('Upload is a Music Performance as it is 25 mins or less and not a TV Show')
-            return 'Music Performance'
-        else:
-            logger.debug('Upload is not a Music Performance')
-            return 'TV Music'
+
+    # Single file that is < 25 mins, decide if Music Performance
+    if len(artists) > 1:  # Multiple artists
+        logger.debug('Upload is a Music Performance as it has derived multiple artists and is 25 mins or less')
+        return 'Music Performance'  # JPS TV Show artists never have multiple artists
+
+    # Single file
+    jps_artist_page = jpopsuki(f"https://jpopsuki.eu/artist.php?name={artists[0]}")
+    soup = BeautifulSoup(jps_artist_page.text, 'html5lib')
+    categories_box = str(soup.select('#content .thin .main_column .box.center'))
+    categories = re.findall(r'\[(.+)\]', categories_box)
+    if any({*Categories.NonTVCategories} & {*categories}):  # Exclude any TV Shows for being mislabeled as Music Performance
+        logger.debug('Upload is a Music Performance as it is 25 mins or less and not a TV Show')
+        return 'Music Performance'
+
+    logger.debug('Upload is not a Music Performance')
+    return 'TV Music'
 
 
 def get_alternate_fansub_category_id(artist, group_name):
@@ -54,36 +57,40 @@ def get_alternate_fansub_category_id(artist, group_name):
     :param group_name: str JPS group name
     :return: int alternative category ID based on Categories.SM()
     """
-    JPSartistpage = jpopsuki(f"https://jpopsuki.eu/artist.php?name={artist}")
-    soup = BeautifulSoup(JPSartistpage.text, 'html5lib')
-    categoriesbox = str(soup.select('#content .thin .main_column .box.center'))
-    categories = re.findall(r'\[(.+)\]', categoriesbox)
+    jps_artist_page = jpopsuki(f"https://jpopsuki.eu/artist.php?name={artist}")
+    soup = BeautifulSoup(jps_artist_page.text, 'html5lib')
+    categories_box = str(soup.select('#content .thin .main_column .box.center'))
+    categories = re.findall(r'\[(.+)\]', categories_box)
 
     if not any({*Categories.NonTVCategories} & {*categories}) and " ".join(categories).count('TV-') == 1:
         # Artist has no music and only 1 TV Category, artist is a TV show and we can auto detect the category for FanSub releases
-        autodetectcategory = re.findall(r'(TV-(?:[^ ]+))', " ".join(categories))[0]
-        logger.debug(f'Autodetected SM category {autodetectcategory} for JPS Fansubs torrent')
-        return autodetectcategory
-    else:  # Cannot autodetect
-        AlternateFanSubCategoriesIDs = (5, 6, 7, 8, 9, 11)  # Matches indices in Categories()
-        logger.warning(f'Cannot auto-detect correct category for torrent group {group_name}.')
-        print('Select Category:')
-        option = 1
-        optionlookup = {}
-        for alternative_fansub_category_id in AlternateFanSubCategoriesIDs:
-            for cat, catid in Categories.SM.items():
-                if alternative_fansub_category_id == catid:
-                    print(f'({option}) {cat}')
-                    optionlookup[option] = alternative_fansub_category_id
-                    option += 1
-        alternate_category_option = input('Choose alternate category or press ENTER to skip: ')
-        if alternate_category_option == "":
-            logger.error('No alternate Fansubs category chosen.')
-            return "Fansubs"  # Allow upload to fail
-        else:
-            category = optionlookup[int(alternate_category_option)]
-            logger.info(f'Alternate Fansubs category {category} chosen')
-            return category
+        autodetect_category = re.findall(r'(TV-(?:[^ ]+))', " ".join(categories))[0]
+        logger.debug(f'Autodetected SM category {autodetect_category} for JPS Fansubs torrent')
+        return autodetect_category
+
+    # Cannot autodetect
+    alternate_fansub_categories_ids = (5, 6, 7, 8, 9, 11)  # Matches indices in Categories()
+    logger.warning(f'Cannot auto-detect correct category for torrent group {group_name}.')
+    print('Select Category:')
+    option = 1
+    option_lookup = {}
+    for alternative_fansub_category_id in alternate_fansub_categories_ids:
+        for cat, catid in Categories.SM.items():
+            if alternative_fansub_category_id == catid:
+                print(f'({option}) {cat}')
+                option_lookup[option] = alternative_fansub_category_id
+                option += 1
+    alternate_category_option = input('Choose alternate category or press ENTER to skip: ')
+
+    # User did not choose an option
+    if alternate_category_option == "":
+        logger.error('No alternate Fansubs category chosen.')
+        return "Fansubs"  # Allow upload to fail
+
+    # User chose an option
+    category = option_lookup[int(alternate_category_option)]
+    logger.info(f'Alternate Fansubs category {category} chosen')
+    return category
 
 
 def validate_jps_video_data(slash_data, category_status):
@@ -177,7 +184,7 @@ def decide_exc_filter(audioformat, media, releasedata):
     if audioformat == args.parsed.excaudioformat:
         logger.info(f'Excluding {releasedata} as exclude audioformat {args.parsed.excaudioformat} is set')
         return True
-    elif media == args.parsed.excmedia:
+    if media == args.parsed.excmedia:
         logger.info(f'Excluding {releasedata} as exclude media {args.parsed.excmedia} is set')
         return True
 
@@ -222,12 +229,13 @@ def decide_ep(jps_torrent_object, uploaddata):
             track_extensions.add(file_path.split('.')[-1])
 
     if has_cue and track_extensions == {'flac'}:
-        logger.debug(f'Upload is not an EP as it has a .cue file and only .flac files')
+        logger.debug('Upload is not an EP as it has a .cue file and only .flac files')
         return 'Album'
 
     if track_count < 7:
         logger.debug(f'Upload is an EP as it has {track_count} standard tracks')
         return 'EP'
-    else:
-        logger.debug(f'Upload is not an EP as it has {track_count} tracks')
-        return 'Album'
+
+    # 7 or more tracks
+    logger.debug(f'Upload is not an EP as it has {track_count} tracks')
+    return 'Album'
