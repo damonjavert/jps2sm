@@ -81,6 +81,10 @@ def get_jps_page(jps_group_url: str) -> str:
         logger.error(f"JPS returned HTTP error {jps_page_res.status_code} on group url {jps_group_url}")
         sys.exit(1)
 
+    if re.search("Database error.", jps_page_res.text):
+        logger.error(f"JPS returned a Database error on group url {jps_group_url}. Either the JPS group ID does not exist or JPS is down.")
+        sys.exit(1)
+
     return jps_page_res.text
 
 
