@@ -68,24 +68,28 @@ def get_jps_group_data_class(batch_group_data: dict, jps_group_id: int) -> datac
     return torrent_group_data
 
 
-def get_jps_page(jps_group_url: str) -> str:
+def get_jps_group_page(jps_urls: str) -> Tuple[str, str]:
     """
     Get the JPS page with some error handling
 
     :return jps_page: str of JPS page
     """
 
-    jps_page_res = jpopsuki(jps_group_url)
+    jps_url = jps_urls.split()[0]  # If there are multiple urls only the first url needs to be retrieved
+    jps_group_id = re.findall(r"\?id=(\d+)", jps_urls)[0]
+    jps_page_res = jpopsuki(jps_url)
 
     if jps_page_res.status_code != 200:
-        logger.error(f"JPS returned HTTP error {jps_page_res.status_code} on group url {jps_group_url}")
+        logger.error(f"JPS returned HTTP error {jps_page_res.status_code} on group url {jps_url}")
         sys.exit(1)
 
     if re.search("Database error.", jps_page_res.text):
-        logger.error(f"JPS returned a Database error on group url {jps_group_url}. Either the JPS group ID does not exist or JPS is down.")
+        logger.error(f"JPS returned a Database error on group url {jps_url}. Either the JPS group ID does not exist or JPS is down.")
         sys.exit(1)
 
-    return jps_page_res.text
+    logger.debug(f'Processing JPS URL: {jps_url}')
+
+    return jps_group_id, jps_page_res.text
 
 
 class GetGroupData:
@@ -95,10 +99,7 @@ class GetGroupData:
     Each property is gathered by calling a method of the class
     """
 
-    def __init__(self, jpsurl):
-        self.jpsurl = jpsurl
-        logger.debug(f'Processing JPS URL: {jpsurl}')
-        self.jps_group_id: int = int()
+    def __init__(self, jps_group_id, jps_group_page_text):
         self.category: str = str()
         self.artist: str = str()
         self.date: str = str()
@@ -110,20 +111,16 @@ class GetGroupData:
         self.imagelink: str = str()
         self.tagsall: str = str()
         self.contribartists: str = str()
+        self.jps_group_id = jps_group_id
 
-        self.jps_group_id = re.findall(r"\?id=(\d+)$", self.jpsurl)[0]
+        self.get_data(jps_group_id, jps_group_page_text)
 
-        jps_group_url = self.jpsurl.split()[0]  # If there are multiple urls only the first url needs to be parsed
-        jps_page = get_jps_page(jps_group_url)
-
-        self.get_data(jps_page)
-
-    def get_data(self, jps_page) -> None:
+    def get_data(self, jps_group_id, jps_group_page_text) -> None:
         date_regex = r'[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])'  # YYYY.MM.DD format
         # YYYY.MM.DD OR YYYY format, for Pictures only
         date_regex2 = r'(?:[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])|(?:19|20)\d\d)'
 
-        soup = BeautifulSoup(jps_page, 'html5lib')
+        soup = BeautifulSoup(jps_group_page_text, 'html5lib')
         artist_line_link = soup.select('.thin h2 a')
         original_title_line = soup.select('.thin h3')
 
@@ -141,7 +138,7 @@ class GetGroupData:
         try:
             self.category = re.findall(r'\[(.*?)\]', torrent_description_page_h2_line)[0]
         except IndexError:
-            logger.error(f'Error: Could not ascertain Category for group {self.jps_group_id}, try adding --debug to see what could be wrong.')
+            logger.error(f'Error: Could not ascertain Category for group {jps_group_id}, try adding --debug to see what could be wrong.')
             raise Exception('JPS Category not found')
 
         logger.info(f'Category: {self.category}')
@@ -236,7 +233,7 @@ class GetGroupData:
 
         # Get description with BB Code if user has group edit permissions on JPS, if not just use stripped html text.
         try:
-            self.groupdescription = get_group_descrption_bbcode(self.jps_group_id)  # Requires PU+ at JPS
+            self.groupdescription = get_group_descrption_bbcode(jps_group_id)  # Requires PU+ at JPS
         except IndexError:
             logger.exception('Could not get group description BBCode. Are you a Power User+ at JPS?')
             self.groupdescription = remove_html_tags(str(soup.select('#content .thin .main_column .box .body')[0]))

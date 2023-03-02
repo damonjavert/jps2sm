@@ -16,7 +16,7 @@ from bs4 import BeautifulSoup
 from loguru import logger
 
 # jps2sm modules
-from jps2sm.get_data import GetGroupData, get_jps_group_data_class
+from jps2sm.get_data import GetGroupData, get_jps_group_data_class, get_jps_group_page
 from jps2sm.myloginsession import jpopsuki
 from jps2sm.save_data import download_sm_uploaded_torrents
 from jps2sm.utils import GetArgs, count_values_dict, GetConfig
@@ -329,7 +329,8 @@ def get_batch_group_data(batch_uploads, excluded_category):
     for jps_group_id, jps_torrent_id in batch_uploads.items():
         try:
             logger.info('-------------------------')
-            group_data_output = GetGroupData("https://jpopsuki.eu/torrents.php?id=%s" % jps_group_id)
+            jps_group_id, jps_group_page_text = get_jps_group_page(f"https://jpopsuki.eu/torrents.php?id={jps_group_id}")
+            group_data_output = GetGroupData(jps_group_id, jps_group_page_text)
             batch_group_data[jps_group_id] = {}
             batch_group_data[jps_group_id] = group_data_output.all()
 
