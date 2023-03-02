@@ -1,11 +1,9 @@
 # Standard library packages
 import re
 import itertools
-import time
 import json
 from dataclasses import dataclass
-from typing import Optional, Dict, List, Any, Union, Tuple
-import collections
+from typing import Dict, List, Union, Tuple
 
 # Third-party packages
 from bs4 import BeautifulSoup
@@ -15,6 +13,7 @@ from loguru import logger
 from jps2sm.myloginsession import jpopsuki, sugoimusic
 from jps2sm.constants import Categories
 from jps2sm.utils import remove_html_tags
+
 
 @dataclass
 class JPSGroup:

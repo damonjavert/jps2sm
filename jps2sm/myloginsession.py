@@ -4,6 +4,7 @@ from requestsloginsession import RequestsLoginSession
 # jps2sm modules
 from jps2sm.utils import GetConfig
 
+
 def jpopsuki(url, test_login=False):
     """
     Get content from JPS

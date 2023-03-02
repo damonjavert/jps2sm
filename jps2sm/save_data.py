@@ -1,7 +1,7 @@
 # Standard library packages
 import json
 import html
-from typing import Type, Tuple
+from typing import Type
 
 # Third-party packages
 from pathlib import Path
