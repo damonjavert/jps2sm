@@ -10,6 +10,7 @@ import collections
 import time
 import re
 import sys
+from time import sleep
 
 # Third-party packages
 from bs4 import BeautifulSoup
@@ -29,6 +30,7 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
     """
     from jps2sm.jps2sm import collate, prepare_torrent, set_original_artists
     args = GetArgs()
+    config = GetConfig()
 
     def batch_stats(final_stats, media_info_mode, dry_run):
         """
@@ -89,7 +91,6 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
     max_size = None
 
     if mode == "recent":
-        config = GetConfig()
         max_size = config.max_size_recent_mode
 
     batch_collate_torrent_info = {}
@@ -134,7 +135,12 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
     if mode == "recent":
         logger.info('Interim stats')
         batch_stats(final_stats=False, media_info_mode=args.parsed.mediainfo, dry_run=args.parsed.dryrun)
-        input('When these files have been downloaded press enter to continue...')
+        wait_time_seconds = 60 * config.wait_time_recent_mode
+        try:
+            print(f'Waiting {config.wait_time_recent_mode} minutes for the files to download, or press Ctrl-C to continue immediately...')
+            sleep(wait_time_seconds)
+        except KeyboardInterrupt:
+            pass
 
     for jps_torrent_id, collate_torrent_info in batch_collate_torrent_info.items():
         try:

@@ -157,11 +157,11 @@ class GetConfig:
         cfg_file_name = 'jps2sm.cfg'
         script_dir = Path(__file__).parent.parent
 
-
-        config_file_locations = [ Path(script_dir, cfg_file_name),
-                                  Path(Path.home(), '.config', 'jps2sm', cfg_file_name),
-                                  Path(Path.home(), '.local', 'etc', cfg_file_name),
-                                  Path(Path.home(), cfg_file_name),]
+        config_file_locations = [Path(script_dir, cfg_file_name),
+                                 Path(Path.home(), '.config', 'jps2sm', cfg_file_name),
+                                 Path(Path.home(), '.local', 'etc', cfg_file_name),
+                                 Path(Path.home(), cfg_file_name),
+                                 ]
 
         config_file = None
         for config_file_location in config_file_locations:
@@ -190,6 +190,7 @@ class GetConfig:
         GetConfig.skip_dupes = config.getboolean(sm, 'SkipDuplicates', fallback=False)
         GetConfig.jps_min_seeders = config.getint(jps, 'MinSeeders', fallback=1)
         GetConfig.max_size_recent_mode = config.get(jps, 'MaxSizeRecentMode', fallback=None)
+        GetConfig.wait_time_recent_mode = config.get(jps, 'WaitTimeRecentModeMins', fallback=20)
 
     def __getattr__(self, item):
         return GetConfig.item
