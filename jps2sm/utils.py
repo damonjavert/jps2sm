@@ -178,16 +178,16 @@ class GetConfig:
 
         open(config_file)
         jps = 'JPopSuki'
-        sm = 'SugoiMusic'
+        sugoi = 'SugoiMusic'
         config = configparser.ConfigParser()
         config.read(config_file)
         GetConfig.jps_user = config.get(jps, 'User')
         GetConfig.jps_pass = config.get(jps, 'Password')
-        GetConfig.sm_user = config.get(sm, 'User')
-        GetConfig.sm_pass = config.get(sm, 'Password')
+        GetConfig.sm_user = config.get(sugoi, 'User')
+        GetConfig.sm_pass = config.get(sugoi, 'Password')
         GetConfig.media_roots = [x.strip() for x in config.get('Media', 'MediaDirectories').split(',')]  # Remove whitespace after comma if any
         GetConfig.directories = config.items('Directories')
-        GetConfig.skip_dupes = config.getboolean(sm, 'SkipDuplicates', fallback=False)
+        GetConfig.skip_dupes = config.getboolean(sugoi, 'SkipDuplicates', fallback=False)
         GetConfig.jps_min_seeders = config.getint(jps, 'MinSeeders', fallback=1)
         GetConfig.max_size_recent_mode = config.get(jps, 'MaxSizeRecentMode', fallback=None)
         GetConfig.wait_time_recent_mode = config.get(jps, 'WaitTimeRecentModeMins', fallback=20)
@@ -262,15 +262,15 @@ def decide_duplicate(jps_torrent_object):
 
     torrent_hashcheckdata = tp.TorrentFileParser(jps_torrent_object).parse()
     torrent_hashcheckdata["info"]["source"] = 'SugoiMusic'
-    fd, temp_torrent_file = tempfile.mkstemp()
+    file_descriptor, temp_torrent_file = tempfile.mkstemp()
     tp.create_torrent_file(temp_torrent_file, torrent_hashcheckdata)
 
-    with open(temp_torrent_file, "rb") as f:
-        data = bencoding.bdecode(f.read())
+    with open(temp_torrent_file, "rb") as file:
+        data = bencoding.bdecode(file.read())
         info = data[b'info']
         hashed_info = hashlib.sha1(bencoding.bencode(info)).hexdigest()
-        f.close()
-    os.close(fd)
+        file.close()
+    os.close(file_descriptor)
 
     # tempfile is supposed to delete it but with me at least it does not
     os.remove(temp_torrent_file)

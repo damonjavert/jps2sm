@@ -33,8 +33,8 @@ def save_sm_html_debug_output(content: str, html_debug_output_filename: str) -> 
 
     html_debug_output_path = Path(output.file_dir['html'], html_debug_output_filename_valid)
 
-    with open(html_debug_output_path, "w") as f:
-        f.write(content)
+    with open(html_debug_output_path, "w") as file:
+        file.write(content)
 
     return html_debug_output_path
 
@@ -64,8 +64,8 @@ def download_sm_uploaded_torrents(torrent_count: int) -> None:
         torrent_filename = get_valid_filename(f'SM-{torrent_id}.torrent')
         sm_torrent_path = Path(output_dir, torrent_filename)
 
-        with open(sm_torrent_path, "wb") as f:
-            f.write(torrent_file.content)
+        with open(sm_torrent_path, "wb") as file:
+            file.write(torrent_file.content)
         logger.debug(f'Downloaded SM torrent as {sm_torrent_path}')
 
 
@@ -87,8 +87,8 @@ def download_sm_torrent(torrent_id: str) -> Path:
     )
     torrent_filename = get_valid_filename(f'SM-{torrent_id}.torrent')
     sm_torrent_path = Path(output_dir, torrent_filename)
-    with open(sm_torrent_path, "wb") as f:
-        f.write(torrent_file.content)
+    with open(sm_torrent_path, "wb") as file:
+        file.write(torrent_file.content)
 
     return sm_torrent_path
 
@@ -122,5 +122,5 @@ def download_jps_torrent(jps_torrent_file, torrent_group_data: Type[GetGroupData
 
     jps_torrent_path = Path(output_dir, jps_torrent_filename)
 
-    with open(jps_torrent_path, "wb") as f:
-        f.write(jps_torrent_file.content)
+    with open(jps_torrent_path, "wb") as file:
+        file.write(jps_torrent_file.content)

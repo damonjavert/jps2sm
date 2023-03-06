@@ -214,8 +214,7 @@ def collate(torrentids, torrentgroupdata, max_size=None):
 
 def prepare_torrent(jps_torrent_object, torrent_group_data, **release_data_collated):
     """
-    Prepare POST data for the SM upload, performs additional validation, reports errors and performs the actual upload to
-    SM whilst saving the html result to investigate any errors if they are not reported correctly.
+    Prepare POST data for the SM upload, and performs additional validation
 
     :param jps_torrent_object: bytes: BytesIO object of the JPS torrent
     :param torrent_group_data: JPSGroup data from GetGroupData
@@ -244,11 +243,13 @@ def prepare_torrent(jps_torrent_object, torrent_group_data, **release_data_colla
 
     logger.debug(release_data_collated)
 
-    # TODO Most of this can be in getmediainfo()
+    # TODO Most of this can be in get_mediainfo()
     if args.parsed.mediainfo:
         try:
-            sugoimusic_upload_data['mediainfo'], releasedatamediainfo = get_mediainfo(jps_torrent_object, release_data_collated['media'], config.media_roots)
-            sugoimusic_upload_data.update(releasedatamediainfo)
+            sugoimusic_upload_data['mediainfo'], release_data_mediainfo = get_mediainfo(jps_torrent_object,
+                                                                                      release_data_collated['media'],
+                                                                                      config.media_roots)
+            sugoimusic_upload_data.update(release_data_mediainfo)
             if 'duration' in sugoimusic_upload_data.keys() and sugoimusic_upload_data['duration'] > 1:
                 duration_friendly_format = humanfriendly.format_timespan(datetime.timedelta(seconds=int(sugoimusic_upload_data['duration'] / 1000)))
                 sugoimusic_upload_data['album_desc'] += f"\n\nDuration: {duration_friendly_format} - {str(sugoimusic_upload_data['duration'])}ms"
@@ -264,7 +265,7 @@ def prepare_torrent(jps_torrent_object, torrent_group_data, **release_data_colla
 
     if torrent_group_data.category not in Categories.NonReleaseData:
         sugoimusic_upload_data['media'] = release_data_collated['media']
-        if 'audioformat' not in sugoimusic_upload_data.keys():  # If not supplied by getmediainfo() use audioformat guessed by collate()
+        if 'audioformat' not in sugoimusic_upload_data.keys():  # If not supplied by get_mediainfo() use audioformat guessed by collate()
             sugoimusic_upload_data['audioformat'] = release_data_collated['audioformat']
 
     if torrent_group_data.imagelink is not None:
@@ -276,12 +277,16 @@ def prepare_torrent(jps_torrent_object, torrent_group_data, **release_data_colla
         if release_data_collated['categorystatus'] == 'bad':  # Need to set a correct category
             if release_data_collated['media'] == 'Bluray':
                 sugoimusic_upload_data['type'] = Categories.JPStoSM['Bluray']
-            else:  # Still need to change the category to something, if not a Bluray then even if it is not a DVD the most sensible category is DVD in a music torrent group
+            # Still need to change the category to something, if not a Bluray then even if it is not a DVD the most sensible category
+            # is DVD in a music torrent group
+            else:
                 sugoimusic_upload_data['type'] = Categories.JPStoSM['DVD']
         if torrent_group_data.category == "TV-Music" and args.parsed.mediainfo:
-            sugoimusic_upload_data['type'] = Categories.SM[decide_music_performance(torrent_group_data.artist, sugoimusic_upload_data['multiplefiles'], sugoimusic_upload_data['duration'])]
+            sugoimusic_upload_data['type'] = Categories.SM[decide_music_performance(torrent_group_data.artist,
+                                                                                    sugoimusic_upload_data['multiplefiles'],
+                                                                                    sugoimusic_upload_data['duration'])]
 
-        # If not supplied by getmediainfo() use codec found by collate()
+        # If not supplied by get_mediainfo() use codec found by collate()
         if 'codec' not in sugoimusic_upload_data.keys():
             sugoimusic_upload_data['codec'] = release_data_collated['codec']
 
@@ -299,7 +304,7 @@ def prepare_torrent(jps_torrent_object, torrent_group_data, **release_data_colla
                 else:
                     sugoimusic_upload_data['ressel'] = 'CHANGEME'
 
-        # If not supplied by getmediainfo() use container found by collate()
+        # If not supplied by get_mediainfo() use container found by collate()
         if 'container' not in sugoimusic_upload_data.keys():
             sugoimusic_upload_data['container'] = release_data_collated['container']
 
@@ -347,17 +352,18 @@ def prepare_torrent(jps_torrent_object, torrent_group_data, **release_data_colla
         pass
 
     try:
-        contribartistsenglish = []
-        for artist, origartist in torrent_group_data.contribartists.items():
-            contribartistsenglish.append(artist)
-        sugoimusic_upload_data['contrib_artists[]'] = contribartistsenglish
+        contrib_artists_english = []
+        for artist, orig_artist in torrent_group_data.contribartists.items():
+            contrib_artists_english.append(artist)
+        sugoimusic_upload_data['contrib_artists[]'] = contrib_artists_english
     except AttributeError:  # If no contrib artists do nothing
         pass
 
     if "V.A." in torrent_group_data.artist:  # At JPS Various Artists torrents have their artists as contrib artists
-        del sugoimusic_upload_data['contrib_artists[]']  # Error if null as if there is a V.A. torrent group with no contrib artists something is wrong
-        sugoimusic_upload_data['idols[]'] = contribartistsenglish
-        logger.debug(f'Various Artists torrent, setting main artists to {contribartistsenglish}')
+        # Error if null as if there is a V.A. torrent group with no contrib artists something is wrong
+        del sugoimusic_upload_data['contrib_artists[]']
+        sugoimusic_upload_data['idols[]'] = contrib_artists_english
+        logger.debug(f'Various Artists torrent, setting main artists to {contrib_artists_english}')
     else:
         sugoimusic_upload_data['idols[]'] = torrent_group_data.artist  # Set the artist normally
 
@@ -369,9 +375,9 @@ def prepare_torrent(jps_torrent_object, torrent_group_data, **release_data_colla
     }
 
     if args.parsed.dryrun or args.parsed.debug:
-        dataexcmediainfo = {x: sugoimusic_upload_data[x] for x in sugoimusic_upload_data if x not in 'mediainfo'}
-        dataexcmediainfo['auth'] = '<scrubbed>'
-        logger.info(json.dumps(dataexcmediainfo, indent=2))  # Mediainfo shows too much data
+        data_exc_mediainfo = {x: sugoimusic_upload_data[x] for x in sugoimusic_upload_data if x not in 'mediainfo'}
+        data_exc_mediainfo['auth'] = '<scrubbed>'
+        logger.info(json.dumps(data_exc_mediainfo, indent=2))  # Mediainfo shows too much data
 
     sugoimusic_upload_data['jps_torrent_id'] = release_data_collated['jpstorrentid']
 
