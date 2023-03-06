@@ -62,37 +62,33 @@ def download_sm_uploaded_torrents(torrent_count: int) -> None:
     for torrent_id, torrent_link in sm_torrent_links.items():
         torrent_file = sugoimusic(torrent_link)
         torrent_filename = get_valid_filename(f'SM-{torrent_id}.torrent')
-        torrent_path = Path(output_dir, torrent_filename)
+        sm_torrent_path = Path(output_dir, torrent_filename)
 
-        with open(torrent_path, "wb") as f:
+        with open(sm_torrent_path, "wb") as f:
             f.write(torrent_file.content)
-        logger.debug(f'Downloaded SM torrent as {torrent_path}')
+        logger.debug(f'Downloaded SM torrent as {sm_torrent_path}')
 
 
-def download_sm_torrent(torrent_id: str, artist: str, title: str) -> Path:
+def download_sm_torrent(torrent_id: str) -> Path:
     """
     Downloads the SM torrent if it is a dupe, in this scenario we cannot use download_sm_uploaded_torrents() as the user
     has not actually uploaded it.
 
     :param torrent_id: SM torrentid to be downloaded
-    :param artist: SM Artist name, for naming torrent file only
-    :param title: SM group title, for naming torrent file only
     :return: name: filename of torrent downloaded
     """
     output_dir = output.file_dir['smtorrents']
 
     sm_user = GetSMUser()
 
-    file = jpopsuki(
+    torrent_file = sugoimusic(
         'https://sugoimusic.me/torrents.php?action='
         f'download&id={torrent_id}&authkey={sm_user.auth_key()}&torrent_pass={sm_user.torrent_password_key()}'
     )
-    name = get_valid_filename(
-        "SM %s - %s - %s.torrent" % (artist, title, torrent_id)
-    )
-    sm_torrent_path = Path(output_dir, name)
+    torrent_filename = get_valid_filename(f'SM-{torrent_id}.torrent')
+    sm_torrent_path = Path(output_dir, torrent_filename)
     with open(sm_torrent_path, "wb") as f:
-        f.write(file.content)
+        f.write(torrent_file.content)
 
     return sm_torrent_path
 

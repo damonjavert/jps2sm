@@ -182,8 +182,7 @@ def collate(torrentids, torrentgroupdata, max_size=None):
 
         if not args.parsed.dryrun and dupe_sugoimusic_torrent_id:
             if not config.skip_dupes:
-                dupe_file_path = download_sm_torrent(dupe_sugoimusic_torrent_id, torrentgroupdata.artist, torrentgroupdata.title)
-                # torrentgroupdata.artist and torrentgroupdata.title is just to generate a pretty filename
+                dupe_file_path = download_sm_torrent(dupe_sugoimusic_torrent_id)
                 logger.warning(
                     f'This torrent already exists on SugoiMusic - https://sugoimusic.me/torrents.php?torrentid={dupe_sugoimusic_torrent_id} '
                     f'The .torrent has been downloaded with name "{dupe_file_path}"'
