@@ -7,8 +7,6 @@ jps2sm main defs
 # Standard library packages
 import sys
 import re
-import os
-import configparser
 
 # Third-party packages
 from bs4 import BeautifulSoup
@@ -20,7 +18,7 @@ from jps2sm.prepare_data import collate, prepare_torrent
 from jps2sm.save_data import download_sm_uploaded_torrents
 from jps2sm.batch import batch_mode
 from jps2sm.upload_data import set_original_artists
-from jps2sm.utils import fatal_error, GetConfig, GetArgs
+from jps2sm.utils import fatal_error, GetArgs, handle_cfg_media_roots
 from jps2sm.myloginsession import jpopsuki
 
 
@@ -47,6 +45,9 @@ def detect_display_swapped_names(userid):
 
 
 def main():
+    """
+    Entry point
+    """
     args = GetArgs()
 
     if args.parsed.debug:
@@ -67,15 +68,7 @@ def main():
             fatal_error('Error: The URL(s) given does not appear to be a valid JPS group/release urls.')
 
     if args.parsed.mediainfo:
-        config = GetConfig()
-        try:
-            for media_dir in config.media_roots:
-                if not os.path.exists(media_dir):
-                    fatal_error(f'Error: Media directory {media_dir} does not exist. Check your configuration in jps2sm.cfg.')
-                if not os.path.isdir(media_dir):
-                    fatal_error(f'Error: Media directory {media_dir} is a file and not a directory. Check your configuration in jps2sm.cfg.')
-        except configparser.NoSectionError:
-            fatal_error('Error: --mediainfo requires you to configure MediaDirectories in jps2sm.cfg for mediainfo to find your file(s).')
+        handle_cfg_media_roots()
 
     jps_user = GetJPSUser()
     jps_user_id = jps_user.user_id()
@@ -126,7 +119,7 @@ def non_batch_upload(jps_torrent_id=None, jps_urls=None, dry_run=None, wait_for_
     if wait_for_jps_dl:
         input('When these files have been downloaded press enter to continue...')
 
-    for jps_torrent_id, data in collate_torrent_info['jps_torrent_collated_data'].items():
+    for _, data in collate_torrent_info['jps_torrent_collated_data'].items():
         prepare_torrent(data['jps_torrent_object'], data['torrentgroupdata'], **data['release_data_collated'])
         if not dry_run:
             download_sm_uploaded_torrents(torrentcount=1, artist=jps_group_data.artist, title=jps_group_data.title)

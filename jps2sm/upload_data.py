@@ -34,13 +34,13 @@ def set_original_artists(contrib_artists) -> None:
         if orig_artist == "":  # If there is no orig_artist at JPS do not bother trying to set it here
             return
 
-        SMartistpage = sugoimusic(f"https://sugoimusic.me/artist.php?artistname={artist}")
+        sugoimusic_artist_page = sugoimusic(f"https://sugoimusic.me/artist.php?artistname={artist}")
 
-        if re.findall("Your search did not match anything", SMartistpage.text):
+        if re.findall("Your search did not match anything", sugoimusic_artist_page.text):
             logger.debug(f"Artist {artist} does not yet exist at SM so orig_artist cannot be set")
             return
 
-        soup = BeautifulSoup(SMartistpage.text, 'html5lib')
+        soup = BeautifulSoup(sugoimusic_artist_page.text, 'html5lib')
         linkbox = str(soup.select('#content .thin .header .linkbox'))
         artistid = re.findall(r'href="artist\.php\?action=edit&amp;artistid=([0-9]+)"', linkbox)[0]
 
@@ -65,7 +65,6 @@ def set_original_artists(contrib_artists) -> None:
             set_original_artist(artist, orig_artist)
         except IndexError:  # Do not let a set_original_artist error affect stats
             logger.debug(f'Error in setting artist {artist} orig_artist {orig_artist}')
-            pass
 
 
 def upload_torrent(sugoimusic_upload_data, sugoimusic_upload_files):
@@ -106,11 +105,11 @@ def upload_torrent(sugoimusic_upload_data, sugoimusic_upload_files):
 
     sugoimusic_upload_error = re.findall('red; text-align: center;">(.*)</p>', sugoimusic_upload_res.text)
     if sugoimusic_upload_error:
-        raise Exception(sugoimusic_upload_error[0])
+        raise RuntimeError(sugoimusic_upload_error[0])
 
     sugoimusic_data_validation_error = re.findall('<p>Invalid (.*)</p>', sugoimusic_upload_res.text)
     if sugoimusic_data_validation_error:  # Error when invalid data entered for upload, eg. Invaid bitrate
-        raise Exception(f'Invalid {sugoimusic_data_validation_error[0]}')
+        raise RuntimeError(f'Invalid {sugoimusic_data_validation_error[0]}')
 
     html_debug_output_path_filename = f"sm_upload_output_{sugoimusic_upload_data['idols[]'][0]}_" \
                                       f"{sugoimusic_upload_data['title']}_" \

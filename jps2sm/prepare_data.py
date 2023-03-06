@@ -3,6 +3,7 @@ Prepare data from get_data and send it to upload_data/save_data modules
 """
 # pylint: disable=no-name-in-module,import-error
 # pylint appears to have a bug where it cannot import despite python itself being able to
+# pylint: disable=fixme
 
 
 # Standard library packages

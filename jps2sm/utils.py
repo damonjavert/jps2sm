@@ -224,6 +224,22 @@ class HandleCfgOutputDirs:
         return HandleCfgOutputDirs.item
 
 
+def handle_cfg_media_roots() -> None:
+    """
+    Sanitise media_roots cfg, check they are dirs and not files and report error if they do not exist.
+    """
+
+    config = GetConfig()
+    try:
+        for media_dir in config.media_roots:
+            if not os.path.exists(media_dir):
+                fatal_error(f'Error: Media directory {media_dir} does not exist. Check your configuration in jps2sm.cfg.')
+            if not os.path.isdir(media_dir):
+                fatal_error(f'Error: Media directory {media_dir} is a file and not a directory. Check your configuration in jps2sm.cfg.')
+    except configparser.NoSectionError:
+        fatal_error('Error: --mediainfo requires you to configure MediaDirectories in jps2sm.cfg for mediainfo to find your file(s).')
+
+
 def remove_html_tags(text):
     """
     Strip html tags, used by GetGroupData() on the group description if unable to get bbcode
