@@ -122,7 +122,7 @@ def non_batch_upload(jps_torrent_id=None, jps_urls=None, dry_run=None, wait_for_
     for _, data in collate_torrent_info['jps_torrent_collated_data'].items():
         prepare_torrent(data['jps_torrent_object'], data['torrentgroupdata'], **data['release_data_collated'])
         if not dry_run:
-            download_sm_uploaded_torrents(torrentcount=1, artist=jps_group_data.artist, title=jps_group_data.title)
+            download_sm_uploaded_torrents(torrent_count=1)
 
     if not dry_run:
         set_original_artists(jps_group_data.contribartists)

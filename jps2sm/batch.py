@@ -162,9 +162,9 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
             continue
         if not args.parsed.dryrun:
             set_original_artists(collate_torrent_info['torrentgroupdata'].contribartists)
-            download_sm_uploaded_torrents(torrentcount=1, artist=collate_torrent_info['torrentgroupdata'].artist,
-                                          title=collate_torrent_info['torrentgroupdata'].title)
             sm_torrents_uploaded_count += 1
+    if not args.parsed.dryrun and batch_collate_torrent_info:
+        download_sm_uploaded_torrents(torrent_count=sm_torrents_uploaded_count)
 
     if batch_uploads_group_errors:
         logger.error('The following JPS groupid(s) (torrentid(s) shown for reference) had errors in retrieving group data, '

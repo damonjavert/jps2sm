@@ -39,37 +39,34 @@ def save_sm_html_debug_output(content: str, html_debug_output_filename: str) -> 
     return html_debug_output_path
 
 
-def download_sm_uploaded_torrents(torrentcount: int, artist: str, title: str) -> None:
+def download_sm_uploaded_torrents(torrent_count: int) -> None:
     """
-    Get last torrentcount torrent DL links that user uploaded using SM API and download them
+    Get last torrent_count torrent DL links that user uploaded using SM API and download them
 
-    :param torrentcount: count of recent torrent links to be downloaded
-    :param artist
-    :param title
-
+    :param torrent_count: count of recent torrent links to be downloaded
     """
     # TODO Merge this functionality into download_sm_torrent()!
 
     output_dir = output.file_dir['smtorrents']
 
-    if torrentcount == 0:
+    if torrent_count == 0:
         return
 
-    user_recents = sugoimusic(f"https://sugoimusic.me/ajax.php?action=user_recents&limit={torrentcount}")
+    user_recents = sugoimusic(f"https://sugoimusic.me/ajax.php?action=user_recents&limit={torrent_count}")
     user_recents_json = json.loads(user_recents.text)
 
-    smtorrentlinks = {}
-    for torrentdata in user_recents_json['response']['uploads']:  # Get list of SM torrent links
-        smtorrentlinks[torrentdata['torrentid']] = torrentdata['torrentdl']
+    sm_torrent_links = {}
+    for torrent_data in user_recents_json['response']['uploads']:  # Get list of SM torrent links
+        sm_torrent_links[torrent_data['torrentid']] = torrent_data['torrentdl']
 
-    for torrentid, torrentlink in smtorrentlinks.items():
-        torrentfile = sugoimusic(torrentlink)
-        torrentfilename = get_valid_filename(f'SM {artist} - {title} - {torrentid}.torrent')
-        torrentpath = Path(output_dir, torrentfilename)
+    for torrent_id, torrent_link in sm_torrent_links.items():
+        torrent_file = sugoimusic(torrent_link)
+        torrent_filename = get_valid_filename(f'SM-{torrent_id}.torrent')
+        torrent_path = Path(output_dir, torrent_filename)
 
-        with open(torrentpath, "wb") as f:
-            f.write(torrentfile.content)
-        logger.debug(f'Downloaded SM torrent as {torrentpath}')
+        with open(torrent_path, "wb") as f:
+            f.write(torrent_file.content)
+        logger.debug(f'Downloaded SM torrent as {torrent_path}')
 
 
 def download_sm_torrent(torrent_id: str, artist: str, title: str) -> Path:
