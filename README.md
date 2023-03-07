@@ -1,6 +1,6 @@
 # jps2sm
 
-![PyPI](https://img.shields.io/pypi/v/jps2sm) ![PyPI - Status](https://img.shields.io/pypi/status/jps2sm) ![PyPI - Downloads](https://img.shields.io/pypi/dw/jps2sm) ![Code Climate maintainability](https://img.shields.io/codeclimate/maintainability/damonjavert/jps2sm) ![Code Climate technical debt](https://img.shields.io/codeclimate/tech-debt/damonjavert/jps2sm) ![GitHub last commit](https://img.shields.io/github/last-commit/damonjavert/jps2sm) ![License](https://img.shields.io/github/license/damonjavert/jps2sm) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+![PyPI](https://img.shields.io/pypi/v/jps2sm) ![PyPI - Status](https://img.shields.io/pypi/status/jps2sm) ![PyPI - Downloads](https://img.shields.io/pypi/dw/jps2sm) ![Code Climate maintainability](https://img.shields.io/codeclimate/maintainability/damonjavert/jps2sm) ![Code Climate technical debt](https://img.shields.io/codeclimate/tech-debt/damonjavert/jps2sm) ![Pylint score](https://img.shields.io/badge/pylint-9.06-green) ![GitHub last commit](https://img.shields.io/github/last-commit/damonjavert/jps2sm) ![License](https://img.shields.io/github/license/damonjavert/jps2sm) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
 ### A project to migrate torrents from JPopSuki to SugoiMusic
 
