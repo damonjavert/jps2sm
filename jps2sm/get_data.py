@@ -265,9 +265,15 @@ class GetGroupData:
                 raise Exception("V.A. torrent with to contrib artists set - torrent has no valid artists so this cannot be uploaded.")
 
     def originalchars(self) -> Tuple[str, str]:
+        """
+        Return orginal artist and title as their own method
+        """
         return self.originalartist, self.originaltitle
 
     def all(self) -> Dict[str, Union[str, Tuple[str, str]]]:
+        """
+        Return a dict with all the group data
+        """
         return {
             'groupid': self.jps_group_id,
             'category': self.category,
@@ -285,6 +291,9 @@ class GetGroupData:
         }
 
     def __getattr__(self, item):
+        """
+        Allow each item to be returned as an attribute
+        """
         return self.item
 
 
@@ -386,14 +395,23 @@ def get_group_descrption_bbcode(groupid: str) -> str:
 
 
 class GetJPSUser:
+    """
+    Implement get_jps_user_id() as a singleton, we only call it if it has not already been called.
+    """
 
     __jps_user_id = None
 
     def __init__(self):
+        """
+        Implement singleton
+        """
         if GetJPSUser.__jps_user_id is None:
             GetJPSUser.__jps_user_id = get_jps_user_id()
 
     def user_id(self) -> str:
+        """
+        Return singleton JPS User id
+        """
         return GetJPSUser.__jps_user_id
 
 
@@ -412,20 +430,32 @@ def get_jps_user_id() -> int:
 
 
 class GetSMUser:
+    """
+    Implement get_user_keys() as a singleton, we only call it if it has not already been called.
+    """
 
     __authkey = None
     __torrent_password_key = None
 
     def __init__(self):
+        """
+        Implement singleton
+        """
         if GetSMUser.__authkey is None:
             userkeys = get_user_keys()
             GetSMUser.__authkey = userkeys['authkey']
             GetSMUser.__torrent_password_key = userkeys['torrent_password_key']
 
     def auth_key(self) -> str:
+        """
+        Return singleton SM authkey
+        """
         return GetSMUser.__authkey
 
     def torrent_password_key(self) -> str:
+        """
+        Return singleton SM torrent password key
+        """
         return GetSMUser.__torrent_password_key
 
 
