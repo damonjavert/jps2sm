@@ -96,8 +96,6 @@ def get_artist(artist_line_link, torrent_description_page_h2_line, date_regex2, 
     """
     Get the artist(s) in a JPS group
     """
-    #date_regex2 = r'(?:[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])|(?:19|20)\d\d)'
-
     if artist_line_link:  # If there are no links standard artist detection will not work
         artist_raw = re.search(r'<a[^>]+>(.*)<', str(artist_line_link[0]))
         if artist_raw is not None:
@@ -109,8 +107,6 @@ def get_artist(artist_line_link, torrent_description_page_h2_line, date_regex2, 
         artist_pictures = re.search(fr'\[Pictures\] ([A-Za-z\. ]+) (?:{date_regex2})', torrent_description_page_h2_line)
         if artist_pictures:
             return artist_pictures.group(1)
-        import code
-        code.interact(local=locals())
         raise IndexError('Cannot find artist in Pictures group')
     elif category == "Misc":
         # JPS has some older groups with no artists set, uploaders still used the "Artist - Group name" syntax though
