@@ -114,14 +114,14 @@ def get_artist(artist_line_link, torrent_description_page_h2_line, category):
         raise IndexError('Cannot find artist')
 
 
-def get_date(torrent_description_page_h2_line, date_regex, category):
+def get_date(torrent_description_page_h2_line, category):
     """
     Get the JPS group date
     """
 
     # Extract date without using '[]' as it allows '[]' elsewhere in the title and it works with JPS TV-* categories
     try:
-        return re.findall(date_regex, torrent_description_page_h2_line)[0].replace(".", "")
+        return re.findall(DateRegexes.yyyy_mm_dd, torrent_description_page_h2_line)[0].replace(".", "")
     except IndexError:  # Handle YYYY dates, creating extra regex as I cannot get it working without causing issue #33
         try:
             return re.findall(r'[^\d]((?:19|20)\d{2})[^\d]', torrent_description_page_h2_line)[0]
@@ -160,10 +160,6 @@ class GetGroupData:
         self.get_data(jps_group_id, jps_group_page_text)
 
     def get_data(self, jps_group_id, jps_group_page_text) -> None:
-        DateRegexes.yyyy_mm_dd = r'[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])'  # YYYY.MM.DD format
-        # YYYY.MM.DD OR YYYY format, for Pictures only
-        DateRegexes.yyyy_mm_dd_or_yyyy = r'(?:[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])|(?:19|20)\d\d)'
-
         soup = BeautifulSoup(jps_group_page_text, 'html5lib')
         artist_line_link = soup.select('.thin h2 a')
         original_title_line = soup.select('.thin h3')
@@ -192,7 +188,7 @@ class GetGroupData:
                                  category=self.category)
         logger.info(f'Artist(s): {self.artist}')
 
-        self.date = get_date(torrent_description_page_h2_line, DateRegexes.yyyy_mm_dd, self.category)
+        self.date = get_date(torrent_description_page_h2_line, self.category)
 
         logger.info(f'Release date: {self.date}')
 
