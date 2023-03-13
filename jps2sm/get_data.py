@@ -92,6 +92,36 @@ def get_jps_group_page(jps_urls: str) -> Tuple[str, str]:
     return jps_group_id, jps_page_res.text
 
 
+def get_artist(artist_line_link, torrent_description_page_h2_line, date_regex2, category):
+    """
+    Get the artist(s) in a JPS group
+    """
+
+    try:
+        artist_raw = re.findall(r'<a[^>]+>(.*)<', str(artist_line_link[0]))[0]
+        return split_bad_multiple_artists(artist_raw)
+    except IndexError:  # Cannot find artist
+        if category == "Pictures":
+            # JPS allows Picture torrents to have no artist set, in this scenario try to infer the artist by examining the text
+            # immediately after the category string up to a YYYY.MM.DD string if available as this should be the magazine title
+            try:
+                return re.findall(fr'\[Pictures\] ([A-Za-z\. ]+) (?:{date_regex2})', torrent_description_page_h2_line)
+            except IndexError:
+                logger.exception('Cannot find artist')
+                raise
+        elif category == "Misc":
+            # JPS has some older groups with no artists set, uploaders still used the "Artist - Group name" syntax though
+            try:
+                artist_raw = re.findall(r'\[Misc\] ([A-Za-z\, ]+) - ', torrent_description_page_h2_line)[0]
+            except IndexError:
+                logger.exception('Cannot find artist')
+                raise
+            return split_bad_multiple_artists(artist_raw)
+        else:
+            logger.exception('JPS upload appears to have no artist set and artist cannot be autodetected')
+            raise
+
+
 class GetGroupData:
     """
     Retrieve group data of the group supplied from args.parsed.urls
@@ -143,30 +173,7 @@ class GetGroupData:
 
         logger.info(f'Category: {self.category}')
 
-        try:
-            artist_raw = re.findall(r'<a[^>]+>(.*)<', str(artist_line_link[0]))[0]
-            self.artist = split_bad_multiple_artists(artist_raw)
-        except IndexError:  # Cannot find artist
-            if self.category == "Pictures":
-                # JPS allows Picture torrents to have no artist set, in this scenario try to infer the artist by examining the text
-                # immediately after the category string up to a YYYY.MM.DD string if available as this should be the magazine title
-                try:
-                    self.artist = re.findall(fr'\[Pictures\] ([A-Za-z\. ]+) (?:{date_regex2})', torrent_description_page_h2_line)
-                except IndexError:
-                    logger.exception('Cannot find artist')
-                    raise
-            elif self.category == "Misc":
-                # JPS has some older groups with no artists set, uploaders still used the "Artist - Group name" syntax though
-                try:
-                    artist_raw = re.findall(r'\[Misc\] ([A-Za-z\, ]+) - ', torrent_description_page_h2_line)[0]
-                except IndexError:
-                    logger.exception('Cannot find artist')
-                    raise
-                self.artist = split_bad_multiple_artists(artist_raw)
-            else:
-                logger.exception('JPS upload appears to have no artist set and artist cannot be autodetected')
-                raise
-
+        self.artist = get_artist(artist_line_link, torrent_description_page_h2_line, date_regex2, self.category)
         logger.info(f'Artist(s): {self.artist}')
 
         # Extract date without using '[]' as it allows '[]' elsewhere in the title and it works with JPS TV-* categories
