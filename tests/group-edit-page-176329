@@ -1,0 +1,377 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<title>Edit torrent group :: JPopsuki 2.0</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<link rel="shortcut icon" href="favicon.ico" />
+	<link rel="search" type="application/opensearchdescription+xml" title="JPopsuki 2.0 - Torrents" href="/opensearch_torrents.xml" />
+	<link rel="search" type="application/opensearchdescription+xml" title="JPopsuki 2.0 - Requests" href="/opensearch_requests.xml" />
+	<link rel="search" type="application/opensearchdescription+xml" title="JPopsuki 2.0 - Forums" href="/opensearch_forums.xml" />
+	<link rel="search" type="application/opensearchdescription+xml" title="JPopsuki 2.0 - Log" href="/opensearch_log.xml" />
+	<link rel="search" type="application/opensearchdescription+xml" title="JPopsuki 2.0 - Users" href="/opensearch_users.xml" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_notify_00000000000000000000000000000000&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - P.T.N." />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_notify_14056_00000000000000000000000000000000&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;name=Artist+notifications" title="JPopsuki 2.0 - Artist notifications" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_all&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - All Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_album&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - Album Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_single&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - Single Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_pv&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - PV Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_dvd&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - DVD Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_tv-music&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - TV-Music Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_tv-variety&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - TV-Variety Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_tv-drama&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - TV-Drama Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_fansubs&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - Fansubs Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_pictures&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - Pictures Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_misc&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - Misc Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_lossless&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - Lossless Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_flac&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - FLAC Torrents" />
+	<link href="static/styles/layer_cake/style.css" title="layer_cake" rel="stylesheet" type="text/css" media="screen" />
+	<link href="static/styles/log.css" rel="stylesheet" type="text/css" />
+	<link href="static/styles/global.css" rel="stylesheet" type="text/css" />
+	<script src="static/functions/jquery.js" type="text/javascript"></script>
+	<script src="static/functions/main.js" type="text/javascript"></script>
+	<link rel="stylesheet" type="text/css" href="static/shadowbox-3.0.3/shadowbox.css">
+	<script type="text/javascript" src="static/shadowbox-3.0.3/shadowbox.js"></script>
+	<script type="text/javascript">
+	Shadowbox.init();
+	</script>
+	<script type="text/javascript">
+		function bluehorse()
+		{
+			if(confirm('Would you like to see a penis?')) {
+				alert('Sick bastard. Oh well, here\'s a penis');
+			} else {
+				alert('Too bad! You\'re going to see one anyways');
+			}
+
+			document.location = "http://jpopsuki.eu/static/images/users/774/KICRK.png";
+		}
+
+		function penis()
+		{
+			document.cookie = 'invasion=zombie_fruits; expires=Fri, 04 Mar 2011 21:29:16 GMT; path=/';
+			$('#randomfitta').css('display', 'none');
+		}
+	</script>
+
+
+</head>
+<body id="torrents">
+<a name="top"></a>
+
+<div id="wrapper">
+<h1 class="hidden">JPopsuki 2.0</h1>
+
+<div id="header">
+	<div id="logo"><a href="index.php"></a></div>
+	<div id="userinfo">
+		<ul id="userinfo_username">
+			<li><a href="user.php?id=1" class="username">username</a></li>
+			<li class="brackets"><a href="user.php?action=edit&amp;userid=1">Edit</a></li>
+			<li class="brackets"><a href="logout.php?auth=00000000000000000000000000000000">Logout</a></li>
+		</ul>
+		<ul id="userinfo_major">
+			<li class="brackets"><strong><a href="upload.php">Upload</a></strong></li>
+			<li class="brackets"><strong><a href="user.php?action=invite">Invite (10)</a></strong></li>
+			<li class="brackets"><strong><a href="donate.php">Donate</a></strong></li>
+		</ul>
+		<ul id="userinfo_stats">
+			<li>Up: <span class="stat">52.08 TB</span></li>
+			<li>Down: <span class="stat">4.71 TB</span></li>
+			<li>Ratio: <span class="stat"><span class="r50">11.06</span></span></li>
+			<li><i><a href="bonus.php">Bonus: <span class="stat">2097150</span></a></i></li>
+		</ul>
+		<ul id="userinfo_minor">
+			<li><a href="inbox.php">Inbox</a></li>
+			<li><a href="notice.php">Notices</a></li>
+			<li><a href="torrents.php?type=uploaded&amp;userid=1">Uploads</a></li>
+			<li><a href="bookmarks.php">Bookmarks</a></li>
+</a></li>
+			<li><a href="user.php?action=notify">Notifications</a></li>
+			<li><a href="userhistory.php?action=posts&amp;userid=1">Posts</a></li>
+			<li><a href="friends.php">Friends</a></li>
+		</ul>
+	</div>
+	<div id="menu">
+		<h4 class="hidden">Site Menu</h4>
+		<ul>
+			<li id="nav_index"><a href="index.php">Home</a></li>
+			<li id="nav_torrents"><a href="torrents.php">Torrents</a></li>
+			<li id="nav_artists"><a href="artist.php">Artists</a></li>
+			<li id="nav_requests"><a href="requests.php">Requests</a></li>
+                        <li id="nav_collages"><a href="collages.php">Collages</a></li>
+			<li id="nav_forums"><a href="forums.php">Forums</a></li>
+			<li id="nav_top10"><a href="top10.php">Top 10</a></li>
+			<li id="nav_irc"><a href="irc.php">IRC</a></li>
+			<li id="nav_tv"><a href="streaming.php">Radio</a></li>
+			<li id="nav_rules"><a href="rules.php">Rules</a></li>
+			<li id="nav_kb"><a href="kb2.php">Help</a></li>
+			<li id="nav_staff"><a href="staff.php">Staff</a></li>
+		</ul>
+	</div>
+	<div id="alerts">
+		<div class="alertbar">
+			<a href="torrents.php?action=notify">You have 21 new torrent notifications</a> (<a href="torrents.php?action=notify_clear&amp;auth=00000000000000000000000000000000">Delete</a>)
+		</div>
+	</div>
+	<div id="searchbars">
+		<ul>
+ 
+			<li>
+				<span class="hidden">Torrents: </span>
+				<form action="torrents.php" method="get">
+					<input
+						onfocus="if (this.value == 'Torrents') this.value='';"
+						onblur="if (this.value == '') this.value='Torrents';"
+						value="Torrents" type="text" name="searchstr" size="17"
+					/>
+					<input value="Search" type="submit" class="hidden" />
+				</form>
+			</li>
+ 
+ 
+			<li>
+				<span class="hidden">Artist: </span>
+				<form action="artist.php" method="get">
+					<input
+						onfocus="if (this.value == 'Artist') this.value='';"
+						onblur="if (this.value == '') this.value='Artist';"
+						value="Artist" type="text" name="name" size="17"
+					/>
+					<input value="Search" type="submit" class="hidden" />
+				</form>
+			</li>
+ 
+			<li>
+				<span class="hidden">Requests: </span>
+				<form action="requests.php" method="get">
+					<input
+						onfocus="if (this.value == 'Requests') this.value='';"
+						onblur="if (this.value == '') this.value='Requests';"
+						value="Requests" type="text" name="search" size="17"
+					/>
+					<input value="Search" type="submit" class="hidden" />
+				</form>
+			</li>
+			<li>
+				<span class="hidden">Forums: </span>
+				<form action="forums.php" method="get">
+					<input value="search" type="hidden" name="action" />
+					<input
+						onfocus="if (this.value == 'Forums') this.value='';"
+						onblur="if (this.value == '') this.value='Forums';"
+						value="Forums" type="text" name="search" size="17"
+					/>
+					<input value="Search" type="submit" class="hidden" />
+				</form>
+			</li>
+			<li>
+				<span class="hidden">Log: </span>
+				<form action="log.php" method="get">
+					<input
+						onfocus="if (this.value == 'Log') this.value='';"
+						onblur="if (this.value == '') this.value='Log';"
+						value="Log" type="text" name="search" size="17"
+					/>
+					<input value="Search" type="submit" class="hidden" />
+				</form>
+			</li>
+			<li>
+				<span class="hidden">Users: </span>
+				<form action="user.php" method="get">
+					<input type="hidden" name="action" value="search" />
+					<input
+						onfocus="if (this.value == 'Peeps') this.value='';"
+						onblur="if (this.value == '') this.value='Peeps';"
+						value="Peeps" type="text" name="username" size="17"
+					/>
+					<input value="Search" type="submit" class="hidden" />
+				</form>
+			</li>
+		</ul>
+	</div>
+
+</div>
+<br />
+<div id="content">
+<div class="center thin">
+	<h2>Edit <a href="torrents.php?id=176329">Momoclo Natsu no Baka Sawagi 2014 Nissan Stadium Taikai ~Tojinsai~</a></h2>
+	<div class="box pad">
+		<form enctype="multipart/form-data" action="torrents.php" method="post">
+			<div>
+				<input type="hidden" name="action" value="takegroupedit" />
+				<input type="hidden" name="groupid" value="176329" />
+								<h3>Current Image</h3>
+				<img src="static/images/torrents/176329.th.jpg" alt="Momoclo Natsu no Baka Sawagi 2014 Nissan Stadium Taikai ~Tojinsai~" width="220px" /><br /><br />
+								<h3>Upload New Image</h3>
+				URL: <input type="text" name="image" size="92" /><br />
+				or<br />
+				Computer: <input name="userfile" type="file" size="85" /><br />
+				<h3>Description</h3>
+				<textarea name="body" cols="91" rows="20">2014.07.26, 27 Kanagawa Nissan Stadium
+http://www.momoclo.net/discography/dvd32.html
+http://www.cdjapan.co.jp/product/KIXM-90191
+
+
+Setlist
+---------------------------------------------------------
+
+&#9679;Day1
+
+Tojinsai no Theme(&#26691;&#31070;&#31085;&#12398;&#12486;&#12540;&#12510;)
+overture -Momoiro Clover Z Sanjo!!-(&#65374;&#12418;&#12418;&#12356;&#12429;&#12463;&#12525;&#12540;&#12496;&#12540;Z&#21442;&#19978;&#65281;&#65281;&#65374;)
+01. Ame no Tajikarao(&#22825;&#25163;&#21147;&#30007;)
+02. Wani to Shampoo(&#12527;&#12491;&#12392;&#12471;&#12515;&#12531;&#12503;&#12540;)
+03. Kuroi Shumatsu(&#40658;&#12356;&#36913;&#26411;)
+04. D&#39; No Junjou(D&#39;&#12398;&#32020;&#24773;)
+05. Doudou Heiwa Sengen(&#22530;&#12293;&#24179;&#21644;&#23459;&#35328;)
+06. CONTRADICTION
+07. Naitemo Ii n da yo(&#27875;&#12356;&#12390;&#12418;&#12356;&#12356;&#12435;&#12384;&#12424;)
+Omatsuri Dai Koushin(&#12362;&#31085;&#12426;&#22823;&#34892;&#36914;)
+08. Nippon Egao Hyakkei(&#12491;&#12483;&#12509;&#12531;&#31505;&#38996;&#30334;&#26223;)
+09. Momoiro Taiko Dodonga Bushi(&#12418;&#12418;&#12356;&#12429;&#22826;&#40723;&#12393;&#12393;&#12435;&#12364;&#31680;)
+10. Koko&#9734;Natsu(&#12467;&#12467;&#9734;&#12490;&#12484;)
+11. Kimi to Sekai(&#12461;&#12511;&#12392;&#12475;&#12459;&#12452;)
+12. Saraba, Itoshiki Kanashimi-tachi Yo(&#12469;&#12521;&#12496;&#12289;&#24859;&#12375;&#12365;&#24754;&#12375;&#12415;&#12383;&#12385;&#12424;)
+13. Rodo Sanka(&#21172;&#20685;&#35715;&#27468;)
+14. My Dear Fellow
+Momoclo Bon Odori(&#12418;&#12418;&#12463;&#12525;&#30406;&#36362;&#12426;)
+15. Neo STARGATE
+16. LOST CHILD
+17. MOON PRIDE
+18. Gekko(&#26376;&#34425;)
+19. Kono Uta(&#12467;&#12494;&#12454;&#12479;)
+20. DNA Rhapsody(DNA&#29378;&#35433;&#26354;)
+21. Hashire!(&#36208;&#12428;&#65281;)
+&#65308;ENCORE&#65310;
+22. Ikuze! Kaito Shojo(&#34892;&#12367;&#12380;&#12387;&#65281;&#24618;&#30423;&#23569;&#22899;)
+23. Hagane no Ishi(&#37628;&#12398;&#24847;&#24535;)
+24. Kimi no Ato(&#12461;&#12511;&#12494;&#12450;&#12488;)
+25. Mouretsu Uchuu Koukyoukyoku Dai 7 Gakushou -Mugen no Ai-(&#29467;&#28872;&#23431;&#23449;&#20132;&#38911;&#26354;&#12539;&#31532;&#19971;&#27005;&#31456;&#12300;&#28961;&#38480;&#12398;&#24859;&#12301;)
+
+Eizo Tokuten(&#26144;&#20687;&#29305;&#20856;)
+Tojin wo Matsuru. Sono Butaiura -Vol.2-(&#26691;&#31070;&#12434;&#31040;&#12427;&#12290;&#12381;&#12398;&#33310;&#21488;&#35023; &#65374;vol.1&#65374;)
+
+
+&#9679;Day2
+
+Tojinsai no Theme(&#26691;&#31070;&#31085;&#12398;&#12486;&#12540;&#12510;)
+overture -Momoiro Clover Z Sanjo!!-(&#65374;&#12418;&#12418;&#12356;&#12429;&#12463;&#12525;&#12540;&#12496;&#12540;Z&#21442;&#19978;&#65281;&#65281;&#65374;)
+01. Ame no Tajikarao(&#22825;&#25163;&#21147;&#30007;)
+02. Wani to Shampoo(&#12527;&#12491;&#12392;&#12471;&#12515;&#12531;&#12503;&#12540;)
+03. DNA Rhapsody(DNA&#29378;&#35433;&#26354;)
+04. D&#39; No Junjou(D&#39;&#12398;&#32020;&#24773;)
+05. Doudou Heiwa Sengen(&#22530;&#12293;&#24179;&#21644;&#23459;&#35328;)
+06. Hagane no Ishi(&#37628;&#12398;&#24847;&#24535;)
+07. Naitemo Ii n da yo(&#27875;&#12356;&#12390;&#12418;&#12356;&#12356;&#12435;&#12384;&#12424;)
+Omatsuri Dai Koushin(&#12362;&#31085;&#12426;&#22823;&#34892;&#36914;)
+08. Nippon Egao Hyakkei(&#12491;&#12483;&#12509;&#12531;&#31505;&#38996;&#30334;&#26223;)
+09. Momoiro Taiko Dodonga Bushi(&#12418;&#12418;&#12356;&#12429;&#22826;&#40723;&#12393;&#12393;&#12435;&#12364;&#31680;)
+10. Koko&#9734;Natsu(&#12467;&#12467;&#9734;&#12490;&#12484;)
+11. Tsuyoku Tsuyoku(&#12484;&#12520;&#12463;&#12484;&#12520;&#12463;)
+12. Chai Maxx
+13. My Dear Fellow
+14. Momoclo no Nippon Banzai!(&#12418;&#12418;&#12463;&#12525;&#12398;&#12491;&#12483;&#12509;&#12531;&#19975;&#27507;&#65281;)
+15. Neo STARGATE
+16. MOON PRIDE
+17. Hashire!(&#36208;&#12428;&#65281;)
+18. Kuroi Shumatsu(&#40658;&#12356;&#36913;&#26411;)
+19. Kimi no Ato(&#12461;&#12511;&#12494;&#12450;&#12488;)
+&#65308;ENCORE&#65310;
+20. Ikuze! Kaito Shojo(&#34892;&#12367;&#12380;&#12387;&#65281;&#24618;&#30423;&#23569;&#22899;)
+21. PUSH
+22. Hai to Diamond(&#28784;&#12392;&#12480;&#12452;&#12516;&#12514;&#12531;&#12489;)
+23. Saraba, Itoshiki Kanashimi-tachi Yo(&#12469;&#12521;&#12496;&#12289;&#24859;&#12375;&#12365;&#24754;&#12375;&#12415;&#12383;&#12385;&#12424;)
+
+Eizo Tokuten(&#26144;&#20687;&#29305;&#20856;)
+Tojin wo Matsuru. Sono Butaiura -Vol.2-(&#26691;&#31070;&#12434;&#31040;&#12427;&#12290;&#12381;&#12398;&#33310;&#21488;&#35023; &#65374;vol.2&#65374;)
+
+
+Edition
+---------------------------------------------------------
+
+Limited Edition(&#21021;&#22238;&#38480;&#23450;&#29256;)
+
+&#12288;KIXM-90191&#65374;90194&#12288;Day1/Day2 LIVE Blu-ray BOX (Blu-ray x 4)
+&#12288;KIBM-90496&#65374;90501&#12288;Day1/Day2 LIVE DVD BOX (DVD x 6)
+
+Regular Edition(&#36890;&#24120;&#29256;)
+
+&#12288;KIXM-191&#65374;192&#12288;Day1 LIVE Blu-ray (Blu-ray x 2)
+&#12288;KIBM-496&#65374;498&#12288;Day1 LIVE DVD (DVD x 3)
+&#12288;KIXM-193&#65374;194&#12288;Day2 LIVE Blu-ray (Blu-ray x 2)
+&#12288;KIBM-499&#65374;501&#12288;Day2 LIVE DVD (DVD x 3)</textarea> <br />
+				<h3>Edit Summary</h3>
+				<input type="text" name="summary" size="92" /><br />
+				<div style="text-align: center;">
+					<input type="submit" value="Submit" />
+				</div>
+			</div>
+		</form>
+	</div>
+
+        <h2>Change Original Title</h2>
+        <div class="box pad">
+                <form action="torrents.php" method="post">
+                        <div>
+                                <input type="hidden" name="action" value="renamejp" />
+                                <input type="hidden" name="groupid" value="176329" />
+                                <input type="text" name="namejp" size="92" value="&#12418;&#12418;&#12463;&#12525;&#22799;&#12398;&#12496;&#12459;&#39442;&#12366;2014 &#26085;&#29987;&#12473;&#12479;&#12472;&#12450;&#12512;&#22823;&#20250;&#65374;&#26691;&#31070;&#31085;&#65374;" />
+                                <div style="text-align: center;">
+                                        <input type="submit" value="Rename" />
+                                </div>
+
+                        </div>
+                </form>
+        </div>
+
+	<h2>Change Release Date</h2>
+	<div class="box pad">
+		<form action="torrents.php" method="post">
+			<div style="text-align: left">
+				<input type="hidden" name="action" value="grpreldate" />
+				<input type="hidden" name="groupid" value="176329" />
+				<h3>Release Date (YYYYMMDD)</h3>
+				<input type="text" name="releasedate" size="15" value="20150225" />
+				<input type="submit" value="Edit" />
+			</div>
+		</form>
+	</div>
+
+ 
+</div>
+</div>
+<div id="footer">
+	<p>Site and design &copy; 2023 JPopsuki 2.0</p>
+	<p>This page was created in 0.00635 second(s) on <span title="Just now">Mar 13 2023, 13:02</span></p>
+	<p>
+
+		<a href="http://en.wikipedia.org/wiki/Load_(computing)" target="_blank">Load average</a>:
+		1.19, 0.68, 0.57		<br />
+		(Average over 1 minute, 5 minutes and 15 minutes
+ on 8 cores. Load is spiked by <a href="http://en.wikipedia.org/wiki/Cron" target="_blank">cron</a> every 15 minutes.)
+	</p>
+	<p>Powered by <a href="http://jpopsuki.eu/static/images/users/774/503x.jpg">Small Horse</a></p>
+<!--	<script type="text/javascript" src="https://widgets.amung.us/colored.js"></script><script type="text/javascript">WAU_colored('l8tchbw95e38', 'e3f4fd000000')</script> -->
+	<script type="text/javascript" src="https://widgets.amung.us/pro.js"></script>
+	<script type="text/javascript" id="wau_scr_30b716e2">
+    	wau_add('d0t8', '30b716e2')
+	</script>
+	<noscript>
+    		<img src="https://whos.amung.us/piwidget/d0t8/" />
+	</noscript> 
+
+</div>
+
+</div>
+<div id="lightbox" class="lightbox"></div>
+<div id="curtain" class="curtain"></div>
+
+<!-- Extra divs, for stylesheet developers to add imagery -->
+<div id="extra1"><span></span></div>
+<div id="extra2"><span></span></div>
+<div id="extra3"><span></span></div>
+<div id="extra4"><span></span></div>
+<div id="extra5"><span></span></div>
+<div id="extra6"><span></span></div>
+</body>
+</html>
