@@ -122,6 +122,28 @@ def get_artist(artist_line_link, torrent_description_page_h2_line, date_regex2, 
         raise IndexError('JPS upload appears to have no artist set and artist cannot be autodetected')
 
 
+def get_date(torrent_description_page_h2_line, date_regex, category):
+    """
+    Get the JPS group date
+    """
+
+    # Extract date without using '[]' as it allows '[]' elsewhere in the title and it works with JPS TV-* categories
+    try:
+        return re.findall(date_regex, torrent_description_page_h2_line)[0].replace(".", "")
+    except IndexError:  # Handle YYYY dates, creating extra regex as I cannot get it working without causing issue #33
+        try:
+            return re.findall(r'[^\d]((?:19|20)\d{2})[^\d]', torrent_description_page_h2_line)[0]
+
+        # Handle if cannot find date in the title, use upload date instead from getreleasedata() but error if the category should have it
+        except IndexError:
+            if category not in Categories.NonDate:
+                logger.exception(f'Group release date not found and not using upload date instead as {self.category} torrents should have it set')
+            else:
+                logger.warning('Date not found from group data, will use upload date as the release date')
+            return None
+            pass
+
+
 class GetGroupData:
     """
     Retrieve group data of the group supplied from args.parsed.urls
@@ -176,21 +198,7 @@ class GetGroupData:
         self.artist = get_artist(artist_line_link, torrent_description_page_h2_line, date_regex2, self.category)
         logger.info(f'Artist(s): {self.artist}')
 
-        # Extract date without using '[]' as it allows '[]' elsewhere in the title and it works with JPS TV-* categories
-        try:
-            self.date = re.findall(date_regex, torrent_description_page_h2_line)[0].replace(".", "")
-        except IndexError:  # Handle YYYY dates, creating extra regex as I cannot get it working without causing issue #33
-            try:
-                self.date = re.findall(r'[^\d]((?:19|20)\d{2})[^\d]', torrent_description_page_h2_line)[0]
-
-            # Handle if cannot find date in the title, use upload date instead from getreleasedata() but error if the category should have it
-            except IndexError:
-                if self.category not in Categories.NonDate:
-                    logger.exception(f'Group release date not found and not using upload date instead as {self.category} torrents should have it set')
-                else:
-                    logger.warning('Date not found from group data, will use upload date as the release date')
-                self.date = None
-                pass
+        self.date = get_date(torrent_description_page_h2_line, date_regex, self.category)
 
         logger.info(f'Release date: {self.date}')
 
