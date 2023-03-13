@@ -101,3 +101,13 @@ class LoginParameters:
     sm_login_url = "https://sugoimusic.me/login.php"
     sm_test_url = "https://sugoimusic.me/"
     sm_success = "Enabled users"
+
+
+class DateRegexes:
+    """
+    Store constants for date regexes
+    """
+
+    yyyy_mm_dd = r'[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])'  # YYYY.MM.DD format
+    # YYYY.MM.DD OR YYYY format, for Pictures only
+    yyyy_mm_dd_or_yyyy = r'(?:[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])|(?:19|20)\d\d)'
