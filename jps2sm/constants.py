@@ -87,3 +87,17 @@ class JPSTorrentView:
         'seeders':  's6',
         'leechers': 's7'
     }
+
+
+class LoginParameters:
+    """
+    Store constants used my requestsloginsession() and tests
+    """
+
+    jps_login_url = "https://jpopsuki.eu/login.php"
+    jps_test_url = "https://jpopsuki.eu"
+    jps_success = '<div id="extra1"><span></span></div>'
+
+    sm_login_url = "https://sugoimusic.me/login.php"
+    sm_test_url = "https://sugoimusic.me/"
+    sm_success = "Enabled users"
