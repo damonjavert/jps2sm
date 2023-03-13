@@ -233,7 +233,7 @@ class GetGroupData:
 
         # Get description with BB Code if user has group edit permissions on JPS, if not just use stripped html text.
         try:
-            self.groupdescription = get_group_descrption_bbcode(jps_group_id)  # Requires PU+ at JPS
+            self.groupdescription = get_group_description_bbcode(jps_group_id)  # Requires PU+ at JPS
         except IndexError:
             logger.exception('Could not get group description BBCode. Are you a Power User+ at JPS?')
             self.groupdescription = remove_html_tags(str(soup.select('#content .thin .main_column .box .body')[0]))
@@ -378,7 +378,7 @@ def get_release_data(torrentids: List[str], torrent_table: str, date: str) -> Di
     return releasedata
 
 
-def get_group_descrption_bbcode(groupid: str) -> str:
+def get_group_description_bbcode(groupid: str) -> str:
     """
     Retrieve original bbcode from edit group url and reformat any JPS style bbcode
 
