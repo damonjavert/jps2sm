@@ -238,12 +238,8 @@ class GetGroupData:
 
         self.torrent_table = str(soup.select('#content .thin .main_column .torrent_table tbody')[0])
 
-        # Get description with BB Code if user has group edit permissions on JPS, if not just use stripped html text.
-        try:
-            self.groupdescription = get_group_description_bbcode(jps_group_id)  # Requires PU+ at JPS
-        except IndexError:
-            logger.exception('Could not get group description BBCode. Are you a Power User+ at JPS?')
-            self.groupdescription = remove_html_tags(str(soup.select('#content .thin .main_column .box .body')[0]))
+        # Does *not* require PU at JPS to show the edit page dialogue, just trying to submit it generates a 403.
+        self.groupdescription = get_group_description_bbcode(jps_group_id)
 
         logger.info(f"Group description:\n{self.groupdescription}")
 
@@ -385,24 +381,22 @@ def get_release_data(torrentids: List[str], torrent_table: str, date: str) -> Di
     return releasedata
 
 
-def get_group_description_bbcode(groupid: str) -> str:
+def get_group_description_bbcode(jps_group_id: str) -> str:
     """
     Retrieve original bbcode from edit group url and reformat any JPS style bbcode
 
     :param: groupid: JPS groupid to get group description with bbcode
     :return: bbcode: group description with bbcode
     """
-    edit_group_page = jpopsuki(f"https://jpopsuki.eu/torrents.php?action=editgroup&groupid={groupid}")
+    edit_group_page = jpopsuki(f"https://jpopsuki.eu/torrents.php?action=editgroup&groupid={jps_group_id}")
     soup = BeautifulSoup(edit_group_page.text, 'html5lib')
     bbcode = soup.find("textarea", {"name": "body"}).string
 
-    import code
-    code.interact(local=locals())
-
-    bbcode_sanitised = re.sub(r'\[youtube=([^\]]+)]', r'[youtube]\1[/youtube]', bbcode)
-
-
-    return bbcode_sanitised
+    if bbcode is None:  # Group description is empty
+        return "There is no information on this torrent."  # String JPS uses when group description is empty
+    else:
+        bbcode_sanitised = re.sub(r'\[youtube=([^\]]+)]', r'[youtube]\1[/youtube]', bbcode)
+        return bbcode_sanitised
 
 
 class GetJPSUser:
