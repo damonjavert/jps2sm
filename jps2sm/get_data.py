@@ -19,7 +19,7 @@ from loguru import logger
 
 # jps2sm modules
 from jps2sm.myloginsession import jpopsuki, sugoimusic
-from jps2sm.constants import Categories
+from jps2sm.constants import Categories, DateRegexes
 from jps2sm.utils import remove_html_tags
 
 
@@ -92,30 +92,26 @@ def get_jps_group_page(jps_urls: str) -> Tuple[str, str]:
     return jps_group_id, jps_page_res.text
 
 
-def get_artist(artist_line_link, torrent_description_page_h2_line, date_regex2, category):
+def get_artist(artist_line_link, torrent_description_page_h2_line, category):
     """
     Get the artist(s) in a JPS group
     """
+    artist_raw = None
+
     if artist_line_link:  # If there are no links standard artist detection will not work
         artist_raw = re.search(r'<a[^>]+>(.*)<', str(artist_line_link[0]))
-        if artist_raw is not None:
-            return split_bad_multiple_artists(artist_raw.group(1))
-
-    if category == "Pictures":
+    elif category == "Pictures":
         # JPS allows Picture torrents to have no artist set, in this scenario try to infer the artist by examining the text
         # immediately after the category string up to a YYYY.MM.DD string if available as this should be the magazine title
-        artist_pictures = re.search(fr'\[Pictures\] ([A-Za-z\. ]+) (?:{date_regex2})', torrent_description_page_h2_line)
-        if artist_pictures:
-            return artist_pictures.group(1)
-        raise IndexError('Cannot find artist in Pictures group')
+        artist_raw = re.search(fr'\[Pictures\] ([A-Za-z\. ]+) (?:{DateRegexes.yyyy_mm_dd_or_yyyy})', torrent_description_page_h2_line)
     elif category == "Misc":
         # JPS has some older groups with no artists set, uploaders still used the "Artist - Group name" syntax though
-        artist_misc = re.search(r'\[Misc\] ([A-Za-z\, ]+) - ', torrent_description_page_h2_line)
-        if artist_misc:
-            return split_bad_multiple_artists(artist_misc.group(1))
-        raise IndexError('Cannot find artist in Misc group')
+        artist_raw = re.search(r'\[Misc\] ([A-Za-z\, ]+) - ', torrent_description_page_h2_line)
+
+    if artist_raw:
+        return split_bad_multiple_artists(artist_raw.group(1))
     else:
-        raise IndexError('JPS upload appears to have no artist set and artist cannot be autodetected')
+        raise IndexError('Cannot find artist')
 
 
 def get_date(torrent_description_page_h2_line, date_regex, category):
@@ -133,7 +129,7 @@ def get_date(torrent_description_page_h2_line, date_regex, category):
         # Handle if cannot find date in the title, use upload date instead from getreleasedata() but error if the category should have it
         except IndexError:
             if category not in Categories.NonDate:
-                logger.exception(f'Group release date not found and not using upload date instead as {self.category} torrents should have it set')
+                logger.exception(f'Group release date not found and not using upload date instead as {category} torrents should have it set')
             else:
                 logger.warning('Date not found from group data, will use upload date as the release date')
             return None
@@ -164,9 +160,9 @@ class GetGroupData:
         self.get_data(jps_group_id, jps_group_page_text)
 
     def get_data(self, jps_group_id, jps_group_page_text) -> None:
-        date_regex = r'[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])'  # YYYY.MM.DD format
+        DateRegexes.yyyy_mm_dd = r'[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])'  # YYYY.MM.DD format
         # YYYY.MM.DD OR YYYY format, for Pictures only
-        date_regex2 = r'(?:[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])|(?:19|20)\d\d)'
+        DateRegexes.yyyy_mm_dd_or_yyyy = r'(?:[12]\d{3}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01])|(?:19|20)\d\d)'
 
         soup = BeautifulSoup(jps_group_page_text, 'html5lib')
         artist_line_link = soup.select('.thin h2 a')
@@ -191,10 +187,12 @@ class GetGroupData:
 
         logger.info(f'Category: {self.category}')
 
-        self.artist = get_artist(artist_line_link, torrent_description_page_h2_line, date_regex2, self.category)
+        self.artist = get_artist(artist_line_link=artist_line_link,
+                                 torrent_description_page_h2_line=torrent_description_page_h2_line,
+                                 category=self.category)
         logger.info(f'Artist(s): {self.artist}')
 
-        self.date = get_date(torrent_description_page_h2_line, date_regex, self.category)
+        self.date = get_date(torrent_description_page_h2_line, DateRegexes.yyyy_mm_dd, self.category)
 
         logger.info(f'Release date: {self.date}')
 
@@ -215,7 +213,7 @@ class GetGroupData:
                         # Fallback to all the text after the category, we need to include the date stamp as magazines are often titled
                         # with the same numbers each year - the first magazine each year appears to always be 'No. 1' for example
                         try:
-                            self.title = re.findall(fr'\[Pictures\] (?:[A-Za-z\. ]+) ({date_regex2}(?:.*))</h2>', torrent_description_page_h2_line)[0]
+                            self.title = re.findall(fr'\[Pictures\] (?:[A-Za-z\. ]+) ({DateRegexes.yyyy_mm_dd_or_yyyy}(?:.*))</h2>', torrent_description_page_h2_line)[0]
                         except IndexError:
                             logger.exception('Cannot find title from the JPS upload')
                             raise
