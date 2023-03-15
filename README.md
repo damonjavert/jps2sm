@@ -173,6 +173,21 @@ Help for optional arguments:
 Pull requests are welcome!
 See https://github.com/damonjavert/jps2sm/issues for areas that you can contribute to.
 
+To setup your Dev environment for Mac/Linux:
+```shell
+git clone https://github.com/damonjavert/jps2sm.git
+cd jps2sm
+python3 -m venv .venv  # or whatever
+. .venv/bin/activate
+pip install -r requirements_dev.txt
+```
+This will install the runtime and dev dependancies and jps2sm itself in editable mode.
+
+To run tests:
+```shell
+cd tests
+pytest
+```
 ### Windows
 Windows 10 users can setup a Dev environment using [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10). Windows 7 users can install [cygwin](https://cygwin.com/install.html) and then select the python 3.8 packages. Or a python3 MSI installer can be found on the [offical python 3 downloads](https://www.python.org/downloads/windows/) page.
 
@@ -180,7 +195,7 @@ Windows 10 users can setup a Dev environment using [Windows Subsystem for Linux]
 Install [Homebrew](https://brew.sh) if you do not have it already and then `brew install python3`. See this guide: https://wsvincent.com/install-python3-mac/
 
 ### Linux
-Your distro's primary repos may not include packages for python3.8. Using `apt-get install python3` for example may only install python3.6 (or even earlier) and due to the use of the walrus operator jps2sm requires python 3.8. Debian and Fedora based distros can follow this guide: https://docs.python-guide.org/starting/install3/linux/ .
+Your distro's primary repos may not include packages for python3.8. Using `apt-get install python3` for example may only install python3.6 (or even earlier) and due to the use of the walrus operator jps2sm requires python 3.8. The recommended approach to workaround this is to install [LinuxBrew](https://docs.brew.sh/Homebrew-on-Linux) and then `brew install python3` as also shown above. Otherwise Debian and Fedora based distros can follow this guide: https://docs.python-guide.org/starting/install3/linux/ .
 
 ## Legal Disclaimer
 Use of jps2sm is not illegal but piracy probably is in your country. Data transferred using jps2sm should be used to maintain backup copies on JPopSuki and SugoiMusic.

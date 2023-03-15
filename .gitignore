@@ -4,6 +4,7 @@ jps2sm.cfg*
 *session.dat
 .idea
 venv
+.venv
 activate
 __pycache__/
 jps2sm.log
