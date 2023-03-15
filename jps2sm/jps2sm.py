@@ -5,7 +5,6 @@ jps2sm main defs
 # pylint appears to have a bug where it cannot import despite python itself being able to
 
 # Standard library packages
-import sys
 import re
 
 # Third-party packages
@@ -18,7 +17,7 @@ from jps2sm.prepare_data import collate, prepare_torrent
 from jps2sm.save_data import download_sm_uploaded_torrents
 from jps2sm.batch import batch_mode
 from jps2sm.upload_data import set_original_artists
-from jps2sm.utils import fatal_error, GetArgs, handle_cfg_media_roots
+from jps2sm.utils import fatal_error, GetArgs, handle_cfg_media_roots, setup_logging
 from jps2sm.myloginsession import jpopsuki
 
 
@@ -49,17 +48,7 @@ def main():
     Entry point
     """
     args = GetArgs()
-
-    if args.parsed.debug:
-        stderr_log_level = "DEBUG"
-    else:
-        stderr_log_level = "INFO"
-    logger.remove()
-    logger.add(sys.stderr, format="<lvl>{message}</>", level=stderr_log_level)
-    logger.add("jps2sm.log", level="DEBUG", rotation="1 MB")
-
-    if not args.parsed.debug:
-        sys.tracebacklimit = 0
+    setup_logging(args.parsed.debug)
 
     if args.parsed.urls:
         try:

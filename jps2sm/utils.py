@@ -291,3 +291,20 @@ def decide_duplicate(jps_torrent_object):
     else:
         raise Exception('Bad response from SugoiMusic hashcheck')
 
+
+def setup_logging(debug: bool):
+    """
+    Setup logging, using loguru, assumes that loguru has already been imported as 'logger'
+    """
+
+    if debug:
+        stderr_log_level = "DEBUG"
+    else:
+        stderr_log_level = "INFO"
+
+    logger.remove()
+    logger.add(sys.stderr, format="<lvl>{message}</>", level=stderr_log_level)
+    logger.add("jps2sm.log", level="DEBUG", rotation="1 MB")
+
+    if not debug:
+        sys.tracebacklimit = 0
