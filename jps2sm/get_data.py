@@ -20,7 +20,6 @@ from loguru import logger
 # jps2sm modules
 from jps2sm.myloginsession import jpopsuki, sugoimusic
 from jps2sm.constants import Categories, DateRegexes
-from jps2sm.utils import remove_html_tags
 
 
 @dataclass

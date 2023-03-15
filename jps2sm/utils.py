@@ -240,15 +240,6 @@ def handle_cfg_media_roots() -> None:
         fatal_error('Error: --mediainfo requires you to configure MediaDirectories in jps2sm.cfg for mediainfo to find your file(s).')
 
 
-def remove_html_tags(text):
-    """
-    Strip html tags, used by GetGroupData() on the group description if unable to get bbcode
-
-    """
-    clean = re.compile('<.*?>')
-    return re.sub(clean, '', text)
-
-
 def decide_duplicate(jps_torrent_object):
     from jps2sm.myloginsession import sugoimusic
     """
