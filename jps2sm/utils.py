@@ -23,8 +23,7 @@ import bencoding
 
 # jps2sm modules
 from jps2sm.constants import JPSTorrentView, Categories
-
-__version__ = "1.15.5"
+from jps2sm.__init__ import __version__
 
 
 def get_valid_filename(s: str) -> AnyStr:
