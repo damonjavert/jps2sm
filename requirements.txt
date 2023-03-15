@@ -17,6 +17,6 @@ humanfriendly==4.18
 pyunpack==0.2.2
 patool==1.12
 bencoding==0.2.6
-requestsloginsession==0.6.1
+requestsloginsession==0.7.1
 loguru==0.6.0
 datasize==1.0.0
