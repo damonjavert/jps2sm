@@ -166,7 +166,7 @@ def collate(torrentids, torrentgroupdata, max_size=None):
         # Picture Category torrents and some TV-Variety.
         release_data_collated['uploaddate'] = datetime.datetime.strptime(uploaddatestr, '%b %d %Y, %H:%M').strftime('%Y%m%d')
 
-        jps_torrent_file = get_jps_torrent(jps_torrent_id, torrentgroupdata)
+        jps_torrent_file = get_jps_torrent(jps_torrent_id, torrentgroupdata.torrent_table)
         jps_torrent_object = io.BytesIO(jps_torrent_file.content)  # Keep file in memory as it could be processed and deleted by a torrent client
 
         if dupe_sugoimusic_torrent_id := decide_duplicate(jps_torrent_object):
@@ -176,7 +176,7 @@ def collate(torrentids, torrentgroupdata, max_size=None):
             logger.debug(f'Not downloading JPS torrent {jps_torrent_id} as it is a duplicate on SM as torrent {dupe_sugoimusic_torrent_id}'
                          f' and SkipDuplicates is true in cfg.')
         else:
-            download_jps_torrent(jps_torrent_file, torrentgroupdata, slash_data)
+            download_jps_torrent(jps_torrent_id, jps_torrent_file)
             logger.debug(f'downloaded jps torrent {jps_torrent_id}')
             jps_torrent_downloaded_count += 1
 

@@ -93,32 +93,30 @@ def download_sm_torrent(torrent_id: str) -> Path:
     return sm_torrent_path
 
 
-def get_jps_torrent(jps_torrent_id: str, torrent_group_data: Type[GetGroupData]):
+def get_jps_torrent(jps_torrent_id: str, torrent_table: str):
     """
     Download a JPS torrent, ascertaining the link from the torrent_table from the JPS Group
 
     :param jps_torrent_id: JPS torrent ID
-    :param torrent_group_data: Data from the JPS Group
+    :param torrent_table: Torrent table from JPS group page
     """
 
-    torrent_link = html.unescape(get_torrent_link(jps_torrent_id, torrent_group_data.torrent_table))
+    torrent_link = html.unescape(get_torrent_link(jps_torrent_id, torrent_table))
     jps_torrent_file = jpopsuki(f"https://jpopsuki.eu/{torrent_link}")  # Download JPS torrent
 
     return jps_torrent_file
 
 
-def download_jps_torrent(jps_torrent_file, torrent_group_data: Type[GetGroupData], release_data):
+def download_jps_torrent(jps_torrent_id: str, jps_torrent_file):
     """
     Save the JPS torrent
 
-    :param jps_torrent_file: jpopsuki() of the JPS torrent
-    :param torrent_group_data: Data from the JPS Group
-    :param release_data: Relase data from collate()
+    :param jps_torrent_id: JPS torrent ID
+    :param jps_torrent_file: requests() object of the JPS torrent
     """
 
     output_dir = output.file_dir['jpstorrents']
-    jps_torrent_filename = get_valid_filename(
-        f"JPS {torrent_group_data.artist} - {torrent_group_data.title} - {'-'.join(release_data)}.torrent")
+    jps_torrent_filename = get_valid_filename(f'JPS-{jps_torrent_id}.torrent')
 
     jps_torrent_path = Path(output_dir, jps_torrent_filename)
 
