@@ -135,10 +135,10 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
     if mode == "recent":
         logger.info('Interim stats')
         batch_stats(final_stats=False, media_info_mode=args.parsed.mediainfo, dry_run=args.parsed.dryrun)
-        wait_time_seconds = 60 * config.wait_time_recent_mode
+        wait_time_seconds = 60 * int(config.wait_time_recent_mode)
         try:
             print(f'Waiting {config.wait_time_recent_mode} minutes for the files to download, or press Ctrl-C to continue immediately...')
-            sleep(wait_time_seconds)
+            sleep(int(wait_time_seconds))
         except KeyboardInterrupt:
             pass
 
