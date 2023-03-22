@@ -264,11 +264,6 @@ class GetGroupData:
             if self.artist == ['V.A.']:
                 raise Exception("V.A. torrent with to contrib artists set - torrent has no valid artists so this cannot be uploaded.")
 
-    def originalchars(self) -> Tuple[str, str]:
-        """
-        Return orginal artist and title as their own method
-        """
-        return self.originalartist, self.originaltitle
 
     def all(self) -> Dict[str, Union[str, Tuple[str, str]]]:
         """
@@ -287,7 +282,6 @@ class GetGroupData:
             'imagelink': self.imagelink,
             'tagsall': self.tagsall,
             'contribartists': self.contribartists,
-            'originalchars': self.originalchars()
         }
 
     def __getattr__(self, item):
