@@ -42,9 +42,9 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
         """
         print(f'--------------------------------------------------------\nOverall stats:'
               f'\nTorrents found at JPS: {batch_uploads_found}'
-              f'\nJPS Group data errors: {count_values_dict(batch_uploads_group_errors)}'
-              f'\nJPS Groups excluded by user: {len(batch_groups_excluded)}'
-              f'\nJPS "V.A." Groups with no contributing artists: {len(batch_groups_va_errors)}'
+              f'\nJPS Group data errors: {count_values_dict(batch_group_results["batch_group_errors"])}'
+              f'\nJPS Groups excluded by user: {len(batch_group_results["batch_groups_excluded"])}'
+              f'\nJPS "V.A." Groups with no contributing artists: {len(batch_group_results["batch_groups_va_errors"])}'
               f'\nJPS Release data errors: {count_values_dict(batch_upload_collate_errors)}'
               f'\nTorrents skipped due to max_size filter: {batch_torrent_info["skipped_torrents_max_size"]}'
               f'\nTorrents skipped due to low seeders: {batch_torrent_info["skipped_torrents_low_seeders"]}'  
@@ -85,8 +85,15 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
 
     logger.info(f'Now attempting to upload {batch_uploads_found} torrents.')
 
-    batch_group_data, batch_uploads_group_errors, batch_groups_excluded, batch_groups_va_errors = get_batch_group_data(batch_uploads, args.parsed.exccategory)
+    batch_group_results = get_batch_group_data(batch_uploads, args.parsed.exccategory)
     # print(json.dumps(batch_group_data, indent=2))
+
+    # batch_group_results = {
+    #     'batch_group_data': batch_group_data,
+    #     'batch_group_errors': batch_group_errors,
+    #     'batch_groups_excluded': batch_groups_excluded,
+    #     'batch_groups_va_errors': batch_groups_va_errors,
+    # }
 
     max_size = None
 
@@ -95,13 +102,13 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
 
     batch_collate_torrent_info = {}
     for jps_group_id, jps_torrent_ids in batch_uploads.items():
-        if jps_group_id in batch_uploads_group_errors or jps_group_id in batch_groups_excluded or jps_group_id in batch_groups_va_errors:
+        if jps_group_id in batch_group_results['batch_group_errors'] or jps_group_id in batch_group_results['batch_groups_excluded'] or jps_group_id in batch_group_results['batch_groups_va_errors']:
             # Skip group if GetGroupData() failed or the group is being excluded by the '-exc' parameter, or if it is a 'V.A.' group and
             # no contrib artists were set
             # TODO Should the jps_group_ids be deleted within get_batch_group_data() ?
             continue
 
-        jps_group_data = get_jps_group_data_class(batch_group_data, jps_group_id)
+        jps_group_data = get_jps_group_data_class(batch_group_results['batch_group_data'], jps_group_id)
 
         try:
             collate_torrent_info = collate(torrentids=jps_torrent_ids, torrentgroupdata=jps_group_data, max_size=max_size)
@@ -166,19 +173,19 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
     if not args.parsed.dryrun and batch_collate_torrent_info:
         download_sm_uploaded_torrents(torrent_count=sm_torrents_uploaded_count)
 
-    if batch_uploads_group_errors:
+    if batch_group_results['batch_group_errors']:
         logger.error('The following JPS groupid(s) (torrentid(s) shown for reference) had errors in retrieving group data, '
                      'keep this data safe and you can possibly retry with it in a later version:')
-        logger.error(batch_uploads_group_errors)
-        logger.error(f'Total: {count_values_dict(batch_uploads_group_errors)}')
-    if batch_groups_excluded:
+        logger.error(batch_group_results['batch_group_errors'])
+        logger.error(f'Total: {count_values_dict(batch_group_results["batch_group_errors"])}')
+    if batch_group_results['batch_groups_excluded']:
         logger.info('The following groups were excluded due to user-specified filters:')
-        logger.info(f'{batch_groups_excluded}\nTotal: {len(batch_groups_excluded)}')
-    if batch_groups_va_errors:
+        logger.info(f'{batch_group_results["batch_groups_excluded"]}\nTotal: {len(batch_group_results["batch_groups_excluded"])}')
+    if batch_group_results['batch_groups_va_errors']:
         logger.warning('The following JPS groupid(s) were "bad V.A." groups - they are Various Artist groups with the artist set as "V.A." and'
                        ' the contributing artists should be set as the actual list of artists, however these are missing:')
-        logger.warning(batch_groups_va_errors)
-        logger.warning(f'Total: {len(batch_groups_va_errors)}')
+        logger.warning(batch_group_results['batch_groups_va_errors'])
+        logger.warning(f'Total: {len(batch_group_results["batch_groups_va_errors"])}')
     if batch_upload_collate_errors:
         logger.error('The following JPS groupid(s) and corresponding torrentid(s) had errors either in collating/retrieving '
                      'release data or in performing the actual upload to SM (although group data was retrieved OK), '
@@ -359,4 +366,14 @@ def get_batch_group_data(batch_uploads, excluded_category):
             batch_group_errors[jps_group_id] = jps_torrent_id
             continue
 
-    return batch_group_data, batch_group_errors, batch_groups_excluded, batch_groups_va_errors
+    batch_group_results = {
+        'batch_group_data': batch_group_data,
+        'batch_group_errors': batch_group_errors,
+        'batch_groups_excluded': batch_groups_excluded,
+        'batch_groups_va_errors': batch_groups_va_errors,
+    }
+
+
+    #return batch_group_data, batch_group_errors, batch_groups_excluded, batch_groups_va_errors
+
+    return batch_group_results
