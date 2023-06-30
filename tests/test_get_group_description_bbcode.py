@@ -1,10 +1,6 @@
 """
 Run tests for get_group_description_bbcode
 """
-import pytest
-import requests
-import requests_mock
-
 from jps2sm.get_data import get_group_description_bbcode
 from jps2sm.myloginsession import LoginParameters
 

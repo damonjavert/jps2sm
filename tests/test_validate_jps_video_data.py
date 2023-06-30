@@ -3,9 +3,8 @@ Run tests for validate_jps_video_data()
 """
 # pylint: disable=duplicate-code
 
-import pytest
-
 from jps2sm.validation import validate_jps_video_data
+
 
 def test_validate_jps_video_data_good_category() -> None:
     """
@@ -30,4 +29,3 @@ def test_validate_jps_video_data_bad_category() -> None:
 
     assert validate_jps_video_data(slash_data=slash_data, category_status=category_status)\
            == {'container': 'ISO', 'codec': 'CHANGEME', 'media': 'DVD', 'audioformat': 'CHANGEME'}
-

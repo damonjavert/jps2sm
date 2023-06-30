@@ -1,9 +1,9 @@
 """
 Run tests for validate_jps_bitrate()
 """
-import pytest
 
 from jps2sm.validation import validate_jps_bitrate
+
 
 def test_validate_jps_bitrate_bad_bitrate_hires() -> None:
     """

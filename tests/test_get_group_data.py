@@ -3,12 +3,9 @@ Run tests for GetGroupData()
 """
 # pylint: disable=duplicate-code
 
-import pytest
 import re
-import requests
-import requests_mock
 
-from jps2sm.get_data import GetGroupData, get_group_description_bbcode
+from jps2sm.get_data import GetGroupData
 from jps2sm.myloginsession import jpopsuki, LoginParameters
 
 

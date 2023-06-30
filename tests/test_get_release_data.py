@@ -3,9 +3,9 @@ Run tests got get_release_data()
 """
 # pylint: disable=duplicate-code
 
-import pytest
 
 from jps2sm.get_data import get_release_data
+
 
 def test_get_release_data_group_111284() -> None:
     """
@@ -416,6 +416,7 @@ def test_get_release_data_group_251299_torrent_358233() -> None:
                     'seeders': '2',
                     'leechers': '0'}}
 
+
 def test_get_release_data_group_28034() -> None:
     """
     group-28034-music-in-video-group
@@ -560,6 +561,7 @@ def test_get_release_data_group_28034() -> None:
     "leechers": "0"
   }
 }
+
 
 def test_get_release_data_group_191144() -> None:
     """
@@ -1131,6 +1133,7 @@ Should be:<br/>
   }
 }
 
+
 def test_get_release_data_group_273366() -> None:
     """
     Test Freeleech remastered in a video group, issue #oldrepo43
@@ -1276,4 +1279,3 @@ def test_get_release_data_group_273366() -> None:
     "leechers": "0"
   }
 }
-
