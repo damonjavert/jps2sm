@@ -1,6 +1,8 @@
 """
 Run tests got get_release_data()
 """
+# pylint: disable=duplicate-code
+
 import pytest
 
 from jps2sm.get_data import get_release_data

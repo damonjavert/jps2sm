@@ -1,6 +1,8 @@
 """
 Run tests for GetGroupData()
 """
+# pylint: disable=duplicate-code
+
 import pytest
 import re
 import requests

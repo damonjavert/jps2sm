@@ -1,6 +1,8 @@
 """
 Run tests for validate_jps_video_data()
 """
+# pylint: disable=duplicate-code
+
 import pytest
 
 from jps2sm.validation import validate_jps_video_data
