@@ -27,15 +27,15 @@ def test_get_batch_group_data(requests_mock, mocker):
 
     excluded_category = "Single"
 
-    with open("group-page-173844", "r") as group_page_173844_file:
+    with open("group-page-173844", "r", encoding="utf-8") as group_page_173844_file:
         group_page_173844 = group_page_173844_file.read()
-    with open("group-page-120274", "r") as group_page_120274_file:
+    with open("group-page-120274", "r", encoding="utf-8") as group_page_120274_file:
         group_page_120274 = group_page_120274_file.read()
-    with open("group-page-219216", "r") as group_page_219216_file:
+    with open("group-page-219216", "r", encoding="utf-8") as group_page_219216_file:
         group_page_219216 = group_page_219216_file.read()
-    with open("group-page-212853", "r") as group_page_212853_file:
+    with open("group-page-212853", "r", encoding="utf-8") as group_page_212853_file:
         group_page_212853 = group_page_212853_file.read()
-    with open("group-page-369725-bad-va", "r") as group_page_219216_bad_va_file:
+    with open("group-page-369725-bad-va", "r", encoding="utf-8") as group_page_219216_bad_va_file:
         group_page_369725_bad_va = group_page_219216_bad_va_file.read()
 
     requests_mock.post("https://jpopsuki.eu/login.php", text=LoginParameters.jps_success)  # Mock the initial login with requestsloginsession()
@@ -45,7 +45,7 @@ def test_get_batch_group_data(requests_mock, mocker):
     requests_mock.get("https://jpopsuki.eu/torrents.php?id=120274", text=group_page_120274)
     requests_mock.get("https://jpopsuki.eu/torrents.php?id=173844", text=group_page_173844)
 
-    with open("batch-group-data", "r") as batch_group_data_file:
+    with open("batch-group-data", "r", encoding="utf-8") as batch_group_data_file:
         batch_group_data = batch_group_data_file.read()
 
     batch_results = get_batch_group_data(batch_uploads=batch_uploads, excluded_category=excluded_category)
