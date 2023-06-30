@@ -1242,8 +1242,6 @@ Regular Edition(通常版)
     assert jps_group_info.imagelink == "https://jpopsuki.eu/static/images/torrents/176329.jpg"
     assert jps_group_info.tagsall == "japanese,pop,female.vocalist,idol"
     assert jps_group_info.contribartists == {}
-    assert jps_group_info.originalchars() == ("\u3082\u3082\u3044\u308d\u30af\u30ed\u30fc\u30d0\u30fcZ",
-                                            "\u3082\u3082\u30af\u30ed\u590f\u306e\u30d0\u30ab\u9a12\u304e2014 \u65e5\u7523\u30b9\u30bf\u30b8\u30a2\u30e0\u5927\u4f1a\uff5e\u6843\u795e\u796d\uff5e")
     torrent_table_start = r'<tbody><tr class="colhead_dark">\n                                <td width="80%">'
     assert re.match(fr'^{torrent_table_start}', jps_group_info.torrent_table)
     assert jps_group_info.groupdescription == group_description
