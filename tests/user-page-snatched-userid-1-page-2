@@ -1,0 +1,1387 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<title>Browse Torrents :: JPopsuki 2.0</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<link rel="shortcut icon" href="favicon.ico" />
+	<link rel="search" type="application/opensearchdescription+xml" title="JPopsuki 2.0 - Torrents" href="/opensearch_torrents.xml" />
+	<link rel="search" type="application/opensearchdescription+xml" title="JPopsuki 2.0 - Requests" href="/opensearch_requests.xml" />
+	<link rel="search" type="application/opensearchdescription+xml" title="JPopsuki 2.0 - Forums" href="/opensearch_forums.xml" />
+	<link rel="search" type="application/opensearchdescription+xml" title="JPopsuki 2.0 - Log" href="/opensearch_log.xml" />
+	<link rel="search" type="application/opensearchdescription+xml" title="JPopsuki 2.0 - Users" href="/opensearch_users.xml" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_notify_00000000000000000000000000000000&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - P.T.N." />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_notify_11111_00000000000000000000000000000000&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;name=Artist+notifications" title="JPopsuki 2.0 - Artist notifications" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_all&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - All Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_album&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - Album Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_single&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - Single Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_pv&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - PV Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_dvd&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - DVD Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_tv-music&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - TV-Music Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_tv-variety&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - TV-Variety Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_tv-drama&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - TV-Drama Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_fansubs&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - Fansubs Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_pictures&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - Pictures Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_misc&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - Misc Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_lossless&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - Lossless Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_flac&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - FLAC Torrents" />
+	<link href="static/styles/layer_cake/style.css" title="layer_cake" rel="stylesheet" type="text/css" media="screen" />
+	<link href="static/styles/log.css" rel="stylesheet" type="text/css" />
+	<link href="static/styles/global.css" rel="stylesheet" type="text/css" />
+	<script src="static/functions/jquery.js" type="text/javascript"></script>
+	<script src="static/functions/main.js" type="text/javascript"></script>
+	<link rel="stylesheet" type="text/css" href="static/shadowbox-3.0.3/shadowbox.css">
+	<script type="text/javascript" src="static/shadowbox-3.0.3/shadowbox.js"></script>
+	<script type="text/javascript">
+	Shadowbox.init();
+	</script>
+	<script type="text/javascript">
+		function bluehorse()
+		{
+			if(confirm('Would you like to see a penis?')) {
+				alert('Sick bastard. Oh well, here\'s a penis');
+			} else {
+				alert('Too bad! You\'re going to see one anyways');
+			}
+
+			document.location = "http://jpopsuki.eu/static/images/users/774/KICRK.png";
+		}
+
+		function penis()
+		{
+			document.cookie = 'invasion=zombie_fruits; expires=Fri, 04 Mar 2011 21:29:16 GMT; path=/';
+			$('#randomfitta').css('display', 'none');
+		}
+	</script>
+
+
+</head>
+<body id="torrents">
+<a name="top"></a>
+
+<div id="wrapper">
+<h1 class="hidden">JPopsuki 2.0</h1>
+
+<div id="header">
+	<div id="logo"><a href="index.php"></a></div>
+	<div id="userinfo">
+		<ul id="userinfo_username">
+			<li><a href="user.php?id=1" class="username">username</a></li>
+			<li class="brackets"><a href="user.php?action=edit&amp;userid=1">Edit</a></li>
+			<li class="brackets"><a href="logout.php?auth=00000000000000000000000000000000">Logout</a></li>
+		</ul>
+		<ul id="userinfo_major">
+			<li class="brackets"><strong><a href="upload.php">Upload</a></strong></li>
+			<li class="brackets"><strong><a href="user.php?action=invite">Invite (10)</a></strong></li>
+			<li class="brackets"><strong><a href="donate.php">Donate</a></strong></li>
+		</ul>
+		<ul id="userinfo_stats">
+			<li>Up: <span class="stat">52.19 TB</span></li>
+			<li>Down: <span class="stat">4.71 TB</span></li>
+			<li>Ratio: <span class="stat"><span class="r50">11.08</span></span></li>
+			<li><i><a href="bonus.php">Bonus: <span class="stat">2097150</span></a></i></li>
+		</ul>
+		<ul id="userinfo_minor">
+			<li><a href="inbox.php">Inbox</a></li>
+			<li><a href="notice.php">Notices</a></li>
+			<li><a href="torrents.php?type=uploaded&amp;userid=1">Uploads</a></li>
+			<li><a href="bookmarks.php">Bookmarks</a></li>
+</a></li>
+			<li><a href="user.php?action=notify">Notifications</a></li>
+			<li><a href="userhistory.php?action=posts&amp;userid=1">Posts</a></li>
+			<li><a href="friends.php">Friends</a></li>
+		</ul>
+	</div>
+	<div id="menu">
+		<h4 class="hidden">Site Menu</h4>
+		<ul>
+			<li id="nav_index"><a href="index.php">Home</a></li>
+			<li id="nav_torrents"><a href="torrents.php">Torrents</a></li>
+			<li id="nav_artists"><a href="artist.php">Artists</a></li>
+			<li id="nav_requests"><a href="requests.php">Requests</a></li>
+                        <li id="nav_collages"><a href="collages.php">Collages</a></li>
+			<li id="nav_forums"><a href="forums.php">Forums</a></li>
+			<li id="nav_top10"><a href="top10.php">Top 10</a></li>
+			<li id="nav_irc"><a href="irc.php">IRC</a></li>
+			<li id="nav_tv"><a href="streaming.php">Radio</a></li>
+			<li id="nav_rules"><a href="rules.php">Rules</a></li>
+			<li id="nav_kb"><a href="kb2.php">Help</a></li>
+			<li id="nav_staff"><a href="staff.php">Staff</a></li>
+		</ul>
+	</div>
+	<div id="alerts">
+		<div class="alertbar">
+			<a href="torrents.php?action=notify">You have 38 new torrent notifications</a> (<a href="torrents.php?action=notify_clear&amp;auth=00000000000000000000000000000000">Delete</a>)
+		</div>
+	</div>
+	<div id="searchbars">
+		<ul>
+ 
+			<li>
+				<span class="hidden">Torrents: </span>
+				<form action="torrents.php" method="get">
+					<input
+						onfocus="if (this.value == 'Torrents') this.value='';"
+						onblur="if (this.value == '') this.value='Torrents';"
+						value="Torrents" type="text" name="searchstr" size="17"
+					/>
+					<input value="Search" type="submit" class="hidden" />
+				</form>
+			</li>
+ 
+ 
+			<li>
+				<span class="hidden">Artist: </span>
+				<form action="artist.php" method="get">
+					<input
+						onfocus="if (this.value == 'Artist') this.value='';"
+						onblur="if (this.value == '') this.value='Artist';"
+						value="Artist" type="text" name="name" size="17"
+					/>
+					<input value="Search" type="submit" class="hidden" />
+				</form>
+			</li>
+ 
+			<li>
+				<span class="hidden">Requests: </span>
+				<form action="requests.php" method="get">
+					<input
+						onfocus="if (this.value == 'Requests') this.value='';"
+						onblur="if (this.value == '') this.value='Requests';"
+						value="Requests" type="text" name="search" size="17"
+					/>
+					<input value="Search" type="submit" class="hidden" />
+				</form>
+			</li>
+			<li>
+				<span class="hidden">Forums: </span>
+				<form action="forums.php" method="get">
+					<input value="search" type="hidden" name="action" />
+					<input
+						onfocus="if (this.value == 'Forums') this.value='';"
+						onblur="if (this.value == '') this.value='Forums';"
+						value="Forums" type="text" name="search" size="17"
+					/>
+					<input value="Search" type="submit" class="hidden" />
+				</form>
+			</li>
+			<li>
+				<span class="hidden">Log: </span>
+				<form action="log.php" method="get">
+					<input
+						onfocus="if (this.value == 'Log') this.value='';"
+						onblur="if (this.value == '') this.value='Log';"
+						value="Log" type="text" name="search" size="17"
+					/>
+					<input value="Search" type="submit" class="hidden" />
+				</form>
+			</li>
+			<li>
+				<span class="hidden">Users: </span>
+				<form action="user.php" method="get">
+					<input type="hidden" name="action" value="search" />
+					<input
+						onfocus="if (this.value == 'Peeps') this.value='';"
+						onblur="if (this.value == '') this.value='Peeps';"
+						value="Peeps" type="text" name="username" size="17"
+					/>
+					<input value="Search" type="submit" class="hidden" />
+				</form>
+			</li>
+		</ul>
+	</div>
+
+</div>
+<br />
+<div id="content">
+<script type="text/javascript">
+function makeDefSearch()
+{
+	$('#mkdefbtn').attr('disabled', 'disabled');
+	$('#clrdefbtn').attr('disabled', 'disabled');
+	$('#fitta').html('<img src="static/styles/layer_cake/images/loading.gif" style="vertical-align: bottom;">');
+
+	$('#fitta').load('ajax.php?section=setdefault&'+$('#torrents_filter').serialize(), function() {
+		$('#mkdefbtn').removeAttr('disabled');
+		$('#clrdefbtn').removeAttr('disabled');
+	});
+}
+
+function clearDefSearch()
+{
+	$('#mkdefbtn').attr('disabled', 'disabled');
+	$('#clrdefbtn').attr('disabled', 'disabled');
+	$('#fitta').html('<img src="static/styles/layer_cake/images/loading.gif" style="vertical-align: bottom;">');
+
+	$('#fitta').load('ajax.php?section=cleardefault', function() {
+		$('#mkdefbtn').removeAttr('disabled');
+		$('#clrdefbtn').removeAttr('disabled');
+	});
+}
+</script>
+<form id="torrents_filter" name="filter" method="get" action=''>
+<input type="hidden" name="type" value="snatched" />
+<input type="hidden" name="userid" value="1" />
+<div id="search_box" class="searchbox">
+<div class="filter_torrents">
+	<h3>
+		Search		(<a href="torrents.php?action=advanced">Advanced</a>)
+	</h3>
+	<div class="box pad">
+		<table>
+			<tr>
+				<td class="label">Search Terms:</td>
+				<td colspan="3">
+					<input type="text" size="40" name="searchstr" class="inputtext" value="" />
+				</td>
+			</tr>
+			<tr>
+				<td class="label">Tags (comma-separated):</td>
+				<td colspan="3">
+					<input type="text" size="40" id="tags" name="searchtags" class="inputtext smaller" value="" />&nbsp;
+					<input type="radio" name="tags_type" id="tags_type0" value="0" checked="checked" /> <label for="tags_type0">Any</label>&nbsp;&nbsp;
+					<input type="radio" name="tags_type" id="tags_type1" value="1"  /> <label for="tags_type1">All</label>
+				</td>
+			</tr>
+			<tr>
+				<td class="label">Order By:</td>
+				<td colspan="1">
+					<select name="order_by" style="width:auto;">
+						<option value="s1" >Name</option>
+						<option value="s2" >Year</option>
+						<option value="s3" selected="selected">Snatched Time</option>
+						<option value="s4" >Size</option>
+						<option value="s5" >Snatched</option>
+						<option value="s6" >Seeders</option>
+						<option value="s7" >Leechers</option>
+					</select>
+					<select name="order_way">
+						<option value="desc" selected="selected">Descending</option>
+						<option value="asc" >Ascending</option>
+					</select>&nbsp;&nbsp;&nbsp;&nbsp;
+					<input type="checkbox" name="enablegrouping" id="enablegrouping" value="1" checked="checked" /> <label for="enablegrouping"><strong>Enable Grouping</strong></label>
+				</td>
+			</tr>
+		</table>
+		<table class="cat_list">
+			<tr>
+				<td>
+					<input type="checkbox" name="filter_cat[1]" id="cat_1" value="1"  />
+					<label for="cat_1">Album</label>
+				</td>
+				<td>
+					<input type="checkbox" name="filter_cat[2]" id="cat_2" value="1"  />
+					<label for="cat_2">Single</label>
+				</td>
+				<td>
+					<input type="checkbox" name="filter_cat[3]" id="cat_3" value="1"  />
+					<label for="cat_3">PV</label>
+				</td>
+				<td>
+					<input type="checkbox" name="filter_cat[4]" id="cat_4" value="1"  />
+					<label for="cat_4">DVD</label>
+				</td>
+				<td>
+					<input type="checkbox" name="filter_cat[5]" id="cat_5" value="1"  />
+					<label for="cat_5">TV-Music</label>
+				</td>
+				<td>
+					<input type="checkbox" name="filter_cat[6]" id="cat_6" value="1"  />
+					<label for="cat_6">TV-Variety</label>
+				</td>
+				<td>
+					<input type="checkbox" name="filter_cat[7]" id="cat_7" value="1"  />
+					<label for="cat_7">TV-Drama</label>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<input type="checkbox" name="filter_cat[8]" id="cat_8" value="1"  />
+					<label for="cat_8">Fansubs</label>
+				</td>
+				<td>
+					<input type="checkbox" name="filter_cat[9]" id="cat_9" value="1"  />
+					<label for="cat_9">Pictures</label>
+				</td>
+				<td>
+					<input type="checkbox" name="filter_cat[10]" id="cat_10" value="1"  />
+					<label for="cat_10">Misc</label>
+				</td>
+		</table>
+		<table class="cat_list " id="taglist">
+			<tr>
+				<td width="12.5%"><a href="javascript:AddTag('japanese')">japanese</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('korean')">korean</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('chinese')">chinese</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('thai')">thai</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('M-ON!')">M-ON!</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('pop')">pop</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('rock')">rock</a></td>
+			</tr>
+			<tr>
+				<td width="12.5%"><a href="javascript:AddTag('alternative')">alternative</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('ballad')">ballad</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('dance')">dance</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('dancehall')">dancehall</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('enka')">enka</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('electro')">electro</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('experimental')">experimental</a></td>
+			</tr>
+			<tr>
+				<td width="12.5%"><a href="javascript:AddTag('folk')">folk</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('female.vocalist')">female.vocalist</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('hardcore')">hardcore</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('hip.hop')">hip.hop</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('house')">house</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('industrial')">industrial</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('instrumental')">instrumental</a></td>
+			</tr>
+			<tr>
+				<td width="12.5%"><a href="javascript:AddTag('male.vocalist')">male.vocalist</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('metal')">metal</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('nagoya.kei')">nagoya.kei</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('post.rock')">post.rock</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('power.pop')">power.pop</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('punk')">punk</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('reggae')">reggae</a></td>
+			</tr>
+			<tr>
+				<td width="12.5%"><a href="javascript:AddTag('rnb')">rnb</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('singer.songwriter')">singer.songwriter</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('soul')">soul</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('soundtrack')">soundtrack</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('ska')">ska</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('techno')">techno</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('trance')">trance</a></td>
+			</tr>
+			<tr>
+				<td width="12.5%"><a href="javascript:AddTag('trip.hop')">trip.hop</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('urban')">urban</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('visual.kei')">visual.kei</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('jazz')">jazz</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('country')">country</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('compilation')">compilation</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('ambient')">ambient</a></td>
+			</tr>
+			<tr>
+				<td width="12.5%"><a href="javascript:AddTag('math.rock')">math.rock</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('shibuya.kei')">shibuya.kei</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('english')">english</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('classical')">classical</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('acoustic')">acoustic</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('new.age')">new.age</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('dark.ambient')">dark.ambient</a></td>
+			</tr>
+			<tr>
+				<td width="12.5%"><a href="javascript:AddTag('live')">live</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('shoegaze')">shoegaze</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('indie')">indie</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('progressive.rock')">progressive.rock</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('shinjuku.kei')">shinjuku.kei</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('blues')">blues</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('remix')">remix</a></td>
+			</tr>
+			<tr>
+				<td width="12.5%"><a href="javascript:AddTag('lounge')">lounge</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('post.hardcore')">post.hardcore</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('vocaloid')">vocaloid</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('bossa.nova')">bossa.nova</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('eurobeat')">eurobeat</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('vocoded.vocals')">vocoded.vocals</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('downtempo')">downtempo</a></td>
+			</tr>
+			<tr>
+				<td width="12.5%"><a href="javascript:AddTag('chiptune')">chiptune</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('oshare.kei')">oshare.kei</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('new.wave')">new.wave</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('avantgarde')">avantgarde</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('anison')">anison</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('angura.kei')">angura.kei</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('black.metal')">black.metal</a></td>
+			</tr>
+			<tr>
+				<td width="12.5%"><a href="javascript:AddTag('death.metal')">death.metal</a></td>
+				<td width="12.5%"><a href="javascript:AddTag('8bit')">8bit</a></td>
+				<td colspan="5"> </td>
+			</tr>
+		</table>
+		<table class="cat_list" width="100%">
+			<tr>
+				<td class="label">Tags: (<a href="#" onclick="return toggleDisp('taglist', 'swaptags', 'Show', 'Hide');" id="swaptags">Hide</a>)</td>
+			</tr>
+		</table>
+		<div class="submit">
+			<span style="float: left">
+				<input id="mkdefbtn" type="button" value="Make Default" onclick="makeDefSearch()" />
+				<input id="clrdefbtn" type="button" value="Clear Default" onclick="clearDefSearch()" />
+				<span id="fitta"></span>
+			</span>
+			<input type="submit" value="Search" onclick="return loadHtml('torrents', $('#torrents_filter').serialize());" />
+			<input type="button" value="Reset" onclick="location.href='torrents.php'" />
+			&nbsp;&nbsp;
+		</div>
+	</div>
+</div>
+</div>
+</form>
+
+<br/>
+<!--<script type="text/javascript">
+$(document).ready(function() {
+	loadHtml('torrents', 'page=2&order_by=s3&order_way=DESC&type=snatched&userid=1&disablegrouping=1');
+});
+</script>-->
+<b><center><a href="torrents.php?action=markold">Mark all torrents old</a></center></b><br/>
+<div id="ajax_torrents"><div class="linkbox"><a href="torrents.php?page=1&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1" onclick="return loadHtml('torrents', 'page=1&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1');"><strong>&lt;&lt; First</strong></a> <a href="torrents.php?page=1&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1" onclick="return loadHtml('torrents', 'page=1&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1');"><strong>&lt; Prev</strong></a> | <a href="torrents.php?page=1&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1" onclick="return loadHtml('torrents', 'page=1&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1');"><strong>1-50</strong></a> | <strong>51-100</strong> | <a href="torrents.php?page=3&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1" onclick="return loadHtml('torrents', 'page=3&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1');"><strong>101-150</strong></a> | <a href="torrents.php?page=4&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1" onclick="return loadHtml('torrents', 'page=4&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1');"><strong>151-200</strong></a> | <a href="torrents.php?page=5&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1" onclick="return loadHtml('torrents', 'page=5&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1');"><strong>201-250</strong></a> | <a href="torrents.php?page=6&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1" onclick="return loadHtml('torrents', 'page=6&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1');"><strong>251-300</strong></a> | <a href="torrents.php?page=7&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1" onclick="return loadHtml('torrents', 'page=7&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1');"><strong>301-350</strong></a> | <a href="torrents.php?page=8&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1" onclick="return loadHtml('torrents', 'page=8&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1');"><strong>351-400</strong></a> | <a href="torrents.php?page=9&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1" onclick="return loadHtml('torrents', 'page=9&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1');"><strong>401-450</strong></a> | <a href="torrents.php?page=10&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1" onclick="return loadHtml('torrents', 'page=10&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1');"><strong>451-500</strong></a> | <a href="torrents.php?page=11&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1" onclick="return loadHtml('torrents', 'page=11&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1');"><strong>501-550</strong></a> | <a href="torrents.php?page=3&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1" onclick="return loadHtml('torrents', 'page=3&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1');"><strong>Next &gt;</strong></a> <a href="torrents.php?page=46&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1" onclick="return loadHtml('torrents', 'page=46&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1');"><strong> Last &gt;&gt;</strong></a></div>
+<table class="torrent_table" id="torrent_table">
+	<tr class="colhead">
+		<td class="small"></td>
+				<td width="65px">Cover</td>
+				<td width="100%"><a href="torrents.php?order_by=s1&amp;order_way=ASC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1"  onclick="return loadHtml('torrents','order_by=s1&amp;order_way=ASC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1');">Name</a> / <a href="torrents.php?order_by=s2&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1"  onclick="return loadHtml('torrents','order_by=s2&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1');">Year</a></td>
+		<td>Files</td>
+		<td><a href="torrents.php?order_by=s3&amp;order_way=ASC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1"  onclick="return loadHtml('torrents','order_by=s3&amp;order_way=ASC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1');">Snatched Time</a></td>
+		<td><a href="torrents.php?order_by=s4&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1"  onclick="return loadHtml('torrents','order_by=s4&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1');">Size</a></td>
+		<td class="sign"><a href="torrents.php?order_by=s5&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1"  onclick="return loadHtml('torrents','order_by=s5&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1');"><img src="static/styles/layer_cake/images/snatched.png" alt="Snatches" title="Snatches" /></a></td>
+		<td class="sign"><a href="torrents.php?order_by=s6&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1"  onclick="return loadHtml('torrents','order_by=s6&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1');"><img src="static/styles/layer_cake/images/seeders.png" alt="Seeders" title="Seeders" /></a></td>
+		<td class="sign"><a href="torrents.php?order_by=s7&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1"  onclick="return loadHtml('torrents','order_by=s7&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1');"><img src="static/styles/layer_cake/images/leechers.png" alt="Leechers" title="Leechers" /></a></td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/129346.jpg" rel="shadowbox" title="noanowa - Cry Like a Monster">
+                        <img src="static/images/torrents/129346.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=173410&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=173410" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=276" title="&#12398;&#12354;&#12398;&#12431; (View Artist)">noanowa</a> - <a href="torrents.php?id=129346&amp;torrentid=173410" title="Cry Like a Monster (View Torrent)">Cry Like a Monster</a>			[MP3 / 192 / CD] [2013.03.06] (<a href="torrents.php?id=129346#comments" title="View Comments">6</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=rock">rock</a>, <a href="torrents.php?searchtags=female.vocalist">female.vocalist</a></div>		</td>
+		<td>12</td>
+		<td class="nobr" title="Mar 27 2013, 14:15">9 years, 11 months</td>
+		<td class="nobr">61.41 MB</td>
+		<td>294</td>
+		<td>2</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/130970.jpg" rel="shadowbox" title="Cyntia - Lady Made">
+                        <img src="static/images/torrents/130970.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=175796&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=175796" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=17933" title="View Artist">Cyntia</a> - <a href="torrents.php?id=130970&amp;torrentid=175796" title="Lady Made (View Torrent)">Lady Made</a>			[MP3 / 320 / CD] [2013.03.20] (<a href="torrents.php?id=130970#comments" title="View Comments">15</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=rock">rock</a>, <a href="torrents.php?searchtags=female.vocalist">female.vocalist</a>, <a href="torrents.php?searchtags=metal">metal</a>, <a href="torrents.php?searchtags=girl.band">girl.band</a></div>		</td>
+		<td>11</td>
+		<td class="nobr" title="Mar 27 2013, 14:15">9 years, 11 months</td>
+		<td class="nobr">119.11 MB</td>
+		<td>674</td>
+		<td>9</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/126396.jpg" rel="shadowbox" title="Tomomi Ukumori - Humble &amp; Radiant">
+                        <img src="static/images/torrents/126396.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=169034&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=169034" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=11372" title="View Artist">Tomomi Ukumori</a> - <a href="torrents.php?id=126396&amp;torrentid=169034" title="View Torrent">Humble &amp; Radiant</a>			[MP3 / V0 (VBR) / WEB] [2012.12.19] (<a href="torrents.php?id=126396#comments" title="View Comments">2</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=female.vocalist">female.vocalist</a>, <a href="torrents.php?searchtags=house">house</a>, <a href="torrents.php?searchtags=techno">techno</a>, <a href="torrents.php?searchtags=electronic">electronic</a>, <a href="torrents.php?searchtags=remix">remix</a></div>		</td>
+		<td>16</td>
+		<td class="nobr" title="Mar 27 2013, 14:09">9 years, 11 months</td>
+		<td class="nobr">187.51 MB</td>
+		<td>158</td>
+		<td>2</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/130208.jpg" rel="shadowbox" title="Koda Kumi - Driving Hit&#39;s 5">
+                        <img src="static/images/torrents/130208.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=174694&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=174694" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=73" title="&#20502;&#30000;&#20358;&#26410; (View Artist)">Koda Kumi</a> - <a href="torrents.php?id=130208&amp;torrentid=174694" title="Driving Hit&#39;s 5 (View Torrent)">Driving Hit&#39;s 5</a>			[MP3 / 320 / CD] [2013.03.20] (<a href="torrents.php?id=130208#comments" title="View Comments">24</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=dance">dance</a>, <a href="torrents.php?searchtags=electro">electro</a>, <a href="torrents.php?searchtags=female.vocalist">female.vocalist</a>, <a href="torrents.php?searchtags=hip.hop">hip.hop</a>, <a href="torrents.php?searchtags=house">house</a>, <a href="torrents.php?searchtags=trance">trance</a>, <a href="torrents.php?searchtags=remix">remix</a></div>		</td>
+		<td>16</td>
+		<td class="nobr" title="Mar 27 2013, 14:06">9 years, 11 months</td>
+		<td class="nobr">129.93 MB</td>
+		<td>1,414</td>
+		<td>10</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/127846.jpg" rel="shadowbox" title="Koda Kumi - Color The Cover">
+                        <img src="static/images/torrents/127846.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=171257&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=171257" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=73" title="&#20502;&#30000;&#20358;&#26410; (View Artist)">Koda Kumi</a> - <a href="torrents.php?id=127846&amp;torrentid=171257" title="View Torrent">Color The Cover</a>			[MP3 / 320 / CD] [2013.02.27] (<a href="torrents.php?id=127846#comments" title="View Comments">41</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=rock">rock</a>, <a href="torrents.php?searchtags=ballad">ballad</a>, <a href="torrents.php?searchtags=dance">dance</a>, <a href="torrents.php?searchtags=electro">electro</a>, <a href="torrents.php?searchtags=female.vocalist">female.vocalist</a>, <a href="torrents.php?searchtags=cover">cover</a></div>		</td>
+		<td>11</td>
+		<td class="nobr" title="Mar 27 2013, 14:01">9 years, 11 months</td>
+		<td class="nobr">107.70 MB</td>
+		<td>2,712</td>
+		<td>10</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/128980.jpg" rel="shadowbox" title="KEYTALK - One Shot Wonder">
+                        <img src="static/images/torrents/128980.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=172853&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=172853" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=9998" title="View Artist">KEYTALK</a> - <a href="torrents.php?id=128980&amp;torrentid=172853" title="View Torrent">One Shot Wonder</a>			[MP3 / Variable / WEB] [2013.03.06] (<a href="torrents.php?id=128980#comments" title="View Comments">2</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=rock">rock</a>, <a href="torrents.php?searchtags=alternative">alternative</a>, <a href="torrents.php?searchtags=indie">indie</a></div>		</td>
+		<td>12</td>
+		<td class="nobr" title="Mar 27 2013, 13:55">9 years, 11 months</td>
+		<td class="nobr">73.00 MB</td>
+		<td>413</td>
+		<td>4</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/130389.jpg" rel="shadowbox" title="Maiko Nakamura - INVITED ~Maiko Nakamura featuring BEST~">
+                        <img src="static/images/torrents/130389.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=174942&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=174942" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=4409" title="&#20013;&#26449;&#33310;&#23376; (View Artist)">Maiko Nakamura</a> - <a href="torrents.php?id=130389&amp;torrentid=174942" title="INVITED&#12316;Maiko Nakamura featuring BEST&#12316; (View Torrent)">INVITED ~Maiko Nakamura featuring BEST~</a>			[MP3 / 320 / CD] [2013.03.20] (<a href="torrents.php?id=130389#comments" title="View Comments">3</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=female.vocalist">female.vocalist</a>, <a href="torrents.php?searchtags=hip.hop">hip.hop</a>, <a href="torrents.php?searchtags=male.vocalist">male.vocalist</a>, <a href="torrents.php?searchtags=rnb">rnb</a>, <a href="torrents.php?searchtags=urban">urban</a>, <a href="torrents.php?searchtags=compilation">compilation</a></div>		</td>
+		<td>15</td>
+		<td class="nobr" title="Mar 27 2013, 13:49">9 years, 11 months</td>
+		<td class="nobr">145.27 MB</td>
+		<td>532</td>
+		<td>9</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/129165.jpg" rel="shadowbox" title="Rania - Just Go">
+                        <img src="static/images/torrents/129165.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=175576&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=175576" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=12731" title="BP &#46972;&#45768;&#50500; (View Artist)">Rania</a> - <a href="torrents.php?id=129165&amp;torrentid=175576" title="View Torrent">Just Go</a>			[MP3 / 320 / CD] [2013.03.08] (<a href="torrents.php?id=129165#comments" title="View Comments">16</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=korean">korean</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=dance">dance</a>, <a href="torrents.php?searchtags=female.vocalist">female.vocalist</a>, <a href="torrents.php?searchtags=english">english</a></div>		</td>
+		<td>12</td>
+		<td class="nobr" title="Mar 27 2013, 13:42">9 years, 11 months</td>
+		<td class="nobr">81.25 MB</td>
+		<td>508</td>
+		<td>6</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/126554.jpg" rel="shadowbox" title="NEGOTO - 5">
+                        <img src="static/images/torrents/126554.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=169275&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=169275" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=8657" title="&#12397;&#12372;&#12392; (View Artist)">NEGOTO</a> - <a href="torrents.php?id=126554&amp;torrentid=169275" title="View Torrent">5</a>			[MP3 / 320 / CD] [2013.02.06] (<a href="torrents.php?id=126554#comments" title="View Comments">23</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=rock">rock</a>, <a href="torrents.php?searchtags=female.vocalist">female.vocalist</a>, <a href="torrents.php?searchtags=girl.band">girl.band</a></div>		</td>
+		<td>14</td>
+		<td class="nobr" title="Mar 27 2013, 13:38">9 years, 11 months</td>
+		<td class="nobr">118.33 MB</td>
+		<td>1,213</td>
+		<td>11</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/126170.jpg" rel="shadowbox" title="SCANDAL - ENCORE SHOW">
+                        <img src="static/images/torrents/126170.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=168700&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=168700" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=19" title="View Artist">SCANDAL</a> - <a href="torrents.php?id=126170&amp;torrentid=168700" title="View Torrent">ENCORE SHOW</a>			[MP3 / 320 / CD] [2013.02.06] (<a href="torrents.php?id=126170#comments" title="View Comments">40</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=rock">rock</a>, <a href="torrents.php?searchtags=female.vocalist">female.vocalist</a>, <a href="torrents.php?searchtags=compilation">compilation</a>, <a href="torrents.php?searchtags=girl.band">girl.band</a></div>		</td>
+		<td>17</td>
+		<td class="nobr" title="Mar 27 2013, 13:36">9 years, 11 months</td>
+		<td class="nobr">147.68 MB</td>
+		<td>3,031</td>
+		<td>16</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/130605.jpg" rel="shadowbox" title="MELL - Entrust - the name of MELL -">
+                        <img src="static/images/torrents/130605.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=175282&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=175282" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=740" title="View Artist">MELL</a> - <a href="torrents.php?id=130605&amp;torrentid=175282" title="Entrust &#12316;the name of MELL&#12316; (View Torrent)">Entrust - the name of MELL -</a>			[MP3 / 320 / CD] [2013.03.20] (<a href="torrents.php?id=130605#comments" title="View Comments">9</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=rock">rock</a>, <a href="torrents.php?searchtags=electro">electro</a>, <a href="torrents.php?searchtags=female.vocalist">female.vocalist</a>, <a href="torrents.php?searchtags=techno">techno</a>, <a href="torrents.php?searchtags=anison">anison</a></div>		</td>
+		<td>14</td>
+		<td class="nobr" title="Mar 27 2013, 13:25">9 years, 11 months</td>
+		<td class="nobr">153.52 MB</td>
+		<td>443</td>
+		<td>8</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/130879.jpg" rel="shadowbox" title="PASSPO - PASSPO BEST 2">
+                        <img src="static/images/torrents/130879.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=175651&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=175651" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=11162" title="&#12401;&#12377;&#12413;&#9734; (View Artist)">PASSPO</a> - <a href="torrents.php?id=130879&amp;torrentid=175651" title="&#12401;&#12377;&#12413;&#9734;&#12505;&#12473;&#12488; 2 (View Torrent)">PASSPO BEST 2</a>			[MP3 / 320 / CD] [2013.03.27] (<a href="torrents.php?id=130879#comments" title="View Comments">3</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=idol">idol</a></div>		</td>
+		<td>14</td>
+		<td class="nobr" title="Mar 27 2013, 13:25">9 years, 11 months</td>
+		<td class="nobr">118.10 MB</td>
+		<td>439</td>
+		<td>5</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/126055.jpg" rel="shadowbox" title="Neat&#39;s - Wonders">
+                        <img src="static/images/torrents/126055.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=168544&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=168544" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=15992" title="View Artist">Neat&#39;s</a> - <a href="torrents.php?id=126055&amp;torrentid=168544" title="View Torrent">Wonders</a>			[MP3 / 192 / CD] [2012.01.28] (<a href="torrents.php?id=126055#comments" title="View Comments">4</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=female.vocalist">female.vocalist</a></div>		</td>
+		<td>12</td>
+		<td class="nobr" title="Mar 27 2013, 13:25">9 years, 11 months</td>
+		<td class="nobr">49.03 MB</td>
+		<td>97</td>
+		<td>2</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/125820.jpg" rel="shadowbox" title="moumoon - PAIN KILLER">
+                        <img src="static/images/torrents/125820.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=168177&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=168177" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=233" title="View Artist">moumoon</a> - <a href="torrents.php?id=125820&amp;torrentid=168177" title="View Torrent">PAIN KILLER</a>			[MP3 / 320 / CD] [2013.01.30] (<a href="torrents.php?id=125820#comments" title="View Comments">20</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=ballad">ballad</a>, <a href="torrents.php?searchtags=female.vocalist">female.vocalist</a>, <a href="torrents.php?searchtags=guitar">guitar</a></div>		</td>
+		<td>12</td>
+		<td class="nobr" title="Mar 27 2013, 13:22">9 years, 11 months</td>
+		<td class="nobr">114.94 MB</td>
+		<td>1,434</td>
+		<td>4</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/126996.jpg" rel="shadowbox" title="AYUSE KOZUE - LOL">
+                        <img src="static/images/torrents/126996.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=169988&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=169988" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=124" title="View Artist">AYUSE KOZUE</a> - <a href="torrents.php?id=126996&amp;torrentid=169988" title="View Torrent">LOL</a>			[MP3 / 320 / CD] [2013.02.13] (<a href="torrents.php?id=126996#comments" title="View Comments">13</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=female.vocalist">female.vocalist</a>, <a href="torrents.php?searchtags=rnb">rnb</a></div>		</td>
+		<td>11</td>
+		<td class="nobr" title="Mar 27 2013, 13:21">9 years, 11 months</td>
+		<td class="nobr">104.88 MB</td>
+		<td>464</td>
+		<td>2</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/129755.jpg" rel="shadowbox" title="Yucca - Queen Of The Night">
+                        <img src="static/images/torrents/129755.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=174023&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=174023" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=528" title="View Artist">Yucca</a> - <a href="torrents.php?id=129755&amp;torrentid=174023" title="View Torrent">Queen Of The Night</a>			[MP3 / 320 / CD] [2011.07.20] (<a href="torrents.php?id=129755#comments" title="View Comments">1</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=female.vocalist">female.vocalist</a>, <a href="torrents.php?searchtags=classical">classical</a>, <a href="torrents.php?searchtags=crossover">crossover</a></div>		</td>
+		<td>12</td>
+		<td class="nobr" title="Mar 27 2013, 13:20">9 years, 11 months</td>
+		<td class="nobr">116.46 MB</td>
+		<td>64</td>
+		<td>2</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/130659.jpg" rel="shadowbox" title="Yoh Shibusawa - Sekirarara">
+                        <img src="static/images/torrents/130659.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=175357&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=175357" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=20708" title="&#28171;&#27810;&#33865; (View Artist)">Yoh Shibusawa</a> - <a href="torrents.php?id=130659&amp;torrentid=175357" title="&#12379;&#12365;&#12425;&#12425;&#12425; (View Torrent)">Sekirarara</a>			[MP3 / 192 / CD] [2012.06.20] (<a href="torrents.php?id=130659#comments" title="View Comments">4</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=rock">rock</a>, <a href="torrents.php?searchtags=alternative">alternative</a>, <a href="torrents.php?searchtags=female.vocalist">female.vocalist</a></div>		</td>
+		<td>7</td>
+		<td class="nobr" title="Mar 27 2013, 13:19">9 years, 11 months</td>
+		<td class="nobr">36.18 MB</td>
+		<td>97</td>
+		<td>5</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/129095.jpg" rel="shadowbox" title="FOUR GET ME A NOTS - BLINKS">
+                        <img src="static/images/torrents/129095.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=173019&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=173019" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=4069" title="View Artist">FOUR GET ME A NOTS</a> - <a href="torrents.php?id=129095&amp;torrentid=173019" title="View Torrent">BLINKS</a>			[MP3 / 320 / CD] [2013.03.06] (<a href="torrents.php?id=129095#comments" title="View Comments">2</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=female.vocalist">female.vocalist</a>, <a href="torrents.php?searchtags=male.vocalist">male.vocalist</a>, <a href="torrents.php?searchtags=punk">punk</a>, <a href="torrents.php?searchtags=english">english</a></div>		</td>
+		<td>14</td>
+		<td class="nobr" title="Mar 27 2013, 13:19">9 years, 11 months</td>
+		<td class="nobr">80.15 MB</td>
+		<td>214</td>
+		<td>3</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/126684.jpg" rel="shadowbox" title="Hemenway - Uraheme Welcome to the Other Side">
+                        <img src="static/images/torrents/126684.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=169458&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=169458" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=15250" title="View Artist">Hemenway</a> - <a href="torrents.php?id=126684&amp;torrentid=169458" title="&#35023;&#12504;&#12513; Welcome to the Other Side (View Torrent)">Uraheme Welcome to the Other Side</a>			[MP3 / 320 / CD] [2012.11.21] (<a href="torrents.php?id=126684#comments" title="View Comments">1</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=rock">rock</a>, <a href="torrents.php?searchtags=alternative">alternative</a>, <a href="torrents.php?searchtags=male.vocalist">male.vocalist</a></div>		</td>
+		<td>7</td>
+		<td class="nobr" title="Mar 27 2013, 13:19">9 years, 11 months</td>
+		<td class="nobr">57.09 MB</td>
+		<td>270</td>
+		<td>4</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/130856.jpg" rel="shadowbox" title="m-flo - m-flo inside -WORKS BEST V-">
+                        <img src="static/images/torrents/130856.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=175761&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=175761" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=168" title="View Artist">m-flo</a> - <a href="torrents.php?id=130856&amp;torrentid=175761" title="View Torrent">m-flo inside -WORKS BEST V-</a>			[MP3 / 301 (VBR) / CD] [2013.03.27] (<a href="torrents.php?id=130856#comments" title="View Comments">10</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=dance">dance</a>, <a href="torrents.php?searchtags=electro">electro</a>, <a href="torrents.php?searchtags=female.vocalist">female.vocalist</a>, <a href="torrents.php?searchtags=hip.hop">hip.hop</a>, <a href="torrents.php?searchtags=male.vocalist">male.vocalist</a>, <a href="torrents.php?searchtags=rnb">rnb</a>, <a href="torrents.php?searchtags=urban">urban</a>, <a href="torrents.php?searchtags=english">english</a>, <a href="torrents.php?searchtags=remix">remix</a></div>		</td>
+		<td>24</td>
+		<td class="nobr" title="Mar 27 2013, 13:18">9 years, 11 months</td>
+		<td class="nobr">320.02 MB</td>
+		<td>959</td>
+		<td>4</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/127103.jpg" rel="shadowbox" title="Kana Hanazawa - claire">
+                        <img src="static/images/torrents/127103.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=170163&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=170163" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=5324" title="&#33457;&#28580;&#39321;&#33756; (View Artist)">Kana Hanazawa</a> - <a href="torrents.php?id=127103&amp;torrentid=170163" title="claire (View Torrent)">claire</a>			[MP3 / 320 / CD] [2013.02.20] (<a href="torrents.php?id=127103#comments" title="View Comments">11</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=female.vocalist">female.vocalist</a></div>		</td>
+		<td>15</td>
+		<td class="nobr" title="Mar 27 2013, 13:18">9 years, 11 months</td>
+		<td class="nobr">134.53 MB</td>
+		<td>1,061</td>
+		<td>11</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/130382.jpg" rel="shadowbox" title="IU - Can You Hear Me?">
+                        <img src="static/images/torrents/130382.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=174991&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=174991" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=434" title="&#50500;&#51060;&#50976; (View Artist)">IU</a> - <a href="torrents.php?id=130382&amp;torrentid=174991" title="View Torrent">Can You Hear Me?</a>			[AAC / 256 / WEB / iTunes Release - 2013] [2013.03.20] (<a href="torrents.php?id=130382#comments" title="View Comments">32</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=ballad">ballad</a>, <a href="torrents.php?searchtags=female.vocalist">female.vocalist</a>, <a href="torrents.php?searchtags=english">english</a>, <a href="torrents.php?searchtags=cover">cover</a></div>		</td>
+		<td>6</td>
+		<td class="nobr" title="Mar 27 2013, 13:17">9 years, 11 months</td>
+		<td class="nobr">36.32 MB</td>
+		<td>178</td>
+		<td>4</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/126898.jpg" rel="shadowbox" title="TRIADIC - TRIADIC">
+                        <img src="static/images/torrents/126898.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=170306&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=170306" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=21482" title="View Artist">TRIADIC</a> - <a href="torrents.php?id=126898&amp;torrentid=170306" title="TRIADIC (View Torrent)">TRIADIC</a>			[MP3 / 320 / CD] [2011.08.03] (<a href="torrents.php?id=126898#comments" title="View Comments">1</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=female.vocalist">female.vocalist</a>, <a href="torrents.php?searchtags=rnb">rnb</a>, <a href="torrents.php?searchtags=jazz">jazz</a></div>		</td>
+		<td>12</td>
+		<td class="nobr" title="Mar 27 2013, 13:17">9 years, 11 months</td>
+		<td class="nobr">85.41 MB</td>
+		<td>62</td>
+		<td>3</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/128670.jpg" rel="shadowbox" title="PIKO - Hitokoe -42701340 -">
+                        <img src="static/images/torrents/128670.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=172443&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=172443" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=7500" title="&#12500;&#12467; (View Artist)">PIKO</a> - <a href="torrents.php?id=128670&amp;torrentid=172443" title="View Torrent">Hitokoe -42701340 -</a>			[MP3 / 192 / CD] [2013.02.20]			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=rock">rock</a>, <a href="torrents.php?searchtags=electro">electro</a>, <a href="torrents.php?searchtags=male.vocalist">male.vocalist</a></div>		</td>
+		<td>10</td>
+		<td class="nobr" title="Mar 27 2013, 13:17">9 years, 11 months</td>
+		<td class="nobr">51.96 MB</td>
+		<td>254</td>
+		<td>2</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/126334.jpg" rel="shadowbox" title="Nanase Aikawa - Konjiki">
+                        <img src="static/images/torrents/126334.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=168953&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=168953" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=750" title="&#30456;&#24029;&#19971;&#28716; (View Artist)">Nanase Aikawa</a> - <a href="torrents.php?id=126334&amp;torrentid=168953" title="&#20170;&#20107;&#35352; (View Torrent)">Konjiki</a>			[MP3 / 320 / CD] [2013.02.06] (<a href="torrents.php?id=126334#comments" title="View Comments">22</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=rock">rock</a>, <a href="torrents.php?searchtags=ballad">ballad</a>, <a href="torrents.php?searchtags=female.vocalist">female.vocalist</a></div>		</td>
+		<td>10</td>
+		<td class="nobr" title="Mar 27 2013, 13:17">9 years, 11 months</td>
+		<td class="nobr">100.61 MB</td>
+		<td>742</td>
+		<td>8</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/129580.jpg" rel="shadowbox" title="Licana - Love Letter">
+                        <img src="static/images/torrents/129580.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=173776&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=173776" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=7570" title="View Artist">Licana</a> - <a href="torrents.php?id=129580&amp;torrentid=173776" title="View Torrent">Love Letter</a>			[AAC / 256 / WEB] [2013.02.20] (<a href="torrents.php?id=129580#comments" title="View Comments">2</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=female.vocalist">female.vocalist</a>, <a href="torrents.php?searchtags=rnb">rnb</a></div>		</td>
+		<td>10</td>
+		<td class="nobr" title="Mar 27 2013, 13:17">9 years, 11 months</td>
+		<td class="nobr">81.44 MB</td>
+		<td>179</td>
+		<td>2</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/126455.jpg" rel="shadowbox" title="Miwa Sasagawa - Machi no Akari">
+                        <img src="static/images/torrents/126455.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=169128&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=169128" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=2439" title="&#31545;&#24029;&#32654;&#21644; (View Artist)">Miwa Sasagawa</a> - <a href="torrents.php?id=126455&amp;torrentid=169128" title="&#37117;&#20250;&#12398;&#28783; (View Torrent)">Machi no Akari</a>			[MP3 / 320 / CD / <strong>Freeleech!</strong>] [2013.01.16] (<a href="torrents.php?id=126455#comments" title="View Comments">5</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=folk">folk</a>, <a href="torrents.php?searchtags=female.vocalist">female.vocalist</a></div>		</td>
+		<td>6</td>
+		<td class="nobr" title="Mar 27 2013, 13:16">9 years, 11 months</td>
+		<td class="nobr">72.93 MB</td>
+		<td>895</td>
+		<td>64</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/129658.jpg" rel="shadowbox" title="ohashiTrio - plugged">
+                        <img src="static/images/torrents/129658.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=173866&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=173866" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=617" title="&#22823;&#27211;&#12488;&#12522;&#12458; (View Artist)">ohashiTrio</a> - <a href="torrents.php?id=129658&amp;torrentid=173866" title="View Torrent">plugged</a>			[AAC / 256 / WEB] [2013.03.13] (<a href="torrents.php?id=129658#comments" title="View Comments">3</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=male.vocalist">male.vocalist</a>, <a href="torrents.php?searchtags=singer.songwriter">singer.songwriter</a></div>		</td>
+		<td>11</td>
+		<td class="nobr" title="Mar 27 2013, 13:16">9 years, 11 months</td>
+		<td class="nobr">94.97 MB</td>
+		<td>340</td>
+		<td>3</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/128683.jpg" rel="shadowbox" title="Pay money To my Pain - Breakfast">
+                        <img src="static/images/torrents/128683.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=172457&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=172457" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=4354" title="View Artist">Pay money To my Pain</a> - <a href="torrents.php?id=128683&amp;torrentid=172457" title="View Torrent">Breakfast</a>			[MP3 / 320 / CD] [2012.10.24] (<a href="torrents.php?id=128683#comments" title="View Comments">4</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=male.vocalist">male.vocalist</a>, <a href="torrents.php?searchtags=metal">metal</a></div>		</td>
+		<td>18</td>
+		<td class="nobr" title="Mar 27 2013, 13:15">9 years, 11 months</td>
+		<td class="nobr">167.49 MB</td>
+		<td>410</td>
+		<td>5</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/126285.jpg" rel="shadowbox" title="doa - RIDE ON">
+                        <img src="static/images/torrents/126285.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=168879&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=168879" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=479" title="View Artist">doa</a> - <a href="torrents.php?id=126285&amp;torrentid=168879" title="RIDE ON (View Torrent)">RIDE ON</a>			[MP3 / 320 / CD] [2013.01.23] (<a href="torrents.php?id=126285#comments" title="View Comments">5</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=rock">rock</a></div>		</td>
+		<td>14</td>
+		<td class="nobr" title="Mar 27 2013, 13:15">9 years, 11 months</td>
+		<td class="nobr">110.48 MB</td>
+		<td>198</td>
+		<td>2</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/128459.jpg" rel="shadowbox" title="ACIDMAN - New World">
+                        <img src="static/images/torrents/128459.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=172155&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=172155" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=3" title="View Artist">ACIDMAN</a> - <a href="torrents.php?id=128459&amp;torrentid=172155" title="&#26032;&#19990;&#30028; (View Torrent)">New World</a>			[MP3 / 320 / CD] [2013.02.27] (<a href="torrents.php?id=128459#comments" title="View Comments">8</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=alternative">alternative</a>, <a href="torrents.php?searchtags=male.vocalist">male.vocalist</a>, <a href="torrents.php?searchtags=post.rock">post.rock</a></div>		</td>
+		<td>13</td>
+		<td class="nobr" title="Mar 27 2013, 13:15">9 years, 11 months</td>
+		<td class="nobr">139.24 MB</td>
+		<td>572</td>
+		<td>5</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/129571.jpg" rel="shadowbox" title="girl next door - Life of Sound">
+                        <img src="static/images/torrents/129571.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=173765&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=173765" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=87" title="View Artist">girl next door</a> - <a href="torrents.php?id=129571&amp;torrentid=173765" title="View Torrent">Life of Sound</a>			[AAC / 256 / WEB] [2013.03.13] (<a href="torrents.php?id=129571#comments" title="View Comments">7</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=female.vocalist">female.vocalist</a></div>		</td>
+		<td>11</td>
+		<td class="nobr" title="Mar 27 2013, 13:15">9 years, 11 months</td>
+		<td class="nobr">102.11 MB</td>
+		<td>239</td>
+		<td>4</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/128481.jpg" rel="shadowbox" title="KREVA - SPACE">
+                        <img src="static/images/torrents/128481.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=172193&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=172193" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=273" title="View Artist">KREVA</a> - <a href="torrents.php?id=128481&amp;torrentid=172193" title="View Torrent">SPACE</a>			[AAC / V0 (VBR) / CD] [2013.02.27] (<a href="torrents.php?id=128481#comments" title="View Comments">7</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=hip.hop">hip.hop</a>, <a href="torrents.php?searchtags=male.vocalist">male.vocalist</a>, <a href="torrents.php?searchtags=urban">urban</a></div>		</td>
+		<td>16</td>
+		<td class="nobr" title="Mar 27 2013, 13:15">9 years, 11 months</td>
+		<td class="nobr">89.73 MB</td>
+		<td>237</td>
+		<td>3</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/130526.jpg" rel="shadowbox" title="Lil&#39;B - Namida Love Letter">
+                        <img src="static/images/torrents/130526.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=175142&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=175142" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=1278" title="View Artist">Lil&#39;B</a> - <a href="torrents.php?id=130526&amp;torrentid=175142" title="&#12490;&#12511;&#12480;&#12521;&#12502;&#12524;&#12479;&#12540; (View Torrent)">Namida Love Letter</a>			[AAC / V0 (VBR) / CD] [2013.03.13] (<a href="torrents.php?id=130526#comments" title="View Comments">2</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=ballad">ballad</a>, <a href="torrents.php?searchtags=female.vocalist">female.vocalist</a></div>		</td>
+		<td>11</td>
+		<td class="nobr" title="Mar 27 2013, 13:15">9 years, 11 months</td>
+		<td class="nobr">96.29 MB</td>
+		<td>136</td>
+		<td>2</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/125296.jpg" rel="shadowbox" title="nao (Japanese pop singer) - nao first Re:Place">
+                        <img src="static/images/torrents/125296.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=167348&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=167348" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=10567" title="View Artist">nao (Japanese pop singer)</a> - <a href="torrents.php?id=125296&amp;torrentid=167348" title="View Torrent">nao first Re:Place</a>			[MP3 / 320 / CD] [2012.12.29] (<a href="torrents.php?id=125296#comments" title="View Comments">1</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=female.vocalist">female.vocalist</a>, <a href="torrents.php?searchtags=game">game</a></div>		</td>
+		<td>12</td>
+		<td class="nobr" title="Mar 27 2013, 13:15">9 years, 11 months</td>
+		<td class="nobr">127.00 MB</td>
+		<td>280</td>
+		<td>5</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/129418.jpg" rel="shadowbox" title="Mao Denda - MENZ Collaboration">
+                        <img src="static/images/torrents/129418.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=173520&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=173520" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=2372" title="&#20659;&#30000;&#30495;&#22830; (View Artist)">Mao Denda</a> - <a href="torrents.php?id=129418&amp;torrentid=173520" title="MENZ Collaboration (View Torrent)">MENZ Collaboration</a>			[MP3 / 320 / CD] [2012.09.05] (<a href="torrents.php?id=129418#comments" title="View Comments">1</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=female.vocalist">female.vocalist</a>, <a href="torrents.php?searchtags=male.vocalist">male.vocalist</a>, <a href="torrents.php?searchtags=rnb">rnb</a>, <a href="torrents.php?searchtags=urban">urban</a>, <a href="torrents.php?searchtags=compilation">compilation</a></div>		</td>
+		<td>8</td>
+		<td class="nobr" title="Mar 27 2013, 13:15">9 years, 11 months</td>
+		<td class="nobr">79.50 MB</td>
+		<td>191</td>
+		<td>3</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/130469.jpg" rel="shadowbox" title="Faylan - PRISM">
+                        <img src="static/images/torrents/130469.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=175140&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=175140" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=2824" title="&#39131;&#34349; (View Artist)">Faylan</a> - <a href="torrents.php?id=130469&amp;torrentid=175140" title="PRISM (View Torrent)">PRISM</a>			[MP3 / 320 / CD] [2013.03.20] (<a href="torrents.php?id=130469#comments" title="View Comments">1</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=rock">rock</a>, <a href="torrents.php?searchtags=female.vocalist">female.vocalist</a></div>		</td>
+		<td>13</td>
+		<td class="nobr" title="Mar 27 2013, 13:15">9 years, 11 months</td>
+		<td class="nobr">139.20 MB</td>
+		<td>508</td>
+		<td>6</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/129734.jpg" rel="shadowbox" title="G.NA - Beautiful Kisses">
+                        <img src="static/images/torrents/129734.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=173990&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=173990" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=7760" title="&#51648;&#45208; (View Artist)">G.NA</a> - <a href="torrents.php?id=129734&amp;torrentid=173990" title="View Torrent">Beautiful Kisses</a>			[MP3 / 320 / WEB] [2013.03.14] (<a href="torrents.php?id=129734#comments" title="View Comments">7</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=korean">korean</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=ballad">ballad</a>, <a href="torrents.php?searchtags=dance">dance</a>, <a href="torrents.php?searchtags=female.vocalist">female.vocalist</a>, <a href="torrents.php?searchtags=rnb">rnb</a></div>		</td>
+		<td>7</td>
+		<td class="nobr" title="Mar 27 2013, 13:14">9 years, 11 months</td>
+		<td class="nobr">51.53 MB</td>
+		<td>1,140</td>
+		<td>12</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/129750.jpg" rel="shadowbox" title="GILLE - GILLEsound Vol.1">
+                        <img src="static/images/torrents/129750.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=174015&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=174015" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=18047" title="&#12472;&#12523; (View Artist)">GILLE</a> - <a href="torrents.php?id=129750&amp;torrentid=174015" title="View Torrent">GILLEsound Vol.1</a>			[MP3 / 320 / CD] [2013.03.06] (<a href="torrents.php?id=129750#comments" title="View Comments">2</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=ballad">ballad</a>, <a href="torrents.php?searchtags=dance">dance</a>, <a href="torrents.php?searchtags=female.vocalist">female.vocalist</a>, <a href="torrents.php?searchtags=english">english</a>, <a href="torrents.php?searchtags=cover">cover</a></div>		</td>
+		<td>15</td>
+		<td class="nobr" title="Mar 27 2013, 13:14">9 years, 11 months</td>
+		<td class="nobr">112.61 MB</td>
+		<td>471</td>
+		<td>5</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/130294.jpg" rel="shadowbox" title="ART-SCHOOL - The Alchemist">
+                        <img src="static/images/torrents/130294.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=174819&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=174819" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=2" title="View Artist">ART-SCHOOL</a> - <a href="torrents.php?id=130294&amp;torrentid=174819" title="View Torrent">The Alchemist</a>			[MP3 / 320 / CD] [2013.03.13] (<a href="torrents.php?id=130294#comments" title="View Comments">5</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=rock">rock</a>, <a href="torrents.php?searchtags=alternative">alternative</a>, <a href="torrents.php?searchtags=male.vocalist">male.vocalist</a></div>		</td>
+		<td>7</td>
+		<td class="nobr" title="Mar 27 2013, 13:14">9 years, 11 months</td>
+		<td class="nobr">54.76 MB</td>
+		<td>404</td>
+		<td>8</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/129939.jpg" rel="shadowbox" title="Dew - PORTABLE">
+                        <img src="static/images/torrents/129939.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=174282&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=174282" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=1945" title="View Artist">Dew</a> - <a href="torrents.php?id=129939&amp;torrentid=174282" title="PORTABLE (View Torrent)">PORTABLE</a>			[MP3 / 320 / CD] [2013.02.08] (<a href="torrents.php?id=129939#comments" title="View Comments">2</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a></div>		</td>
+		<td>9</td>
+		<td class="nobr" title="Mar 27 2013, 13:14">9 years, 11 months</td>
+		<td class="nobr">102.71 MB</td>
+		<td>194</td>
+		<td>3</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/130878.jpg" rel="shadowbox" title="PASSPO - PASSPO BEST 1">
+                        <img src="static/images/torrents/130878.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=175650&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=175650" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=11162" title="&#12401;&#12377;&#12413;&#9734; (View Artist)">PASSPO</a> - <a href="torrents.php?id=130878&amp;torrentid=175650" title="&#12401;&#12377;&#12413;&#9734;&#12505;&#12473;&#12488; 1 (View Torrent)">PASSPO BEST 1</a>			[MP3 / 320 / CD] [2013.03.27]			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=idol">idol</a></div>		</td>
+		<td>15</td>
+		<td class="nobr" title="Mar 27 2013, 13:14">9 years, 11 months</td>
+		<td class="nobr">126.01 MB</td>
+		<td>462</td>
+		<td>6</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/128100.jpg" rel="shadowbox" title="Mao Uchu - Wonder Pop">
+                        <img src="static/images/torrents/128100.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=171615&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=171615" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=18109" title="&#23431;&#23449;&#12414;&#12362; (View Artist)">Mao Uchu</a> - <a href="torrents.php?id=128100&amp;torrentid=171615" title="&#12527;&#12531;&#12480;&#12540;&#12509;&#12483;&#12503; (View Torrent)">Wonder Pop</a>			[MP3 / 192 / CD] [2012.11.07] (<a href="torrents.php?id=128100#comments" title="View Comments">4</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=female.vocalist">female.vocalist</a></div>		</td>
+		<td>8</td>
+		<td class="nobr" title="Mar 27 2013, 13:14">9 years, 11 months</td>
+		<td class="nobr">43.19 MB</td>
+		<td>103</td>
+		<td>3</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/129282.jpg" rel="shadowbox" title="Mayo Okamoto - Tomorrow">
+                        <img src="static/images/torrents/129282.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=173297&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=173297" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=3940" title="&#23713;&#26412;&#30495;&#22812; (View Artist)">Mayo Okamoto</a> - <a href="torrents.php?id=129282&amp;torrentid=173297" title="Tomorrow (View Torrent)">Tomorrow</a>			[MP3 / 320 / CD] [2013.03.07] (<a href="torrents.php?id=129282#comments" title="View Comments">4</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a></div>		</td>
+		<td>10</td>
+		<td class="nobr" title="Mar 27 2013, 13:13">9 years, 11 months</td>
+		<td class="nobr">94.24 MB</td>
+		<td>256</td>
+		<td>2</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/128859.jpg" rel="shadowbox" title="ONE OK ROCK - Jinsei x Boku =">
+                        <img src="static/images/torrents/128859.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=173672&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=173672" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=383" title="View Artist">ONE OK ROCK</a> - <a href="torrents.php?id=128859&amp;torrentid=173672" title="&#20154;&#29983;x&#20693;= (View Torrent)">Jinsei x Boku =</a>			[MP3 / V0 (VBR) / CD] [2013.03.05] (<a href="torrents.php?id=128859#comments" title="View Comments">87</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=rock">rock</a>, <a href="torrents.php?searchtags=alternative">alternative</a>, <a href="torrents.php?searchtags=ballad">ballad</a>, <a href="torrents.php?searchtags=male.vocalist">male.vocalist</a>, <a href="torrents.php?searchtags=english">english</a></div>		</td>
+		<td>13</td>
+		<td class="nobr" title="Mar 27 2013, 13:13">9 years, 11 months</td>
+		<td class="nobr">119.37 MB</td>
+		<td>234</td>
+		<td>3</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/127236.jpg" rel="shadowbox" title="Fantastic Plastic Machine - Scale">
+                        <img src="static/images/torrents/127236.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=172890&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=172890" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=492" title="View Artist">Fantastic Plastic Machine</a> - <a href="torrents.php?id=127236&amp;torrentid=172890" title="View Torrent">Scale</a>			[MP3 / 320 / CD / -Bonus Track - 2013] [2013.02.13] (<a href="torrents.php?id=127236#comments" title="View Comments">7</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=house">house</a>, <a href="torrents.php?searchtags=electronic">electronic</a></div>		</td>
+		<td>12</td>
+		<td class="nobr" title="Mar 27 2013, 13:13">9 years, 11 months</td>
+		<td class="nobr">152.44 MB</td>
+		<td>322</td>
+		<td>3</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/130335.jpg" rel="shadowbox" title="Mergrim - Invisible Landscape">
+                        <img src="static/images/torrents/130335.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=174941&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=174941" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=21754" title="View Artist">Mergrim</a> - <a href="torrents.php?id=130335&amp;torrentid=174941" title="View Torrent">Invisible Landscape</a>			[MP3 / V0 (VBR) / WEB] [2011.04.06] (<a href="torrents.php?id=130335#comments" title="View Comments">4</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=experimental">experimental</a>, <a href="torrents.php?searchtags=electronic">electronic</a>, <a href="torrents.php?searchtags=ambient">ambient</a>, <a href="torrents.php?searchtags=idm">idm</a>, <a href="torrents.php?searchtags=glitch">glitch</a></div>		</td>
+		<td>12</td>
+		<td class="nobr" title="Mar 27 2013, 13:13">9 years, 11 months</td>
+		<td class="nobr">91.45 MB</td>
+		<td>27</td>
+		<td>3</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/126553.jpg" rel="shadowbox" title="LEO (Japanese singer) - EMOTION">
+                        <img src="static/images/torrents/126553.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=169274&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=169274" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=51789" title="View Artist">LEO (Japanese singer)</a> - <a href="torrents.php?id=126553&amp;torrentid=169274" title="View Torrent">EMOTION</a>			[MP3 / 320 / CD] [2013.02.06] (<a href="torrents.php?id=126553#comments" title="View Comments">1</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=ballad">ballad</a>, <a href="torrents.php?searchtags=male.vocalist">male.vocalist</a>, <a href="torrents.php?searchtags=rnb">rnb</a>, <a href="torrents.php?searchtags=urban">urban</a></div>		</td>
+		<td>14</td>
+		<td class="nobr" title="Mar 27 2013, 13:13">9 years, 11 months</td>
+		<td class="nobr">125.04 MB</td>
+		<td>145</td>
+		<td>2</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/130811.jpg" rel="shadowbox" title="Tomoyasu Hotei - COME RAIN COME SHINE">
+                        <img src="static/images/torrents/130811.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=175562&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=175562" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=474" title="&#24067;&#34955;&#23493;&#27888; (View Artist)">Tomoyasu Hotei</a> - <a href="torrents.php?id=130811&amp;torrentid=175562" title="View Torrent">COME RAIN COME SHINE</a>			[MP3 / 320 / CD] [2013.02.06] (<a href="torrents.php?id=130811#comments" title="View Comments">7</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=rock">rock</a></div>		</td>
+		<td>13</td>
+		<td class="nobr" title="Mar 27 2013, 13:11">9 years, 11 months</td>
+		<td class="nobr">138.81 MB</td>
+		<td>358</td>
+		<td>4</td>
+		<td>0</td>
+	</tr>
+	<tr class="torrent">
+		<td class="center"><a href='torrents.php?order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1&amp;filter_cat%5B1%5D=1'>Album</a></td>
+                                <td><center>
+                                        <a href="static/images/torrents/129707.jpg" rel="shadowbox" title="TRF - WATCH THE MUSIC">
+                        <img src="static/images/torrents/129707.th.jpg" style="max-width:64px; max-height:64px" /></a>
+                                </center></td>
+                		<td>
+			<span>[<a href="torrents.php?action=download&amp;id=173960&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+			|                                   <a href="reports.php?action=report&amp;id=173960" title="Report">RP</a>]</span>
+                                  
+			<a href="artist.php?id=1356" title="View Artist">TRF</a> - <a href="torrents.php?id=129707&amp;torrentid=173960" title="View Torrent">WATCH THE MUSIC</a>			[MP3 / 320 / CD] [2013.02.25] (<a href="torrents.php?id=129707#comments" title="View Comments">3</a>)			<br /><div class="tags"><a href="torrents.php?searchtags=japanese">japanese</a>, <a href="torrents.php?searchtags=pop">pop</a>, <a href="torrents.php?searchtags=dance">dance</a>, <a href="torrents.php?searchtags=female.vocalist">female.vocalist</a></div>		</td>
+		<td>8</td>
+		<td class="nobr" title="Mar 27 2013, 13:11">9 years, 11 months</td>
+		<td class="nobr">78.43 MB</td>
+		<td>356</td>
+		<td>4</td>
+		<td>0</td>
+	</tr>
+</table>
+<div class="linkbox"><a href="torrents.php?page=1&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1" onclick="return loadHtml('torrents', 'page=1&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1');"><strong>&lt;&lt; First</strong></a> <a href="torrents.php?page=1&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1" onclick="return loadHtml('torrents', 'page=1&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1');"><strong>&lt; Prev</strong></a> | <a href="torrents.php?page=1&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1" onclick="return loadHtml('torrents', 'page=1&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1');"><strong>1-50</strong></a> | <strong>51-100</strong> | <a href="torrents.php?page=3&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1" onclick="return loadHtml('torrents', 'page=3&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1');"><strong>101-150</strong></a> | <a href="torrents.php?page=4&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1" onclick="return loadHtml('torrents', 'page=4&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1');"><strong>151-200</strong></a> | <a href="torrents.php?page=5&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1" onclick="return loadHtml('torrents', 'page=5&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1');"><strong>201-250</strong></a> | <a href="torrents.php?page=6&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1" onclick="return loadHtml('torrents', 'page=6&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1');"><strong>251-300</strong></a> | <a href="torrents.php?page=7&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1" onclick="return loadHtml('torrents', 'page=7&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1');"><strong>301-350</strong></a> | <a href="torrents.php?page=8&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1" onclick="return loadHtml('torrents', 'page=8&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1');"><strong>351-400</strong></a> | <a href="torrents.php?page=9&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1" onclick="return loadHtml('torrents', 'page=9&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1');"><strong>401-450</strong></a> | <a href="torrents.php?page=10&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1" onclick="return loadHtml('torrents', 'page=10&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1');"><strong>451-500</strong></a> | <a href="torrents.php?page=11&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1" onclick="return loadHtml('torrents', 'page=11&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1');"><strong>501-550</strong></a> | <a href="torrents.php?page=3&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1" onclick="return loadHtml('torrents', 'page=3&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1');"><strong>Next &gt;</strong></a> <a href="torrents.php?page=46&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1" onclick="return loadHtml('torrents', 'page=46&amp;order_by=s3&amp;order_way=DESC&amp;type=snatched&amp;userid=1&amp;disablegrouping=1');"><strong> Last &gt;&gt;</strong></a></div>
+
+</div>
+<div id="ajax_torrents_loading" style="text-align: center; display: none"><img src="static/styles/layer_cake/images/loading.gif" alt="Loading" /><br />Loading</div>
+</div>
+<div id="footer">
+	<p>Site and design &copy; 2023 JPopsuki 2.0</p>
+	<p>This page was created in 0.07706 second(s) on <span title="Just now">Mar 19 2023, 14:42</span></p>
+	<p>
+
+		<a href="http://en.wikipedia.org/wiki/Load_(computing)" target="_blank">Load average</a>:
+		1.37, 0.67, 0.72		<br />
+		(Average over 1 minute, 5 minutes and 15 minutes
+ on 8 cores. Load is spiked by <a href="http://en.wikipedia.org/wiki/Cron" target="_blank">cron</a> every 15 minutes.)
+	</p>
+	<p>Powered by <a href="http://jpopsuki.eu/static/images/users/774/503x.jpg">Small Horse</a></p>
+<!--	<script type="text/javascript" src="https://widgets.amung.us/colored.js"></script><script type="text/javascript">WAU_colored('l8tchbw95e38', 'e3f4fd000000')</script> -->
+	<script type="text/javascript" src="https://widgets.amung.us/pro.js"></script>
+	<script type="text/javascript" id="wau_scr_30b716e2">
+    	wau_add('d0t8', '30b716e2')
+	</script>
+	<noscript>
+    		<img src="https://whos.amung.us/piwidget/d0t8/" />
+	</noscript> 
+
+</div>
+
+</div>
+<div id="lightbox" class="lightbox"></div>
+<div id="curtain" class="curtain"></div>
+
+<!-- Extra divs, for stylesheet developers to add imagery -->
+<div id="extra1"><span></span></div>
+<div id="extra2"><span></span></div>
+<div id="extra3"><span></span></div>
+<div id="extra4"><span></span></div>
+<div id="extra5"><span></span></div>
+<div id="extra6"><span></span></div>
+</body>
+</html>

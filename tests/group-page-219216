@@ -1,0 +1,916 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<title>Buono! - Buono! Festa 2016 :: JPopsuki 2.0</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<link rel="shortcut icon" href="favicon.ico" />
+	<link rel="search" type="application/opensearchdescription+xml" title="JPopsuki 2.0 - Torrents" href="/opensearch_torrents.xml" />
+	<link rel="search" type="application/opensearchdescription+xml" title="JPopsuki 2.0 - Requests" href="/opensearch_requests.xml" />
+	<link rel="search" type="application/opensearchdescription+xml" title="JPopsuki 2.0 - Forums" href="/opensearch_forums.xml" />
+	<link rel="search" type="application/opensearchdescription+xml" title="JPopsuki 2.0 - Log" href="/opensearch_log.xml" />
+	<link rel="search" type="application/opensearchdescription+xml" title="JPopsuki 2.0 - Users" href="/opensearch_users.xml" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_notify_00000000000000000000000000000000&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - P.T.N." />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_notify_11111_00000000000000000000000000000000&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;name=Artist+notifications" title="JPopsuki 2.0 - Artist notifications" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_all&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - All Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_album&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - Album Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_single&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - Single Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_pv&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - PV Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_dvd&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - DVD Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_tv-music&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - TV-Music Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_tv-variety&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - TV-Variety Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_tv-drama&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - TV-Drama Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_fansubs&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - Fansubs Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_pictures&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - Pictures Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_misc&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - Misc Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_lossless&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - Lossless Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_flac&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - FLAC Torrents" />
+	<link href="static/styles/layer_cake/style.css" title="layer_cake" rel="stylesheet" type="text/css" media="screen" />
+	<link href="static/styles/log.css" rel="stylesheet" type="text/css" />
+	<link href="static/styles/global.css" rel="stylesheet" type="text/css" />
+	<script src="static/functions/jquery.js" type="text/javascript"></script>
+	<script src="static/functions/main.js" type="text/javascript"></script>
+	<link rel="stylesheet" type="text/css" href="static/shadowbox-3.0.3/shadowbox.css">
+	<script type="text/javascript" src="static/shadowbox-3.0.3/shadowbox.js"></script>
+	<script type="text/javascript">
+	Shadowbox.init();
+	</script>
+	<script type="text/javascript">
+		function bluehorse()
+		{
+			if(confirm('Would you like to see a penis?')) {
+				alert('Sick bastard. Oh well, here\'s a penis');
+			} else {
+				alert('Too bad! You\'re going to see one anyways');
+			}
+
+			document.location = "http://jpopsuki.eu/static/images/users/774/KICRK.png";
+		}
+
+		function penis()
+		{
+			document.cookie = 'invasion=zombie_fruits; expires=Fri, 04 Mar 2011 21:29:16 GMT; path=/';
+			$('#randomfitta').css('display', 'none');
+		}
+	</script>
+
+	<script src="static/functions/details.js" type="text/javascript"></script>
+	<script src="static/functions/posts.js" type="text/javascript"></script>
+	<script src="static/functions/jquery-ui.js" type="text/javascript"></script>
+
+</head>
+<body id="torrents">
+<a name="top"></a>
+
+<div id="wrapper">
+<h1 class="hidden">JPopsuki 2.0</h1>
+
+<div id="header">
+	<div id="logo"><a href="index.php"></a></div>
+	<div id="userinfo">
+		<ul id="userinfo_username">
+			<li><a href="user.php?id=1" class="username">username</a></li>
+			<li class="brackets"><a href="user.php?action=edit&amp;userid=1">Edit</a></li>
+			<li class="brackets"><a href="logout.php?auth=00000000000000000000000000000000">Logout</a></li>
+		</ul>
+		<ul id="userinfo_major">
+			<li class="brackets"><strong><a href="upload.php">Upload</a></strong></li>
+			<li class="brackets"><strong><a href="user.php?action=invite">Invite (10)</a></strong></li>
+			<li class="brackets"><strong><a href="donate.php">Donate</a></strong></li>
+		</ul>
+		<ul id="userinfo_stats">
+			<li>Up: <span class="stat">52.21 TB</span></li>
+			<li>Down: <span class="stat">4.71 TB</span></li>
+			<li>Ratio: <span class="stat"><span class="r50">11.09</span></span></li>
+			<li><i><a href="bonus.php">Bonus: <span class="stat">2097150</span></a></i></li>
+		</ul>
+		<ul id="userinfo_minor">
+			<li><a href="inbox.php">Inbox</a></li>
+			<li><a href="notice.php">Notices</a></li>
+			<li><a href="torrents.php?type=uploaded&amp;userid=1">Uploads</a></li>
+			<li><a href="bookmarks.php">Bookmarks</a></li>
+</a></li>
+			<li><a href="user.php?action=notify">Notifications</a></li>
+			<li><a href="userhistory.php?action=posts&amp;userid=1">Posts</a></li>
+			<li><a href="friends.php">Friends</a></li>
+		</ul>
+	</div>
+	<div id="menu">
+		<h4 class="hidden">Site Menu</h4>
+		<ul>
+			<li id="nav_index"><a href="index.php">Home</a></li>
+			<li id="nav_torrents"><a href="torrents.php">Torrents</a></li>
+			<li id="nav_artists"><a href="artist.php">Artists</a></li>
+			<li id="nav_requests"><a href="requests.php">Requests</a></li>
+                        <li id="nav_collages"><a href="collages.php">Collages</a></li>
+			<li id="nav_forums"><a href="forums.php">Forums</a></li>
+			<li id="nav_top10"><a href="top10.php">Top 10</a></li>
+			<li id="nav_irc"><a href="irc.php">IRC</a></li>
+			<li id="nav_tv"><a href="streaming.php">Radio</a></li>
+			<li id="nav_rules"><a href="rules.php">Rules</a></li>
+			<li id="nav_kb"><a href="kb2.php">Help</a></li>
+			<li id="nav_staff"><a href="staff.php">Staff</a></li>
+		</ul>
+	</div>
+	<div id="alerts">
+		<div class="alertbar">
+			<a href="torrents.php?action=notify">You have 38 new torrent notifications</a> (<a href="torrents.php?action=notify_clear&amp;auth=00000000000000000000000000000000">Delete</a>)
+		</div>
+	</div>
+	<div id="searchbars">
+		<ul>
+ 
+			<li>
+				<span class="hidden">Torrents: </span>
+				<form action="torrents.php" method="get">
+					<input
+						onfocus="if (this.value == 'Torrents') this.value='';"
+						onblur="if (this.value == '') this.value='Torrents';"
+						value="Torrents" type="text" name="searchstr" size="17"
+					/>
+					<input value="Search" type="submit" class="hidden" />
+				</form>
+			</li>
+ 
+ 
+			<li>
+				<span class="hidden">Artist: </span>
+				<form action="artist.php" method="get">
+					<input
+						onfocus="if (this.value == 'Artist') this.value='';"
+						onblur="if (this.value == '') this.value='Artist';"
+						value="Artist" type="text" name="name" size="17"
+					/>
+					<input value="Search" type="submit" class="hidden" />
+				</form>
+			</li>
+ 
+			<li>
+				<span class="hidden">Requests: </span>
+				<form action="requests.php" method="get">
+					<input
+						onfocus="if (this.value == 'Requests') this.value='';"
+						onblur="if (this.value == '') this.value='Requests';"
+						value="Requests" type="text" name="search" size="17"
+					/>
+					<input value="Search" type="submit" class="hidden" />
+				</form>
+			</li>
+			<li>
+				<span class="hidden">Forums: </span>
+				<form action="forums.php" method="get">
+					<input value="search" type="hidden" name="action" />
+					<input
+						onfocus="if (this.value == 'Forums') this.value='';"
+						onblur="if (this.value == '') this.value='Forums';"
+						value="Forums" type="text" name="search" size="17"
+					/>
+					<input value="Search" type="submit" class="hidden" />
+				</form>
+			</li>
+			<li>
+				<span class="hidden">Log: </span>
+				<form action="log.php" method="get">
+					<input
+						onfocus="if (this.value == 'Log') this.value='';"
+						onblur="if (this.value == '') this.value='Log';"
+						value="Log" type="text" name="search" size="17"
+					/>
+					<input value="Search" type="submit" class="hidden" />
+				</form>
+			</li>
+			<li>
+				<span class="hidden">Users: </span>
+				<form action="user.php" method="get">
+					<input type="hidden" name="action" value="search" />
+					<input
+						onfocus="if (this.value == 'Peeps') this.value='';"
+						onblur="if (this.value == '') this.value='Peeps';"
+						value="Peeps" type="text" name="username" size="17"
+					/>
+					<input value="Search" type="submit" class="hidden" />
+				</form>
+			</li>
+		</ul>
+	</div>
+
+</div>
+<br />
+<div id="content">
+<script type="text/javascript">
+$(document).ready(function() {
+	$('#lolpenis').autocomplete({
+		delay: 500,
+		source: "ajax.php?section=a_artist",
+		minLength: 2
+	});
+});
+</script>
+<div class="thin">
+	<h2>[DVD] <a href="artist.php?id=188">Buono!</a> - Buono! Festa 2016 [2016.11.23]</h2>
+	<div class="sidebar">
+		<div class="box">
+			<div class="head"><strong>Page Options</strong></div>
+			<ul class="stats nobullet">
+				<li><a href="reports.php?action=report&amp;type=Group&amp;id=219216">Report</a></li>
+				<li><a href="torrents.php?action=editgroup&amp;groupid=219216">Edit Description</a></li>
+				<li><a href="torrents.php?action=history&amp;groupid=219216">View History</a></li>
+				<li><a href="javascript:Bookmark();">Bookmark</a></li>
+				<li><a href="upload.php?groupid=219216">Add Format</a></li>
+			</ul>
+		</div>
+		<div class="box">
+			<div class="head"><strong>Cover / Screenshot</strong></div>
+			<p align="center"><a href="static/images/torrents/219216.jpg" rel="shadowbox" title="Buono! - Buono! Festa 2016 [2016.11.23]"><img src="static/images/torrents/219216.th.jpg" width="220" alt="Buono! - Buono! Festa 2016 [2016.11.23]" title="Buono! - Buono! Festa 2016 [2016.11.23]" border="0" /></a></p>
+		</div>
+		<div class="box">
+			<div class="head"><strong>Contributing Artists</strong></div>
+			<div class="body">
+				<ul class="stats nobullet">
+				</ul>
+				<form action="torrents.php" method="post">
+					<input type="hidden" name="action" value="add_contrib" />
+					<input type="hidden" name="groupid" value="219216" />
+					<input type="text" id="lolpenis" name="artistname" size="20" />
+					<input type="submit" value="+" />
+				</form>
+			</div>
+		</div>
+
+		<div class="box">
+			<div class="head"><strong>Tags</strong></div>
+			<ul class="stats nobullet">
+<!-- 1|1|1|1|44|594 -->				<li>
+					<a href="torrents.php?searchtags=japanese">japanese</a>
+					<a href="torrents.php?action=vote_tag&amp;way=up&amp;groupid=219216&amp;tagid=1&amp;auth=00000000000000000000000000000000">[+]</a>
+					<a href="torrents.php?action=vote_tag&amp;way=down&amp;groupid=219216&amp;tagid=1&amp;auth=00000000000000000000000000000000">[-]</a>
+				</li>
+				<li>
+					<a href="torrents.php?searchtags=pop">pop</a>
+					<a href="torrents.php?action=vote_tag&amp;way=up&amp;groupid=219216&amp;tagid=7&amp;auth=00000000000000000000000000000000">[+]</a>
+					<a href="torrents.php?action=vote_tag&amp;way=down&amp;groupid=219216&amp;tagid=7&amp;auth=00000000000000000000000000000000">[-]</a>
+				</li>
+				<li>
+					<a href="torrents.php?searchtags=rock">rock</a>
+					<a href="torrents.php?action=vote_tag&amp;way=up&amp;groupid=219216&amp;tagid=8&amp;auth=00000000000000000000000000000000">[+]</a>
+					<a href="torrents.php?action=vote_tag&amp;way=down&amp;groupid=219216&amp;tagid=8&amp;auth=00000000000000000000000000000000">[-]</a>
+				</li>
+				<li>
+					<a href="torrents.php?searchtags=female.vocalist">female.vocalist</a>
+					<a href="torrents.php?action=vote_tag&amp;way=up&amp;groupid=219216&amp;tagid=17&amp;auth=00000000000000000000000000000000">[+]</a>
+					<a href="torrents.php?action=vote_tag&amp;way=down&amp;groupid=219216&amp;tagid=17&amp;auth=00000000000000000000000000000000">[-]</a>
+				</li>
+				<li>
+					<a href="torrents.php?searchtags=hello.project">hello.project</a>
+					<a href="torrents.php?action=vote_tag&amp;way=up&amp;groupid=219216&amp;tagid=58&amp;auth=00000000000000000000000000000000">[+]</a>
+					<a href="torrents.php?action=vote_tag&amp;way=down&amp;groupid=219216&amp;tagid=58&amp;auth=00000000000000000000000000000000">[-]</a>
+				</li>
+				<li>
+					<a href="torrents.php?searchtags=idol">idol</a>
+					<a href="torrents.php?action=vote_tag&amp;way=up&amp;groupid=219216&amp;tagid=175&amp;auth=00000000000000000000000000000000">[+]</a>
+					<a href="torrents.php?action=vote_tag&amp;way=down&amp;groupid=219216&amp;tagid=175&amp;auth=00000000000000000000000000000000">[-]</a>
+				</li>
+			</ul>
+		</div>
+		<div class="box">
+			<div class="head"><strong>Add Tag</strong></div>
+			<div class="body">
+				<form action="torrents.php" method="post">
+					<input type="hidden" name="action" value="add_tag" />
+					<input type="hidden" name="groupid" value="219216" />
+					<input type="text" name="tagname" size="20" />
+					<input type="submit" value="+" />
+				</form>
+				<br /><br />
+				<strong><a href="rules.php?p=tag">Tagging Rules</a></strong>
+			</div>
+		</div>
+	</div>
+	<div class="main_column">
+		<table class="torrent_table" style="margin-top: 0px">
+			<tr class="colhead_dark">
+				<td width="80%"><strong>Torrents</strong></td>
+				<td><strong>Size</strong></td>
+				<td class="sign"><img src="static/styles/layer_cake/images/snatched.png" alt="Snatches" title="Snatches" /></td>
+				<td class="sign"><img src="static/styles/layer_cake/images/seeders.png" alt="Seeders" title="Seeders" /></td>
+				<td class="sign"><img src="static/styles/layer_cake/images/leechers.png" alt="Leechers" title="Leechers" /></td>
+			</tr>
+			<tr class="group_torrent" style="font-weight: normal;">
+				<td>
+					<span>[
+						<a href="torrents.php?action=download&amp;id=306764&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+                        			|                         			<a href="reports.php?action=report&amp;id=306764" title="Report">RP</a>                
+                        									| <a href="torrents.php?action=edit&amp;id=306764" title="Edit">ED</a>
+						| <a href="torrents.php?action=delete&amp;torrentid=306764" title="Remove">RM</a>
+					]</span>
+					<a href="#" onclick="return swapTorrent('306764');">&raquo; MKV / Blu-Ray / <strong>Freeleech!</strong></a>
+				</td>
+				<td class="nobr">42.89 GB</td>
+				<td>68</td>
+				<td>2</td>
+				<td>0</td>
+			</tr>
+
+		<tr class="pad hide" id="torrent_306764">
+                <td colspan="5">
+            
+                                        <blockquote>
+                        Uploaded by <a href="user.php?id=180443">ginghamcheckgoldie</a>  on <span title="6 years, 3 months, 3 weeks ago">Nov 25 2016, 12:10</span>					</blockquote>
+					<blockquote>Uncompressed decrypted mkvs</blockquote>					<table style="overflow-x:auto;"><tr class="colhead_dark"><td><strong>Filename</strong></td><td><strong>Size</strong></td></tr><tr><td>title00.mkv</td><td>30.89 GB</td></tr><tr><td>title01.mkv</td><td>12.01 GB</td></tr></table>			Peer List: (<a href="#" id="swapPeer_306764" onclick="return swapPeerList('306764', '46057856722', 'Show', 'Hide');">Show</a>)<br />
+			<div id="ajax_peerlist_306764" style="text-align: center"></div><br />
+			Snatch List: (<a href="#" id="swapSnatch_306764" onclick="return swapSnatchList('306764', 'Show', 'Hide');">Show</a>)<br />
+			<div id="ajax_snatchlist_306764" style="text-align: center"></div>
+
+				</td>
+			</tr>
+			<tr class="group_torrent" style="font-weight: normal;">
+				<td>
+					<span>[
+						<a href="torrents.php?action=download&amp;id=311021&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+                        			|                         			<a href="reports.php?action=report&amp;id=311021" title="Report">RP</a>                
+                        									| <a href="torrents.php?action=edit&amp;id=311021" title="Edit">ED</a>
+						| <a href="torrents.php?action=delete&amp;torrentid=311021" title="Remove">RM</a>
+					]</span>
+					<a href="#" onclick="return swapTorrent('311021');">&raquo; MKV / Blu-Ray</a>
+				</td>
+				<td class="nobr">4.34 GB</td>
+				<td>100</td>
+				<td>4</td>
+				<td>0</td>
+			</tr>
+
+		<tr class="pad hide" id="torrent_311021">
+                <td colspan="5">
+            
+                    					<blockquote>
+						New ratio after downloading (without uploading): <span class="r50">11.08</span><br />
+						<em>Estimated Calculation. This assumes you're not downloading any other torrent.</em>
+					</blockquote>
+					                    <blockquote>
+                        Uploaded by <a href="user.php?id=180443">ginghamcheckgoldie</a>  on <span title="6 years, 2 months, 2 weeks ago">Dec 31 2016, 16:33</span>					</blockquote>
+					<blockquote>From the iso^H^H^H physical disc - x265 constant quality 23, encoding speed medium</blockquote>					<table style="overflow-x:auto;"><tr class="colhead_dark"><td><strong>Filename</strong></td><td><strong>Size</strong></td></tr><tr><td>Buono Festa 2016 guests.mkv</td><td>1.16 GB</td></tr><tr><td>Buono Festa 2016.mkv</td><td>3.18 GB</td></tr></table>			Peer List: (<a href="#" id="swapPeer_311021" onclick="return swapPeerList('311021', '4662406064', 'Show', 'Hide');">Show</a>)<br />
+			<div id="ajax_peerlist_311021" style="text-align: center"></div><br />
+			Snatch List: (<a href="#" id="swapSnatch_311021" onclick="return swapSnatchList('311021', 'Show', 'Hide');">Show</a>)<br />
+			<div id="ajax_snatchlist_311021" style="text-align: center"></div>
+
+				</td>
+			</tr>
+			<tr class="group_torrent" style="font-weight: normal;">
+				<td>
+					<span>[
+						<a href="torrents.php?action=download&amp;id=375899&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+                        			|                         			<a href="reports.php?action=report&amp;id=375899" title="Report">RP</a>                
+                        								]</span>
+					<a href="#" onclick="return swapTorrent('375899');">&raquo; ISO / Blu-Ray / <strong>Freeleech!</strong></a>
+				</td>
+				<td class="nobr">45.30 GB</td>
+				<td>38</td>
+				<td>3</td>
+				<td>0</td>
+			</tr>
+
+		<tr class="pad hide" id="torrent_375899">
+                <td colspan="5">
+            
+                                        <blockquote>
+                        Uploaded by <a href="user.php?id=205893">KakashiZ</a>  on <span title="4 years, 6 months, 4 days ago">Sep 13 2018, 11:18</span>					</blockquote>
+					<blockquote>I noticed the currently seeded ISO was corrupted when trying to transcode, so I ripped my copy of the Blu-Ray.</blockquote>					<table style="overflow-x:auto;"><tr class="colhead_dark"><td><strong>Filename</strong></td><td><strong>Size</strong></td></tr><tr><td>EPXE 5092.iso</td><td>45.30 GB</td></tr><tr><td>EPXE 5092.jpg</td><td>276.47 KB</td></tr></table>			Peer List: (<a href="#" id="swapPeer_375899" onclick="return swapPeerList('375899', '48642609629', 'Show', 'Hide');">Show</a>)<br />
+			<div id="ajax_peerlist_375899" style="text-align: center"></div><br />
+			Snatch List: (<a href="#" id="swapSnatch_375899" onclick="return swapSnatchList('375899', 'Show', 'Hide');">Show</a>)<br />
+			<div id="ajax_snatchlist_375899" style="text-align: center"></div>
+
+				</td>
+			</tr>
+			<tr class="group_torrent" style="font-weight: normal;">
+				<td>
+					<span>[
+						<a href="torrents.php?action=download&amp;id=381763&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+                        			|                         			<a href="reports.php?action=report&amp;id=381763" title="Report">RP</a>                
+                        								]</span>
+					<a href="#" onclick="return swapTorrent('381763');">&raquo; FLAC / CD / Bonus CDs - 2016</a>
+				</td>
+				<td class="nobr">755.53 MB</td>
+				<td>18</td>
+				<td>2</td>
+				<td>0</td>
+			</tr>
+
+		<tr class="pad hide" id="torrent_381763">
+                <td colspan="5">
+            
+                    					<blockquote>
+						New ratio after downloading (without uploading): <span class="r50">11.09</span><br />
+						<em>Estimated Calculation. This assumes you're not downloading any other torrent.</em>
+					</blockquote>
+					                    <blockquote>
+                        Uploaded by <a href="user.php?id=205893">KakashiZ</a>  on <span title="4 years, 4 months, 2 weeks ago">Nov 02 2018, 23:39</span>					</blockquote>
+										<table style="overflow-x:auto;"><tr class="colhead_dark"><td><strong>Filename</strong></td><td><strong>Size</strong></td></tr><tr><td>Buono!   Buono! Festa 2016.jpg</td><td>276.47 KB</td></tr><tr><td>Buono! Festa 2016   Group Shot.jpg</td><td>289.29 KB</td></tr><tr><td>CD1/01 Buono!   &#12525;&#12483;&#12463;&#12398;&#32854;&#22320;.flac</td><td>37.37 MB</td></tr><tr><td>CD1/02 Buono!   We are Buono! &#12316; Buono!&#12398;&#12486;&#12540;&#12510;&#9825;.flac</td><td>22.73 MB</td></tr><tr><td>CD1/03 Buono!   &#12525;&#12483;&#12479;&#12521; &#12525;&#12483;&#12479;&#12521;.flac</td><td>29.10 MB</td></tr><tr><td>CD1/04 Buono!   Independent Girl &#65374; &#29420;&#31435;&#22899;&#23376;&#12391;&#12354;&#12427;&#12383;&#12417;&#12395;.flac</td><td>33.35 MB</td></tr><tr><td>CD1/05 Buono!   &#38609;&#33609;&#12398;&#12358;&#12383;.flac</td><td>27.79 MB</td></tr><tr><td>CD1/06 Buono!   JUICY HE@RT.flac</td><td>31.27 MB</td></tr><tr><td>CD1/07 Buono!   &#12477;&#12521;&#12471;&#12489; &#65374;&#12397;&#12360;&#12397;&#12360;&#65374;.flac</td><td>32.25 MB</td></tr><tr><td>CD1/08 Buono!   &#12460;&#12481;&#12531;&#12467;&#12391;&#12356;&#12371;&#12358;!.flac</td><td>27.80 MB</td></tr><tr><td>CD1/09 Buono!   &#12510;&#12452;&#12521;&#12502;.flac</td><td>27.57 MB</td></tr><tr><td>CD1/10 Buono!   Kiss! Kiss! Kiss!.flac</td><td>34.08 MB</td></tr><tr><td>CD1/11 Buono!   &#12358;&#12425;&#12399;&#12425; (&#12450;&#12467;&#12540;&#12473;&#12486;&#12451;&#12483;&#12463; Ver.).flac</td><td>24.58 MB</td></tr><tr><td>CD1/12 Buono!   &#21531;&#12364;&#12356;&#12428;&#12400; (&#12450;&#12467;&#12540;&#12473;&#12486;&#12451;&#12483;&#12463; Ver.).flac</td><td>29.67 MB</td></tr><tr><td>CD1/13 Buono!   You&#39;re My Friend (&#12450;&#12467;&#12540;&#12473;&#12486;&#12451;&#12483;&#12463; Ver.).flac</td><td>40.48 MB</td></tr><tr><td>CD1/Buono!   Buono! Festa 2016.log</td><td>11.22 KB</td></tr><tr><td>CD2/14 Buono!   &#27875;&#12365;&#34411;&#23569;&#24180;.flac</td><td>31.72 MB</td></tr><tr><td>CD2/15 Buono!   &#12459;&#12479;&#12458;&#12514;&#12452;&#12290;.flac</td><td>26.51 MB</td></tr><tr><td>CD2/16 Buono!   &#21021;&#24651;&#12469;&#12452;&#12480;&#12540; (Album ver.).flac</td><td>27.78 MB</td></tr><tr><td>CD2/17 Buono!   Bravo&#9734;Bravo.flac</td><td>37.49 MB</td></tr><tr><td>CD2/18 Buono!   &#12376;&#12419;&#12394;&#12365;&#12419;&#12418;&#12387;&#12383;&#12356;&#12394;&#12356;&#12387;!.flac</td><td>30.73 MB</td></tr><tr><td>CD2/19 Buono!   &#12428;&#12391;&#12355;&#12401;&#12435;&#12373;&#12353;.flac</td><td>24.88 MB</td></tr><tr><td>CD2/20 Buono!   MY BOY.flac</td><td>33.68 MB</td></tr><tr><td>CD2/21 Buono!   &#24651;&#24859;&hearts;&#12521;&#12452;&#12480;&#12540;.flac</td><td>31.99 MB</td></tr><tr><td>CD2/22 Buono!   &#12525;&#12483;&#12463;&#12398;&#31070;&#27096; [ENCORE].flac</td><td>33.48 MB</td></tr><tr><td>CD2/23 Buono!   &#12527;&#12540;&#12503;! [ENCORE].flac</td><td>28.20 MB</td></tr><tr><td>CD2/24 Buono!   &#12479;&#12499;&#12480;&#12481;&#12398;&#27468; [ENCORE].flac</td><td>50.45 MB</td></tr><tr><td>CD2/Buono!   Buono! Festa 2016.log</td><td>9.99 KB</td></tr></table>			Peer List: (<a href="#" id="swapPeer_381763" onclick="return swapPeerList('381763', '792231236', 'Show', 'Hide');">Show</a>)<br />
+			<div id="ajax_peerlist_381763" style="text-align: center"></div><br />
+			Snatch List: (<a href="#" id="swapSnatch_381763" onclick="return swapSnatchList('381763', 'Show', 'Hide');">Show</a>)<br />
+			<div id="ajax_snatchlist_381763" style="text-align: center"></div>
+
+				</td>
+			</tr>
+			<tr class="group_torrent" style="font-weight: normal;">
+				<td>
+					<span>[
+						<a href="torrents.php?action=download&amp;id=381765&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+                        			|                         			<a href="reports.php?action=report&amp;id=381765" title="Report">RP</a>                
+                        								]</span>
+					<a href="#" onclick="return swapTorrent('381765');">&raquo; FLAC / Blu-Ray</a>
+				</td>
+				<td class="nobr">2.21 GB</td>
+				<td>10</td>
+				<td>2</td>
+				<td>0</td>
+			</tr>
+
+		<tr class="pad hide" id="torrent_381765">
+                <td colspan="5">
+            
+                    					<blockquote>
+						New ratio after downloading (without uploading): <span class="r50">11.08</span><br />
+						<em>Estimated Calculation. This assumes you're not downloading any other torrent.</em>
+					</blockquote>
+					                    <blockquote>
+                        Uploaded by <a href="user.php?id=205893">KakashiZ</a>  on <span title="4 years, 4 months, 2 weeks ago">Nov 02 2018, 23:41</span>					</blockquote>
+										<table style="overflow-x:auto;"><tr class="colhead_dark"><td><strong>Filename</strong></td><td><strong>Size</strong></td></tr><tr><td>01 Buono!   &#12525;&#12483;&#12463;&#12398;&#32854;&#22320;.flac</td><td>66.79 MB</td></tr><tr><td>02 Buono!   MC1.flac</td><td>2.46 MB</td></tr><tr><td>03 Buono!   We are Buono! &#12316; Buono!&#12398;&#12486;&#12540;&#12510;&#9825;.flac</td><td>37.84 MB</td></tr><tr><td>04 Buono!   &#12525;&#12483;&#12479;&#12521; &#12525;&#12483;&#12479;&#12521;.flac</td><td>52.33 MB</td></tr><tr><td>05 Buono!   Independent Girl &#65374; &#29420;&#31435;&#22899;&#23376;&#12391;&#12354;&#12427;&#12383;&#12417;&#12395;.flac</td><td>14.70 MB</td></tr><tr><td>06 Buono!   &#38609;&#33609;&#12398;&#12358;&#12383;.flac</td><td>54.71 MB</td></tr><tr><td>07 Buono!   JUICY HE@RT.flac</td><td>49.83 MB</td></tr><tr><td>08 Buono!   MC2 (&#22799;&#28988;&#38597;&#12398;&#35477;&#29983;&#26085;&#12362;&#31069;&#12356;).flac</td><td>54.31 MB</td></tr><tr><td>09 Buono!   MC2&#12398;&#32154;&#12365;.flac</td><td>59.55 MB</td></tr><tr><td>10 Buono!   &#12477;&#12521;&#12471;&#12489; &#65374;&#12397;&#12360;&#12397;&#12360;&#65374;.flac</td><td>55.88 MB</td></tr><tr><td>11 Buono!   &#12460;&#12481;&#12531;&#12467;&#12391;&#12356;&#12371;&#12358;!.flac</td><td>49.92 MB</td></tr><tr><td>12 Buono!   &#12510;&#12452;&#12521;&#12502;.flac</td><td>49.03 MB</td></tr><tr><td>13 Buono!   Kiss! Kiss! Kiss!.flac</td><td>61.25 MB</td></tr><tr><td>14 Buono!   MC3 (Dolce&#12513;&#12531;&#12496;&#12540;&#12539;&#12473;&#12488;&#12522;&#12531;&#12464;&#12473;   &#12354;&#12417;&#12385;&#12419;&#12435; [ &#38632;&#23470;&#40635;&#26411;&#23376; ] &#32057;&#20171;).flac</td><td>32.41 MB</td></tr><tr><td>15 Buono!   &#12358;&#12425;&#12399;&#12425; (&#12450;&#12467;&#12540;&#12473;&#12486;&#12451;&#12483;&#12463; Ver.).flac</td><td>46.51 MB</td></tr><tr><td>16 Buono!   &#21531;&#12364;&#12356;&#12428;&#12400; (&#12450;&#12467;&#12540;&#12473;&#12486;&#12451;&#12483;&#12463; Ver.).flac</td><td>58.12 MB</td></tr><tr><td>17 Buono!   You&#39;re My Friend (&#12450;&#12467;&#12540;&#12473;&#12486;&#12451;&#12483;&#12463; Ver.).flac</td><td>73.07 MB</td></tr><tr><td>18 Buono!   VTR (&#23544;&#21127;&#65306;Buono!&#12473;&#12479;&#12483;&#12501;&#12452;&#12531;&#12479;&#12499;&#12517;&#12540;).flac</td><td>66.24 MB</td></tr><tr><td>19 Buono!   &#27875;&#12365;&#34411;&#23569;&#24180;.flac</td><td>56.30 MB</td></tr><tr><td>20 Buono!   &#12459;&#12479;&#12458;&#12514;&#12452;&#12290;.flac</td><td>47.88 MB</td></tr><tr><td>21 Buono!   &#21021;&#24651;&#12469;&#12452;&#12480;&#12540; (Album Ver.).flac</td><td>49.35 MB</td></tr><tr><td>22 Buono!   Bravo&#9734;Bravo&#12398;&#12452;&#12531;&#12488;&#12525;.flac</td><td>4.14 MB</td></tr><tr><td>23 Buono!   Bravo&#9734;Bravo.flac</td><td>64.09 MB</td></tr><tr><td>24 Buono!   &#12376;&#12419;&#12394;&#12365;&#12419;&#12418;&#12387;&#12383;&#12356;&#12394;&#12356;&#12387;!.flac</td><td>54.29 MB</td></tr><tr><td>25 Buono!   &#12428;&#12391;&#12355;&#12401;&#12435;&#12373;&#12353;.flac</td><td>44.53 MB</td></tr><tr><td>26 Buono!   MY BOY.flac</td><td>59.84 MB</td></tr><tr><td>27 Buono!   &#24651;&#24859;&hearts;&#12521;&#12452;&#12480;&#12540;.flac</td><td>64.12 MB</td></tr><tr><td>28 Buono!   &#12525;&#12483;&#12463;&#12398;&#31070;&#27096; [ENCORE].flac</td><td>58.86 MB</td></tr><tr><td>29 Buono!   MC4 [ENCORE].flac</td><td>50.86 MB</td></tr><tr><td>30 Buono!   &#12527;&#12540;&#12503;! [ENCORE].flac</td><td>50.21 MB</td></tr><tr><td>31 Buono!   &#12479;&#12499;&#12480;&#12481;&#12398;&#27468; [ENCORE].flac</td><td>92.04 MB</td></tr><tr><td>32 Buono!   ENDING (BGM  &#22799;&#12480;&#12459;&#12521;!).flac</td><td>25.21 MB</td></tr><tr><td>33 PINK CRES.   VTR1 (&#12458;&#12540;&#12487;&#12451;&#12471;&#12519;&#12531; &#12524;&#12483;&#12473;&#12531; &#12464;&#12523;&#12540;&#12503;&#21517;&#30330;&#34920;).flac</td><td>49.70 MB</td></tr><tr><td>34 PINK CRES.   Warning &#65374;&#26410;&#26469;&#35686;&#22577;&#65374; [&#12513;&#12489;&#12524;&#12540;].flac</td><td>32.64 MB</td></tr><tr><td>35 PINK CRES.   &#12454;&#12527;&#12494;&#12477;&#12521; [&#12513;&#12489;&#12524;&#12540;].flac</td><td>31.83 MB</td></tr><tr><td>36 PINK CRES.   MC1.flac</td><td>52.10 MB</td></tr><tr><td>37 PINK CRES.   Summer Wonderland.flac</td><td>62.36 MB</td></tr><tr><td>38 &#12459;&#12531;&#12488;&#12522;&#12540;&#12539;&#12460;&#12540;&#12523;&#12474;   &#24651;&#27877;&#26834; (&#12452;&#12531;&#12488;&#12525; Long Ver.).flac</td><td>51.44 MB</td></tr><tr><td>39 &#12459;&#12531;&#12488;&#12522;&#12540;&#12539;&#12460;&#12540;&#12523;&#12474;   MC2.flac</td><td>26.90 MB</td></tr><tr><td>40 &#12459;&#12531;&#12488;&#12522;&#12540;&#12539;&#12460;&#12540;&#12523;&#12474;   &#12393;&#12540;&#12384;&#12387;&#12390;&#12356;&#12356;&#12398;.flac</td><td>39.35 MB</td></tr><tr><td>41 &#12459;&#12531;&#12488;&#12522;&#12540;&#12539;&#12460;&#12540;&#12523;&#12474;   &#24859;&#12362;&#12375;&#12367;&#12387;&#12390;&#12372;&#12417;&#12435;&#12397;.flac</td><td>56.58 MB</td></tr><tr><td>42 &#8451; ute   &#37117;&#20250;&#12387;&#23376; &#32020;&#24773; (2012 &#31070;&#32854;&#12394;&#12427; Ver.).flac</td><td>43.60 MB</td></tr><tr><td>43 &#8451; ute   MC3.flac</td><td>18.91 MB</td></tr><tr><td>44 &#8451; ute   &#20154;&#29983;&#12399;STEP!.flac</td><td>54.93 MB</td></tr><tr><td>45 &#8451; ute   Kiss me &#24859;&#12375;&#12390;&#12427;.flac</td><td>41.34 MB</td></tr><tr><td>46 &#8451; ute   Dance&#12391;&#12496;&#12467;&#12540;&#12531;.flac</td><td>36.26 MB</td></tr><tr><td>47 &#8451; ute&#12539;&#12459;&#12531;&#12488;&#12522;&#12540;&#12539;&#12460;&#12540;&#12523;&#12474;   &#12507;&#12531;&#12488;&#12398;&#12376;&#12406;&#12435;.flac</td><td>58.65 MB</td></tr><tr><td>Buono! Festa 2016   Group Shot.jpg</td><td>289.29 KB</td></tr><tr><td>Buono! Festa 2016.jpg</td><td>276.47 KB</td></tr></table>			Peer List: (<a href="#" id="swapPeer_381765" onclick="return swapPeerList('381765', '2373762013', 'Show', 'Hide');">Show</a>)<br />
+			<div id="ajax_peerlist_381765" style="text-align: center"></div><br />
+			Snatch List: (<a href="#" id="swapSnatch_381765" onclick="return swapSnatchList('381765', 'Show', 'Hide');">Show</a>)<br />
+			<div id="ajax_snatchlist_381765" style="text-align: center"></div>
+
+				</td>
+			</tr>
+		</table>
+		<div class="box">
+			<div class="head"><strong>Release Info</strong></div>
+			<div class="body">Buono! Festa 2016 is Buono!&#39;s first concert at Nippon Budokan. It took place on August 25, 2016.<br />
+<br />
+The DVD and Blu-ray of the concert were released on November 23, 2016. The Blu-ray comes in a box set with a live photo leaflet and two live CDs.<br />
+<br />
+Fanclub-exclusive solo angle DVDs were available for pre-order, individually or as a box set, until January 27, 2017.<br />
+<br />
+A mini photobook of the concert, titled Buono! Festa 2016 LIVE Mini Shashinshuu (Buono! Festa 2016 LIVE&#12511;&#12491;&#20889;&#30495;&#38598;), was released on May 20, 2017.</div>
+		</div>
+<div id="comments"></div>
+<div id="ajax_tcomments">
+<div class="linkbox"><strong>1-10</strong> | <a href="torrents.php?page=2&amp;id=219216" onclick="return loadHtml('tcomments', 'page=2&amp;id=219216');"><strong>11-20</strong></a> | <a href="torrents.php?page=2&amp;id=219216" onclick="return loadHtml('tcomments', 'page=2&amp;id=219216');"><strong>Next &gt;</strong></a> <a href="torrents.php?page=2&amp;id=219216" onclick="return loadHtml('tcomments', 'page=2&amp;id=219216');"><strong> Last &gt;&gt;</strong></a></div><table class="forum_post box vertical_margin" id="post456250">
+    <tr class="colhead_dark">
+        <td colspan="2">
+            <span style="float:left;"><a href='torrents.php?page=1&amp;id=219216#post456250'>#456250</a>
+            - <strong><a href="user.php?id=193765">Mikitok</a>  (<span class="permission_4">Power User</span>)</strong>
+             6 years, 3 months ago - <a href="#quickpost" onclick="Quote('456250','Mikitok');">[Quote]</a>
+          - <a href="reports.php?action=report&amp;type=Comment&amp;id=456250">[Report]</a>
+	    </span>
+            <span style="float: right;"><a href="#top">[Top]</a></span>
+        </td>
+    </tr>
+    <tr>
+        <td class="avatar" valign="top" height="1%">
+            <img src='https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgTGW0dWuk9u8PSEHY8JFYjxsATbiIMEGB4awLyi--5LY49fpfKp29fq7aNGegoB_UGeWmd3-OFDOpujga-eUyn9-6tmmEH2wQUgnJkHeyrO4LZMZrKvfPR3HkKjXXn-Y2veBEzK94Gjlv9G5ah3ES4ioIWnlQBN38ml4iCZaQZK_usysWYJniFYu1w/s640/1970' width='150' alt="Mikitok's avatar" />
+        </td>
+        <td class="body" valign="top" rowspan="2">
+            <div id="content456250" class="postcontent">
+                Many thanks  <img border='0' src='static/common/smileys/wub.gif' alt='wub.gif' />            </div>
+            <span id="bar456250" style="margin: 0 auto;"></span>
+                                    <div class="signature"></div>
+                    </td>
+    </tr>
+    <tr>
+        <td valign="top">
+            Joined: 6 years, 9 months ago<br />
+            Ratio: <span class="r50">6.44</span><br />
+                    Upload: 2.34 TB<br />
+            Download: 372.20 GB<br />
+        </td>
+            </tr>
+</table>
+
+<table class="forum_post box vertical_margin" id="post456291">
+    <tr class="colhead_dark">
+        <td colspan="2">
+            <span style="float:left;"><a href='torrents.php?page=1&amp;id=219216#post456291'>#456291</a>
+            - <strong><a href="user.php?id=99233">bajuri</a>  (<span class="permission_3">Member</span>)</strong>
+             6 years, 3 months ago - <a href="#quickpost" onclick="Quote('456291','bajuri');">[Quote]</a>
+          - <a href="reports.php?action=report&amp;type=Comment&amp;id=456291">[Report]</a>
+	    </span>
+            <span style="float: right;"><a href="#top">[Top]</a></span>
+        </td>
+    </tr>
+    <tr>
+        <td class="avatar" valign="top" height="1%">
+            <img src='static/common/avatars/default.png' width='150' alt="Default avatar" />
+        </td>
+        <td class="body" valign="top" rowspan="2">
+            <div id="content456291" class="postcontent">
+                Am I the only one who can&#39;t play this ISO?? do i need a special software? because my other BD ISOs are working well.            </div>
+            <span id="bar456291" style="margin: 0 auto;"></span>
+                                    <div class="signature"></div>
+                    </td>
+    </tr>
+    <tr>
+        <td valign="top">
+            Joined: 12 years, 6 months ago<br />
+            Ratio: <span class="r10">1.00</span><br />
+                    Upload: 6.40 TB<br />
+            Download: 6.41 TB<br />
+        </td>
+            </tr>
+</table>
+
+<table class="forum_post box vertical_margin" id="post456300">
+    <tr class="colhead_dark">
+        <td colspan="2">
+            <span style="float:left;"><a href='torrents.php?page=1&amp;id=219216#post456300'>#456300</a>
+            - <strong><a href="user.php?id=1">username</a>  (<span class="permission_4">Power User</span>)</strong>
+             6 years, 3 months ago - <a href="#quickpost" onclick="Quote('456300','username');">[Quote]</a>
+ - <a href="#post456300" onclick="EditForm('456300','Preview','Editor','Post','Cancel');">[Edit]</a>
+          - <a href="reports.php?action=report&amp;type=Comment&amp;id=456300">[Report]</a>
+	    </span>
+            <span style="float: right;"><a href="#top">[Top]</a></span>
+        </td>
+    </tr>
+    <tr>
+        <td class="avatar" valign="top" height="1%">
+            <img src='http://jpopsuki.eu/static/images/avatars/1.png' width='150' alt="username's avatar" />
+        </td>
+        <td class="body" valign="top" rowspan="2">
+            <div id="content456300" class="postcontent">
+                I think the size can affect it. My previous PC couldnt play the 1830m Tokyo Dome isos for example, now they can.  Can you extract the data using rar and try playing that?            </div>
+            <span id="bar456300" style="margin: 0 auto;"></span>
+                                    <div class="signature"></div>
+                    </td>
+    </tr>
+    <tr>
+        <td valign="top">
+            Joined: 7 years, 8 months ago<br />
+            Ratio: <span class="r50">11.09</span><br />
+                    Upload: 52.21 TB<br />
+            Download: 4.71 TB<br />
+        </td>
+            </tr>
+</table>
+
+<table class="forum_post box vertical_margin" id="post456301">
+    <tr class="colhead_dark">
+        <td colspan="2">
+            <span style="float:left;"><a href='torrents.php?page=1&amp;id=219216#post456301'>#456301</a>
+            - <strong><a href="user.php?id=193765">Mikitok</a>  (<span class="permission_4">Power User</span>)</strong>
+             6 years, 3 months ago - <a href="#quickpost" onclick="Quote('456301','Mikitok');">[Quote]</a>
+          - <a href="reports.php?action=report&amp;type=Comment&amp;id=456301">[Report]</a>
+	    </span>
+            <span style="float: right;"><a href="#top">[Top]</a></span>
+        </td>
+    </tr>
+    <tr>
+        <td class="avatar" valign="top" height="1%">
+            <img src='https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgTGW0dWuk9u8PSEHY8JFYjxsATbiIMEGB4awLyi--5LY49fpfKp29fq7aNGegoB_UGeWmd3-OFDOpujga-eUyn9-6tmmEH2wQUgnJkHeyrO4LZMZrKvfPR3HkKjXXn-Y2veBEzK94Gjlv9G5ah3ES4ioIWnlQBN38ml4iCZaQZK_usysWYJniFYu1w/s640/1970' width='150' alt="Mikitok's avatar" />
+        </td>
+        <td class="body" valign="top" rowspan="2">
+            <div id="content456301" class="postcontent">
+                <strong>bajuri</strong> Wrote: <blockquote>Am I the only one who can&#39;t play this ISO?? do i need a special software? because my other BD ISOs are working well.</blockquote><br />
+<br />
+I use always DVDFab to extract and convert to mkv with menus all ISOs            </div>
+            <span id="bar456301" style="margin: 0 auto;"></span>
+                                    <div class="signature"></div>
+                    </td>
+    </tr>
+    <tr>
+        <td valign="top">
+            Joined: 6 years, 9 months ago<br />
+            Ratio: <span class="r50">6.44</span><br />
+                    Upload: 2.34 TB<br />
+            Download: 372.20 GB<br />
+        </td>
+            </tr>
+</table>
+
+<table class="forum_post box vertical_margin" id="post456306">
+    <tr class="colhead_dark">
+        <td colspan="2">
+            <span style="float:left;"><a href='torrents.php?page=1&amp;id=219216#post456306'>#456306</a>
+            - <strong><a href="user.php?id=1">username</a>  (<span class="permission_4">Power User</span>)</strong>
+             6 years, 3 months ago - <a href="#quickpost" onclick="Quote('456306','username');">[Quote]</a>
+ - <a href="#post456306" onclick="EditForm('456306','Preview','Editor','Post','Cancel');">[Edit]</a>
+          - <a href="reports.php?action=report&amp;type=Comment&amp;id=456306">[Report]</a>
+	    </span>
+            <span style="float: right;"><a href="#top">[Top]</a></span>
+        </td>
+    </tr>
+    <tr>
+        <td class="avatar" valign="top" height="1%">
+            <img src='http://jpopsuki.eu/static/images/avatars/1.png' width='150' alt="username's avatar" />
+        </td>
+        <td class="body" valign="top" rowspan="2">
+            <div id="content456306" class="postcontent">
+                And does it work for you?            </div>
+            <span id="bar456306" style="margin: 0 auto;"></span>
+                                    <div class="signature"></div>
+                    </td>
+    </tr>
+    <tr>
+        <td valign="top">
+            Joined: 7 years, 8 months ago<br />
+            Ratio: <span class="r50">11.09</span><br />
+                    Upload: 52.21 TB<br />
+            Download: 4.71 TB<br />
+        </td>
+            </tr>
+</table>
+
+<table class="forum_post box vertical_margin" id="post456308">
+    <tr class="colhead_dark">
+        <td colspan="2">
+            <span style="float:left;"><a href='torrents.php?page=1&amp;id=219216#post456308'>#456308</a>
+            - <strong><a href="user.php?id=53185">TeslaGuy</a> <img src="static/common/symbols/tree.gif" alt="Took part in the Christmas contest 2011!" title="Took part in the Christmas contest 2011!" style="vertical-align: bottom" /> (<span class="permission_1">Anthill Kicker</span>)</strong>
+             (Christmas Elf) 6 years, 3 months ago - <a href="#quickpost" onclick="Quote('456308','TeslaGuy');">[Quote]</a>
+          - <a href="reports.php?action=report&amp;type=Comment&amp;id=456308">[Report]</a>
+	    </span>
+            <span style="float: right;"><a href="#top">[Top]</a></span>
+        </td>
+    </tr>
+    <tr>
+        <td class="avatar" valign="top" height="1%">
+            <img src='http://jpopsuki.eu/static/images/avatars/53185.jpg' width='150' alt="TeslaGuy's avatar" />
+        </td>
+        <td class="body" valign="top" rowspan="2">
+            <div id="content456308" class="postcontent">
+                No one else has reported a problem, at least yet.<br />
+<br />
+I made this freeleech. Feel free to make a freeleech request if you upload anything else &gt;20GB.            </div>
+            <span id="bar456308" style="margin: 0 auto;"></span>
+                                    <div class="signature"></div>
+                    </td>
+    </tr>
+    <tr>
+        <td valign="top">
+            Joined: 13 years, 3 months ago<br />
+            Ratio: <span class="r50">383.42</span><br />
+                    Upload: 718.53 TB<br />
+            Download: 1.87 TB<br />
+        </td>
+            </tr>
+</table>
+
+<table class="forum_post box vertical_margin" id="post456368">
+    <tr class="colhead_dark">
+        <td colspan="2">
+            <span style="float:left;"><a href='torrents.php?page=1&amp;id=219216#post456368'>#456368</a>
+            - <strong><a href="user.php?id=99233">bajuri</a>  (<span class="permission_3">Member</span>)</strong>
+             6 years, 3 months ago - <a href="#quickpost" onclick="Quote('456368','bajuri');">[Quote]</a>
+          - <a href="reports.php?action=report&amp;type=Comment&amp;id=456368">[Report]</a>
+	    </span>
+            <span style="float: right;"><a href="#top">[Top]</a></span>
+        </td>
+    </tr>
+    <tr>
+        <td class="avatar" valign="top" height="1%">
+            <img src='static/common/avatars/default.png' width='150' alt="Default avatar" />
+        </td>
+        <td class="body" valign="top" rowspan="2">
+            <div id="content456368" class="postcontent">
+                <strong>username</strong> Wrote: <blockquote>I think the size can affect it. My previous PC couldnt play the 1830m Tokyo Dome isos for example, now they can.  Can you extract the data using rar and try playing that?</blockquote><br />
+<br />
+I had done that. the same thing happen. it won&#39;t play, i&#39;ve used 3 different player (k-lite mpc,vlc player, splash pro).<br />
+<br />
+my latest bluray ISO is Mai Kuraki Symphonic opus 3. it was around last june I downloaded it. it work well. but not this file<br />
+<br />
+<strong>Daniele03</strong> Wrote: <blockquote><br />
+I use always DVDFab to extract and convert to mkv with menus all ISOs</blockquote><br />
+<br />
+so I used DVDfab. when i open the iso file, it is said that i need internet to open the ISO file. I try with my other ISO file, it worked fine, no pop up appear mentioning i need to connect internet, and it worked fine with my other ISO.<br />
+<br />
+does anybody have the same trouble with me?            </div>
+            <span id="bar456368" style="margin: 0 auto;"></span>
+                                    <div class="signature"></div>
+                    </td>
+    </tr>
+    <tr>
+        <td valign="top">
+            Joined: 12 years, 6 months ago<br />
+            Ratio: <span class="r10">1.00</span><br />
+                    Upload: 6.40 TB<br />
+            Download: 6.41 TB<br />
+        </td>
+            </tr>
+</table>
+
+<table class="forum_post box vertical_margin" id="post456403">
+    <tr class="colhead_dark">
+        <td colspan="2">
+            <span style="float:left;"><a href='torrents.php?page=1&amp;id=219216#post456403'>#456403</a>
+            - <strong><a href="user.php?id=185741">SCH1ZGORE</a>  (<span class="permission_4">Power User</span>)</strong>
+             6 years, 3 months ago - <a href="#quickpost" onclick="Quote('456403','SCH1ZGORE');">[Quote]</a>
+          - <a href="reports.php?action=report&amp;type=Comment&amp;id=456403">[Report]</a>
+	    </span>
+            <span style="float: right;"><a href="#top">[Top]</a></span>
+        </td>
+    </tr>
+    <tr>
+        <td class="avatar" valign="top" height="1%">
+            <img src='static/common/avatars/default.png' width='150' alt="Default avatar" />
+        </td>
+        <td class="body" valign="top" rowspan="2">
+            <div id="content456403" class="postcontent">
+                ISO still encrypted with AACS. Works with leawo/4videosoft players or any other that decrypts AACS.            </div>
+            <span id="bar456403" style="margin: 0 auto;"></span>
+                                    <div class="signature"></div>
+                    </td>
+    </tr>
+    <tr>
+        <td valign="top">
+            Joined: 6 years, 9 months ago<br />
+            Ratio: <span class="r50">53.86</span><br />
+                    Upload: 94.35 TB<br />
+            Download: 1.75 TB<br />
+        </td>
+            </tr>
+</table>
+
+<table class="forum_post box vertical_margin" id="post456416">
+    <tr class="colhead_dark">
+        <td colspan="2">
+            <span style="float:left;"><a href='torrents.php?page=1&amp;id=219216#post456416'>#456416</a>
+            - <strong><a href="user.php?id=99233">bajuri</a>  (<span class="permission_3">Member</span>)</strong>
+             6 years, 3 months ago - <a href="#quickpost" onclick="Quote('456416','bajuri');">[Quote]</a>
+          - <a href="reports.php?action=report&amp;type=Comment&amp;id=456416">[Report]</a>
+	    </span>
+            <span style="float: right;"><a href="#top">[Top]</a></span>
+        </td>
+    </tr>
+    <tr>
+        <td class="avatar" valign="top" height="1%">
+            <img src='static/common/avatars/default.png' width='150' alt="Default avatar" />
+        </td>
+        <td class="body" valign="top" rowspan="2">
+            <div id="content456416" class="postcontent">
+                <strong>SCH1ZGORE</strong> Wrote: <blockquote>ISO still encrypted with AACS. Works with leawo/4videosoft players or any other that decrypts AACS.</blockquote><br />
+<br />
+thanx a lot for ur info... installed 4videosoft and it works like a magic.. now i finally can enjoy the concert that i&#39;ve been waiting for.            </div>
+            <span id="bar456416" style="margin: 0 auto;"></span>
+                                    <div class="signature"></div>
+                    </td>
+    </tr>
+    <tr>
+        <td valign="top">
+            Joined: 12 years, 6 months ago<br />
+            Ratio: <span class="r10">1.00</span><br />
+                    Upload: 6.40 TB<br />
+            Download: 6.41 TB<br />
+        </td>
+            </tr>
+</table>
+
+<table class="forum_post box vertical_margin" id="post456422">
+    <tr class="colhead_dark">
+        <td colspan="2">
+            <span style="float:left;"><a href='torrents.php?page=1&amp;id=219216#post456422'>#456422</a>
+            - <strong><a href="user.php?id=147179">HokkaidoSuki</a>  (<span class="permission_4">Power User</span>)</strong>
+             6 years, 3 months ago - <a href="#quickpost" onclick="Quote('456422','HokkaidoSuki');">[Quote]</a>
+          - <a href="reports.php?action=report&amp;type=Comment&amp;id=456422">[Report]</a>
+	    </span>
+            <span style="float: right;"><a href="#top">[Top]</a></span>
+        </td>
+    </tr>
+    <tr>
+        <td class="avatar" valign="top" height="1%">
+            <img src='http://jpopsuki.eu/static/images/avatars/147179.jpg' width='150' alt="HokkaidoSuki's avatar" />
+        </td>
+        <td class="body" valign="top" rowspan="2">
+            <div id="content456422" class="postcontent">
+                So is the non-freeleech version the one to go for?  for unencrypted?  But I guess this version can&#39;t be made freeleech?<br />
+<br />
+Seems the second version was reported for being a duplicate, but if it is unencrypted then it&#39;s not a duplicate.            </div>
+            <span id="bar456422" style="margin: 0 auto;"></span>
+                                    <div class="signature"></div>
+                    </td>
+    </tr>
+    <tr>
+        <td valign="top">
+            Joined: 11 years, 1 week ago<br />
+            Ratio: <span class="r50">7.88</span><br />
+                    Upload: 11.10 TB<br />
+            Download: 1.41 TB<br />
+        </td>
+            </tr>
+</table>
+
+<div class="linkbox"><strong>1-10</strong> | <a href="torrents.php?page=2&amp;id=219216" onclick="return loadHtml('tcomments', 'page=2&amp;id=219216');"><strong>11-20</strong></a> | <a href="torrents.php?page=2&amp;id=219216" onclick="return loadHtml('tcomments', 'page=2&amp;id=219216');"><strong>Next &gt;</strong></a> <a href="torrents.php?page=2&amp;id=219216" onclick="return loadHtml('tcomments', 'page=2&amp;id=219216');"><strong> Last &gt;&gt;</strong></a></div></div>
+<div id="ajax_tcomments_loading" style="text-align: center; display: none"><img src="static/styles/layer_cake/images/loading.gif" alt="Loading" /><br />Loading</div>
+<h3>Quick Reply</h3>
+<div class="box pad" style="padding:20px 10px 10px 10px;">
+    <a href="javascript:void(0);" onclick="bbcode_ins('quickpost', 'b')"><img src="static/common/bbc/bold.gif" width="23" height="22" alt="Bold" title="Bold" style="background-image: url(static/common/bbc/bbc_bg.gif);margin: 1px 2px 1px 1px; vertical-align: bottom;" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', 'u')"><img src="static/common/bbc/underline.gif" width="23" height="22" alt="Underlin" title="Underline" style="background-image: url(static/common/bbc/bbc_bg.gif);margin: 1px 2px 1px 1px; vertical-align: bottom;" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', 'i')"><img src="static/common/bbc/italicize.gif" width="23" height="22" alt="Italic" title="Italic" style="background-image: url(static/common/bbc/bbc_bg.gif);margin: 1px 2px 1px 1px; vertical-align: bottom;" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', 's')"><img src="static/common/bbc/strike.gif" width="23" height="22" alt="Strike-Through" title="Strike" style="background-image: url(static/common/bbc/bbc_bg.gif);margin: 1px 2px 1px 1px; vertical-align: bottom;" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', 'img')"><img src="static/common/bbc/img.gif" width="23" height="22" alt="Image" title="Image" style="background-image: url(static/common/bbc/bbc_bg.gif);margin: 1px 2px 1px 1px; vertical-align: bottom;" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', 'url')"><img src="static/common/bbc/url.gif" width="23" height="22" alt="URL" title="URL" style="background-image: url(static/common/bbc/bbc_bg.gif);margin: 1px 2px 1px 1px; vertical-align: bottom;" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', 'youtube')"><img src="static/common/bbc/youtube.gif" width="23" height="22" alt="YouTube" title="YouTube" style="background-image: url(static/common/bbc/bbc_bg.gif);margin: 1px 2px 1px 1px; vertical-align: bottom;" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', 'jptv')"><img src="static/common/bbc/flash.gif" width="23" height="22" alt="JPopsuki TV" title="JPopsuki.tv" style="background-image: url(static/common/bbc/bbc_bg.gif);margin: 1px 2px 1px 1px; vertical-align: bottom;" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', 'pre')"><img src="static/common/bbc/pre.gif" width="23" height="22" alt="Pre-Formated" title="Pre-Formated Text" style="background-image: url(static/common/bbc/bbc_bg.gif);margin: 1px 2px 1px 1px; vertical-align: bottom;" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', 'left')"><img src="static/common/bbc/left.gif" width="23" height="22" alt="Left Alig" title="Left align. Text" style="background-image: url(static/common/bbc/bbc_bg.gif);margin: 1px 2px 1px 1px; vertical-align: bottom;" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', 'center')"><img src="static/common/bbc/center.gif" width="23" height="22" alt="Centered" title="Centered Text" style="background-image: url(static/common/bbc/bbc_bg.gif);margin: 1px 2px 1px 1px; vertical-align: bottom;" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', 'right')"><img src="static/common/bbc/right.gif" width="23" height="22" alt="Right Alig" title="Right align. Text" style="background-image: url(static/common/bbc/bbc_bg.gif);margin: 1px 2px 1px 1px; vertical-align: bottom;" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', 'nfo')"><img src="static/common/bbc/code.gif" width="23" height="22" alt="Code" title="Code or NFO" style="background-image: url(static/common/bbc/bbc_bg.gif);margin: 1px 2px 1px 1px; vertical-align: bottom;" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', 'quote')"><img src="static/common/bbc/quote.gif" width="23" height="22" alt="Quote" title="Quote" style="background-image: url(static/common/bbc/bbc_bg.gif);margin: 1px 2px 1px 1px; vertical-align: bottom;" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', 'size')"><img src="static/common/bbc/size.gif" width="23" height="22" alt="Font Size" title="Font Size (1-10)" style="background-image: url(static/common/bbc/bbc_bg.gif);margin: 1px 2px 1px 1px; vertical-align: bottom;" /></a>
+<select onchange="bbcode_ins('quickpost', value)"><option value="" selected="selected">Change Color</option>
+							<option value="black">Black</option>
+							<option value="white">White</option>
+							<option value="silver">Silver</option>
+							<option value="red">Red</option>
+							<option value="yellow">Yellow</option>
+							<option value="pink">Pink</option>
+							<option value="fuchsia">Fuchsia</option>
+							<option value="green">Green</option>
+							<option value="olive">Olive</option>
+							<option value="orange">Orange</option>
+							<option value="purple">Purple</option>
+							<option value="aqua">Aqua</option>
+							<option value="blue">Blue</option>
+							<option value="grey">Grey</option>
+							<option value="brown">Brown</option>
+							<option value="teal">Teal</option>
+							<option value="navy">Navy</option>
+							<option value="maroon">Maroon</option>
+							<option value="lime">LimeGreen</option>
+	</select>
+<br />
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :)')" /><img src="static/common/smileys/smile.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :(')" /><img src="static/common/smileys/sad.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' ;)')" /><img src="static/common/smileys/wink.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :D')" /><img src="static/common/smileys/biggrin.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :|')" /><img src="static/common/smileys/blank.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :P')" /><img src="static/common/smileys/tongue.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :angry:')" /><img src="static/common/smileys/angry.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' ;_;')" /><img src="static/common/smileys/crying.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :lol:')" /><img src="static/common/smileys/laughing.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :blush:')" /><img src="static/common/smileys/blush.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :frown:')" /><img src="static/common/smileys/frown.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :cool:')" /><img src="static/common/smileys/cool.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :unsure:')" /><img src="static/common/smileys/hmm.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :no:')" /><img src="static/common/smileys/no.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :nod:')" /><img src="static/common/smileys/nod.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :ohno:')" /><img src="static/common/smileys/ohnoes.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :omg:')" /><img src="static/common/smileys/omg.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :O')" /><img src="static/common/smileys/ohshit.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :shifty:')" /><img src="static/common/smileys/shifty.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :sick:')" /><img src="static/common/smileys/sick.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :evil:')" /><img src="static/common/smileys/evil.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :ninja:')" /><img src="static/common/smileys/ninja.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :wtf:')" /><img src="static/common/smileys/wtf.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :wub:')" /><img src="static/common/smileys/wub.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :loveflac:')" /><img src="static/common/smileys/loveflac.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+
+<br /><br />
+    <form id="quickpostform" action="" method="post" style="display: block; text-align: center; padding: 10px;">
+        <div id="quickreplypreview" class="box" style="text-align: left; display: none; padding: 10px;"></div>
+        <div id="quickreplytext">
+            <input type="hidden" name="action" value="reply" />
+            <input type="hidden" name="thread" value="219216" />
+            <textarea id="quickpost" name="body"  style="width:100%" rows="8"></textarea> <br />
+        </div>
+        <div id="quickreplybuttons">
+            <input type="button" value="Preview" onclick="QuickPreview('Preview','Editor','Submit');" />
+            <input type="submit" value="Submit" />
+        </div>
+    </form>
+</div>
+
+	</div>
+</div>
+</div>
+<div id="footer">
+	<p>Site and design &copy; 2023 JPopsuki 2.0</p>
+	<p>This page was created in 0.03776 second(s) on <span title="Just now">Mar 19 2023, 19:46</span></p>
+	<p>
+
+		<a href="http://en.wikipedia.org/wiki/Load_(computing)" target="_blank">Load average</a>:
+		0.91, 0.75, 0.75		<br />
+		(Average over 1 minute, 5 minutes and 15 minutes
+ on 8 cores. Load is spiked by <a href="http://en.wikipedia.org/wiki/Cron" target="_blank">cron</a> every 15 minutes.)
+	</p>
+	<p>Powered by <a href="http://jpopsuki.eu/static/images/users/774/503x.jpg">Small Horse</a></p>
+<!--	<script type="text/javascript" src="https://widgets.amung.us/colored.js"></script><script type="text/javascript">WAU_colored('l8tchbw95e38', 'e3f4fd000000')</script> -->
+	<script type="text/javascript" src="https://widgets.amung.us/pro.js"></script>
+	<script type="text/javascript" id="wau_scr_30b716e2">
+    	wau_add('d0t8', '30b716e2')
+	</script>
+	<noscript>
+    		<img src="https://whos.amung.us/piwidget/d0t8/" />
+	</noscript> 
+
+</div>
+
+</div>
+<div id="lightbox" class="lightbox"></div>
+<div id="curtain" class="curtain"></div>
+
+<!-- Extra divs, for stylesheet developers to add imagery -->
+<div id="extra1"><span></span></div>
+<div id="extra2"><span></span></div>
+<div id="extra3"><span></span></div>
+<div id="extra4"><span></span></div>
+<div id="extra5"><span></span></div>
+<div id="extra6"><span></span></div>
+</body>
+</html>

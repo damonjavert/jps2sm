@@ -1,0 +1,771 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<title>Buono! - So La Si Do ~Nee Nee~ :: JPopsuki 2.0</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<link rel="shortcut icon" href="favicon.ico" />
+	<link rel="search" type="application/opensearchdescription+xml" title="JPopsuki 2.0 - Torrents" href="/opensearch_torrents.xml" />
+	<link rel="search" type="application/opensearchdescription+xml" title="JPopsuki 2.0 - Requests" href="/opensearch_requests.xml" />
+	<link rel="search" type="application/opensearchdescription+xml" title="JPopsuki 2.0 - Forums" href="/opensearch_forums.xml" />
+	<link rel="search" type="application/opensearchdescription+xml" title="JPopsuki 2.0 - Log" href="/opensearch_log.xml" />
+	<link rel="search" type="application/opensearchdescription+xml" title="JPopsuki 2.0 - Users" href="/opensearch_users.xml" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_notify_00000000000000000000000000000000&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - P.T.N." />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_notify_11111_00000000000000000000000000000000&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000&amp;name=Artist+notifications" title="JPopsuki 2.0 - Artist notifications" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_all&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - All Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_album&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - Album Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_single&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - Single Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_pv&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - PV Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_dvd&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - DVD Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_tv-music&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - TV-Music Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_tv-variety&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - TV-Variety Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_tv-drama&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - TV-Drama Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_fansubs&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - Fansubs Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_pictures&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - Pictures Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_misc&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - Misc Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_lossless&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - Lossless Torrents" />
+	<link rel="alternate" type="application/rss+xml" href="/feeds.php?feed=torrents_flac&amp;user=1&amp;auth=00000000000000000000000000000000&amp;passkey=00000000000000000000000000000000&amp;authkey=00000000000000000000000000000000" title="JPopsuki 2.0 - FLAC Torrents" />
+	<link href="static/styles/layer_cake/style.css" title="layer_cake" rel="stylesheet" type="text/css" media="screen" />
+	<link href="static/styles/log.css" rel="stylesheet" type="text/css" />
+	<link href="static/styles/global.css" rel="stylesheet" type="text/css" />
+	<script src="static/functions/jquery.js" type="text/javascript"></script>
+	<script src="static/functions/main.js" type="text/javascript"></script>
+	<link rel="stylesheet" type="text/css" href="static/shadowbox-3.0.3/shadowbox.css">
+	<script type="text/javascript" src="static/shadowbox-3.0.3/shadowbox.js"></script>
+	<script type="text/javascript">
+	Shadowbox.init();
+	</script>
+	<script type="text/javascript">
+		function bluehorse()
+		{
+			if(confirm('Would you like to see a penis?')) {
+				alert('Sick bastard. Oh well, here\'s a penis');
+			} else {
+				alert('Too bad! You\'re going to see one anyways');
+			}
+
+			document.location = "http://jpopsuki.eu/static/images/users/774/KICRK.png";
+		}
+
+		function penis()
+		{
+			document.cookie = 'invasion=zombie_fruits; expires=Fri, 04 Mar 2011 21:29:16 GMT; path=/';
+			$('#randomfitta').css('display', 'none');
+		}
+	</script>
+
+	<script src="static/functions/details.js" type="text/javascript"></script>
+	<script src="static/functions/posts.js" type="text/javascript"></script>
+	<script src="static/functions/jquery-ui.js" type="text/javascript"></script>
+
+</head>
+<body id="torrents">
+<a name="top"></a>
+
+<div id="wrapper">
+<h1 class="hidden">JPopsuki 2.0</h1>
+
+<div id="header">
+	<div id="logo"><a href="index.php"></a></div>
+	<div id="userinfo">
+		<ul id="userinfo_username">
+			<li><a href="user.php?id=1" class="username">username</a></li>
+			<li class="brackets"><a href="user.php?action=edit&amp;userid=1">Edit</a></li>
+			<li class="brackets"><a href="logout.php?auth=00000000000000000000000000000000">Logout</a></li>
+		</ul>
+		<ul id="userinfo_major">
+			<li class="brackets"><strong><a href="upload.php">Upload</a></strong></li>
+			<li class="brackets"><strong><a href="user.php?action=invite">Invite (10)</a></strong></li>
+			<li class="brackets"><strong><a href="donate.php">Donate</a></strong></li>
+		</ul>
+		<ul id="userinfo_stats">
+			<li>Up: <span class="stat">52.21 TB</span></li>
+			<li>Down: <span class="stat">4.71 TB</span></li>
+			<li>Ratio: <span class="stat"><span class="r50">11.09</span></span></li>
+			<li><i><a href="bonus.php">Bonus: <span class="stat">2097150</span></a></i></li>
+		</ul>
+		<ul id="userinfo_minor">
+			<li><a href="inbox.php">Inbox</a></li>
+			<li><a href="notice.php">Notices</a></li>
+			<li><a href="torrents.php?type=uploaded&amp;userid=1">Uploads</a></li>
+			<li><a href="bookmarks.php">Bookmarks</a></li>
+</a></li>
+			<li><a href="user.php?action=notify">Notifications</a></li>
+			<li><a href="userhistory.php?action=posts&amp;userid=1">Posts</a></li>
+			<li><a href="friends.php">Friends</a></li>
+		</ul>
+	</div>
+	<div id="menu">
+		<h4 class="hidden">Site Menu</h4>
+		<ul>
+			<li id="nav_index"><a href="index.php">Home</a></li>
+			<li id="nav_torrents"><a href="torrents.php">Torrents</a></li>
+			<li id="nav_artists"><a href="artist.php">Artists</a></li>
+			<li id="nav_requests"><a href="requests.php">Requests</a></li>
+                        <li id="nav_collages"><a href="collages.php">Collages</a></li>
+			<li id="nav_forums"><a href="forums.php">Forums</a></li>
+			<li id="nav_top10"><a href="top10.php">Top 10</a></li>
+			<li id="nav_irc"><a href="irc.php">IRC</a></li>
+			<li id="nav_tv"><a href="streaming.php">Radio</a></li>
+			<li id="nav_rules"><a href="rules.php">Rules</a></li>
+			<li id="nav_kb"><a href="kb2.php">Help</a></li>
+			<li id="nav_staff"><a href="staff.php">Staff</a></li>
+		</ul>
+	</div>
+	<div id="alerts">
+		<div class="alertbar">
+			<a href="torrents.php?action=notify">You have 38 new torrent notifications</a> (<a href="torrents.php?action=notify_clear&amp;auth=00000000000000000000000000000000">Delete</a>)
+		</div>
+	</div>
+	<div id="searchbars">
+		<ul>
+ 
+			<li>
+				<span class="hidden">Torrents: </span>
+				<form action="torrents.php" method="get">
+					<input
+						onfocus="if (this.value == 'Torrents') this.value='';"
+						onblur="if (this.value == '') this.value='Torrents';"
+						value="Torrents" type="text" name="searchstr" size="17"
+					/>
+					<input value="Search" type="submit" class="hidden" />
+				</form>
+			</li>
+ 
+ 
+			<li>
+				<span class="hidden">Artist: </span>
+				<form action="artist.php" method="get">
+					<input
+						onfocus="if (this.value == 'Artist') this.value='';"
+						onblur="if (this.value == '') this.value='Artist';"
+						value="Artist" type="text" name="name" size="17"
+					/>
+					<input value="Search" type="submit" class="hidden" />
+				</form>
+			</li>
+ 
+			<li>
+				<span class="hidden">Requests: </span>
+				<form action="requests.php" method="get">
+					<input
+						onfocus="if (this.value == 'Requests') this.value='';"
+						onblur="if (this.value == '') this.value='Requests';"
+						value="Requests" type="text" name="search" size="17"
+					/>
+					<input value="Search" type="submit" class="hidden" />
+				</form>
+			</li>
+			<li>
+				<span class="hidden">Forums: </span>
+				<form action="forums.php" method="get">
+					<input value="search" type="hidden" name="action" />
+					<input
+						onfocus="if (this.value == 'Forums') this.value='';"
+						onblur="if (this.value == '') this.value='Forums';"
+						value="Forums" type="text" name="search" size="17"
+					/>
+					<input value="Search" type="submit" class="hidden" />
+				</form>
+			</li>
+			<li>
+				<span class="hidden">Log: </span>
+				<form action="log.php" method="get">
+					<input
+						onfocus="if (this.value == 'Log') this.value='';"
+						onblur="if (this.value == '') this.value='Log';"
+						value="Log" type="text" name="search" size="17"
+					/>
+					<input value="Search" type="submit" class="hidden" />
+				</form>
+			</li>
+			<li>
+				<span class="hidden">Users: </span>
+				<form action="user.php" method="get">
+					<input type="hidden" name="action" value="search" />
+					<input
+						onfocus="if (this.value == 'Peeps') this.value='';"
+						onblur="if (this.value == '') this.value='Peeps';"
+						value="Peeps" type="text" name="username" size="17"
+					/>
+					<input value="Search" type="submit" class="hidden" />
+				</form>
+			</li>
+		</ul>
+	</div>
+
+</div>
+<br />
+<div id="content">
+<script type="text/javascript">
+$(document).ready(function() {
+	$('#lolpenis').autocomplete({
+		delay: 500,
+		source: "ajax.php?section=a_artist",
+		minLength: 2
+	});
+});
+</script>
+<div class="thin">
+	<h2>[Single] <a href="artist.php?id=188">Buono!</a> - So La Si Do ~Nee Nee~ [2016.09.21]</h2>
+<h3 style="text-align:center;">(<a href="artist.php?id=188">Buono!</a> - &#12477;&#12521;&#12471;&#12489;&#65374;&#12397;&#12360;&#12397;&#12360;&#65374;)</h3>	<div class="sidebar">
+		<div class="box">
+			<div class="head"><strong>Page Options</strong></div>
+			<ul class="stats nobullet">
+				<li><a href="reports.php?action=report&amp;type=Group&amp;id=212853">Report</a></li>
+				<li><a href="torrents.php?action=editgroup&amp;groupid=212853">Edit Description</a></li>
+				<li><a href="torrents.php?action=history&amp;groupid=212853">View History</a></li>
+				<li><a href="javascript:Bookmark();">Bookmark</a></li>
+				<li><a href="upload.php?groupid=212853">Add Format</a></li>
+			</ul>
+		</div>
+		<div class="box">
+			<div class="head"><strong>Cover / Screenshot</strong></div>
+			<p align="center"><a href="static/images/torrents/212853.jpg" rel="shadowbox" title="Buono! - So La Si Do ~Nee Nee~ [2016.09.21]"><img src="static/images/torrents/212853.th.jpg" width="220" alt="Buono! - So La Si Do ~Nee Nee~ [2016.09.21]" title="Buono! - So La Si Do ~Nee Nee~ [2016.09.21]" border="0" /></a></p>
+		</div>
+		<div class="box">
+			<div class="head"><strong>Contributing Artists</strong></div>
+			<div class="body">
+				<ul class="stats nobullet">
+				</ul>
+				<form action="torrents.php" method="post">
+					<input type="hidden" name="action" value="add_contrib" />
+					<input type="hidden" name="groupid" value="212853" />
+					<input type="text" id="lolpenis" name="artistname" size="20" />
+					<input type="submit" value="+" />
+				</form>
+			</div>
+		</div>
+
+		<div class="box">
+			<div class="head"><strong>Tags</strong></div>
+			<ul class="stats nobullet">
+<!-- 1|1|1|44|594 -->				<li>
+					<a href="torrents.php?searchtags=japanese">japanese</a>
+					<a href="torrents.php?action=vote_tag&amp;way=up&amp;groupid=212853&amp;tagid=1&amp;auth=00000000000000000000000000000000">[+]</a>
+					<a href="torrents.php?action=vote_tag&amp;way=down&amp;groupid=212853&amp;tagid=1&amp;auth=00000000000000000000000000000000">[-]</a>
+				</li>
+				<li>
+					<a href="torrents.php?searchtags=pop">pop</a>
+					<a href="torrents.php?action=vote_tag&amp;way=up&amp;groupid=212853&amp;tagid=7&amp;auth=00000000000000000000000000000000">[+]</a>
+					<a href="torrents.php?action=vote_tag&amp;way=down&amp;groupid=212853&amp;tagid=7&amp;auth=00000000000000000000000000000000">[-]</a>
+				</li>
+				<li>
+					<a href="torrents.php?searchtags=female.vocalist">female.vocalist</a>
+					<a href="torrents.php?action=vote_tag&amp;way=up&amp;groupid=212853&amp;tagid=17&amp;auth=00000000000000000000000000000000">[+]</a>
+					<a href="torrents.php?action=vote_tag&amp;way=down&amp;groupid=212853&amp;tagid=17&amp;auth=00000000000000000000000000000000">[-]</a>
+				</li>
+				<li>
+					<a href="torrents.php?searchtags=hello.project">hello.project</a>
+					<a href="torrents.php?action=vote_tag&amp;way=up&amp;groupid=212853&amp;tagid=58&amp;auth=00000000000000000000000000000000">[+]</a>
+					<a href="torrents.php?action=vote_tag&amp;way=down&amp;groupid=212853&amp;tagid=58&amp;auth=00000000000000000000000000000000">[-]</a>
+				</li>
+				<li>
+					<a href="torrents.php?searchtags=idol">idol</a>
+					<a href="torrents.php?action=vote_tag&amp;way=up&amp;groupid=212853&amp;tagid=175&amp;auth=00000000000000000000000000000000">[+]</a>
+					<a href="torrents.php?action=vote_tag&amp;way=down&amp;groupid=212853&amp;tagid=175&amp;auth=00000000000000000000000000000000">[-]</a>
+				</li>
+			</ul>
+		</div>
+		<div class="box">
+			<div class="head"><strong>Add Tag</strong></div>
+			<div class="body">
+				<form action="torrents.php" method="post">
+					<input type="hidden" name="action" value="add_tag" />
+					<input type="hidden" name="groupid" value="212853" />
+					<input type="text" name="tagname" size="20" />
+					<input type="submit" value="+" />
+				</form>
+				<br /><br />
+				<strong><a href="rules.php?p=tag">Tagging Rules</a></strong>
+			</div>
+		</div>
+	</div>
+	<div class="main_column">
+		<table class="torrent_table" style="margin-top: 0px">
+			<tr class="colhead_dark">
+				<td width="80%"><strong>Torrents</strong></td>
+				<td><strong>Size</strong></td>
+				<td class="sign"><img src="static/styles/layer_cake/images/snatched.png" alt="Snatches" title="Snatches" /></td>
+				<td class="sign"><img src="static/styles/layer_cake/images/seeders.png" alt="Seeders" title="Seeders" /></td>
+				<td class="sign"><img src="static/styles/layer_cake/images/leechers.png" alt="Leechers" title="Leechers" /></td>
+			</tr>
+			<tr class="group_torrent" style="font-weight: normal;">
+				<td>
+					<span>[
+						<a href="torrents.php?action=download&amp;id=300250&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+                        			|                         			<a href="reports.php?action=report&amp;id=300250" title="Report">RP</a>                
+                        								]</span>
+					<a href="#" onclick="return swapTorrent('300250');">&raquo; MP3 / 320 / CD</a>
+				</td>
+				<td class="nobr">37.89 MB</td>
+				<td>222</td>
+				<td>6</td>
+				<td>0</td>
+			</tr>
+
+		<tr class="pad hide" id="torrent_300250">
+                <td colspan="5">
+            
+                    					<blockquote>
+						New ratio after downloading (without uploading): <span class="r50">11.09</span><br />
+						<em>Estimated Calculation. This assumes you're not downloading any other torrent.</em>
+					</blockquote>
+					                    <blockquote>
+                        Uploaded by <a href="user.php?id=164063">cracrayol</a>  on <span title="6 years, 5 months, 2 weeks ago">Oct 03 2016, 11:41</span>					</blockquote>
+										<table style="overflow-x:auto;"><tr class="colhead_dark"><td><strong>Filename</strong></td><td><strong>Size</strong></td></tr><tr><td>01   &#12477;&#12521;&#12471;&#12489;&#12316;&#12397;&#12360;&#12397;&#12360;&#12316;.mp3</td><td>9.80 MB</td></tr><tr><td>02   &#12525;&#12483;&#12463;&#12398;&#32854;&#22320;.mp3</td><td>9.18 MB</td></tr><tr><td>03   &#12477;&#12521;&#12471;&#12489;&#12316;&#12397;&#12360;&#12397;&#12360;&#12316; (Instrumental).mp3</td><td>9.80 MB</td></tr><tr><td>04   &#12525;&#12483;&#12463;&#12398;&#32854;&#22320; (Instrumental).mp3</td><td>9.04 MB</td></tr><tr><td>cover.jpg</td><td>69.97 KB</td></tr></table>			Peer List: (<a href="#" id="swapPeer_300250" onclick="return swapPeerList('300250', '39729529', 'Show', 'Hide');">Show</a>)<br />
+			<div id="ajax_peerlist_300250" style="text-align: center"></div><br />
+			Snatch List: (<a href="#" id="swapSnatch_300250" onclick="return swapSnatchList('300250', 'Show', 'Hide');">Show</a>)<br />
+			<div id="ajax_snatchlist_300250" style="text-align: center"></div>
+
+				</td>
+			</tr>
+			<tr class="group_torrent" style="font-weight: normal;">
+				<td>
+					<span>[
+						<a href="torrents.php?action=download&amp;id=300252&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+                        			|                         			<a href="reports.php?action=report&amp;id=300252" title="Report">RP</a>                
+                        								]</span>
+					<a href="#" onclick="return swapTorrent('300252');">&raquo; ISO / Variable / DVD</a>
+				</td>
+				<td class="nobr">868.90 MB</td>
+				<td>78</td>
+				<td>1</td>
+				<td>0</td>
+			</tr>
+
+		<tr class="pad hide" id="torrent_300252">
+                <td colspan="5">
+            
+                    					<blockquote>
+						New ratio after downloading (without uploading): <span class="r50">11.09</span><br />
+						<em>Estimated Calculation. This assumes you're not downloading any other torrent.</em>
+					</blockquote>
+					                    <blockquote>
+                        Uploaded by <a href="user.php?id=164063">cracrayol</a>  on <span title="6 years, 5 months, 2 weeks ago">Oct 03 2016, 11:46</span>					</blockquote>
+					<blockquote>ISO image of the Bonus DVD.<br />
+<br />
+Contains :<br />
+1. &#12477;&#12521;&#12471;&#12489;&#12316;&#12397;&#12360;&#12397;&#12360;&#12316; (Music video)<br />
+2. &#12477;&#12521;&#12471;&#12489;&#12316;&#12397;&#12360;&#12397;&#12360;&#12316; (Dance shot ver.)<br />
+3. &#12525;&#12483;&#12463;&#12398;&#32854;&#22320; (@Recording)</blockquote>					<table style="overflow-x:auto;"><tr class="colhead_dark"><td><strong>Filename</strong></td><td><strong>Size</strong></td></tr><tr><td>TGBS 9386.ISO</td><td>868.90 MB</td></tr></table>			Peer List: (<a href="#" id="swapPeer_300252" onclick="return swapPeerList('300252', '911112192', 'Show', 'Hide');">Show</a>)<br />
+			<div id="ajax_peerlist_300252" style="text-align: center"></div><br />
+			Snatch List: (<a href="#" id="swapSnatch_300252" onclick="return swapSnatchList('300252', 'Show', 'Hide');">Show</a>)<br />
+			<div id="ajax_snatchlist_300252" style="text-align: center"></div>
+
+				</td>
+			</tr>
+			<tr class="group_torrent" style="font-weight: normal;">
+				<td>
+					<span>[
+						<a href="torrents.php?action=download&amp;id=300251&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+                        			|                         			<a href="reports.php?action=report&amp;id=300251" title="Report">RP</a>                
+                        								]</span>
+					<a href="#" onclick="return swapTorrent('300251');">&raquo; FLAC / Lossless / CD</a>
+				</td>
+				<td class="nobr">123.69 MB</td>
+				<td>102</td>
+				<td>7</td>
+				<td>0</td>
+			</tr>
+
+		<tr class="pad hide" id="torrent_300251">
+                <td colspan="5">
+            
+                    					<blockquote>
+						New ratio after downloading (without uploading): <span class="r50">11.09</span><br />
+						<em>Estimated Calculation. This assumes you're not downloading any other torrent.</em>
+					</blockquote>
+					                    <blockquote>
+                        Uploaded by <a href="user.php?id=164063">cracrayol</a>  on <span title="6 years, 5 months, 2 weeks ago">Oct 03 2016, 11:42</span>					</blockquote>
+										<table style="overflow-x:auto;"><tr class="colhead_dark"><td><strong>Filename</strong></td><td><strong>Size</strong></td></tr><tr><td>01   &#12477;&#12521;&#12471;&#12489;&#65374;&#12397;&#12360;&#12397;&#12360;&#65374;.flac</td><td>31.95 MB</td></tr><tr><td>02   &#12525;&#12483;&#12463;&#12398;&#32854;&#22320;.flac</td><td>30.23 MB</td></tr><tr><td>03   &#12477;&#12521;&#12471;&#12489;&#12316;&#12397;&#12360;&#12397;&#12360;&#12316; (Instrumental).flac</td><td>31.49 MB</td></tr><tr><td>04   &#12525;&#12483;&#12463;&#12398;&#32854;&#22320; (Instrumental).flac</td><td>29.95 MB</td></tr><tr><td>cover.jpg</td><td>69.97 KB</td></tr></table>			Peer List: (<a href="#" id="swapPeer_300251" onclick="return swapPeerList('300251', '129700696', 'Show', 'Hide');">Show</a>)<br />
+			<div id="ajax_peerlist_300251" style="text-align: center"></div><br />
+			Snatch List: (<a href="#" id="swapSnatch_300251" onclick="return swapSnatchList('300251', 'Show', 'Hide');">Show</a>)<br />
+			<div id="ajax_snatchlist_300251" style="text-align: center"></div>
+
+				</td>
+			</tr>
+			<tr class="group_torrent" style="font-weight: normal;">
+				<td>
+					<span>[
+						<a href="torrents.php?action=download&amp;id=296459&amp;authkey=00000000000000000000000000000000&amp;torrent_pass=00000000000000000000000000000000" title="Download">DL</a>
+                        			|                         			<a href="reports.php?action=report&amp;id=296459" title="Report">RP</a>                
+                        								]</span>
+					<a href="#" onclick="return swapTorrent('296459');">&raquo; AAC / (VBR) / CD</a>
+				</td>
+				<td class="nobr">33.82 MB</td>
+				<td>132</td>
+				<td>3</td>
+				<td>0</td>
+			</tr>
+
+		<tr class="pad hide" id="torrent_296459">
+                <td colspan="5">
+            
+                    					<blockquote>
+						New ratio after downloading (without uploading): <span class="r50">11.09</span><br />
+						<em>Estimated Calculation. This assumes you're not downloading any other torrent.</em>
+					</blockquote>
+					                    <blockquote>
+                        Uploaded by <a href="user.php?id=185475">Momochifan24</a>  on <span title="6 years, 6 months, 2 weeks ago">Aug 30 2016, 05:52</span>					</blockquote>
+										<table style="overflow-x:auto;"><tr class="colhead_dark"><td><strong>Filename</strong></td><td><strong>Size</strong></td></tr><tr><td>&#12477;&#12521;&#12471;&#12489;&#12316;&#12397;&#12360;&#12397;&#12360;&#12316;   EP/01 &#12477;&#12521;&#12471;&#12489;&#12316;&#12397;&#12360;&#12397;&#12360;&#12316;.m4a</td><td>8.62 MB</td></tr><tr><td>&#12477;&#12521;&#12471;&#12489;&#12316;&#12397;&#12360;&#12397;&#12360;&#12316;   EP/02 &#12525;&#12483;&#12463;&#12398;&#32854;&#22320;.m4a</td><td>8.17 MB</td></tr><tr><td>&#12477;&#12521;&#12471;&#12489;&#12316;&#12397;&#12360;&#12397;&#12360;&#12316;   EP/03 &#12477;&#12521;&#12471;&#12489;&#12316;&#12397;&#12360;&#12397;&#12360;&#12316; (Instrumental).m4a</td><td>8.80 MB</td></tr><tr><td>&#12477;&#12521;&#12471;&#12489;&#12316;&#12397;&#12360;&#12397;&#12360;&#12316;   EP/04 &#12525;&#12483;&#12463;&#12398;&#32854;&#22320; (Instrumental).m4a</td><td>8.23 MB</td></tr></table>			Peer List: (<a href="#" id="swapPeer_296459" onclick="return swapPeerList('296459', '35458808', 'Show', 'Hide');">Show</a>)<br />
+			<div id="ajax_peerlist_296459" style="text-align: center"></div><br />
+			Snatch List: (<a href="#" id="swapSnatch_296459" onclick="return swapSnatchList('296459', 'Show', 'Hide');">Show</a>)<br />
+			<div id="ajax_snatchlist_296459" style="text-align: center"></div>
+
+				</td>
+			</tr>
+		</table>
+		<div class="box">
+			<div class="head"><strong>Release Info</strong></div>
+			<div class="body">Pre-released at Buono! Budokan concert on August 25, 2016.<br />
+This single contains the tracks So La Si Do ~Nee Nee~ and Rock no Seichi. Rock no Seichi is an answer song to &quot;Rock no Kamisama&quot; from their first album Caf&eacute; Buono! <br />
+Official release date in 9/21.</div>
+		</div>
+<div id="comments"></div>
+<div id="ajax_tcomments">
+<div class="linkbox"></div><table class="forum_post box vertical_margin" id="post447064">
+    <tr class="colhead_dark">
+        <td colspan="2">
+            <span style="float:left;"><a href='torrents.php?page=1&amp;id=212853#post447064'>#447064</a>
+            - <strong><a href="user.php?id=1">username</a>  (<span class="permission_4">Power User</span>)</strong>
+             6 years, 6 months ago - <a href="#quickpost" onclick="Quote('447064','username');">[Quote]</a>
+ - <a href="#post447064" onclick="EditForm('447064','Preview','Editor','Post','Cancel');">[Edit]</a>
+          - <a href="reports.php?action=report&amp;type=Comment&amp;id=447064">[Report]</a>
+	    </span>
+            <span style="float: right;"><a href="#top">[Top]</a></span>
+        </td>
+    </tr>
+    <tr>
+        <td class="avatar" valign="top" height="1%">
+            <img src='http://jpopsuki.eu/static/images/avatars/1.png' width='150' alt="username's avatar" />
+        </td>
+        <td class="body" valign="top" rowspan="2">
+            <div id="content447064" class="postcontent">
+                wow cool! thanks!!!            </div>
+            <span id="bar447064" style="margin: 0 auto;"></span>
+                                    <div class="signature"></div>
+                    </td>
+    </tr>
+    <tr>
+        <td valign="top">
+            Joined: 7 years, 8 months ago<br />
+            Ratio: <span class="r50">11.09</span><br />
+                    Upload: 52.21 TB<br />
+            Download: 4.71 TB<br />
+        </td>
+            </tr>
+</table>
+
+<table class="forum_post box vertical_margin" id="post447213">
+    <tr class="colhead_dark">
+        <td colspan="2">
+            <span style="float:left;"><a href='torrents.php?page=1&amp;id=212853#post447213'>#447213</a>
+            - <strong><a href="user.php?id=193765">Mikitok</a>  (<span class="permission_4">Power User</span>)</strong>
+             6 years, 6 months ago - <a href="#quickpost" onclick="Quote('447213','Mikitok');">[Quote]</a>
+          - <a href="reports.php?action=report&amp;type=Comment&amp;id=447213">[Report]</a>
+	    </span>
+            <span style="float: right;"><a href="#top">[Top]</a></span>
+        </td>
+    </tr>
+    <tr>
+        <td class="avatar" valign="top" height="1%">
+            <img src='https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgTGW0dWuk9u8PSEHY8JFYjxsATbiIMEGB4awLyi--5LY49fpfKp29fq7aNGegoB_UGeWmd3-OFDOpujga-eUyn9-6tmmEH2wQUgnJkHeyrO4LZMZrKvfPR3HkKjXXn-Y2veBEzK94Gjlv9G5ah3ES4ioIWnlQBN38ml4iCZaQZK_usysWYJniFYu1w/s640/1970' width='150' alt="Mikitok's avatar" />
+        </td>
+        <td class="body" valign="top" rowspan="2">
+            <div id="content447213" class="postcontent">
+                so fast  <img border='0' src='static/common/smileys/ohshit.gif' alt='ohshit.gif' />            </div>
+            <span id="bar447213" style="margin: 0 auto;"></span>
+                                    <div class="signature"></div>
+                    </td>
+    </tr>
+    <tr>
+        <td valign="top">
+            Joined: 6 years, 9 months ago<br />
+            Ratio: <span class="r50">6.44</span><br />
+                    Upload: 2.34 TB<br />
+            Download: 372.20 GB<br />
+        </td>
+            </tr>
+</table>
+
+<table class="forum_post box vertical_margin" id="post447565">
+    <tr class="colhead_dark">
+        <td colspan="2">
+            <span style="float:left;"><a href='torrents.php?page=1&amp;id=212853#post447565'>#447565</a>
+            - <strong><a href="user.php?id=155628">LadiiDorquette</a>  (<span class="permission_3">Member</span>)</strong>
+             6 years, 6 months ago - <a href="#quickpost" onclick="Quote('447565','LadiiDorquette');">[Quote]</a>
+          - <a href="reports.php?action=report&amp;type=Comment&amp;id=447565">[Report]</a>
+	    </span>
+            <span style="float: right;"><a href="#top">[Top]</a></span>
+        </td>
+    </tr>
+    <tr>
+        <td class="avatar" valign="top" height="1%">
+            <img src='https://68.media.tumblr.com/48fdcb8d3abc3287372db04dd27550dd/tumblr_n4drk6qWPh1t3bzuqo1_400.gif' width='150' alt="LadiiDorquette's avatar" />
+        </td>
+        <td class="body" valign="top" rowspan="2">
+            <div id="content447565" class="postcontent">
+                thank you bunches!            </div>
+            <span id="bar447565" style="margin: 0 auto;"></span>
+                                    <div class="signature"></div>
+                    </td>
+    </tr>
+    <tr>
+        <td valign="top">
+            Joined: 10 years, 4 months ago<br />
+            Ratio: <span class="r10">1.46</span><br />
+                    Upload: 416.16 GB<br />
+            Download: 285.23 GB<br />
+        </td>
+            </tr>
+</table>
+
+<table class="forum_post box vertical_margin" id="post450870">
+    <tr class="colhead_dark">
+        <td colspan="2">
+            <span style="float:left;"><a href='torrents.php?page=1&amp;id=212853#post450870'>#450870</a>
+            - <strong><a href="user.php?id=193765">Mikitok</a>  (<span class="permission_4">Power User</span>)</strong>
+             6 years, 5 months ago - <a href="#quickpost" onclick="Quote('450870','Mikitok');">[Quote]</a>
+          - <a href="reports.php?action=report&amp;type=Comment&amp;id=450870">[Report]</a>
+	    </span>
+            <span style="float: right;"><a href="#top">[Top]</a></span>
+        </td>
+    </tr>
+    <tr>
+        <td class="avatar" valign="top" height="1%">
+            <img src='https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgTGW0dWuk9u8PSEHY8JFYjxsATbiIMEGB4awLyi--5LY49fpfKp29fq7aNGegoB_UGeWmd3-OFDOpujga-eUyn9-6tmmEH2wQUgnJkHeyrO4LZMZrKvfPR3HkKjXXn-Y2veBEzK94Gjlv9G5ah3ES4ioIWnlQBN38ml4iCZaQZK_usysWYJniFYu1w/s640/1970' width='150' alt="Mikitok's avatar" />
+        </td>
+        <td class="body" valign="top" rowspan="2">
+            <div id="content450870" class="postcontent">
+                Thanks for the ISO  <img border='0' src='static/common/smileys/biggrin.gif' alt='biggrin.gif' />            </div>
+            <span id="bar450870" style="margin: 0 auto;"></span>
+                                    <div class="signature"></div>
+                    </td>
+    </tr>
+    <tr>
+        <td valign="top">
+            Joined: 6 years, 9 months ago<br />
+            Ratio: <span class="r50">6.44</span><br />
+                    Upload: 2.34 TB<br />
+            Download: 372.20 GB<br />
+        </td>
+            </tr>
+</table>
+
+<table class="forum_post box vertical_margin" id="post450946">
+    <tr class="colhead_dark">
+        <td colspan="2">
+            <span style="float:left;"><a href='torrents.php?page=1&amp;id=212853#post450946'>#450946</a>
+            - <strong><a href="user.php?id=110487">idevz</a>  (<span class="permission_3">Member</span>)</strong>
+             6 years, 5 months ago - <a href="#quickpost" onclick="Quote('450946','idevz');">[Quote]</a>
+          - <a href="reports.php?action=report&amp;type=Comment&amp;id=450946">[Report]</a>
+	    </span>
+            <span style="float: right;"><a href="#top">[Top]</a></span>
+        </td>
+    </tr>
+    <tr>
+        <td class="avatar" valign="top" height="1%">
+            <img src='http://jpopsuki.eu/static/images/avatars/110487.jpg' width='150' alt="idevz's avatar" />
+        </td>
+        <td class="body" valign="top" rowspan="2">
+            <div id="content450946" class="postcontent">
+                Thank you   <img border='0' src='static/common/smileys/wub.gif' alt='wub.gif' /> <img border='0' src='static/common/smileys/wub.gif' alt='wub.gif' />            </div>
+            <span id="bar450946" style="margin: 0 auto;"></span>
+                                    <div class="signature"></div>
+                    </td>
+    </tr>
+    <tr>
+        <td valign="top">
+            Joined: 12 years, 6 months ago<br />
+            Ratio: <span class="r20">3.18</span><br />
+                    Upload: 5.62 TB<br />
+            Download: 1.77 TB<br />
+        </td>
+            </tr>
+</table>
+
+<table class="forum_post box vertical_margin" id="post450969">
+    <tr class="colhead_dark">
+        <td colspan="2">
+            <span style="float:left;"><a href='torrents.php?page=1&amp;id=212853#post450969'>#450969</a>
+            - <strong><a href="user.php?id=1">username</a>  (<span class="permission_4">Power User</span>)</strong>
+             6 years, 5 months ago - <a href="#quickpost" onclick="Quote('450969','username');">[Quote]</a>
+ - <a href="#post450969" onclick="EditForm('450969','Preview','Editor','Post','Cancel');">[Edit]</a>
+          - <a href="reports.php?action=report&amp;type=Comment&amp;id=450969">[Report]</a>
+	    </span>
+            <span style="float: right;"><a href="#top">[Top]</a></span>
+        </td>
+    </tr>
+    <tr>
+        <td class="avatar" valign="top" height="1%">
+            <img src='http://jpopsuki.eu/static/images/avatars/1.png' width='150' alt="username's avatar" />
+        </td>
+        <td class="body" valign="top" rowspan="2">
+            <div id="content450969" class="postcontent">
+                <img border='0' src='static/common/smileys/smile.gif' alt='smile.gif' />))            </div>
+            <span id="bar450969" style="margin: 0 auto;"></span>
+                                    <div class="signature"></div>
+                    </td>
+    </tr>
+    <tr>
+        <td valign="top">
+            Joined: 7 years, 8 months ago<br />
+            Ratio: <span class="r50">11.09</span><br />
+                    Upload: 52.21 TB<br />
+            Download: 4.71 TB<br />
+        </td>
+            </tr>
+</table>
+
+<table class="forum_post box vertical_margin" id="post461168">
+    <tr class="colhead_dark">
+        <td colspan="2">
+            <span style="float:left;"><a href='torrents.php?page=1&amp;id=212853#post461168'>#461168</a>
+            - <strong><a href="user.php?id=196708">auroris_m</a>  (<span class="permission_3">Member</span>)</strong>
+             6 years, 2 months ago - <a href="#quickpost" onclick="Quote('461168','auroris_m');">[Quote]</a>
+          - <a href="reports.php?action=report&amp;type=Comment&amp;id=461168">[Report]</a>
+	    </span>
+            <span style="float: right;"><a href="#top">[Top]</a></span>
+        </td>
+    </tr>
+    <tr>
+        <td class="avatar" valign="top" height="1%">
+            <img src='http://jpopsuki.eu/static/images/avatars/196708.jpg' width='150' alt="auroris_m's avatar" />
+        </td>
+        <td class="body" valign="top" rowspan="2">
+            <div id="content461168" class="postcontent">
+                tnaks!            </div>
+            <span id="bar461168" style="margin: 0 auto;"></span>
+                                    <div class="signature"></div>
+                    </td>
+    </tr>
+    <tr>
+        <td valign="top">
+            Joined: 6 years, 2 months ago<br />
+            Ratio: <span class="r20">4.16</span><br />
+                    Upload: 232.23 GB<br />
+            Download: 55.88 GB<br />
+        </td>
+            </tr>
+</table>
+
+<div class="linkbox"></div></div>
+<div id="ajax_tcomments_loading" style="text-align: center; display: none"><img src="static/styles/layer_cake/images/loading.gif" alt="Loading" /><br />Loading</div>
+<h3>Quick Reply</h3>
+<div class="box pad" style="padding:20px 10px 10px 10px;">
+    <a href="javascript:void(0);" onclick="bbcode_ins('quickpost', 'b')"><img src="static/common/bbc/bold.gif" width="23" height="22" alt="Bold" title="Bold" style="background-image: url(static/common/bbc/bbc_bg.gif);margin: 1px 2px 1px 1px; vertical-align: bottom;" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', 'u')"><img src="static/common/bbc/underline.gif" width="23" height="22" alt="Underlin" title="Underline" style="background-image: url(static/common/bbc/bbc_bg.gif);margin: 1px 2px 1px 1px; vertical-align: bottom;" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', 'i')"><img src="static/common/bbc/italicize.gif" width="23" height="22" alt="Italic" title="Italic" style="background-image: url(static/common/bbc/bbc_bg.gif);margin: 1px 2px 1px 1px; vertical-align: bottom;" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', 's')"><img src="static/common/bbc/strike.gif" width="23" height="22" alt="Strike-Through" title="Strike" style="background-image: url(static/common/bbc/bbc_bg.gif);margin: 1px 2px 1px 1px; vertical-align: bottom;" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', 'img')"><img src="static/common/bbc/img.gif" width="23" height="22" alt="Image" title="Image" style="background-image: url(static/common/bbc/bbc_bg.gif);margin: 1px 2px 1px 1px; vertical-align: bottom;" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', 'url')"><img src="static/common/bbc/url.gif" width="23" height="22" alt="URL" title="URL" style="background-image: url(static/common/bbc/bbc_bg.gif);margin: 1px 2px 1px 1px; vertical-align: bottom;" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', 'youtube')"><img src="static/common/bbc/youtube.gif" width="23" height="22" alt="YouTube" title="YouTube" style="background-image: url(static/common/bbc/bbc_bg.gif);margin: 1px 2px 1px 1px; vertical-align: bottom;" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', 'jptv')"><img src="static/common/bbc/flash.gif" width="23" height="22" alt="JPopsuki TV" title="JPopsuki.tv" style="background-image: url(static/common/bbc/bbc_bg.gif);margin: 1px 2px 1px 1px; vertical-align: bottom;" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', 'pre')"><img src="static/common/bbc/pre.gif" width="23" height="22" alt="Pre-Formated" title="Pre-Formated Text" style="background-image: url(static/common/bbc/bbc_bg.gif);margin: 1px 2px 1px 1px; vertical-align: bottom;" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', 'left')"><img src="static/common/bbc/left.gif" width="23" height="22" alt="Left Alig" title="Left align. Text" style="background-image: url(static/common/bbc/bbc_bg.gif);margin: 1px 2px 1px 1px; vertical-align: bottom;" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', 'center')"><img src="static/common/bbc/center.gif" width="23" height="22" alt="Centered" title="Centered Text" style="background-image: url(static/common/bbc/bbc_bg.gif);margin: 1px 2px 1px 1px; vertical-align: bottom;" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', 'right')"><img src="static/common/bbc/right.gif" width="23" height="22" alt="Right Alig" title="Right align. Text" style="background-image: url(static/common/bbc/bbc_bg.gif);margin: 1px 2px 1px 1px; vertical-align: bottom;" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', 'nfo')"><img src="static/common/bbc/code.gif" width="23" height="22" alt="Code" title="Code or NFO" style="background-image: url(static/common/bbc/bbc_bg.gif);margin: 1px 2px 1px 1px; vertical-align: bottom;" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', 'quote')"><img src="static/common/bbc/quote.gif" width="23" height="22" alt="Quote" title="Quote" style="background-image: url(static/common/bbc/bbc_bg.gif);margin: 1px 2px 1px 1px; vertical-align: bottom;" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', 'size')"><img src="static/common/bbc/size.gif" width="23" height="22" alt="Font Size" title="Font Size (1-10)" style="background-image: url(static/common/bbc/bbc_bg.gif);margin: 1px 2px 1px 1px; vertical-align: bottom;" /></a>
+<select onchange="bbcode_ins('quickpost', value)"><option value="" selected="selected">Change Color</option>
+							<option value="black">Black</option>
+							<option value="white">White</option>
+							<option value="silver">Silver</option>
+							<option value="red">Red</option>
+							<option value="yellow">Yellow</option>
+							<option value="pink">Pink</option>
+							<option value="fuchsia">Fuchsia</option>
+							<option value="green">Green</option>
+							<option value="olive">Olive</option>
+							<option value="orange">Orange</option>
+							<option value="purple">Purple</option>
+							<option value="aqua">Aqua</option>
+							<option value="blue">Blue</option>
+							<option value="grey">Grey</option>
+							<option value="brown">Brown</option>
+							<option value="teal">Teal</option>
+							<option value="navy">Navy</option>
+							<option value="maroon">Maroon</option>
+							<option value="lime">LimeGreen</option>
+	</select>
+<br />
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :)')" /><img src="static/common/smileys/smile.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :(')" /><img src="static/common/smileys/sad.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' ;)')" /><img src="static/common/smileys/wink.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :D')" /><img src="static/common/smileys/biggrin.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :|')" /><img src="static/common/smileys/blank.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :P')" /><img src="static/common/smileys/tongue.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :angry:')" /><img src="static/common/smileys/angry.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' ;_;')" /><img src="static/common/smileys/crying.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :lol:')" /><img src="static/common/smileys/laughing.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :blush:')" /><img src="static/common/smileys/blush.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :frown:')" /><img src="static/common/smileys/frown.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :cool:')" /><img src="static/common/smileys/cool.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :unsure:')" /><img src="static/common/smileys/hmm.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :no:')" /><img src="static/common/smileys/no.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :nod:')" /><img src="static/common/smileys/nod.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :ohno:')" /><img src="static/common/smileys/ohnoes.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :omg:')" /><img src="static/common/smileys/omg.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :O')" /><img src="static/common/smileys/ohshit.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :shifty:')" /><img src="static/common/smileys/shifty.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :sick:')" /><img src="static/common/smileys/sick.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :evil:')" /><img src="static/common/smileys/evil.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :ninja:')" /><img src="static/common/smileys/ninja.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :wtf:')" /><img src="static/common/smileys/wtf.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :wub:')" /><img src="static/common/smileys/wub.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+<a href="javascript:void(0);" onclick="bbcode_ins('quickpost', ' :loveflac:')" /><img src="static/common/smileys/loveflac.gif" align="bottom" alt="Smiley" title="Smiley" /></a>
+
+<br /><br />
+    <form id="quickpostform" action="" method="post" style="display: block; text-align: center; padding: 10px;">
+        <div id="quickreplypreview" class="box" style="text-align: left; display: none; padding: 10px;"></div>
+        <div id="quickreplytext">
+            <input type="hidden" name="action" value="reply" />
+            <input type="hidden" name="thread" value="212853" />
+            <textarea id="quickpost" name="body"  style="width:100%" rows="8"></textarea> <br />
+        </div>
+        <div id="quickreplybuttons">
+            <input type="button" value="Preview" onclick="QuickPreview('Preview','Editor','Submit');" />
+            <input type="submit" value="Submit" />
+        </div>
+    </form>
+</div>
+
+	</div>
+</div>
+</div>
+<div id="footer">
+	<p>Site and design &copy; 2023 JPopsuki 2.0</p>
+	<p>This page was created in 0.02032 second(s) on <span title="Just now">Mar 19 2023, 20:19</span></p>
+	<p>
+
+		<a href="http://en.wikipedia.org/wiki/Load_(computing)" target="_blank">Load average</a>:
+		1.59, 1.00, 0.92		<br />
+		(Average over 1 minute, 5 minutes and 15 minutes
+ on 8 cores. Load is spiked by <a href="http://en.wikipedia.org/wiki/Cron" target="_blank">cron</a> every 15 minutes.)
+	</p>
+	<p>Powered by <a href="http://jpopsuki.eu/static/images/users/774/503x.jpg">Small Horse</a></p>
+<!--	<script type="text/javascript" src="https://widgets.amung.us/colored.js"></script><script type="text/javascript">WAU_colored('l8tchbw95e38', 'e3f4fd000000')</script> -->
+	<script type="text/javascript" src="https://widgets.amung.us/pro.js"></script>
+	<script type="text/javascript" id="wau_scr_30b716e2">
+    	wau_add('d0t8', '30b716e2')
+	</script>
+	<noscript>
+    		<img src="https://whos.amung.us/piwidget/d0t8/" />
+	</noscript> 
+
+</div>
+
+</div>
+<div id="lightbox" class="lightbox"></div>
+<div id="curtain" class="curtain"></div>
+
+<!-- Extra divs, for stylesheet developers to add imagery -->
+<div id="extra1"><span></span></div>
+<div id="extra2"><span></span></div>
+<div id="extra3"><span></span></div>
+<div id="extra4"><span></span></div>
+<div id="extra5"><span></span></div>
+<div id="extra6"><span></span></div>
+</body>
+</html>
