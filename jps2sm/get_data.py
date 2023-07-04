@@ -75,7 +75,7 @@ def get_jps_group_page(jps_urls: str) -> Tuple[str, str]:
     """
 
     jps_url = jps_urls.split()[0]  # If there are multiple urls only the first url needs to be retrieved
-    jps_group_id = re.findall(r"\?id=(\d+)", jps_urls)[0]
+
     jps_page_res = jpopsuki(jps_url)
 
     if jps_page_res.status_code != 200:
@@ -86,7 +86,17 @@ def get_jps_group_page(jps_urls: str) -> Tuple[str, str]:
         logger.error(f"JPS returned a Database error on group url {jps_url}. Either the JPS group ID does not exist or JPS is down.")
         sys.exit(1)
 
+    if re.search("Torrent not found", jps_page_res.text):
+        logger.error(f"JPS returned a torrent not found error on url {jps_url}")
+        sys.exit(1)
+
     logger.debug(f'Processing JPS URL: {jps_url}')
+
+    try:
+        jps_group_id = re.findall(r"\?id=(\d+)", jps_urls)[0]
+    except IndexError:
+        # We have been given a torrentid URL
+        jps_group_id = re.findall(r"upload\.php\?groupid=(\d+)", jps_page_res.text)[0]
 
     return jps_group_id, jps_page_res.text
 
