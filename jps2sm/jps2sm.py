@@ -74,9 +74,9 @@ def main():
         non_batch_upload(jps_urls=args.parsed.urls, dry_run=args.parsed.dryrun, wait_for_jps_dl=args.parsed.wait_for_jps_dl)
         return
 
-    if args.batch_modes == 1:
+    if args.parsed.batch:
         batch_mode_user = args.parsed.batchuser or jps_user_id
-        batch_mode(mode=args.batch_mode, user=batch_mode_user, start=args.parsed.batchstart,
+        batch_mode(mode=args.parsed.batch, user=batch_mode_user, start=args.parsed.batchstart,
                    end=args.parsed.batchend, sort=args.parsed.batchsort, order=args.parsed.batchsortorder)
     else:
         # If we reach here something has gone very wrong with parsing args

@@ -66,80 +66,53 @@ class GetArgs:
 
     def __init__(self):
         # pylint: disable=line-too-long
-        # It is actually easier to read the arguments without wrapping the lines and using lots of vars for the help texts
-        # would unnecessary extra code.
+        # It is actually easier to read the arguments without wrapping the lines
 
         if GetArgs.__args_parsed is not None:
             return
 
         GetArgs.__args_parsed = True
+        batch_modes = ['uploaded', 'seeding', 'snatched', 'recent']
         parser = argparse.ArgumentParser()
+
+        jps2sm_core_args = parser.add_argument_group(title="jps2sm actions", description="Choose ONE action for jps2sm to migrate data from")
+        jps2sm_core_args = jps2sm_core_args.add_mutually_exclusive_group(required=True)
+        jps2sm_core_args.add_argument("-u", "--urls", help="JPS URL for a group, or multiple individual releases URLs from the same group", type=str)
+        jps2sm_core_args.add_argument("-t", "--torrentid", help="JPS torrent id", type=int)
+        jps2sm_core_args.add_argument("-bm", "--batch",
+                                      help="Batch mode: Upload all releases either uploaded, seeding, snatched by you or, if provided, user id specified by --batchuser. OR all recent uploads to JPS.",
+                                      type=str, choices=batch_modes)
+        jps2sm_core_args.add_argument("-U", "--batchuploaded", help="alias to --batch upload", dest="batch", const="uploaded", action="store_const")
+        jps2sm_core_args.add_argument("-S", "--batchseeding", help="alias to --batch seeding", dest="batch", const="seeding", action="store_const")
+        jps2sm_core_args.add_argument("-SN", "--batchsnatched", help="alias to --batch snatched", dest="batch", const="snatched", action="store_const")
+        jps2sm_core_args.add_argument("-R", "--batchrecent", help="alias to --batch recent", dest="batch", const="recent", action="store_const")
+
+        batch_mode_args = parser.add_argument_group(title="Batch mode (--batch MODE) optional arguments")
+        batch_mode_args.add_argument("-b", "--batchuser", help="User id for batch user operations, default is user id of SM Username specified in jps2sm.cfg", type=int)
+        batch_mode_args.add_argument("-bs", "--batchsort", help=f"Sort for batch upload, must be one of: {','.join(JPSTorrentView.sort_by.keys())}", choices=JPSTorrentView.sort_by.keys())
+        batch_mode_args.add_argument("-bso", "--batchsortorder", help="Sort order for batch upload, either ASC or DESC.", choices=['asc', 'desc'], type=str.lower)
+        batch_mode_args.add_argument("-s", "--batchstart", help="Start at this page", type=int)
+        batch_mode_args.add_argument("-e", "--batchend", help="End at this page", type=int)
+        batch_mode_args.add_argument("-exc", "--exccategory", help="Exclude a JPS category from upload", type=str, choices=Categories.JPS)
+        batch_mode_args.add_argument("-exf", "--excaudioformat", help="Exclude an audioformat from upload", type=str)
+        batch_mode_args.add_argument("-exm", "--excmedia", help="Exclude a media from upload", type=str)
+
         parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + __version__)
         parser.add_argument('-d', '--debug', help='Enable debug mode', action='store_true')
-        parser.add_argument("-u", "--urls", help="JPS URL for a group, or multiple individual releases URLs from the same group", type=str)
-        parser.add_argument("-t", "--torrentid", help="JPS torrent id", type=int)
-        parser.add_argument("-n", "--dryrun", help="Just parse url and show the output, do not add the torrent to SM", action="store_true")
-        parser.add_argument("-b", "--batchuser", help="User id for batch user operations, default is user id of SM Username specified in jps2sm.cfg")
-        parser.add_argument("-U", "--batchuploaded", help="(Batch mode only) Upload all releases uploaded by you or, if provided, user id specified by --batchuser", action="store_true")
-        parser.add_argument("-S", "--batchseeding", help="(Batch mode only) Upload all releases currently seeding by you or, if provided, user id specified by --batchuser", action="store_true")
-        parser.add_argument("-R", "--batchrecent", help="(Batch mode only) Upload recent releases uploaded to JPS that are under 1Gb in size", action="store_true")
-        parser.add_argument("-SN", "--batchsnatched", help="(Batch mode only) Upload all releases snatched by you or, if provided, user id specified by --batchuser", action="store_true")
-        parser.add_argument("-bs", "--batchsort", help=f"(Batch mode only) Sort for batch upload, must be one of: {','.join(JPSTorrentView.sort_by.keys())}")
-        parser.add_argument("-bso", "--batchsortorder", help="(Batch mode only) Sort order for batch upload, either ASC or DESC.")
-        parser.add_argument("-s", "--batchstart", help="(Batch mode only) Start at this page", type=int)
-        parser.add_argument("-e", "--batchend", help="(Batch mode only) End at this page", type=int)
+        parser.add_argument("-n", "--dryrun", help="Just parse JPS data and show the output, do not upload the torrent(s) to SM", action="store_true")
         parser.add_argument("-w", "--wait-for-jps-dl", help="Wait for JPS file to be downloaded", action="store_true")
-        parser.add_argument("-exc", "--exccategory", help="(Batch mode only) Exclude a JPS category from upload", type=str)
-        parser.add_argument("-exf", "--excaudioformat", help="(Batch mode only) Exclude an audioformat from upload", type=str)
-        parser.add_argument("-exm", "--excmedia", help="(Batch mode only) Exclude a media from upload", type=str)
-        parser.add_argument("-m", "--mediainfo", help="Search and get mediainfo data from the source file(s) in the directories specified by MediaDirectories. Extract data to set codec, resolution, audio format and container fields as well as the mediainfo field itself.", action="store_true")
+        parser.add_argument("-m", "--mediainfo",
+                            help="Search and get mediainfo data from the source file(s) in the directories specified by MediaDirectories. Extract data to set codec, resolution, audio format and container fields as well as the mediainfo field itself.",
+                            action="store_true")
+
         GetArgs.parsed = parser.parse_args()
 
-        # Handle bag args
-        GetArgs.batch_modes = sum([bool(GetArgs.parsed.batchuploaded),
-                                   bool(GetArgs.parsed.batchseeding),
-                                   bool(GetArgs.parsed.batchsnatched),
-                                   bool(GetArgs.parsed.batchrecent)])
-        if GetArgs.batch_modes > 1:
-            fatal_error('Error: Multiple batch modes of operation specified - only one can be used at the same time. See --help')
+        if GetArgs.parsed.debug:
+            print(GetArgs.parsed)
 
-        if GetArgs.parsed.urls is not None and GetArgs.parsed.torrentid is not None:
-            fatal_error('Error: Both JPS URL(s) (--urls) and a JPS torrent id (--torrentid) have been specified '
-                        '- only one can be used at the same time. See --help')
-        if GetArgs.parsed.urls is None and GetArgs.parsed.torrentid is None and GetArgs.batch_modes == 0:
-            fatal_error('Error: Neither any JPS URL(s) (--urls) '
-                        'nor a JPS torrent id (--torrentid) '
-                        'nor any batch parameters (--batchsnatched, --batchuploaded, --batchseeding or --batchrecent) have been specified. See --help')
-        elif (GetArgs.parsed.urls is not None or GetArgs.parsed.torrentid is not None) and GetArgs.batch_modes == 1:
-            fatal_error(
-                'Error: Both the JPS URL(s) (--urls) or torrent id (--torrentid) and batch parameters '
-                '(--batchsnatched,--batchuploaded, --batchseeding or --batchrecent) have been specified, but only one is allowed.')
-
-        if GetArgs.parsed.batchsort is not None and GetArgs.parsed.batchsort not in JPSTorrentView.sort_by.keys():
-            fatal_error(f'Error: Incorrect --batchsort mode specified, sort mode must be one of {",".join(JPSTorrentView.sort_by.keys())}')
-        if GetArgs.parsed.batchsortorder is not None and str(GetArgs.parsed.batchsortorder).upper() not in ("ASC", "DESC"):
-            fatal_error(f'Error: Incorrect --batchsortorder specified, order must be wither ASC or DESC')
-        if GetArgs.parsed.exccategory is not None and str(GetArgs.parsed.exccategory) not in Categories.JPS:
-            fatal_error(f'Error: Incorrect --exccategory specified, it must match a JPS category, these are: {",".join(Categories.JPS)}')
-
-        if GetArgs.batch_modes == 1:  # Handle bad batch args TODO this should be handles as part of proper sub args if possible
-            if GetArgs.parsed.batchuser:
-                if GetArgs.parsed.batchuser.isnumeric() is False:
-                    fatal_error('Error: "--batchuser" or short "-b" should be a JPS profile ID. See --help')
-
+        if GetArgs.parsed.batch:
             if bool(GetArgs.parsed.batchstart) ^ bool(GetArgs.parsed.batchend):
-                fatal_error('Error: You have specified an incomplete page range. See --help')
-
-            if GetArgs.parsed.batchuploaded:
-                GetArgs.batch_mode = "uploaded"
-            elif GetArgs.parsed.batchseeding:
-                GetArgs.batch_mode = "seeding"
-            elif GetArgs.parsed.batchsnatched:
-                GetArgs.batch_mode = "snatched"
-            elif GetArgs.parsed.batchrecent:
-                GetArgs.batch_mode = "recent"
-            else:
-                raise RuntimeError("Expected some batch mode to be set")
+                parser.error('Error: You have specified an incomplete page range. See --help')
 
     def __getattr__(self, item):
         return GetArgs.item
