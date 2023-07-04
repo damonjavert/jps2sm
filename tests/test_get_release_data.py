@@ -256,7 +256,7 @@ I forgot to provide the .jpg file for cover, sorry for that <img alt="sad.gif" b
     date = "20120815"
 
     # 147830 only
-    assert get_release_data(torrentids=torrent_ids_mp3_320, torrent_table=torrent_table, date=date)\
+    assert get_release_data(jps_torrent_ids=torrent_ids_mp3_320, torrent_table=torrent_table, date=date)\
            == {'147830':
                    {'slashdata': ['MP3', '320', 'CD'],
                     'uploaddate': 'Aug 11 2012, 17:58',
@@ -266,7 +266,7 @@ I forgot to provide the .jpg file for cover, sorry for that <img alt="sad.gif" b
                     'seeders': '14', 'leechers': '0'}}
 
     # 148289 only
-    assert get_release_data(torrentids=torrent_ids_flac_lossless_cd, torrent_table=torrent_table, date=date)\
+    assert get_release_data(jps_torrent_ids=torrent_ids_flac_lossless_cd, torrent_table=torrent_table, date=date)\
            == {'148289': {'slashdata': ['FLAC', 'Lossless', 'CD'],
                           'uploaddate': 'Aug 15 2012, 08:30',
                           'size_no_units': '1.08',
@@ -276,7 +276,7 @@ I forgot to provide the .jpg file for cover, sorry for that <img alt="sad.gif" b
                           'leechers': '0'}}
 
     # Whole group
-    assert get_release_data(torrentids=torrent_ids_whole_group, torrent_table=torrent_table, date=date)\
+    assert get_release_data(jps_torrent_ids=torrent_ids_whole_group, torrent_table=torrent_table, date=date)\
            == {'147830':
                    {'slashdata': ['MP3', '320', 'CD'],
                     'uploaddate': 'Aug 11 2012, 17:58',
@@ -406,7 +406,7 @@ def test_get_release_data_group_251299_torrent_358233() -> None:
             </tbody>"""
     date = "20180221"
 
-    assert get_release_data(torrentids=torrent_ids, torrent_table=torrent_table, date=date)\
+    assert get_release_data(jps_torrent_ids=torrent_ids, torrent_table=torrent_table, date=date)\
            == {'358233':
                    {'slashdata': ['MP3', 'V0 (VBR)', 'WEB'],
                     'uploaddate': 'Apr 06 2018, 19:55',
@@ -523,7 +523,7 @@ def test_get_release_data_group_28034() -> None:
                 </tbody>"""
     date = "20190522"
 
-    assert get_release_data(torrentids=torrent_ids_whole_group, torrent_table=torrent_table, date=date)\
+    assert get_release_data(jps_torrent_ids=torrent_ids_whole_group, torrent_table=torrent_table, date=date)\
            == {"405749": {
     "slashdata": [
       "MKV",
@@ -965,7 +965,7 @@ Should be:<br/>
                 </tbody>"""
     date = "20151118"
 
-    assert get_release_data(torrentids=torrent_ids_whole_group, torrent_table=torrent_table, date=date)\
+    assert get_release_data(jps_torrent_ids=torrent_ids_whole_group, torrent_table=torrent_table, date=date)\
            == {
   "372210": {
     "slashdata": [
@@ -1237,7 +1237,7 @@ def test_get_release_data_group_273366() -> None:
                 </tbody>"""
     date = "20190313"
 
-    assert get_release_data(torrentids=torrent_ids_whole_group, torrent_table=torrent_table, date=date)\
+    assert get_release_data(jps_torrent_ids=torrent_ids_whole_group, torrent_table=torrent_table, date=date)\
            == {
   "435401": {
     "slashdata": [

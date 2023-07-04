@@ -296,17 +296,17 @@ def split_bad_multiple_artists(artists: str) -> List[str]:
     return re.split(', | x | & ', artists)
 
 
-def get_release_data(torrentids: List[str], torrent_table: str, date: str) -> Dict[str, Dict[str, Union[List[str], str]]]:
+def get_release_data(jps_torrent_ids: List[str], torrent_table: str, date: str) -> Dict[str, Dict[str, Union[List[str], str]]]:
     # TODO When upgrading to 3.9+ the 'List[str]' can be changed to 'list[str]' and  'Union[list, str]' can be 'list | str'. See PEP 585
     """
     Retrieve all torrent id and release data (slash separated data, upload date torrent size, snatch count, seeders, leechers)
     whilst coping with 'noise' from FL torrents, and either return all data if using a group URL or only return the relevant
     releases if release url(s) were used
 
-    :param torrentids: list of torrentids to be processed, empty list if a group URL is being used.
+    :param jps_torrent_ids: list of torrentids to be processed, empty list if a group URL is being used.
     :param torrent_table: contents of .torrent_table tbody of the JPS group page
     :param date: Date for the JPS group in YYYYMMDD format or YYYY
-    :return: releasedata: 2d dict of release data in the format of :
+    :return: release_data: 2d dict of release data in the format of :
                 torrentid: { "slashdata" : [ slashdatalist ] ,
                           "uploaddate": uploaddate,
                           "size_no_units": size_no_units,
@@ -319,57 +319,50 @@ def get_release_data(torrentids: List[str], torrent_table: str, date: str) -> Di
     """
 
     # print(torrent_table)
-    freeleechtext = '<strong>Freeleech!</strong>'
-    releasedatapre = re.findall(r"swapTorrent\('([0-9]+)'\);\">» (.+?(?=</a>))</a>(?:\s*)</td>(?:\s*)<td class=\"nobr\">(\d*(?:\.)?(?:\d{0,2})?) (\w{2})</td>(?:\s*)<td>([0-9,]{1,6})</td>(?:\s*)<td>([0-9,]{1,6})</td>(?:\s*)<td>([0-9,]{1,6})</td>.*?<blockquote>(?:\s*)Uploaded by <a href=\"user.php\?id=(?:[0-9]+)\">(?:[\S]+)</a>  on <span title=\"(?:[^\"]+)\">([^<]+)</span>", torrent_table, re.DOTALL)
-    # logger.debug(f'Pre-processed releasedata: {json.dumps(releasedatapre, indent=2)}')
+    freeleech_text = '<strong>Freeleech!</strong>'
+    release_data_raw = re.findall(r"swapTorrent\('([0-9]+)'\);\">» (.+?(?=</a>))</a>(?:\s*)</td>(?:\s*)<td class=\"nobr\">(\d*(?:\.)?(?:\d{0,2})?) (\w{2})</td>(?:\s*)<td>([0-9,]{1,6})</td>(?:\s*)<td>([0-9,]{1,6})</td>(?:\s*)<td>([0-9,]{1,6})</td>.*?<blockquote>(?:\s*)Uploaded by <a href=\"user.php\?id=(?:[0-9]+)\">(?:[\S]+)</a>  on <span title=\"(?:[^\"]+)\">([^<]+)</span>", torrent_table, re.DOTALL)
+    # logger.debug(f'Pre-processed release_data: {json.dumps(release_data_raw, indent=2)}')
 
-    releasedata = {}
+    release_data = {}
 
     try:
         # Create exception if no release data was found, else these get silently skipped in collate() as the response is null.
-        test = releasedatapre[0]
+        test = release_data_raw[0]
     except IndexError:
-        raise RuntimeError(f'No release data found for {torrentids}')
+        raise RuntimeError(f'No release data found for {jps_torrent_ids}')
 
-    for release in releasedatapre:
-        torrentid = release[0]
-        slashlist = ([i.split(' / ') for i in [release[1]]])[0]
-        size_no_units = release[2]
-        size_units = release[3]
-        completed = release[4]
-        seeders = release[5]
-        leechers = release[6]
-        uploadeddate = release[7]
-        releasedata[torrentid] = {}
-        releasedata[torrentid]['slashdata'] = slashlist
-        releasedata[torrentid]['uploaddate'] = uploadeddate
-        releasedata[torrentid]['size_no_units'] = size_no_units
-        releasedata[torrentid]['size_units'] = size_units
-        releasedata[torrentid]['completed'] = completed
-        releasedata[torrentid]['seeders'] = seeders
-        releasedata[torrentid]['leechers'] = leechers
+    for release in release_data_raw:
+        jps_torrent_id = release[0]
+        release_data[jps_torrent_id] = {}
+        release_data[jps_torrent_id]['slashdata'] = ([i.split(' / ') for i in [release[1]]])[0]
+        release_data[jps_torrent_id]['uploaddate'] = release[7]
+        release_data[jps_torrent_id]['size_no_units'] = release[2]
+        release_data[jps_torrent_id]['size_units'] = release[3]
+        release_data[jps_torrent_id]['completed'] = release[4]
+        release_data[jps_torrent_id]['seeders'] = release[5]
+        release_data[jps_torrent_id]['leechers'] = release[6]
 
-    logger.debug(f'Entire group contains: {json.dumps(releasedata, indent=2)}')
+    logger.debug(f'Entire group contains: {json.dumps(release_data, indent=2)}')
 
-    removetorrents = []
-    for torrentid, release in releasedata.items():  # Now release is a dict!
-        if len(torrentids) != 0 and torrentid not in torrentids:
+    remove_torrents = []
+    for jps_torrent_id, release in release_data.items():  # Now release is a dict!
+        if len(jps_torrent_ids) != 0 and jps_torrent_id not in jps_torrent_ids:
             # If len(torrentids) != 0 then user has supplied a group url and every release is processed,
-            # otherwise iterate through releasedata{} and remove what is not needed
-            removetorrents.append(torrentid)
-        if freeleechtext in release['slashdata']:
-            release['slashdata'].remove(freeleechtext)  # Remove Freeleech whole match so it does not interfere with Remastered
-        for index, slashreleaseitem in enumerate(release['slashdata']):
+            # otherwise iterate through release_data{} and remove what is not needed
+            remove_torrents.append(jps_torrent_id)
+        if freeleech_text in release['slashdata']:
+            release['slashdata'].remove(freeleech_text)  # Remove Freeleech whole match so it does not interfere with Remastered
+        for index, slash_release_item in enumerate(release['slashdata']):
             # Handle Freeleech remastered torrents, issue #oldrepo43 (in a video group)
-            if remaster_freeleech_removed := re.findall(r'(.*) - <strong>Freeleech!<\/strong>', slashreleaseitem):
+            if remaster_freeleech_removed := re.findall(r'(.*) - <strong>Freeleech!<\/strong>', slash_release_item):
                 # Use the extracted value and append group JPS release year
                 release['slashdata'][index] = f'{remaster_freeleech_removed[0]} - {date[:4]}'
-                logger.debug(f"Torrent {torrentid} is freeleech remastered, validated remasterdata to {release['slashdata'][index]}")
-    for torrentid in removetorrents:
-        del (releasedata[torrentid])
+                logger.debug(f"Torrent {jps_torrent_id} is freeleech remastered, validated remasterdata to {release['slashdata'][index]}")
+    for jps_torrent_id in remove_torrents:
+        del (release_data[jps_torrent_id])
 
-    logger.info(f'Selected for upload: {releasedata}')
-    return releasedata
+    logger.info(f'Selected for upload: {release_data}')
+    return release_data
 
 
 def get_group_description_bbcode(jps_group_id: str) -> str:
