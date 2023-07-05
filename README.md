@@ -185,7 +185,7 @@ This will install the runtime and dev dependancies and jps2sm itself in editable
 
 To run tests:
 ```shell
-cd tests
+# Run from the repo root, else the required files will not be found
 pytest
 ```
 ### Windows
