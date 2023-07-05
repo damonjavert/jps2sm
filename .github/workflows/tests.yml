@@ -4,6 +4,7 @@ on: [push]
 
 jobs:
   test:
+    if: false
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -29,8 +30,7 @@ jobs:
         cd tests
         pytest
   coverage:
-    if: false
-    needs: [ test ]
+    #needs: [ test ]
     name: coverage
     runs-on: ubuntu-latest
     steps:
@@ -45,13 +45,16 @@ jobs:
         pip install -r requirements.txt
         pip install -r requirements_dev.txt
     - name: Running coverage
+      env:
+        CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
       run: |
         curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
         chmod +x ./cc-test-reporter
+        mv tests/jps2sm.tests.cfg ./jps2sm.cfg
         ./cc-test-reporter before-build
         coverage run -m pytest
+        coverage_exit=$?
         coverage lcov
         mkdir coverage
         mv coverage.lcov coverage/lcov.info
-        ./cc-test-reporter after-build --coverage-input-type lcov --exit-code $?
-
+        ./cc-test-reporter after-build --coverage-input-type lcov --exit-code $coverage_exit

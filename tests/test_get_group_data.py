@@ -1228,7 +1228,7 @@ Regular Edition(通常版)
 　KIXM-193～194　Day2 LIVE Blu-ray (Blu-ray x 2)
 　KIBM-499～501　Day2 LIVE DVD (DVD x 3)"""
 
-    with open("group-edit-page-176329", "r", encoding="utf-8") as group_edit_page_176329:
+    with open("tests/group-edit-page-176329", "r", encoding="utf-8") as group_edit_page_176329:
         requests_mock.post("https://jpopsuki.eu/login.php", text=LoginParameters.jps_success)  # Mock the initial login with requestsloginsession()
         requests_mock.get("https://jpopsuki.eu/torrents.php?action=editgroup&groupid=176329", text=group_edit_page_176329.read())
         jps_group_info = GetGroupData(jps_group_id, jps_group_page_text)
@@ -1252,7 +1252,7 @@ def collect_data():
     """
 
     jps_page = jpopsuki("https://jpopsuki.eu/torrents.php?action=editgroup&groupid=176329")
-    with open("edit-page-text176329", "w", encoding="utf-8") as file:
+    with open("tests/edit-page-text176329", "w", encoding="utf-8") as file:
         file.write(jps_page.text)
 
 

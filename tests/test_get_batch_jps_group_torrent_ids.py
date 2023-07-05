@@ -34,9 +34,9 @@ def test_get_batch_jps_group_torrent_ids(requests_mock, mocker):
 
     # with open("user-page-snatched-userid-1", "r", encoding="utf-8") as user_page_snatched_userid_file:
     #    user_page_snatched_userid_1 = user_page_snatched_userid_file.read()
-    with open("user-page-snatched-userid-1-page-1", "r", encoding="utf-8") as user_page_snatched_userid_1_page_1_file:
+    with open("tests/user-page-snatched-userid-1-page-1", "r", encoding="utf-8") as user_page_snatched_userid_1_page_1_file:
         user_page_snatched_userid_1_page_1 = user_page_snatched_userid_1_page_1_file.read()
-    with open("user-page-snatched-userid-1-page-2", "r", encoding="utf-8") as user_page_snatched_userid_1_page_2_file:
+    with open("tests/user-page-snatched-userid-1-page-2", "r", encoding="utf-8") as user_page_snatched_userid_1_page_2_file:
         user_page_snatched_userid_1_page_2 = user_page_snatched_userid_1_page_2_file.read()
 
     requests_mock.post("https://jpopsuki.eu/login.php", text=LoginParameters.jps_success)  # Mock the initial login with requestsloginsession()
