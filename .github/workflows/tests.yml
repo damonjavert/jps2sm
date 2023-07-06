@@ -26,7 +26,6 @@ jobs:
     - name: Run pytest
       run: |
         mv tests/jps2sm.tests.cfg ./jps2sm.cfg
-        cd tests
         pytest
   coverage:
     name: coverage
