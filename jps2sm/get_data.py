@@ -274,7 +274,6 @@ class GetGroupData:
             if self.artist == ['V.A.']:
                 raise Exception("V.A. torrent with to contrib artists set - torrent has no valid artists so this cannot be uploaded.")
 
-
     def all(self) -> Dict[str, Union[str, Tuple[str, str]]]:
         """
         Return a dict with all the group data

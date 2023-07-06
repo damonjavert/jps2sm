@@ -67,11 +67,19 @@ def main():
         fatal_error("Error: 'Display original Artist/Album titles' is enabled in your JPS user profile. This must be disabled for jps2sm to run.")
 
     if args.parsed.torrentid:
-        non_batch_upload(jps_torrent_id=args.parsed.torrentid, dry_run=args.parsed.dryrun, wait_for_jps_dl=args.parsed.wait_for_jps_dl)
+        non_batch_upload(jps_torrent_id=args.parsed.torrentid,
+                         dry_run=args.parsed.dryrun,
+                         mediainfo=args.parsed.mediainfo,
+                         wait_for_jps_dl=args.parsed.wait_for_jps_dl
+                         )
         return
 
     if args.parsed.urls:
-        non_batch_upload(jps_urls=args.parsed.urls, dry_run=args.parsed.dryrun, wait_for_jps_dl=args.parsed.wait_for_jps_dl)
+        non_batch_upload(jps_urls=args.parsed.urls,
+                         dry_run=args.parsed.dryrun,
+                         mediainfo=args.parsed.mediainfo,
+                         wait_for_jps_dl=args.parsed.wait_for_jps_dl
+                         )
         return
 
     if args.parsed.batch:
@@ -83,7 +91,7 @@ def main():
         raise RuntimeError('Argument handling error')
 
 
-def non_batch_upload(jps_torrent_id=None, jps_urls=None, dry_run=None, wait_for_jps_dl=False):
+def non_batch_upload(jps_torrent_id=None, jps_urls=None, dry_run=None, mediainfo=None, wait_for_jps_dl=False):
     """
     Perform simple non-batch upload to SM with either a single jps_torrent_id from --torrentid or a string of --urls
     """
@@ -109,7 +117,10 @@ def non_batch_upload(jps_torrent_id=None, jps_urls=None, dry_run=None, wait_for_
         input('When these files have been downloaded press enter to continue...')
 
     for _, data in collate_torrent_info['jps_torrent_collated_data'].items():
-        sugoimusic_upload_data = prepare_torrent(data['jps_torrent_object'], data['torrentgroupdata'], **data['release_data_collated'])
+        sugoimusic_upload_data = prepare_torrent(jps_torrent_object=data['jps_torrent_object'],
+                                                 torrent_group_data=data['torrentgroupdata'],
+                                                 mediainfo=mediainfo,
+                                                 **data['release_data_collated'])
         if not dry_run:
             upload_torrent(sugoimusic_upload_data, data['jps_torrent_object'])
             download_sm_uploaded_torrents(torrent_count=1)

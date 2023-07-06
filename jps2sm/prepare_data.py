@@ -212,16 +212,15 @@ def collate(torrentids, torrentgroupdata, max_size=None):
     return collate_torrent_info
 
 
-def prepare_torrent(jps_torrent_object, torrent_group_data, **release_data_collated):
+def prepare_torrent(jps_torrent_object, torrent_group_data, mediainfo: bool, **release_data_collated):
     """
     Prepare POST data for the SM upload, and performs additional validation
 
     :param jps_torrent_object: bytes: BytesIO object of the JPS torrent
     :param torrent_group_data: JPSGroup data from GetGroupData
     :param release_data_collated: dict of collated / validated release data from collate()
+    :param mediainfo: True if mediainfo should be gathered
     """
-    config = GetConfig()
-    args = GetArgs()
     languages = ('Japanese', 'English', 'Korean', 'Chinese', 'Vietnamese')
 
     sugoimusic_upload_data = {
@@ -237,18 +236,12 @@ def prepare_torrent(jps_torrent_object, torrent_group_data, **release_data_colla
     else:
         sugoimusic_upload_data['year'] = torrent_group_data.date
 
-    if not args.parsed.dryrun:
-        sm_user = GetSMUser()
-        sugoimusic_upload_data['auth'] = sm_user.auth_key()
-
     logger.debug(release_data_collated)
 
     # TODO Most of this can be in get_mediainfo()
-    if args.parsed.mediainfo:
+    if mediainfo:
         try:
-            sugoimusic_upload_data['mediainfo'], release_data_mediainfo = get_mediainfo(jps_torrent_object,
-                                                                                      release_data_collated['media'],
-                                                                                      config.media_roots)
+            sugoimusic_upload_data['mediainfo'], release_data_mediainfo = get_mediainfo(jps_torrent_object, release_data_collated['media'])
             sugoimusic_upload_data.update(release_data_mediainfo)
             if 'duration' in sugoimusic_upload_data.keys() and sugoimusic_upload_data['duration'] > 1:
                 duration_friendly_format = humanfriendly.format_timespan(datetime.timedelta(seconds=int(sugoimusic_upload_data['duration'] / 1000)))
@@ -281,7 +274,7 @@ def prepare_torrent(jps_torrent_object, torrent_group_data, **release_data_colla
             # is DVD in a music torrent group
             else:
                 sugoimusic_upload_data['type'] = Categories.JPStoSM['DVD']
-        if torrent_group_data.category == "TV-Music" and args.parsed.mediainfo:
+        if torrent_group_data.category == "TV-Music" and mediainfo:
             sugoimusic_upload_data['type'] = Categories.SM[decide_music_performance(torrent_group_data.artist,
                                                                                     sugoimusic_upload_data['multiplefiles'],
                                                                                     sugoimusic_upload_data['duration'])]
@@ -338,10 +331,10 @@ def prepare_torrent(jps_torrent_object, torrent_group_data, **release_data_colla
     # Now that all Category validation is complete decide if we should strip some mediainfo data
     mediainfo_non_resolution = ('container', 'mediainfo')
     mediainfo_resolution = ('ressel', 'resolution')
-    if args.parsed.mediainfo and sugoimusic_upload_data['type'] in Categories.SM_StripAllMediainfo:
+    if mediainfo and sugoimusic_upload_data['type'] in Categories.SM_StripAllMediainfo:
         for field in (mediainfo_non_resolution + mediainfo_resolution):
             sugoimusic_upload_data.pop(field, None)
-    elif args.parsed.mediainfo and sugoimusic_upload_data['type'] == Categories.SM_StripAllMediainfoExcResolution:
+    elif mediainfo and sugoimusic_upload_data['type'] == Categories.SM_StripAllMediainfoExcResolution:
         for field in mediainfo_non_resolution:
             sugoimusic_upload_data.pop(field, None)
 
@@ -367,12 +360,8 @@ def prepare_torrent(jps_torrent_object, torrent_group_data, **release_data_colla
     else:
         sugoimusic_upload_data['idols[]'] = torrent_group_data.artist  # Set the artist normally
 
-    jps_torrent_object.seek(0)
-
-    if args.parsed.dryrun or args.parsed.debug:
-        data_exc_mediainfo = {x: sugoimusic_upload_data[x] for x in sugoimusic_upload_data if x not in 'mediainfo'}
-        data_exc_mediainfo['auth'] = '<scrubbed>'
-        logger.info(json.dumps(data_exc_mediainfo, indent=2))  # Mediainfo shows too much data
+    data_exc_mediainfo = {x: sugoimusic_upload_data[x] for x in sugoimusic_upload_data if x not in 'mediainfo'}
+    logger.debug(json.dumps(data_exc_mediainfo, indent=2))  # Mediainfo shows too much data
 
     sugoimusic_upload_data['jps_torrent_id'] = release_data_collated['jpstorrentid']
 

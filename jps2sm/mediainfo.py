@@ -18,15 +18,17 @@ import torrent_parser as tp
 from pyunpack import Archive
 from loguru import logger
 
+# jps2sm modules
+from jps2sm.utils import GetConfig
 
-def get_mediainfo(jps_torrent_object: BytesIO, media: str, media_roots: List[str]) -> Tuple[str, Dict[str, str]]:
+
+def get_mediainfo(jps_torrent_object: BytesIO, media: str) -> Tuple[str, Dict[str, str]]:
     """
     Get filename(s) of video files in the torrent and run mediainfo and capture the output, extract if DVD found (Blurays not yet supported)
     then set the appropriate fields for the upload
 
     :param jps_torrent_object: bytes: BytesIO object of the JPS torrent
     :param media: str Validated media from collate()
-    :param media_roots: Sanitised MediaDirectories from cfg for use by get_media_location()
     :return: mediainfo, releasedataout
             mediainfo: Mediainfo text output of the file(s)
             releaseadtaout: Fields gathered from mediainfo for SM upload
@@ -71,6 +73,7 @@ def get_mediainfo(jps_torrent_object: BytesIO, media: str, media_roots: List[str
 
         return validated_codec
 
+    config = GetConfig()
     torrent_metadata = tp.TorrentFileParser(jps_torrent_object).parse()
     torrent_name = torrent_metadata['info']['name']  # Directory if >1 file, otherwise it is filename
     # print(torrentmetadata)
@@ -85,7 +88,7 @@ def get_mediainfo(jps_torrent_object: BytesIO, media: str, media_roots: List[str
         torrent_has_directory = False
 
     logger.info(f'According to torrent metadata the dir/file is is {torrent_name}')
-    file_path = get_media_location(torrent_name, torrent_has_directory, media_roots)
+    file_path = get_media_location(torrent_name, torrent_has_directory, config.media_roots)
     if not torrent_has_directory:
         release_data_from_mediainfo['multiplefiles'] = False
         mediainfo_whole_str += str(MediaInfo.parse(file_path, text=True))

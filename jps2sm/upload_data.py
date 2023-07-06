@@ -101,10 +101,14 @@ def upload_torrent(sugoimusic_upload_data, jps_torrent_object):
     """
     upload_url = 'https://sugoimusic.me/upload.php'
 
+    jps_torrent_object.seek(0)
     sugoimusic_upload_files = {
         # We need to specify a filename  now we are using BytesIO and SM will validate files without a .torrent extension
         'file_input': ('blah.torrent', jps_torrent_object)
     }
+
+    sm_user = GetSMUser()
+    sugoimusic_upload_data['auth'] = sm_user.auth_key()
 
     sugoimusic_upload_res = sugoimusic(upload_url, "post", sugoimusic_upload_data, sugoimusic_upload_files)
 
