@@ -369,11 +369,6 @@ def prepare_torrent(jps_torrent_object, torrent_group_data, **release_data_colla
 
     jps_torrent_object.seek(0)
 
-    sugoimusic_upload_files = {
-        # We need to specify a filename  now we are using BytesIO and SM will validate files without a .torrent extension
-        'file_input': ('blah.torrent', jps_torrent_object)
-    }
-
     if args.parsed.dryrun or args.parsed.debug:
         data_exc_mediainfo = {x: sugoimusic_upload_data[x] for x in sugoimusic_upload_data if x not in 'mediainfo'}
         data_exc_mediainfo['auth'] = '<scrubbed>'
@@ -381,5 +376,4 @@ def prepare_torrent(jps_torrent_object, torrent_group_data, **release_data_colla
 
     sugoimusic_upload_data['jps_torrent_id'] = release_data_collated['jpstorrentid']
 
-    if not args.parsed.dryrun:
-        upload_torrent(sugoimusic_upload_data, sugoimusic_upload_files)
+    return sugoimusic_upload_data

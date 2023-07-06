@@ -16,7 +16,7 @@ from jps2sm.get_data import GetGroupData, GetJPSUser, get_jps_group_page
 from jps2sm.prepare_data import collate, prepare_torrent
 from jps2sm.save_data import download_sm_uploaded_torrents
 from jps2sm.batch import batch_mode
-from jps2sm.upload_data import set_original_artists
+from jps2sm.upload_data import set_original_artists, upload_torrent
 from jps2sm.utils import fatal_error, GetArgs, handle_cfg_media_roots, setup_logging
 from jps2sm.myloginsession import jpopsuki
 
@@ -109,8 +109,9 @@ def non_batch_upload(jps_torrent_id=None, jps_urls=None, dry_run=None, wait_for_
         input('When these files have been downloaded press enter to continue...')
 
     for _, data in collate_torrent_info['jps_torrent_collated_data'].items():
-        prepare_torrent(data['jps_torrent_object'], data['torrentgroupdata'], **data['release_data_collated'])
+        sugoimusic_upload_data = prepare_torrent(data['jps_torrent_object'], data['torrentgroupdata'], **data['release_data_collated'])
         if not dry_run:
+            upload_torrent(sugoimusic_upload_data, data['jps_torrent_object'])
             download_sm_uploaded_torrents(torrent_count=1)
 
     if not dry_run:

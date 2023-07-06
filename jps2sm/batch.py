@@ -18,6 +18,7 @@ from loguru import logger
 
 # jps2sm modules
 from jps2sm.get_data import GetGroupData, get_jps_group_data_class, get_jps_group_page
+from jps2sm.upload_data import upload_torrent
 from jps2sm.myloginsession import jpopsuki
 from jps2sm.save_data import download_sm_uploaded_torrents
 from jps2sm.utils import GetArgs, count_values_dict, GetConfig
@@ -151,7 +152,7 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
 
     for jps_torrent_id, collate_torrent_info in batch_collate_torrent_info.items():
         try:
-            prepare_torrent(collate_torrent_info['jps_torrent_object'], collate_torrent_info['torrentgroupdata'], **collate_torrent_info['release_data_collated'])
+            sugoimusic_upload_data = prepare_torrent(collate_torrent_info['jps_torrent_object'], collate_torrent_info['torrentgroupdata'], **collate_torrent_info['release_data_collated'])
         except KeyboardInterrupt:  # Allow Ctrl-C to exit without showing the error multiple times and polluting the final error dict
             break  # Still continue to get error dicts and dupe list so far
         except Exception as exc:
@@ -162,12 +163,15 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
                 batch_upload_source_data_not_found.append(missing_file)
             elif str(exc).startswith('You do not appear to have entered any MediaInfo data for your video upload.'):
                 batch_upload_mediainfo_not_submitted += 1
-            else:
+            continue
+        if not args.parsed.dryrun and batch_collate_torrent_info:
+            try:
+                upload_torrent(sugoimusic_upload_data, collate_torrent_info['jps_torrent_object'])
+            except:
                 # Catch all for any upload_torrent() exception
                 logger.exception(f"SM upload error with JPS torrent id {jps_torrent_id} - {collate_torrent_info['torrentgroupdata'].title}")
                 sm_upload_errors += 1
-            continue
-        if not args.parsed.dryrun:
+                continue
             set_original_artists(collate_torrent_info['torrentgroupdata'].contribartists)
             sm_torrents_uploaded_count += 1
     if not args.parsed.dryrun and batch_collate_torrent_info:

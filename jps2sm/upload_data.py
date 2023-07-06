@@ -67,7 +67,7 @@ def set_original_artists(contrib_artists) -> None:
             logger.debug(f'Error in setting artist {artist} orig_artist {orig_artist}')
 
 
-def upload_torrent(sugoimusic_upload_data, sugoimusic_upload_files):
+def upload_torrent(sugoimusic_upload_data, jps_torrent_object):
     """
     Perform upload to SugoiMusic and do error handling
 
@@ -100,6 +100,11 @@ def upload_torrent(sugoimusic_upload_data, sugoimusic_upload_files):
     :param sugoimusic_upload_files: dict with the torrent to upload in the format of: {'file_input': ('filename.torrent', torrent_object: bytesIO) }
     """
     upload_url = 'https://sugoimusic.me/upload.php'
+
+    sugoimusic_upload_files = {
+        # We need to specify a filename  now we are using BytesIO and SM will validate files without a .torrent extension
+        'file_input': ('blah.torrent', jps_torrent_object)
+    }
 
     sugoimusic_upload_res = sugoimusic(upload_url, "post", sugoimusic_upload_data, sugoimusic_upload_files)
 
