@@ -20,10 +20,9 @@ from loguru import logger
 
 # jps2sm modules
 from jps2sm.constants import VideoOptions, Categories
-from jps2sm.get_data import get_release_data, GetSMUser
+from jps2sm.get_data import get_release_data
 from jps2sm.mediainfo import get_mediainfo
 from jps2sm.save_data import get_jps_torrent, download_jps_torrent, download_sm_torrent
-from jps2sm.upload_data import upload_torrent
 from jps2sm.utils import GetConfig, GetArgs, decide_duplicate
 from jps2sm.validation import validate_jps_video_data, validate_jps_bitrate, decide_exc_filter, decide_music_performance, \
     get_alternate_fansub_category_id, decide_ep
@@ -187,7 +186,8 @@ def collate(torrentids, torrentgroupdata, max_size=None):
                     f'This torrent already exists on SugoiMusic - https://sugoimusic.me/torrents.php?torrentid={dupe_sugoimusic_torrent_id} '
                     f'The .torrent has been downloaded with name "{dupe_file_path}"'
                 )
-            dupe_error_msg = f'The exact same torrent file already exists on the site! See: https://sugoimusic.me/torrents.php?torrentid={dupe_sugoimusic_torrent_id} JPS torrent id: {jps_torrent_id}'
+            dupe_error_msg = f'The exact same torrent file already exists on the site! ' \
+                             f'See: https://sugoimusic.me/torrents.php?torrentid={dupe_sugoimusic_torrent_id} JPS torrent id: {jps_torrent_id}'
             logger.warning(dupe_error_msg)
             dupe_jps_ids.append(int(jps_torrent_id))
             dupe_sm_ids.append(int(dupe_sugoimusic_torrent_id))
@@ -243,7 +243,7 @@ def prepare_torrent(jps_torrent_object, torrent_group_data, mediainfo: bool, **r
         try:
             sugoimusic_upload_data['mediainfo'], release_data_mediainfo = get_mediainfo(jps_torrent_object, release_data_collated['media'])
             sugoimusic_upload_data.update(release_data_mediainfo)
-            if 'duration' in sugoimusic_upload_data.keys() and sugoimusic_upload_data['duration'] > 1:
+            if 'duration' in sugoimusic_upload_data and sugoimusic_upload_data['duration'] > 1:
                 duration_friendly_format = humanfriendly.format_timespan(datetime.timedelta(seconds=int(sugoimusic_upload_data['duration'] / 1000)))
                 sugoimusic_upload_data['album_desc'] += f"\n\nDuration: {duration_friendly_format} - {str(sugoimusic_upload_data['duration'])}ms"
         except Exception as mediainfo_exc:
@@ -253,12 +253,11 @@ def prepare_torrent(jps_torrent_object, torrent_group_data, mediainfo: bool, **r
                 pass
             if torrent_group_data.category in Categories.Video:
                 raise
-            else:
-                logger.debug(f'Skipping exception on mediainfo failing as {torrent_group_data.title} is not a Video category.')
+            logger.debug(f'Skipping exception on mediainfo failing as {torrent_group_data.title} is not a Video category.')
 
     if torrent_group_data.category not in Categories.NonReleaseData:
         sugoimusic_upload_data['media'] = release_data_collated['media']
-        if 'audioformat' not in sugoimusic_upload_data.keys():  # If not supplied by get_mediainfo() use audioformat guessed by collate()
+        if 'audioformat' not in sugoimusic_upload_data:  # If not supplied by get_mediainfo() use audioformat guessed by collate()
             sugoimusic_upload_data['audioformat'] = release_data_collated['audioformat']
 
     if torrent_group_data.imagelink is not None:
@@ -280,11 +279,11 @@ def prepare_torrent(jps_torrent_object, torrent_group_data, mediainfo: bool, **r
                                                                                     sugoimusic_upload_data['duration'])]
 
         # If not supplied by get_mediainfo() use codec found by collate()
-        if 'codec' not in sugoimusic_upload_data.keys():
+        if 'codec' not in sugoimusic_upload_data:
             sugoimusic_upload_data['codec'] = release_data_collated['codec']
 
         # If not supplied by getmediainfo() try to detect resolution by searching the group description for resolutions
-        if 'ressel' not in sugoimusic_upload_data.keys():
+        if 'ressel' not in sugoimusic_upload_data:
             foundresolutions720 = re.findall('1080 ?x ?720', torrent_group_data.groupdescription)
             foundresolutions1080 = re.findall('1920 ?x ?1080', torrent_group_data.groupdescription)
             if len(foundresolutions720) != 0:
@@ -298,7 +297,7 @@ def prepare_torrent(jps_torrent_object, torrent_group_data, mediainfo: bool, **r
                     sugoimusic_upload_data['ressel'] = 'CHANGEME'
 
         # If not supplied by get_mediainfo() use container found by collate()
-        if 'container' not in sugoimusic_upload_data.keys():
+        if 'container' not in sugoimusic_upload_data:
             sugoimusic_upload_data['container'] = release_data_collated['container']
 
         sugoimusic_upload_data['sub'] = 'NoSubs'  # assumed default
@@ -309,10 +308,10 @@ def prepare_torrent(jps_torrent_object, torrent_group_data, mediainfo: bool, **r
     elif torrent_group_data.category in Categories.Music:
         sugoimusic_upload_data['bitrate'] = release_data_collated['bitrate']
 
-    if 'remastertitle' in release_data_collated.keys():
+    if 'remastertitle' in release_data_collated:
         sugoimusic_upload_data['remaster'] = 'remaster'
         sugoimusic_upload_data['remastertitle'] = release_data_collated['remastertitle']
-    if 'remasteryear' in release_data_collated.keys():
+    if 'remasteryear' in release_data_collated:
         sugoimusic_upload_data['remaster'] = 'remaster'
         sugoimusic_upload_data['remasteryear'] = release_data_collated['remasteryear']
 
@@ -325,7 +324,7 @@ def prepare_torrent(jps_torrent_object, torrent_group_data, mediainfo: bool, **r
     elif torrent_group_data.category == "Album":  # Ascertain if upload is EP
         sugoimusic_upload_data['type'] = Categories.JPStoSM[decide_ep(jps_torrent_object, release_data_collated)]
 
-    if 'type' not in sugoimusic_upload_data.keys():  # Set default value after all validation has been done
+    if 'type' not in sugoimusic_upload_data:  # Set default value after all validation has been done
         sugoimusic_upload_data['type'] = Categories.JPStoSM[torrent_group_data.category]
 
     # Now that all Category validation is complete decide if we should strip some mediainfo data

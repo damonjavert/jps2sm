@@ -8,14 +8,13 @@ All defs that save data to disk
 # Standard library packages
 import json
 import html
-from typing import Type
 
 # Third-party packages
 from pathlib import Path
 from loguru import logger
 
 # jps2sm modules
-from jps2sm.get_data import GetGroupData, GetSMUser, get_torrent_link
+from jps2sm.get_data import GetSMUser, get_torrent_link
 from jps2sm.myloginsession import sugoimusic, jpopsuki
 from jps2sm.utils import get_valid_filename, GetConfig, HandleCfgOutputDirs
 
@@ -33,7 +32,7 @@ def save_sm_html_debug_output(content: str, html_debug_output_filename: str) -> 
 
     html_debug_output_path = Path(output.file_dir['html'], html_debug_output_filename_valid)
 
-    with open(html_debug_output_path, "w") as file:
+    with open(html_debug_output_path, "w", encoding="utf8") as file:
         file.write(content)
 
     return html_debug_output_path

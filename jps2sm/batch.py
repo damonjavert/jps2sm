@@ -29,6 +29,8 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
     """
     Operate batch upload mode
     """
+    # pylint: disable=too-many-arguments
+    # This is the minimum paras needed to parse the JPS data
     from jps2sm.jps2sm import collate, prepare_torrent, set_original_artists
     args = GetArgs()
     config = GetConfig()
@@ -64,7 +66,14 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
 
     batch_uploads = get_batch_jps_group_torrent_ids(mode=mode, user=user, first=start, last=end, sort=sort, order=order)
 
-    # batch_uploads = { '362613': ['535927'], '354969': ['535926'], '362612': ['535925'], '362611': ['535924'], '181901': ['535923'], '181902': ['535922'] }
+    """ For debugging
+    batch_uploads = {'362613': ['535927'],
+                     '354969': ['535926'],
+                     '362612': ['535925'],
+                     '362611': ['535924'],
+                     '181901': ['535923'],
+                     '181902': ['535922']}
+    """
 
     batch_upload_collate_errors = collections.defaultdict(list)
     batch_upload_source_data_not_found = []
@@ -103,7 +112,9 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
 
     batch_collate_torrent_info = {}
     for jps_group_id, jps_torrent_ids in batch_uploads.items():
-        if jps_group_id in batch_group_results['batch_group_errors'] or jps_group_id in batch_group_results['batch_groups_excluded'] or jps_group_id in batch_group_results['batch_groups_va_errors']:
+        if jps_group_id in batch_group_results['batch_group_errors']\
+                or jps_group_id in batch_group_results['batch_groups_excluded']\
+                or jps_group_id in batch_group_results['batch_groups_va_errors']:
             # Skip group if GetGroupData() failed or the group is being excluded by the '-exc' parameter, or if it is a 'V.A.' group and
             # no contrib artists were set
             # TODO Should the jps_group_ids be deleted within get_batch_group_data() ?
@@ -134,7 +145,8 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
             break  # Still continue to get error dicts and dupe list so far
         except Exception as exc:
             # Catch all for any collate() exception
-            logger.exception(f'Error with collating/retrieving release data for JPS group id {jps_group_id} torrentid(s) {",".join(jps_torrent_ids)}, skipping upload')
+            logger.exception(f'Error with collating/retrieving release data for JPS group id'
+                             f'{jps_group_id} torrentid(s) {",".join(jps_torrent_ids)}, skipping upload')
             batch_upload_collate_errors[jps_group_id] = jps_torrent_ids
             continue
 
@@ -200,8 +212,10 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
         logger.error(batch_upload_collate_errors)
         logger.error(f'Total: {count_values_dict(batch_upload_collate_errors)}')
     if batch_torrent_info['dupe_sm_ids']:  # Dupes found by decide_duplicate()
-        logger.warning('The following torrents have already been uploaded to the site, and were found by searching for the torrent hash on SM, the SM torrents were download so you can cross seed:')
-        logger.warning(f'SM duplicate torrent ids: {batch_torrent_info["dupe_sm_ids"]}\nJPS duplicate torrent ids: {batch_torrent_info["dupe_jps_ids"]}'
+        logger.warning('The following torrents have already been uploaded to the site, '
+                       'and were found by searching for the torrent hash on SM, the SM torrents were download so you can cross seed:')
+        logger.warning(f'SM duplicate torrent ids: {batch_torrent_info["dupe_sm_ids"]}'
+                       f'\nJPS duplicate torrent ids: {batch_torrent_info["dupe_jps_ids"]}'
                        f'\nTotal: {len(batch_torrent_info["dupe_sm_ids"])}')
     if batch_upload_source_data_not_found:
         logger.error('The following file(s)/dir(s) were not found in your MediaDirectories specified in jps2sm.cfg and the upload was skipped:')
@@ -229,16 +243,8 @@ def get_batch_jps_group_torrent_ids(mode, user, first=1, last=None, sort=None, o
     :param order: Order by ASC or DESC
     :return: batch_uploads: dict
     """
-
-    # sort_by = {
-    #    'name': 's1',
-    #    'year': 's2',
-    #    'time': 's3',  # snatched time for snatched, seeding time for seeding, added for uploaded and recent
-    #    'size': 's4',
-    #    'snatches': 's5',
-    #    'seeders':  's6',
-    #    'leechers': 's7'
-    # }
+    # pylint: disable=too-many-arguments
+    # This is the minimum paras needed to parse the JPS data
 
     def get_sort_mode(user_sort):
         # By default:
@@ -251,13 +257,16 @@ def get_batch_jps_group_torrent_ids(mode, user, first=1, last=None, sort=None, o
         default_sort_order_init = "ASC"
         if user_sort is not None:
             return JPSTorrentView.sort_by[user_sort], default_sort_order_init
-        if mode == 'snatched' or mode == 'uploaded':
+        if mode in ('snatched', 'uploaded'):
             return JPSTorrentView.sort_by['time'], default_sort_order_init
-        elif mode == 'seeding':
+        if mode == 'seeding':
             return JPSTorrentView.sort_by['name'], default_sort_order_init
-        elif mode == 'recent':
+        if mode == 'recent':
             default_sort_order_init = "DESC"
             return JPSTorrentView.sort_by['time'], default_sort_order_init
+
+        # If we get this far something is wrong
+        raise RuntimeError('Bad user_sort or batch mode')
 
     sort_mode, default_sort_order = get_sort_mode(sort)
 
@@ -297,7 +306,7 @@ def get_batch_jps_group_torrent_ids(mode, user, first=1, last=None, sort=None, o
 
     # Parse every torrent page and add to dict
     for i in range(first, int(last) + 1):
-        if mode == 'snatched' or mode == 'uploaded' or mode == 'seeding':
+        if mode in ('snatched', 'uploaded', 'seeding'):
             batch_upload_url = f"https://jpopsuki.eu/torrents.php?page={i}&order_by={sort_mode}&order_way={order_way}&type={mode}&userid={user}&disablegrouping=1"
         elif mode == 'recent':
             batch_upload_url = f"https://jpopsuki.eu/torrents.php?page={i}&order_by={sort_mode}&order_way={order_way}&disablegrouping=1"
@@ -318,7 +327,7 @@ def get_batch_jps_group_torrent_ids(mode, user, first=1, last=None, sort=None, o
             else:
                 raise
         # Find all jps_group_id/jps_torrent_id pairs and returns a list of tuples
-        all_jps_group_ids_and_torrent_ids = re.findall('torrents.php\?id=([0-9]+)&amp;torrentid=([0-9]+)', torrent_table)
+        all_jps_group_ids_and_torrent_ids = re.findall(r'torrents.php\?id=([0-9]+)&amp;torrentid=([0-9]+)', torrent_table)
         logger.info(f'jps_group_ids and jps_torrent_ids found on page: {all_jps_group_ids_and_torrent_ids}')
 
         for jps_group_id, jps_torrent_id in all_jps_group_ids_and_torrent_ids:
@@ -369,7 +378,7 @@ def get_batch_group_data(batch_uploads, excluded_category):
                 batch_groups_va_errors.append(jps_group_id)
                 continue
             logger.exception(
-                'Error with retrieving group data for jps_group_id %s jps_torrent_id %s, skipping upload' % (jps_group_id, ",".join(jps_torrent_id)))
+                f'Error with retrieving group data for jps_group_id {jps_group_id} jps_torrent_id {",".join(jps_torrent_id)}, skipping upload')
             batch_group_errors[jps_group_id] = jps_torrent_id
             continue
 
@@ -379,8 +388,5 @@ def get_batch_group_data(batch_uploads, excluded_category):
         'batch_groups_excluded': batch_groups_excluded,
         'batch_groups_va_errors': batch_groups_va_errors,
     }
-
-
-    #return batch_group_data, batch_group_errors, batch_groups_excluded, batch_groups_va_errors
 
     return batch_group_results

@@ -24,6 +24,9 @@ from jps2sm.constants import Categories, DateRegexes
 
 @dataclass
 class JPSGroup:
+    """
+    Dataclass for JPS Group data, this could be used more broadly in the future
+    """
     groupid: int
     category: str
     artist: str
@@ -119,8 +122,8 @@ def get_artist(artist_line_link, torrent_description_page_h2_line, category):
 
     if artist_raw:
         return split_bad_multiple_artists(artist_raw.group(1))
-    else:
-        raise IndexError('Cannot find artist')
+
+    raise IndexError('Cannot find artist')
 
 
 def get_date(torrent_description_page_h2_line, category):
@@ -169,6 +172,9 @@ class GetGroupData:
         self.get_data(jps_group_id, jps_group_page_text)
 
     def get_data(self, jps_group_id, jps_group_page_text) -> None:
+        """
+        Get JPS group data
+        """
         soup = BeautifulSoup(jps_group_page_text, 'html5lib')
         artist_line_link = soup.select('.thin h2 a')
         original_title_line = soup.select('.thin h3')
@@ -252,7 +258,7 @@ class GetGroupData:
 
         image = str(soup.select('#content .thin .sidebar .box p a'))
         try:
-            self.imagelink = "https://jpopsuki.eu/" + re.findall('<a\s+(?:[^>]*?\s+)?href=\"([^\"]*)\"', image)[0]
+            self.imagelink = "https://jpopsuki.eu/" + re.findall(r'<a\s+(?:[^>]*?\s+)?href=\"([^\"]*)\"', image)[0]
             logger.info(f'Image link: {self.imagelink}')
         except IndexError:  # No image for the group
             self.imagelink = None
@@ -301,6 +307,9 @@ class GetGroupData:
 
 
 def split_bad_multiple_artists(artists: str) -> List[str]:
+    """
+    JPS cannot handle multiple artists so uploaders to use a single artist string but delimit them with ',' | 'x' | '&'
+    """
     # TODO When upgrading to 3.9+ the type can be changed to list[str] See PEP 585
     return re.split(', | x | & ', artists)
 
@@ -368,7 +377,7 @@ def get_release_data(jps_torrent_ids: List[str], torrent_table: str, date: str) 
                 release['slashdata'][index] = f'{remaster_freeleech_removed[0]} - {date[:4]}'
                 logger.debug(f"Torrent {jps_torrent_id} is freeleech remastered, validated remasterdata to {release['slashdata'][index]}")
     for jps_torrent_id in remove_torrents:
-        del (release_data[jps_torrent_id])
+        del release_data[jps_torrent_id]
 
     logger.info(f'Selected for upload: {release_data}')
     return release_data
@@ -387,9 +396,9 @@ def get_group_description_bbcode(jps_group_id: str) -> str:
 
     if bbcode is None:  # Group description is empty
         return "There is no information on this torrent."  # String JPS uses when group description is empty
-    else:
-        bbcode_sanitised = re.sub(r'\[youtube=([^\]]+)]', r'[youtube]\1[/youtube]', bbcode)
-        return bbcode_sanitised
+
+    bbcode_sanitised = re.sub(r'\[youtube=([^\]]+)]', r'[youtube]\1[/youtube]', bbcode)
+    return bbcode_sanitised
 
 
 class GetJPSUser:

@@ -26,26 +26,26 @@ from jps2sm.constants import JPSTorrentView, Categories
 from jps2sm.__init__ import __version__
 
 
-def get_valid_filename(s: str) -> AnyStr:
+def get_valid_filename(bad_filename: str) -> AnyStr:
     """
     Return the given string converted to a string that can be used for a clean
     filename. Remove leading and trailing spaces; convert other spaces to
     underscores; and remove anything that is not an alphanumeric, dash,
     underscore, or dot.
 
-    :param s: str: A string that needs to be converted
+    :param bad_filename: str: A string that needs to be converted
     :return: str: A string with a clean filename
     """
 
-    s = str(s).strip().replace(' ', '_')
-    return re.sub(r'(?u)[^-\w.]', '', s)
+    bad_filename = str(bad_filename).strip().replace(' ', '_')
+    return re.sub(r'(?u)[^-\w.]', '', bad_filename)
 
 
-def count_values_dict(dict):
+def count_values_dict(dict_counted):
     """
     Count the values in a dictionary.
     """
-    return sum([len(dict[x]) for x in dict])
+    return sum([len(dict_counted[x]) for x in dict_counted])
 
 
 def fatal_error(msg):
@@ -62,6 +62,9 @@ def fatal_error(msg):
 
 
 class GetArgs:
+    """
+    Handle command-line arguments
+    """
     __args_parsed = None
 
     def __init__(self):
@@ -119,6 +122,9 @@ class GetArgs:
 
 
 class GetConfig:
+    """
+    Handle jps2sm.cfg
+    """
     __config_parsed = None
 
     def __init__(self):
@@ -138,7 +144,7 @@ class GetConfig:
         config_file = None
         for config_file_location in config_file_locations:
             try:
-                open(config_file_location)
+                open(config_file_location, "r", encoding="utf-8")
             except FileNotFoundError:
                 continue
             config_file = config_file_location
@@ -148,7 +154,7 @@ class GetConfig:
             fatal_error(f'Error: configuration file not found. jps2sm searches for the config file following locations: {config_file_locations_str}'
                         f'\nSee: https://github.com/damonjavert/jps2sm/blob/master/jps2sm.cfg.example for example configuration.')
 
-        open(config_file)
+        open(config_file, "r", encoding="utf-8")
         jps = 'JPopSuki'
         sugoi = 'SugoiMusic'
         config = configparser.ConfigParser()
@@ -213,7 +219,6 @@ def handle_cfg_media_roots() -> None:
 
 
 def decide_duplicate(jps_torrent_object):
-    from jps2sm.myloginsession import sugoimusic
     """
     Detect if a torrent is a duplicate by crafting the torrent hash and then sending this to SM.
 
@@ -222,6 +227,7 @@ def decide_duplicate(jps_torrent_object):
 
     jps_torrent_object: bytes: BytesIO object of the JPS torrent
     """
+    from jps2sm.myloginsession import sugoimusic
 
     torrent_hashcheckdata = tp.TorrentFileParser(jps_torrent_object).parse()
     torrent_hashcheckdata["info"]["source"] = 'SugoiMusic'
@@ -245,14 +251,15 @@ def decide_duplicate(jps_torrent_object):
     if hashcheckjson.text == '{"status":"failure","error":"bad hash parameter"}':
         logger.debug('Duplicate not detected via torrent hash')
         return None
-    elif str(hashcheckjson.text).startswith('{"status":"success"'):
+    if str(hashcheckjson.text).startswith('{"status":"success"'):
         logger.debug('Duplicate detected via torrent hash')
         dupe_jps_torrent_json = json.loads(hashcheckjson.text)
         dupe_jps_torrent_id = dupe_jps_torrent_json['response']['torrent']['id']
         logger.debug(f'Dupe torrent: {dupe_jps_torrent_id}')
         return dupe_jps_torrent_id
-    else:
-        raise Exception('Bad response from SugoiMusic hashcheck')
+
+    # If we reach here something has gone wrong with the hash check
+    raise Exception('Bad response from SugoiMusic hashcheck')
 
 
 def setup_logging(debug: bool):

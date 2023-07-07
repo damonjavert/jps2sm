@@ -82,10 +82,7 @@ def get_mediainfo(jps_torrent_object: BytesIO, media: str) -> Tuple[str, Dict[st
 
     # TODO Need to cleanup the logic to 3^H2-way duplication we currently have between ISO and non-ISO
 
-    if 'files' in torrent_metadata['info'].keys():
-        torrent_has_directory = True
-    else:
-        torrent_has_directory = False
+    torrent_has_directory = bool('files' in torrent_metadata['info'].keys())
 
     logger.info(f'According to torrent metadata the dir/file is is {torrent_name}')
     file_path = get_media_location(torrent_name, torrent_has_directory, config.media_roots)
@@ -116,7 +113,7 @@ def get_mediainfo(jps_torrent_object: BytesIO, media: str) -> Tuple[str, Dict[st
         tempdir = tempfile.TemporaryDirectory()
         Archive(file_for_sm_upload_video_fields).extractall(tempdir.name)
         dir_files = []
-        for root, subFolder, files in os.walk(tempdir.name):
+        for root, sub_folder, files in os.walk(tempdir.name):
             for item in files:
                 filenamewithpath = os.path.join(root, item)
                 dir_files.append(filenamewithpath)
@@ -161,8 +158,8 @@ def get_mediainfo(jps_torrent_object: BytesIO, media: str) -> Tuple[str, Dict[st
                 if str(track.width) == width and str(track.height) == height:
                     release_data_from_mediainfo['ressel'] = height
 
-            if 'ressel' in release_data_from_mediainfo.keys():  # Known resolution type, try to determine if interlaced
-                if track.scan_type == "Interlaced" or track.scan_type == "MBAFF":
+            if 'ressel' in release_data_from_mediainfo:  # Known resolution type, try to determine if interlaced
+                if track.scan_type in ('Interlaced', 'MBAFF'):
                     release_data_from_mediainfo['ressel'] += "i"
                 else:
                     release_data_from_mediainfo['ressel'] += "p"  # Sometimes a Progressive encode has no field set
@@ -170,7 +167,7 @@ def get_mediainfo(jps_torrent_object: BytesIO, media: str) -> Tuple[str, Dict[st
                 release_data_from_mediainfo['ressel'] = 'Other'
                 release_data_from_mediainfo['resolution'] = str(track.width) + "x" + str(track.height)
 
-        if track.track_type == 'Audio' or track.track_type == 'Audio #1':  # Handle multiple audio streams, we just get data from the first for now
+        if track.track_type in ('Audio', 'Audio #1'):  # Handle multiple audio streams, we just get data from the first for now
             if track.format in ["AAC", "DTS", "PCM", "AC3", "Vorbis", "Opus"]:
                 release_data_from_mediainfo['audioformat'] = track.format
             elif track.format == "AC-3":
@@ -197,9 +194,10 @@ def get_mediainfo_duration(filename: Union[str, Path]) -> float:
         if track.track_type == 'General':
             if track.duration is None:
                 return 0
-            else:
-                logger.info(f'Mediainfo duration: {filename} {track.duration}')
-                return float(track.duration)  # time in ms
+            logger.info(f'Mediainfo duration: {filename} {track.duration}')
+            return float(track.duration)  # time in ms
+
+    raise RuntimeError('Bad mediainfo presented to get_mediainfo_duration. Missing "General" track type')
 
 
 def get_media_location(media_name: str, directory: bool, media_roots: List[str]) -> Path:
@@ -231,7 +229,7 @@ def get_media_location(media_name: str, directory: bool, media_roots: List[str])
                         media_location = os.path.join(dir_name, filename)
                         return Path(media_dir_search, media_location)
 
-    if media_location is None:
-        media_not_found_error_msg = f'Mediainfo error - file/directory not found: {media_name} in any of the MediaDirectories specified: {media_roots}'
-        logger.error(media_not_found_error_msg)
-        raise RuntimeError(media_not_found_error_msg)
+    # If we get this far the media was not found
+    media_not_found_error_msg = f'Mediainfo error - file/directory not found: {media_name} in any of the MediaDirectories specified: {media_roots}'
+    logger.error(media_not_found_error_msg)
+    raise RuntimeError(media_not_found_error_msg)

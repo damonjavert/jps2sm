@@ -22,7 +22,11 @@ jobs:
         pip install pylint
     - name: Analysing the code with pylint
       run: |
-        pylint --disable=locally-disabled --max-line-length 150 --fail-under 9.0 $(git ls-files jps2sm/*.py)
+        perfect_files = "jps2sm/__init__.py jps2sm/jps2sm.py jps2sm/myloginsession.py jps2sm/save_data.py jps2sm/upload_data.py jps2sm/constants.py"
+        for perfect_file in $perfect_files; do
+          pylint --disable=locally-disabled --max-line-length 150 $perfect_file
+        done
+        pylint --disable=locally-disabled --max-line-length 150 --fail-under 9.4 $(git ls-files jps2sm/*.py)
     - name: Run pytest
       run: |
         mv tests/jps2sm.tests.cfg ./jps2sm.cfg
