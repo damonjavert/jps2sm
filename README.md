@@ -9,9 +9,9 @@ jps2sm will automatically gather and validate data from JPS and transfer it to S
 
 ## Features
 * Create upload on SM by automatically retrieving all data on JPS, including english and original titles, group description, release information (format / media / bitrate etc.), group images, contributing artists, original titles, mediainfo data and remaster information if applicable.
-* Upload by specifiyng a JPS group or release `--url`
-* Upload all your (or someone elses) personally uploaded / seeding / snatched torrents with `--batchupload` / `--batchseeding` / `--batchsnatched`
-* Contribute to SM  by uploading ALL non-large recent torrents to SM with `--batchrecent` mode. Note: This mode will prompt you to continue once the JPS data has been downloaded. A maximum size can be configured with `MaxSizeRecentMode` in jps2sm.cfg
+* Upload by specifiyng a JPS group or release `--url` or a `--torrentid`
+* Upload all your (or someone elses) personally uploaded / seeding / snatched torrents with `--batch upload` / `--batch seeding` / `--batch snatched`
+* Contribute to SM  by uploading ALL recent torrents to JPS with `--batch recent` mode. A maximum size can be configured with `MaxSizeRecentMode`, a minimum number of seeders with `MinSeeders` and an amount of time to wait for JPS files to be downloaded with `WaitTimeRecentModeMins` in jps2sm.cfg
 * Search for your media files specified in `MediaDirectories` and run [Mediainfo](https://mediaarea.net/en/MediaInfo) against them and save the output to the 'mediainfo' field and parse the data to populate the codec, container, audioformat and resolution fields. DVD ISOs are automatically extracted and Mediainfo is run against the VOB files, BR ISO images are not currently supported in the pyunpack module.
 * Exclude certain audioformats, medias or categories with `--excaudioformat` , `--excmedia` and `--exccategory`
 * Test your uploads with `--dryrun` mode.
@@ -55,27 +55,27 @@ jps2sm --urls <group-url or release-url(s)>
 ## Command line usage Examples
 To upload all your current seeding torrents, whilst automatically retrieving mediainfo data:
 
-    jps2sm --batchseeding --mediainfo    
+    jps2sm --batch seeding --mediainfo
 
 To upload the latest 50 torrents uploaded to JPS, prompting the user to continue once JPS data has been downloaded:
 
-    jps2sm --batchrecent --mediainfo
+    jps2sm --batch recent --mediainfo
 
 To *test* upload all your JPS uploads:
 
-    jps2sm --batchuploaded --dryrun
+    jps2sm --batch uploaded --dryrun
 
 To upload all your JPS uploads:
 
-    jps2sm --batchuploaded
+    jps2sm --batch uploaded
 
 To upload the most recent 50 torrents you uploaded at JPS:
 
-    jps2sm --batchuploaded --batchsort time --batchsortorder desc --batchstart 1 --batchend 1
+    jps2sm --batch uploaded --batchsort time --batchsortorder desc --batchstart 1 --batchend 1
 
 To upload your 100 most popular uploads, based on snatches:
 
-    jps2sm --batchuploaded --batchsort snatches --batchsortorder desc --batchstart 1 --batchend 2
+    jps2sm --batch uploaded --batchsort snatches --batchsortorder desc --batchstart 1 --batchend 2
 
 To upload every release of AKB48 - 1830m:
 
@@ -94,80 +94,58 @@ To upload every release of AKB48 - 1830m, excluding the ISOs *(in JPS ISO is con
 ## Usage
 
 ```text
-usage: jps2sm ( --urls | --torrentid | --batchuploaded | --batchseeding | --batchsnatched | --batchrecent )
-[--batchuser] [--batchsort] [--batchsortorder] [--batchstart --batchend]
-[--exccategory] [--excaudioformat] [--excmedia]
+usage: jps2sm (--urls URLS | --torrentid TORRENTID | --batch {uploaded,seeding,snatched,recent} | -U | -S | -SN | -R)
+[--batchuser BATCHUSER] [--batchsort {name,year,time,size,snatches,seeders,leechers}]
+[--batchsortorder {asc,desc}] [--batchstart PAGESTART] [--batchend PAGEEND]
+[--exccategory {Album,Single,PV,DVD,TV-Music,TV-Variety,TV-Drama,Fansubs,Pictures,Misc}]
+[-excaudoiformat EXCAUDIOFORMAT] [--excmedia EXCMEDIA]
 [--help] [--version] [--debug] [--dryrun] [--mediainfo] [--wait-for-jps-dl]
 
-Single group / release(s):
 
-  --urls URLS
+jps2sm actions:
+  Choose ONE action for jps2sm to migrate data from
 
-Single torrent id:
-
-  --torrentid JPSTORRENTID
-
-Batch processing mode:
-
-  --batchuser BATCHUSER (--batchuploaded | --batchseeding | --batchsnatched | --batchrecent)
-  [--batchstart BATCHSTART] [--batchend BATCHEND]
-  [--exccategory EXCCATEGORY] [--excaudioformat EXCAUDIOFORMAT] [--excmedia EXCMEDIA]
-
-
-Help for arguments for group/release uploads:
-
-  -t JPSTORRENTID, --torrentid JPSTORRENTID
-                        Specify a JPS torrent id to upload
-  -u URLS, --urls URLS  JPS URL for a group, or multiple individual releases URLs from the same group, space delimited
-                        in quotes
+  -u URLS, --urls URLS  JPS URL for a group, or multiple individual releases URLs from the same group
+  -t TORRENTID, --torrentid TORRENTID
+                        JPS torrent id
+  -bm {uploaded,seeding,snatched,recent}, --batch {uploaded,seeding,snatched,recent}
+                        Batch mode: Upload all releases either uploaded, seeding, snatched by you or, if provided, user id specified by --batchuser. OR all
+                        recent uploads to JPS.
+  -U, --batchuploaded   alias to --batch upload
+  -S, --batchseeding    alias to --batch seeding
+  -SN, --batchsnatched  alias to --batch snatched
+  -R, --batchrecent     alias to --batch recent
 
 
-Help for arguments for batch mode:
-
+Batch mode (--batch MODE) optional arguments:
   -b BATCHUSER, --batchuser BATCHUSER
                         User id for batch user operations, default is user id of SM Username specified in jps2sm.cfg
-  -U, --batchuploaded   Upload all releases personally uploaded
-        **or**
-  -S, --batchseeding    Upload all releases currently seeding
-        **or**
-  -SN, --batchsnatched  Upload all releases that have been snatched
-        **or**
-  -R, --batchrecent     Upload ALL recent releases uploaded to JPS
-                        This mode will prompt you to continue once the JPS data has been downloaded, by default it parses
-                        the first page at JPS - the last 50 torrents shown on the main page: https://jpopsuki.eu/torrents.php .
-                        This mode is designed to contribute to SM even if you do not have much activity at JPS and/or ensure
-                        that we have the very latest torrents!
-
-
-Help for optional arguments for batch mode:
-
+  -bs {name,year,time,size,snatches,seeders,leechers}, --batchsort {name,year,time,size,snatches,seeders,leechers}
+                        Sort for batch upload, must be one of: name,year,time,size,snatches,seeders,leechers
+  -bso {asc,desc}, --batchsortorder {asc,desc}
+                        Sort order for batch upload, either ASC or DESC.
   -s BATCHSTART, --batchstart BATCHSTART
-                    Start at this page
+                        Start at this page
   -e BATCHEND, --batchend BATCHEND
-                    End at this page
-  -bs BATCHSORT, --batchsort BATCHSORT
-                    Sort for batch upload, must be one of: name,year,time,size,snatches,seeders,leechers
-  -bso BATCHSORTORDER, --batchsortorder BATCHSORTORDER
-                    Sort order for batch upload, either ASC or DESC.
-  -exc EXCCATEGORY, --exccategory EXCCATEGORY
-                    Exclude a JPS category from upload
+                        End at this page
+  -exc {Album,Single,PV,DVD,TV-Music,TV-Variety,TV-Drama,Fansubs,Pictures,Misc}, --exccategory {Album,Single,PV,DVD,TV-Music,TV-Variety,TV-Drama,Fansubs,Pictures,Misc}
+                        Exclude a JPS category from upload
   -exf EXCAUDIOFORMAT, --excaudioformat EXCAUDIOFORMAT
-                    Exclude an audioformat from upload
+                        Exclude an audioformat from upload
   -exm EXCMEDIA, --excmedia EXCMEDIA
-                    Exclude a media from upload
+                        Exclude a media from upload
 
 
-Help for optional arguments:
-
+optional arguments:
   -h, --help            show this help message and exit
   -v, --version         show program's version number and exit
-  -d, --debug           Enable debug mode. Run your command with this before submitting bugs.
-  -n, --dryrun          Just parse data and show the output, do not add the torrent to SM
-  -m, --mediainfo       Search and get mediainfo data from the source file(s) in the directories
-                        specified by MediaDirectories. Extract data to set codec, resolution,
-                        audio format and container fields as well as the mediainfo field itself.
-  -w --wait-for-jps-dl  (Non-batch mode only) Show a prompt for the user to continue after scraping JPS torrent data and the
+  -d, --debug           Enable debug mode
+  -n, --dryrun          Just parse JPS data and show the output, do not upload the torrent(s) to SM
+  -w, --wait-for-jps-dl
+                        (Non-batch mode only) Show a prompt for the user to continue after scraping JPS torrent data and the
                         torrent, to allow for the file to be downloaded before adding it to SM
+  -m, --mediainfo       Search and get mediainfo data from the source file(s) in the directories specified by MediaDirectories. Extract data to set codec,
+                        resolution, audio format and container fields as well as the mediainfo field itself.
 ```
 
 ## Development
