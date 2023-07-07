@@ -22,7 +22,7 @@ jobs:
         pip install pylint
     - name: Analysing the code with pylint
       run: |
-        perfect_files = "jps2sm/__init__.py jps2sm/jps2sm.py jps2sm/myloginsession.py jps2sm/save_data.py jps2sm/upload_data.py jps2sm/constants.py"
+        perfect_files="jps2sm/__init__.py jps2sm/jps2sm.py jps2sm/myloginsession.py jps2sm/save_data.py jps2sm/upload_data.py jps2sm/constants.py"
         for perfect_file in $perfect_files; do
           pylint --disable=locally-disabled --max-line-length 150 $perfect_file
         done
