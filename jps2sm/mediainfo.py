@@ -22,6 +22,47 @@ from loguru import logger
 from jps2sm.utils import GetConfig
 
 
+def validate_container(file_extension: str) -> str:
+    """
+    Map known 'bad' / alternative file extensions of containers to the primary name of the container type.
+    """
+    extensions = {
+        "TP": "TS",
+        "TSV": "TS",
+        "TSA": "TS",
+        "M4V": "MP4",
+        "MPG": "MPEG",
+    }
+
+    validated_extension = file_extension  # Default is to not validate if it is not in the known incorrect list above - let SM catch it.
+    for old, new in extensions.items():
+        if file_extension.upper() == old:
+            validated_extension = new
+
+    return validated_extension
+
+
+def validate_codec(codec: str) -> str:
+    """
+    Map known alternative names for codecs returned by mediainfo to the primary name of the codec
+    """
+    codecs = {
+        "MPEG Video": "MPEG-2",
+        "AVC": "h264",
+        "HEVC": "h265",
+        "MPEG-4 Visual": "DivX",  # MPEG-4 Part 2 / h263 , usually xvid / divx
+        "VP09": "VP9",
+        "VP08": "VP8",
+    }
+
+    validated_codec = codec  # Default is to not validate it if it is not known in the incorrect list above - let SM catch it.
+    for old, new in codecs.items():
+        if codec == old:
+            validated_codec = new
+
+    return validated_codec
+
+
 def get_mediainfo(jps_torrent_object: BytesIO, media: str) -> Tuple[str, Dict[str, str]]:
     """
     Get filename(s) of video files in the torrent and run mediainfo and capture the output, extract if DVD found (Blurays not yet supported)
@@ -33,45 +74,6 @@ def get_mediainfo(jps_torrent_object: BytesIO, media: str) -> Tuple[str, Dict[st
             mediainfo: Mediainfo text output of the file(s)
             releaseadtaout: Fields gathered from mediainfo for SM upload
     """
-
-    def validate_container(file_extension: str) -> str:
-        """
-        Map known 'bad' / alternative file extensions of containers to the primary name of the container type.
-        """
-        extensions = {
-            "TP": "TS",
-            "TSV": "TS",
-            "TSA": "TS",
-            "M4V": "MP4",
-            "MPG": "MPEG",
-        }
-
-        validated_extension = file_extension  # Default is to not validate if it is not in the known incorrect list above - let SM catch it.
-        for old, new in extensions.items():
-            if file_extension.upper() == old:
-                validated_extension = new
-
-        return validated_extension
-
-    def validate_codec(codec: str) -> str:
-        """
-        Map known alternative names for codecs returned by mediainfo to the primary name of the codec
-        """
-        codecs = {
-            "MPEG Video": "MPEG-2",
-            "AVC": "h264",
-            "HEVC": "h265",
-            "MPEG-4 Visual": "DivX",  # MPEG-4 Part 2 / h263 , usually xvid / divx
-            "VP09": "VP9",
-            "VP08": "VP8",
-        }
-
-        validated_codec = codec  # Default is to not validate it if it is not known in the incorrect list above - let SM catch it.
-        for old, new in codecs.items():
-            if codec == old:
-                validated_codec = new
-
-        return validated_codec
 
     config = GetConfig()
     torrent_metadata = tp.TorrentFileParser(jps_torrent_object).parse()
@@ -134,52 +136,82 @@ def get_mediainfo(jps_torrent_object: BytesIO, media: str) -> Tuple[str, Dict[st
     if Path(file_for_sm_upload_video_fields).suffix == '.iso' and media == 'DVD':
         tempdir.cleanup()  # TODO This looks like it can be moved to the if block above
 
+    mediainfo_general = mediainfo_video = mediainfo_audio = None
+
     for track in mediainfo_release_data.tracks:
         if track.track_type == 'General':
-            # releasedataout['language'] = track.audio_language_list  # Will need to check if this is reliable
-            if 'container' not in release_data_from_mediainfo:  # Not an ISO, only set container if we do not already know its an ISO
-                release_data_from_mediainfo['container'] = validate_container(track.file_extension.upper())
-            else:  # We have ISO - get category data based Mediainfo if we have it
-                if track.file_extension.upper() == 'VOB':
-                    release_data_from_mediainfo['category'] = 'DVD'
-                elif track.file_extension.upper() == 'M2TS':  # Not used yet as we cannot handle Bluray / UDF
-                    release_data_from_mediainfo['category'] = 'Bluray'
-
+            mediainfo_general = track.__dict__
         if track.track_type == 'Video':
-            release_data_from_mediainfo['codec'] = validate_codec(track.format)
-
-            standard_resolutions = {
-                "3840": "1920",
-                "1920": "1080",
-                "1280": "720",
-                "720": "480",
-            }
-            for width, height in standard_resolutions.items():
-                if str(track.width) == width and str(track.height) == height:
-                    release_data_from_mediainfo['ressel'] = height
-
-            if 'ressel' in release_data_from_mediainfo:  # Known resolution type, try to determine if interlaced
-                if track.scan_type in ('Interlaced', 'MBAFF'):
-                    release_data_from_mediainfo['ressel'] += "i"
-                else:
-                    release_data_from_mediainfo['ressel'] += "p"  # Sometimes a Progressive encode has no field set
-            else:  # Custom resolution
-                release_data_from_mediainfo['ressel'] = 'Other'
-                release_data_from_mediainfo['resolution'] = str(track.width) + "x" + str(track.height)
-
+            mediainfo_video = track.__dict__
         if track.track_type in ('Audio', 'Audio #1'):  # Handle multiple audio streams, we just get data from the first for now
-            if track.format in ["AAC", "DTS", "PCM", "AC3", "Vorbis", "Opus"]:
-                release_data_from_mediainfo['audioformat'] = track.format
-            elif track.format == "AC-3":
-                release_data_from_mediainfo['audioformat'] = "AC3"
-            elif track.format == "MPEG Audio" and track.format_profile == "Layer 3":
-                release_data_from_mediainfo['audioformat'] = "MP3"
-            elif track.format == "MPEG Audio" and track.format_profile == "Layer 2":
-                release_data_from_mediainfo['audioformat'] = "MP2"
+            mediainfo_audio = track.__dict__
+
+    if mediainfo_general is None:
+        raise RuntimeError('Bad mediainfo presented to get_mediainfo_duration. Missing "General" track type')
+    if mediainfo_video is None:
+        raise RuntimeError('Bad mediainfo presented to get_mediainfo_duration. Missing "Video" track type')
+    if mediainfo_audio is None:
+        raise RuntimeError('Bad mediainfo presented to get_mediainfo_duration. Missing "Audio" track type')
+
+    video_fields_from_mediainfo = get_video_fields_from_mediainfo(general=mediainfo_general, video=mediainfo_video, audio=mediainfo_audio)
+    release_data_from_mediainfo.update(video_fields_from_mediainfo)
 
     logger.debug(f'Mediainfo interpreted data: {release_data_from_mediainfo}')
-
     return mediainfo_whole_str, release_data_from_mediainfo
+
+
+def get_video_fields_from_mediainfo(general: Dict, video: Dict, audio: Dict) -> Dict:
+    """
+    Determine the SM video fields from mediainfo track data
+
+    :param general: Dict from get_mediainfo() of the 'General' mediainfo track
+    :param video: Dict from get_mediainfo() of the 'Video' mediainfo track
+    :param audio: Dict from get_mediainfo() of the 'Audio' mediainfo track
+    :return video_fields_from_mediainfo: Dict with validated SM video fields from mediainfo
+    """
+    video_fields_from_mediainfo = {}
+
+    # General track
+    file_extension = general['file_extension'].upper()
+    video_fields_from_mediainfo['container'] = validate_container(general['file_extension'].upper())
+    if file_extension == 'VOB':
+        video_fields_from_mediainfo['category'] = 'DVD'
+    elif file_extension == 'M2TS':  # Not used yet as we cannot handle Bluray / UDF
+        video_fields_from_mediainfo['category'] = 'Bluray'
+
+    # Video track
+    video_fields_from_mediainfo['codec'] = validate_codec(video['format'])
+
+    standard_resolutions = {
+        "3840": "1920",
+        "1920": "1080",
+        "1280": "720",
+        "720": "480",
+    }
+    for width, height in standard_resolutions.items():
+        if str(video['width']) == width and str(video['height']) == height:
+            video_fields_from_mediainfo['ressel'] = height
+
+    if 'ressel' in video_fields_from_mediainfo:  # Known resolution type, try to determine if interlaced
+        if video['scan_type'] in ('Interlaced', 'MBAFF'):
+            video_fields_from_mediainfo['ressel'] += "i"
+        else:
+            video_fields_from_mediainfo['ressel'] += "p"  # Sometimes a Progressive encode has no field set
+    else:  # Custom resolution
+        video_fields_from_mediainfo['ressel'] = 'Other'
+        video_fields_from_mediainfo['resolution'] = str(video['width']) + "x" + str(video['height'])
+
+    # Audio
+    if audio['format'] in ["AAC", "DTS", "PCM", "AC3", "Vorbis", "Opus"]:
+        video_fields_from_mediainfo['audioformat'] = audio['format']
+    elif audio['format'] == "AC-3":
+        video_fields_from_mediainfo['audioformat'] = "AC3"
+    elif audio['format'] == "MPEG Audio" and audio['format_profile'] == "Layer 3":
+        video_fields_from_mediainfo['audioformat'] = "MP3"
+    elif audio['format'] == "MPEG Audio" and audio['format_profile'] == "Layer 2":
+        video_fields_from_mediainfo['audioformat'] = "MP2"
+
+    return video_fields_from_mediainfo
 
 
 def get_mediainfo_duration(filename: Union[str, Path]) -> float:
