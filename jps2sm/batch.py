@@ -165,9 +165,9 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
     for jps_torrent_id, collate_torrent_info in batch_collate_torrent_info.items():
         try:
             sugoimusic_upload_data = prepare_torrent(jps_torrent_object=collate_torrent_info['jps_torrent_object'],
-                                                     collate_torrent_info=collate_torrent_info['torrentgroupdata'],
+                                                     torrent_group_data=collate_torrent_info['torrentgroupdata'],
                                                      mediainfo=args.parsed.mediainfo,
-                                                     **collate_torrent_info['release_data_collated'])
+                                                     release_data_collated=collate_torrent_info['release_data_collated'])
         except KeyboardInterrupt:  # Allow Ctrl-C to exit without showing the error multiple times and polluting the final error dict
             break  # Still continue to get error dicts and dupe list so far
         except Exception as exc:
@@ -178,13 +178,15 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
                 batch_upload_source_data_not_found.append(missing_file)
             elif str(exc).startswith('You do not appear to have entered any MediaInfo data for your video upload.'):
                 batch_upload_mediainfo_not_submitted += 1
+            else:
+                logger.exception(exc)
             continue
         if not args.parsed.dryrun and batch_collate_torrent_info:
             try:
                 upload_torrent(sugoimusic_upload_data, collate_torrent_info['jps_torrent_object'])
-            except:
+            except Exception as exc:
                 # Catch all for any upload_torrent() exception
-                logger.exception(f"SM upload error with JPS torrent id {jps_torrent_id} - {collate_torrent_info['torrentgroupdata'].title}")
+                logger.exception(f"SM upload error with JPS torrent id {jps_torrent_id} - {collate_torrent_info['torrentgroupdata'].title} - {exc}")
                 sm_upload_errors += 1
                 continue
             set_original_artists(collate_torrent_info['torrentgroupdata'].contribartists)

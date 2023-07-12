@@ -120,7 +120,7 @@ def non_batch_upload(jps_torrent_id=None, jps_urls=None, dry_run=None, mediainfo
         sugoimusic_upload_data = prepare_torrent(jps_torrent_object=data['jps_torrent_object'],
                                                  torrent_group_data=data['torrentgroupdata'],
                                                  mediainfo=mediainfo,
-                                                 **data['release_data_collated'])
+                                                 release_data_collated=data['release_data_collated'])
         if not dry_run:
             upload_torrent(sugoimusic_upload_data, data['jps_torrent_object'])
             download_sm_uploaded_torrents(torrent_count=1)

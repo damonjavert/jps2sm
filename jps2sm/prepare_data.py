@@ -212,7 +212,7 @@ def collate(torrentids, torrentgroupdata, max_size=None):
     return collate_torrent_info
 
 
-def prepare_torrent(jps_torrent_object, torrent_group_data, mediainfo: bool, **release_data_collated):
+def prepare_torrent(jps_torrent_object, torrent_group_data, mediainfo: bool, release_data_collated):
     """
     Prepare POST data for the SM upload, and performs additional validation
 

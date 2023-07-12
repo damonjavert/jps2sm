@@ -68,4 +68,4 @@ def test_prepare_torrent():
     assert prepare_torrent(jps_torrent_object=jps_torrent_object,
                            torrent_group_data=torrent_group_data,
                            mediainfo=False,
-                           **release_data_collated) == sugoimusic_upload_data
+                           release_data_collated=release_data_collated) == sugoimusic_upload_data
