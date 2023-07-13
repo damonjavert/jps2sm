@@ -32,6 +32,7 @@ jobs:
         mv tests/jps2sm.tests.cfg ./jps2sm.cfg
         pytest
   coverage:
+    needs: [ test ]
     name: coverage
     runs-on: ubuntu-latest
     steps:
