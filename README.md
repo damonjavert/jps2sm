@@ -28,7 +28,7 @@ cd jps2sm
 python setup.py install
 ```
 
-**jps2sm** requires python >=3.8
+**jps2sm** requires python >=3.10
 
 ## Quickstart
 * Install the latest release of python: https://www.python.org/downloads/
