@@ -128,6 +128,7 @@ def get_mediainfo(jps_torrent_object: BytesIO, media: str) -> Tuple[str, Dict[st
         file_for_sm_upload_video_fields = sorted(dir_files, key=filesize)[-1]  # Assume the largest file is the main file that should populate SM upload fields
 
     # Now we have decided which file will have its mediainfo parsed for SM fields, parse its mediainfo
+    logger.debug(f'file_for_sm_upload_video_fields is {file_for_sm_upload_video_fields}')
     mediainfo_release_data = MediaInfo.parse(file_for_sm_upload_video_fields)
     # Remove path to file in case it reveals usernames etc.
     replacement = str(Path(file_path).parent)
@@ -193,7 +194,7 @@ def get_video_fields_from_mediainfo(general: Dict, video: Dict, audio: Dict) -> 
             video_fields_from_mediainfo['ressel'] = height
 
     if 'ressel' in video_fields_from_mediainfo:  # Known resolution type, try to determine if interlaced
-        if video['scan_type'] in ('Interlaced', 'MBAFF'):
+        if determine_interfaced(video) == 'Interlaced':
             video_fields_from_mediainfo['ressel'] += "i"
         else:
             video_fields_from_mediainfo['ressel'] += "p"  # Sometimes a Progressive encode has no field set
@@ -212,6 +213,22 @@ def get_video_fields_from_mediainfo(general: Dict, video: Dict, audio: Dict) -> 
         video_fields_from_mediainfo['audioformat'] = "MP2"
 
     return video_fields_from_mediainfo
+
+
+def determine_interfaced(video_track_mediainfo):
+    """
+    Return if a video is inerlaced or not based on its mediainfo
+
+    :param video_track_mediainfo: Dict from get_mediainfo() of the 'Video' mediainfo track
+    """
+    if 'scan_type' not in video_track_mediainfo:
+        # According to some online sources getting the scan_type from HEVC does always work and/or it is
+        # not officially supported. For HEVC is is likely progressive though.
+        return 'Progressive'
+    elif video_track_mediainfo['scan_type'] in ('Interlaced', 'MBAFF'):
+        return 'Interlaced'
+    else:
+        return 'Progressive'
 
 
 def get_mediainfo_duration(filename: Union[str, Path]) -> float:
