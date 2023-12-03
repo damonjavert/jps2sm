@@ -99,6 +99,7 @@ class GetArgs:
         batch_mode_args.add_argument("-exc", "--exccategory", help="Exclude a JPS category from upload", type=str, choices=Categories.JPS)
         batch_mode_args.add_argument("-exf", "--excaudioformat", help="Exclude an audioformat from upload", type=str)
         batch_mode_args.add_argument("-exm", "--excmedia", help="Exclude a media from upload", type=str)
+        batch_mode_args.add_argument("-fl", "--freeleech-only", help="Include only freeleech torrents", action="store_true")
 
         parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + __version__)
         parser.add_argument('-d', '--debug', help='Enable debug mode', action='store_true')

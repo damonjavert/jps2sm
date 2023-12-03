@@ -64,7 +64,7 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
                             f'\nNew uploads successfully created: {sm_torrents_uploaded_count}'
                             )
 
-    batch_uploads = get_batch_jps_group_torrent_ids(mode=mode, user=user, first=start, last=end, sort=sort, order=order)
+    batch_uploads = get_batch_jps_group_torrent_ids(mode=mode, user=user, first=start, last=end, sort=sort, order=order, freeleech=args.parsed.freeleech_only)
 
     """ For debugging
     batch_uploads = {'362613': ['535927'],
@@ -228,7 +228,7 @@ def batch_mode(mode, user, start=1, end=None, sort=None, order=None):
     batch_stats(final_stats=True, media_info_mode=args.parsed.mediainfo, dry_run=args.parsed.dryrun)
 
 
-def get_batch_jps_group_torrent_ids(mode, user, first=1, last=None, sort=None, order=None):
+def get_batch_jps_group_torrent_ids(mode, user, first=1, last=None, sort=None, order=None, freeleech=None):
     """
     Iterates through pages of uploads on JPS and gathers the jps_group_ids and corresponding jps_torrent_id and returns
     a dict in the format of jps_group_id: [jps_torrent_id]
@@ -243,10 +243,14 @@ def get_batch_jps_group_torrent_ids(mode, user, first=1, last=None, sort=None, o
     :param last: upload page to finish at
     :param sort: Sort the JPS torrents page by a specific column, one of: {",".join(JPSTorrentView.sort_by.keys())}
     :param order: Order by ASC or DESC
+    :param freeleech: Search for freeleech torrents only - only for recent mode as JPS does not support it
     :return: batch_uploads: dict
     """
     # pylint: disable=too-many-arguments
     # This is the minimum paras needed to parse the JPS data
+
+    if mode != "recent" and freeleech:
+        raise RuntimeError("Error: Unsupported search type - JPS does not support filtering by freeleech for user-based searching.")
 
     def get_sort_mode(user_sort):
         # By default:
@@ -302,16 +306,20 @@ def get_batch_jps_group_torrent_ids(mode, user, first=1, last=None, sort=None, o
     logger.debug(f'Batch user is {user}, batch mode is {mode}, '
                  f'sort is {sort}, JPS sort column is {sort_mode} - {jps_sort_name}, '
                  f'order by is {order_way} '
-                 f'first page is {first}, last page is {last}')
+                 f'first page is {first}, last page is {last}, freeleech-only is {freeleech}')
 
     batch_uploads = collections.defaultdict(list)
+
+    search_freeleech_uri = ""
+    if freeleech:
+        search_freeleech_uri = "&action=advanced&freeleech=1"  # If JPS does not see action=advanced it ignores freeleech=1
 
     # Parse every torrent page and add to dict
     for i in range(first, int(last) + 1):
         if mode in ('snatched', 'uploaded', 'seeding'):
             batch_upload_url = f"https://jpopsuki.eu/torrents.php?page={i}&order_by={sort_mode}&order_way={order_way}&type={mode}&userid={user}&disablegrouping=1"
         elif mode == 'recent':
-            batch_upload_url = f"https://jpopsuki.eu/torrents.php?page={i}&order_by={sort_mode}&order_way={order_way}&disablegrouping=1"
+            batch_upload_url = f"https://jpopsuki.eu/torrents.php?page={i}&order_by={sort_mode}&order_way={order_way}&disablegrouping=1{search_freeleech_uri}"
         else:
             raise RuntimeError("Unknown batch mode set")
 
