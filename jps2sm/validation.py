@@ -224,7 +224,7 @@ def decide_ep(jps_torrent_object, uploaddata):
         if list(filter(file_path.endswith, music_extensions)) and \
                 not any(substring in file_path for substring in off_vocal_phrases):
             #  Count music files which are not an off-vocal or instrumental
-            logger.debug(f"Deciding if EP with torrent with these tracks: {file['path'][-1]}")
+            logger.trace(f"Deciding if EP with torrent with these tracks: {file['path'][-1]}")
             track_count += 1
             track_extensions.add(file_path.split('.')[-1])
 

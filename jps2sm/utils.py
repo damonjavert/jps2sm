@@ -269,18 +269,17 @@ def decide_duplicate(jps_torrent_object):
     # tempfile is supposed to delete it but with me at least it does not
     os.remove(temp_torrent_file)
 
-    logger.debug(hashed_info)
+    logger.trace(hashed_info)
 
     hashcheckjson = sugoimusic('https://sugoimusic.me/ajax.php?action=torrent&hash=' + hashed_info)
 
     if hashcheckjson.text == '{"status":"failure","error":"bad hash parameter"}':
-        logger.debug('Duplicate not detected via torrent hash')
+        logger.trace('Duplicate not detected via torrent hash')
         return None
     if str(hashcheckjson.text).startswith('{"status":"success"'):
-        logger.debug('Duplicate detected via torrent hash')
         dupe_jps_torrent_json = json.loads(hashcheckjson.text)
         dupe_jps_torrent_id = dupe_jps_torrent_json['response']['torrent']['id']
-        logger.debug(f'Dupe torrent: {dupe_jps_torrent_id}')
+        logger.debug(f'Duplicate detected via torrent hash - duplicate torrent: {dupe_jps_torrent_id}')
         return dupe_jps_torrent_id
 
     # If we reach here something has gone wrong with the hash check

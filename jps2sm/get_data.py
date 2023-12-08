@@ -254,7 +254,7 @@ class GetGroupData:
         # Does *not* require PU at JPS to show the edit page dialogue, just trying to submit it generates a 403.
         self.groupdescription = get_group_description_bbcode(jps_group_id)
 
-        logger.info(f"Group description:\n{self.groupdescription}")
+        logger.trace(f"Group description:\n{self.groupdescription}")
 
         image = str(soup.select('#content .thin .sidebar .box p a'))
         try:
@@ -339,7 +339,7 @@ def get_release_data(jps_torrent_ids: List[str], torrent_table: str, date: str) 
     # print(torrent_table)
     freeleech_text = '<strong>Freeleech!</strong>'
     release_data_raw = re.findall(r"swapTorrent\('([0-9]+)'\);\">» (.+?(?=</a>))</a>(?:\s*)</td>(?:\s*)<td class=\"nobr\">(\d*(?:\.)?(?:\d{0,2})?) (\w{2})</td>(?:\s*)<td>([0-9,]{1,6})</td>(?:\s*)<td>([0-9,]{1,6})</td>(?:\s*)<td>([0-9,]{1,6})</td>.*?<blockquote>(?:\s*)Uploaded by <a href=\"user.php\?id=(?:[0-9]+)\">(?:[\S]+)</a>  on <span title=\"(?:[^\"]+)\">([^<]+)</span>", torrent_table, re.DOTALL)
-    # logger.debug(f'Pre-processed release_data: {json.dumps(release_data_raw, indent=2)}')
+    logger.trace(f'Pre-processed release_data: {json.dumps(release_data_raw, indent=2)}')
 
     release_data = {}
 
@@ -379,7 +379,7 @@ def get_release_data(jps_torrent_ids: List[str], torrent_table: str, date: str) 
     for jps_torrent_id in remove_torrents:
         del release_data[jps_torrent_id]
 
-    logger.info(f'Selected for upload: {release_data}')
+    logger.trace(f'Selected for upload: {release_data}')
     return release_data
 
 
