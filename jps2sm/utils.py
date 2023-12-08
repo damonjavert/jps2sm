@@ -108,6 +108,7 @@ class GetArgs:
         parser.add_argument("-m", "--mediainfo",
                             help="Search and get mediainfo data from the source file(s) in the directories specified by MediaDirectories. Extract data to set codec, resolution, audio format and container fields as well as the mediainfo field itself.",
                             action="store_true")
+        parser.add_argument("-c", "--cfg-file", help="Use a custom config file location", type=str)
 
         GetArgs.parsed = parser.parse_args()
 
@@ -122,6 +123,38 @@ class GetArgs:
         return GetArgs.item
 
 
+def locate_cfg_file() -> Path:
+    """
+    Locate jps2sm.cfg file is not provided by --cfg-file parameter
+
+    return: config_file: Path
+    """
+
+    cfg_file_name = 'jps2sm.cfg'
+    script_dir = Path(__file__).parent.parent
+
+    config_file_locations = [Path(script_dir, cfg_file_name),
+                             Path(Path.home(), '.config', 'jps2sm', cfg_file_name),
+                             Path(Path.home(), '.local', 'etc', cfg_file_name),
+                             Path(Path.home(), cfg_file_name),
+                             ]
+
+    config_file = None
+    for config_file_location in config_file_locations:
+        try:
+            open(config_file_location, "r", encoding="utf-8")
+        except FileNotFoundError:
+            continue
+        config_file = config_file_location
+        break
+    if config_file is None:
+        config_file_locations_str = list(map(str, config_file_locations))
+        fatal_error(f'Error: configuration file not found. jps2sm searches for the config file following locations: {config_file_locations_str}'
+                    f'\nSee: https://github.com/damonjavert/jps2sm/blob/master/jps2sm.cfg.example for example configuration.')
+
+    return config_file
+
+
 class GetConfig:
     """
     Handle jps2sm.cfg
@@ -129,33 +162,20 @@ class GetConfig:
     __config_parsed = None
 
     def __init__(self):
+        args = GetArgs()
+
         if GetConfig.__config_parsed is not None:
             return
 
-        GetConfig.__config_parsed = True
-        cfg_file_name = 'jps2sm.cfg'
-        script_dir = Path(__file__).parent.parent
+        if args.parsed.cfg_file:
+            config_file = Path(args.parsed.cfg_file)
+        else:
+            config_file = locate_cfg_file()
 
-        config_file_locations = [Path(script_dir, cfg_file_name),
-                                 Path(Path.home(), '.config', 'jps2sm', cfg_file_name),
-                                 Path(Path.home(), '.local', 'etc', cfg_file_name),
-                                 Path(Path.home(), cfg_file_name),
-                                 ]
-
-        config_file = None
-        for config_file_location in config_file_locations:
-            try:
-                open(config_file_location, "r", encoding="utf-8")
-            except FileNotFoundError:
-                continue
-            config_file = config_file_location
-            break
-        if config_file is None:
-            config_file_locations_str = list(map(str, config_file_locations))
-            fatal_error(f'Error: configuration file not found. jps2sm searches for the config file following locations: {config_file_locations_str}'
-                        f'\nSee: https://github.com/damonjavert/jps2sm/blob/master/jps2sm.cfg.example for example configuration.')
-
-        open(config_file, "r", encoding="utf-8")
+        try:
+            open(config_file, "r", encoding="utf-8")
+        except FileNotFoundError:
+            fatal_error(f'Error: Config file {config_file} not found.')
         jps = 'JPopSuki'
         sugoi = 'SugoiMusic'
         config = configparser.ConfigParser()
@@ -170,6 +190,10 @@ class GetConfig:
         GetConfig.jps_min_seeders = config.getint(jps, 'MinSeeders', fallback=1)
         GetConfig.max_size_recent_mode = config.get(jps, 'MaxSizeRecentMode', fallback=None)
         GetConfig.wait_time_recent_mode = config.get(jps, 'WaitTimeRecentModeMins', fallback=20)
+
+        logger.debug(f"Config file used: {config_file}")
+
+        GetConfig.__config_parsed = True
 
     def __getattr__(self, item):
         return GetConfig.item
