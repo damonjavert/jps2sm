@@ -19,7 +19,7 @@ from datasize import DataSize
 from loguru import logger
 
 # jps2sm modules
-from jps2sm.constants import VideoOptions, Categories
+from jps2sm.constants import VideoOptions, Categories, DateRegexes
 from jps2sm.get_data import get_release_data
 from jps2sm.mediainfo import get_mediainfo
 from jps2sm.save_data import get_jps_torrent, download_jps_torrent, download_sm_torrent
@@ -143,12 +143,17 @@ def collate(torrentids, torrentgroupdata, max_size=None):
             raise RuntimeError('Could not handle release data')
 
         if remaster_data:
+            remaster_year = None
             try:
-                remaster_text = re.findall('(.*) - (.*)$', remaster_data)[0]
+                remaster_text = re.findall('(.*) - (.*)$', remaster_data)[0]  # "remaster_title - remaster_year" format
                 release_data_collated['remastertitle'] = remaster_text[0]
                 remaster_year = remaster_text[1]
-            except IndexError:  # Torrent is remastered and only has year set
-                remaster_year = remaster_data  # The whole string is just the year
+            except IndexError:  # Torrent is remastered and only has year or title set
+                try:
+                    remaster_year = re.findall(DateRegexes.yyyy_mm_dd_or_yyyy, remaster_data)[0]
+                except IndexError:
+                    # The whole string is just the title
+                    release_data_collated['remastertitle'] = remaster_data
 
             # Year is mandatory on JPS so most remastered releases have current year set as year. This looks ugly on SM (and JPS) so if the
             # year is the groupdata['year'] we will not set it.
