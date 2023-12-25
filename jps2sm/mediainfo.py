@@ -57,7 +57,7 @@ def validate_codec(codec: str) -> str:
 
     validated_codec = codec  # Default is to not validate it if it is not known in the incorrect list above - let SM catch it.
     for old, new in codecs.items():
-        if codec == old:
+        if codec.upper() == old.upper():
             validated_codec = new
 
     return validated_codec
