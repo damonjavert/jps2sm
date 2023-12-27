@@ -11,7 +11,7 @@ soupsieve==1.9.4
 sqlparse==0.3.0
 urllib3==1.25.6
 webencodings==0.5.1
-pymediainfo==4.1
+pymediainfo==6.1.0
 torrent-parser==0.3.0
 humanfriendly==4.18
 pyunpack==0.2.2

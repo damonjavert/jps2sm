@@ -90,14 +90,14 @@ def get_mediainfo(jps_torrent_object: BytesIO, media: str) -> Tuple[str, Dict[st
     file_path = get_media_location(torrent_name, torrent_has_directory, config.media_roots)
     if not torrent_has_directory:
         release_data_from_mediainfo['multiplefiles'] = False
-        mediainfo_whole_str += str(MediaInfo.parse(file_path, text=True))
+        mediainfo_whole_str += str(MediaInfo.parse(file_path, output=""))
         release_data_from_mediainfo['duration'] += get_mediainfo_duration(file_path)
         file_for_sm_upload_video_fields = file_path
     else:
         release_data_from_mediainfo['multiplefiles'] = True
         for file in torrent_metadata['info']['files']:
             file_name = os.path.join(*[file_path, *file['path']])  # Each file in the directory of source data for the torrent
-            mediainfo_whole_str += str(MediaInfo.parse(file_name, text=True))
+            mediainfo_whole_str += str(MediaInfo.parse(file_name, output=""))
             release_data_from_mediainfo['duration'] += get_mediainfo_duration(file_name)  # TODO should this reference file_path directly?
         # Get biggest file and mediainfo on this to set the fields for the release
         max_file = max(torrent_metadata['info']['files'], key=lambda x: x['length'])  # returns {'length': int, 'path': [str]} of largest file
