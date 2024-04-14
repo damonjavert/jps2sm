@@ -48,6 +48,7 @@ def validate_codec(codec: str) -> str:
     """
     codecs = {
         "MPEG Video": "MPEG-2",
+        "MPEG-2 Video": "MPEG-2",
         "AVC": "h264",
         "HEVC": "h265",
         "MPEG-4 Visual": "DivX",  # MPEG-4 Part 2 / h263 , usually xvid / divx
@@ -181,7 +182,7 @@ def get_video_fields_from_mediainfo(general: Dict, video: Dict, audio: Dict) -> 
         video_fields_from_mediainfo['category'] = 'Bluray'
 
     # Video track
-    video_fields_from_mediainfo['codec'] = validate_codec(video['format'])
+    video_fields_from_mediainfo['codec'] = validate_codec(video['commercial_name'])
 
     standard_resolutions = {
         "3840": "1920",
